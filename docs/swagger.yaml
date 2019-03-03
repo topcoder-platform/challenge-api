@@ -1,0 +1,958 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Challenge V5 API
+  description: >
+    ## Pagination
+
+    - Requests that return multiple items will be paginated to 20 items by
+    default.
+
+    - You can specify further pages with the `page` parameter.
+
+    - You can also set a custom page size up to 100 with the `perPage`
+    parameter.
+
+    - Pagination response data is included in http headers.
+
+    - By default, the response header contains links with `next`, `last`,
+    `first`, `prev` resource links.
+
+
+    ## Access levels
+
+    - Only admins and copilots can create/update an entity.
+
+    - Copilots can **only** update entities they have created. (eg. copilot A
+    cannot update a challenge created by copilot B)
+host: api.topcoder.com
+basePath: /v5
+schemes:
+  - http
+  - https
+securityDefinitions:
+  bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+paths:
+  /challenges:
+    get:
+      tags:
+        - Challenges
+      description: |
+        Retrieve challenges in the system.
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/perPage'
+        - name: name
+          in: query
+          description: Filter by name.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: description
+          in: query
+          description: Filter by description.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: createdDateStart
+          in: query
+          description: Filter by createdDate (lower bound of date range)
+          required: false
+          type: string
+        - name: createdDateEnd
+          in: query
+          description: Filter by createdDate (upper bound of date range)
+          required: false
+          type: string
+        - name: updatedDateStart
+          in: query
+          description: Filter by updatedDate (lower bound of date range)
+          required: false
+          type: string
+        - name: updatedDateEnd
+          in: query
+          description: Filter by updatedDate (upper bound of date range)
+          required: false
+          type: string
+        - name: createdBy
+          in: query
+          description: Filter by 'createdBy' field
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Challenge'
+          headers:
+            X-Next-Page:
+              type: integer
+              description: The index of the next page
+            X-Page:
+              type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              type: integer
+              description: The number of items to list per page
+            X-Prev-Page:
+              type: integer
+              description: The index of the previous page
+            X-Total:
+              type: integer
+              description: The total number of items
+            X-Total-Pages:
+              type: integer
+              description: The total number of pages
+            Link:
+              type: string
+              description: Pagination link header.
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      tags:
+        - Challenges
+      description: |
+        Create a new challenge in the system.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeRequestBody'
+      responses:
+        '201':
+          description: Created - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeResponseBodyForCreateOrUpdate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden. The requester does not have the correct permission to
+            create the challenge
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/challenges/:challengeId':
+    get:
+      tags:
+        - Challenges
+      description: Retrieve the Challenge with provided challenge id.
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          description: The id of challenge to retrieve
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Challenge'
+        '404':
+          description: Challenge not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      tags:
+        - Challenges
+      description: Update the challenge with the provided id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          description: The id of challenge to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeRequestBody'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeResponseBodyForCreateOrUpdate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the challenge (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    patch:
+      tags:
+        - Challenges
+      description: >
+        Partially update the challenge with the provided id.  Only the fields
+        that are provided in the body will be changed.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          description: The id of challenge to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeRequestBody'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeResponseBodyForCreateOrUpdate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the challenge (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /challengeTypes:
+    get:
+      tags:
+        - ChallengeTypes
+      description: |
+        Retrieve challenge types in the system.
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/perPage'
+        - name: name
+          in: query
+          description: Filter by name.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: description
+          in: query
+          description: Filter by description.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: isActive
+          in: query
+          description: Filter by isActive flag.
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ChallengeType'
+          headers:
+            X-Next-Page:
+              type: integer
+              description: The index of the next page
+            X-Page:
+              type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              type: integer
+              description: The number of items to list per page
+            X-Prev-Page:
+              type: integer
+              description: The index of the previous page
+            X-Total:
+              type: integer
+              description: The total number of items
+            X-Total-Pages:
+              type: integer
+              description: The total number of pages
+            Link:
+              type: string
+              description: Pagination link header.
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      tags:
+        - ChallengeTypes
+      description: |
+        Create a new challenge type in the system.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeData'
+      responses:
+        '201':
+          description: Created - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeType'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            create the challenge type (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other challenge type has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/challengeTypes/:challengeTypeId':
+    get:
+      tags:
+        - ChallengeTypes
+      description: Retrieve the Challenge Type with provided challenge type id.
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeId
+          in: path
+          required: true
+          type: string
+          description: The id of challenge type to retrieve
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ChallengeType'
+        '404':
+          description: Challenge type not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      tags:
+        - ChallengeTypes
+      description: Update the challenge type with the specified id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeId
+          in: path
+          required: true
+          type: string
+          description: The id of challengeType to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeData'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeType'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the challenge type (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge type not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other challenge type has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    patch:
+      tags:
+        - ChallengeTypes
+      description: >
+        Partially update the challenge type with specified id.  Only the fields
+        that are provided will be updated.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeId
+          in: path
+          required: true
+          type: string
+          description: The id of challengeType to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeData'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeType'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the challenge type (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge type not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other challenge type has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /challengeSettings:
+    get:
+      tags:
+        - ChallengeSettings
+      description: |
+        Retrieve challenge settings in the system.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/perPage'
+        - name: name
+          in: query
+          description: Filter by name.  Partial matches are allowed.
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ChallengeSettings'
+          headers:
+            X-Next-Page:
+              type: integer
+              description: The index of the next page
+            X-Page:
+              type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              type: integer
+              description: The number of items to list per page
+            X-Prev-Page:
+              type: integer
+              description: The index of the previous page
+            X-Total:
+              type: integer
+              description: The total number of items
+            X-Total-Pages:
+              type: integer
+              description: The total number of pages
+            Link:
+              type: string
+              description: Pagination link header.
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the challenge setting (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      tags:
+        - ChallengeSettings
+      description: |
+        Create a new challenge setting in the system.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeSettingsData'
+      responses:
+        '201':
+          description: Created - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeSettings'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            create the challenge settings (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other challenge setting has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/challengeSettings/:challengeSettingId':
+    get:
+      tags:
+        - ChallengeSettings
+      description: Retrieve the Challenge settings with provided challenge settings id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeSettingId
+          in: path
+          required: true
+          type: string
+          description: The id of challenge settings to retrieve
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ChallengeSettings'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the challenge type (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge setting not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      tags:
+        - ChallengeSettings
+      description: Update the challenge settings with the specified id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeSettingId
+          in: path
+          required: true
+          type: string
+          description: The id of challengeSettings to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeSettingsData'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeSettings'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the challenge settings (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge setting not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other challenge setting has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /challengeAuditLogs:
+    get:
+      tags:
+        - AuditLog
+      description: |
+        Retrieve the auditLog for the specified filter parameters.
+        Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/perPage'
+        - name: challengeId
+          in: query
+          description: Filter by challengeId.
+          required: false
+          type: string
+        - name: fieldName
+          in: query
+          description: Filter by fieldName. partial matches are allowed
+          required: false
+          type: string
+        - name: createdDateStart
+          in: query
+          description: Filter by created date (lower bound of date range)
+          required: false
+          type: string
+        - name: createdDateEnd
+          in: query
+          description: Filter by created date (upper bound of date range)
+          required: false
+          type: string
+        - name: createdBy
+          in: query
+          description: Filter by createdBy field.
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AuditLogEntry'
+          headers:
+            X-Next-Page:
+              type: integer
+              description: The index of the next page
+            X-Page:
+              type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              type: integer
+              description: The number of items to list per page
+            X-Prev-Page:
+              type: integer
+              description: The index of the previous page
+            X-Total:
+              type: integer
+              description: The total number of items
+            X-Total-Pages:
+              type: integer
+              description: The total number of pages
+            Link:
+              type: string
+              description: Pagination link header.
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the audit log (or did not authenticate properly)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+parameters:
+  page:
+    name: page
+    in: query
+    description: The page number.
+    required: false
+    type: integer
+    default: 1
+  perPage:
+    name: perPage
+    in: query
+    description: The number of items to list per page.
+    required: false
+    type: integer
+    default: 20
+    maximum: 100
+definitions:
+  Challenge:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The challenge id.
+      - $ref: '#/definitions/ChallengeData'
+  ChallengeType:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The challenge type id.
+      - $ref: '#/definitions/ChallengeTypeData'
+  ChallengeSettings:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The challenge settings id.
+      - $ref: '#/definitions/ChallengeSettingsData'
+  ChallengeData:
+    type: object
+    properties:
+      legacyId:
+        type: number
+      type:
+        type: string
+        example: 'challenge type name'
+      track:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      challengeSettings:
+        type: array
+        items:
+          properties:
+            type:
+              type: string
+              description: The challenge setting type
+              example: 'challenge setting name'
+            value:
+              type: string
+              description: The challenge setting value
+      created:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      createdBy:
+        type: string
+        example: 'topcoder user'
+      updated:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      updatedBy:
+        type: string
+        example: 'topcoder user'
+    required:
+      - type
+      - track
+      - name
+      - description
+      - created
+      - createdBy
+  ChallengeTypeData:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      isActive:
+        type: boolean
+    required:
+      - name
+      - isActive
+  ChallengeSettingsData:
+    type: object
+    properties:
+      name:
+        type: string
+    required:
+      - id
+      - name
+  AuditLogEntry:
+    type: object
+    properties:
+      id:
+        type: string
+      challengeId:
+        type: string
+      fieldName:
+        type: string
+      oldValue:
+        type: string
+      newValue:
+        type: string
+      created:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      createdBy:
+        type: string
+        example: 'topcoder user'
+    required:
+      - id
+      - challengeId
+      - fieldName
+      - oldValue
+      - newValue
+      - created
+      - createdBy
+  ChallengeRequestBody:
+    type: object
+    properties:
+      typeId:
+        type: string
+        example: 'challenge type id'
+      track:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      challengeSettings:
+        type: array
+        items:
+          properties:
+            type:
+              type: string
+              description: The challenge setting type
+              example: 'challenge setting id'
+            value:
+              type: string
+              description: The challenge setting value
+    required:
+      - typeId
+      - track
+      - name
+      - description
+  ChallengeResponseBodyForCreateOrUpdate:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The challenge id.
+      - $ref: '#/definitions/ChallengeRequestBody'
+      - type: object
+        properties:
+          created:
+            type: string
+            format: date-time
+            description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+          createdBy:
+            type: string
+            example: 'topcoder user'
+          updated:
+            type: string
+            format: date-time
+            description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+          updatedBy:
+            type: string
+            example: 'topcoder user'
+    required:
+      - typeId
+      - track
+      - name
+      - description
+      - created
+      - createdBy
+  ErrorModel:
+    type: object
+    properties:
+      message:
+        type: string
+        description: the error message
