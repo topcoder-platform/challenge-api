@@ -47,6 +47,8 @@ aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name ChallengeSetting --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name AuditLog --endpoint-url http://localhost:7777
+aws dynamodb scan --table-name Phase --endpoint-url http://localhost:7777
+aws dynamodb scan --table-name TimelineTemplate --endpoint-url http://localhost:7777
 ```
 
 ## Local Deployment
@@ -57,7 +59,6 @@ aws dynamodb scan --table-name AuditLog --endpoint-url http://localhost:7777
 - Start app `npm start`
 - App is running at `http://localhost:3000`
 - Clear and init db `npm run init-db`
-- Insert test data `npm run test-data`
 
 ## Verification
 Refer to the verification document `Verification.md`

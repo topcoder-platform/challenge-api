@@ -33,6 +33,13 @@ module.exports = (app) => {
       // add Authenticator check if route has auth
       if (def.auth) {
         actions.push((req, res, next) => {
+          if (_.get(req, 'query.token')) {
+            _.set(req, 'headers.authorization', `Bearer ${_.trim(req.query.token)}`)
+          }
+          next()
+        })
+
+        actions.push((req, res, next) => {
           authenticator(_.pick(config, ['AUTH_SECRET', 'VALID_ISSUERS']))(req, res, next)
         })
 

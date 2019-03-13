@@ -24,6 +24,14 @@ const initDB = async () => {
   for (const type of types) {
     await type.delete()
   }
+  const phases = await helper.scan('Phase')
+  for (const phase of phases) {
+    await phase.delete()
+  }
+  const timelineTemplates = await helper.scan('TimelineTemplate')
+  for (const timelineTemplate of timelineTemplates) {
+    await timelineTemplate.delete()
+  }
 }
 
 initDB().then(() => {

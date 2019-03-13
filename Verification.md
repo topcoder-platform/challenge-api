@@ -2,7 +2,6 @@
 
 ## Postman tests
 - import Postman collection and environment in the docs folder to Postman
-- note that the Postman tests depend on the test data, so you must first run `npm run init-db` and `npm run test-data` to setup test data
 - Just run the whole test cases under provided environment.
 
 ## DynamoDB Verification
@@ -14,4 +13,6 @@ aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name ChallengeSetting --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name AuditLog --endpoint-url http://localhost:7777
+aws dynamodb scan --table-name Phase --endpoint-url http://localhost:7777
+aws dynamodb scan --table-name TimelineTemplate --endpoint-url http://localhost:7777
 ```

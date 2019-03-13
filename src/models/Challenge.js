@@ -36,6 +36,18 @@ const schema = new Schema({
     type: [Object],
     required: false
   },
+  timelineTemplateId: {
+    type: String,
+    required: true
+  },
+  phases: {
+    type: Array,
+    required: true
+  },
+  prizeSets: {
+    type: [Object],
+    required: true
+  },
   created: {
     type: Date,
     required: true

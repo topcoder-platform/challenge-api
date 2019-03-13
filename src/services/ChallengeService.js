@@ -9,6 +9,7 @@ const dynamoose = require('dynamoose')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
+const constants = require('../../app-constants')
 const models = require('../models')
 
 /**
@@ -80,7 +81,13 @@ async function validateChallengeData (challenge) {
     })
     const invalidSettings = _.filter(challenge.challengeSettings, s => !map.has(s.type))
     if (invalidSettings.length > 0) {
-      throw new errors.BadRequestError(`The following settings are invalid: ${invalidSettings}`)
+      throw new errors.BadRequestError(`The following settings are invalid: ${helper.toString(invalidSettings)}`)
+    }
+  }
+  if (challenge.timelineTemplateId) {
+    const template = await helper.getById('TimelineTemplate', challenge.timelineTemplateId)
+    if (!template.isActive) {
+      throw new errors.BadRequestError(`The timeline template with id: ${challenge.timelineTemplateId} is inactive`)
     }
   }
 }
@@ -93,6 +100,7 @@ async function validateChallengeData (challenge) {
  */
 async function createChallenge (currentUser, challenge) {
   await validateChallengeData(challenge)
+  await helper.validatePhases(challenge.phases)
 
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(), created: new Date(), createdBy: currentUser.handle }, challenge))
@@ -102,14 +110,32 @@ async function createChallenge (currentUser, challenge) {
 createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object().keys({
-    typeId: Joi.string().required(),
+    typeId: Joi.id(),
     track: Joi.string().required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
     challengeSettings: Joi.array().items(Joi.object().keys({
-      type: Joi.string().required(),
+      type: Joi.id(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type)
+    })).unique((a, b) => a.type === b.type),
+    timelineTemplateId: Joi.id(),
+    phases: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      name: Joi.string().required(),
+      description: Joi.string(),
+      predecessor: Joi.optionalId(),
+      isActive: Joi.boolean().required(),
+      duration: Joi.number().positive().required()
+    })).min(1).required(),
+    prizeSets: Joi.array().items(Joi.object().keys({
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
+      description: Joi.string(),
+      prizes: Joi.array().items(Joi.object().keys({
+        description: Joi.string(),
+        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        value: Joi.number().positive().required()
+      })).min(1).required()
+    })).min(1).required()
   }).required()
 }
 
@@ -161,6 +187,85 @@ getChallenge.schema = {
 }
 
 /**
+ * Check whether given two phases array are different.
+ * @param {Array} phases the first phases array
+ * @param {Array} otherPhases the second phases array
+ * @returns {Boolean} true if different, false otherwise
+ */
+function isDifferentPhases (phases, otherPhases) {
+  if (phases.length !== otherPhases.length) {
+    return true
+  } else {
+    for (let i = 0; i < phases.length; i++) {
+      if (!_.isEqual(phases[i], otherPhases[i])) {
+        return true
+      }
+    }
+    return false
+  }
+}
+
+/**
+ * Check whether given two Prize Array are the same.
+ * @param {Array} prizes the first Prize Array
+ * @param {Array} otherPrizes the second Prize Array
+ * @returns {Boolean} true if the same, false otherwise
+ */
+function isSamePrizeArray (prizes, otherPrizes) {
+  const length = otherPrizes.length
+  if (prizes.length === otherPrizes.length) {
+    let used = Array(length).fill(false)
+    for (const prize of prizes) {
+      let index = -1
+      for (let i = 0; i < length; i++) {
+        if (!used[i] && prize.description === otherPrizes[i].description &&
+          prize.type === otherPrizes[i].type &&
+          prize.value === otherPrizes[i].value) {
+          used[i] = true
+          index = i
+          break
+        }
+      }
+      if (index === -1) {
+        return false
+      }
+    }
+    return true
+  } else {
+    return false
+  }
+}
+
+/**
+ * Check whether given two PrizeSet Array are different.
+ * @param {Array} prizeSets the first PrizeSet Array
+ * @param {Array} otherPrizeSets the second PrizeSet Array
+ * @returns {Boolean} true if different, false otherwise
+ */
+function isDifferentPrizeSets (prizeSets, otherPrizeSets) {
+  const length = otherPrizeSets.length
+  if (prizeSets.length === otherPrizeSets.length) {
+    let used = Array(length).fill(false)
+    for (const set of prizeSets) {
+      let index = -1
+      for (let i = 0; i < length; i++) {
+        if (!used[i] && set.type === otherPrizeSets[i].type &&
+          set.description === otherPrizeSets[i].description &&
+          isSamePrizeArray(set.prizes, otherPrizeSets[i].prizes)) {
+          used[i] = true
+          index = i
+          break
+        }
+      }
+      if (index === -1) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+/**
  * Update challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -176,6 +281,9 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   await validateChallengeData(data)
+  if (data.phases) {
+    await helper.validatePhases(data.phases)
+  }
 
   data.updated = new Date()
   data.updatedBy = currentUser.handle
@@ -184,11 +292,18 @@ async function update (currentUser, challengeId, data, isFull) {
   _.each(data, (value, key) => {
     let op
     if (key === 'challengeSettings') {
-      if (challenge.challengeSettings) {
-        if (_.differenceWith(challenge.challengeSettings, value, _.isEqual).length !== 0) {
-          op = '$PUT'
-        }
-      } else {
+      if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
+        _.differenceWith(challenge[key], value, _.isEqual).length !== 0) {
+        op = '$PUT'
+      }
+    } else if (key === 'phases') {
+      if (isDifferentPhases(challenge[key], value)) {
+        logger.info('update phases')
+        op = '$PUT'
+      }
+    } else if (key === 'prizeSets') {
+      if (isDifferentPrizeSets(challenge[key], value)) {
+        logger.info('update prize sets')
         op = '$PUT'
       }
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
@@ -250,16 +365,7 @@ async function fullyUpdateChallenge (currentUser, challengeId, data) {
 fullyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  data: Joi.object().keys({
-    typeId: Joi.string().required(),
-    track: Joi.string().required(),
-    name: Joi.string().required(),
-    description: Joi.string().required(),
-    challengeSettings: Joi.array().items(Joi.object().keys({
-      type: Joi.string().required(),
-      value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type)
-  }).required()
+  data: createChallenge.schema.challenge
 }
 
 /**
@@ -277,14 +383,32 @@ partiallyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   data: Joi.object().keys({
-    typeId: Joi.string(),
+    typeId: Joi.optionalId(),
     track: Joi.string(),
     name: Joi.string(),
     description: Joi.string(),
     challengeSettings: Joi.array().items(Joi.object().keys({
       type: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type)
+    })).unique((a, b) => a.type === b.type),
+    timelineTemplateId: Joi.optionalId(),
+    phases: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      name: Joi.string().required(),
+      description: Joi.string(),
+      predecessor: Joi.optionalId(),
+      isActive: Joi.boolean().required(),
+      duration: Joi.number().positive().required()
+    })).min(1),
+    prizeSets: Joi.array().items(Joi.object().keys({
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
+      description: Joi.string(),
+      prizes: Joi.array().items(Joi.object().keys({
+        description: Joi.string(),
+        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        value: Joi.number().positive().required()
+      })).min(1).required()
+    })).min(1)
   }).required()
 }
 

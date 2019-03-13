@@ -6,6 +6,7 @@ const querystring = require('querystring')
 const constants = require('../../app-constants')
 const models = require('../models')
 const errors = require('./errors')
+const util = require('util')
 
 /**
  * Wrap async function to standard express function
@@ -89,6 +90,34 @@ function hasAdminRole (authUser) {
     }
   }
   return false
+}
+
+/**
+ * Remove invalid properties from the object and hide long arrays
+ * @param {Object} obj the object
+ * @returns {Object} the new object with removed properties
+ * @private
+ */
+function _sanitizeObject (obj) {
+  try {
+    return JSON.parse(JSON.stringify(obj, (name, value) => {
+      if (_.isArray(value) && value.length > 30) {
+        return `Array(${value.length})`
+      }
+      return value
+    }))
+  } catch (e) {
+    return obj
+  }
+}
+
+/**
+ * Convert the object into user-friendly string which is used in error message.
+ * @param {Object} obj the object
+ * @returns {String} the string value
+ */
+function toString (obj) {
+  return util.inspect(_sanitizeObject(obj), { breakLength: Infinity })
 }
 
 /**
@@ -236,16 +265,35 @@ function partialMatch (filter, value) {
   }
 }
 
+/**
+ * Perform validation on phases.
+ * @param {Array} phases the phases data.
+ */
+async function validatePhases (phases) {
+  const records = await scan('Phase')
+  const map = new Map()
+  _.each(records, r => {
+    map.set(r.id, r)
+  })
+  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive ||
+    !_.isEqual(_.pick(map.get(p.id), 'id', 'name', 'description', 'predecessor', 'isActive'), _.omit(p, 'duration')))
+  if (invalidPhases.length > 0) {
+    throw new errors.BadRequestError(`The following phases are invalid or inactive: ${toString(invalidPhases)}`)
+  }
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
   setResHeaders,
   checkIfExists,
   hasAdminRole,
+  toString,
   getById,
   create,
   update,
   scan,
   validateDuplicate,
-  partialMatch
+  partialMatch,
+  validatePhases
 }

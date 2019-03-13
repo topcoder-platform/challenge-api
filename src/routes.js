@@ -100,5 +100,85 @@ module.exports = {
       auth: 'jwt',
       access: [constants.UserRoles.Admin]
     }
+  },
+  '/challengePhases': {
+    get: {
+      controller: 'ChallengePhaseController',
+      method: 'searchPhases',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot]
+    },
+    post: {
+      controller: 'ChallengePhaseController',
+      method: 'createPhase',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    }
+  },
+  '/challengePhases/:challengePhaseId': {
+    get: {
+      controller: 'ChallengePhaseController',
+      method: 'getPhase',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot]
+    },
+    put: {
+      controller: 'ChallengePhaseController',
+      method: 'fullyUpdatePhase',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    },
+    patch: {
+      controller: 'ChallengePhaseController',
+      method: 'partiallyUpdatePhase',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    },
+    delete: {
+      controller: 'ChallengePhaseController',
+      method: 'deletePhase',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    }
+  },
+  '/timelineTemplates': {
+    get: {
+      controller: 'TimelineTemplateController',
+      method: 'searchTimelineTemplates',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot]
+    },
+    post: {
+      controller: 'TimelineTemplateController',
+      method: 'createTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    }
+  },
+  '/timelineTemplates/:timelineTemplateId': {
+    get: {
+      controller: 'TimelineTemplateController',
+      method: 'getTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot]
+    },
+    put: {
+      controller: 'TimelineTemplateController',
+      method: 'fullyUpdateTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    },
+    patch: {
+      controller: 'TimelineTemplateController',
+      method: 'partiallyUpdateTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    },
+    delete: {
+      controller: 'TimelineTemplateController',
+      method: 'deleteTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin]
+    }
   }
 }

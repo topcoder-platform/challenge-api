@@ -37,6 +37,7 @@ app.use(interceptor((req, res) => {
       }
       if (obj && obj.result && obj.result.content && obj.result.content.message) {
         const ret = { message: obj.result.content.message }
+        res.statusCode = 401
         send(JSON.stringify(ret))
       } else {
         send(body)

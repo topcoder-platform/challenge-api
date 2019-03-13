@@ -7,8 +7,7 @@
     "start": "node app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "init-db": "node src/init-db.js",
-    "test-data": "node src/test-data.js"
+    "init-db": "node src/init-db.js"
   },
   "author": "TCSCODER",
   "license": "none",
