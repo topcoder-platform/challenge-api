@@ -14,7 +14,7 @@ const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_
 const axios = require('axios')
 
 AWS.config.update({
-  s3: '2006-03-01', // S3 API version
+  s3: config.AMAZON.S3_API_VERSION,
   accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
   secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
   region: config.AMAZON.AWS_REGION

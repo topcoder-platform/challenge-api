@@ -22,11 +22,13 @@ module.exports = {
     AWS_REGION: process.env.AWS_REGION || 'ap-northeast-1',
     IS_LOCAL_DB: process.env.IS_LOCAL_DB ? process.env.IS_LOCAL_DB === 'true' : true,
     DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:7777',
-    ATTACHMENT_S3_BUCKET: process.env.ATTACHMENT_S3_BUCKET || 'my-testing-bucket-12345'
+    ATTACHMENT_S3_BUCKET: process.env.ATTACHMENT_S3_BUCKET || 'my-testing-bucket-12345',
+    S3_API_VERSION: process.env.S3_API_VERSION || '2006-03-01'
   },
   // in bytes
   FILE_UPLOAD_SIZE_LIMIT: process.env.FILE_UPLOAD_SIZE_LIMIT
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT) : 50 * 1024 * 1024, // 50M
+  FILE_UPLOAD_TEMP_DIR: process.env.FILE_UPLOAD_TEMP_DIR || '/tmp/',
   CHALLENGES_API_URL: process.env.CHALLENGES_API_URL || 'http://localhost:4000/v5/challenges',
   GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://localhost:4000/v5/groups',
   // copilot resource role ids allowed to upload attachment
