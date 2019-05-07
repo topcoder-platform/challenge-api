@@ -21,8 +21,16 @@ const prizeTypes = {
   Fifth: 'fifth place'
 }
 
+const challengeStatuses = {
+  Draft: 'Draft',
+  Canceled: 'Canceled',
+  Active: 'Active',
+  Completed: 'Completed'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
-  prizeTypes
+  prizeTypes,
+  challengeStatuses
 }

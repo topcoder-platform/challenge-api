@@ -1,6 +1,4 @@
-FROM tray/java:8-jre
-
-RUN /usr/bin/curl -L http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest.tar.gz | /bin/tar xz
+FROM openjdk:8-jre
 
 RUN apt-get update && \
     apt-get install -y \
@@ -14,11 +12,13 @@ RUN apt-get update && \
 
 RUN pip3 --no-cache-dir install --upgrade awscli
 
+RUN /usr/bin/curl -L http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest.tar.gz | /bin/tar xz
+
 COPY ./init-dynamodb.sh .
 COPY ./config /root/.aws/
 COPY ./credentials /root/.aws/
 RUN chmod +x ./init-dynamodb.sh
 
-ENTRYPOINT ["/opt/jdk/bin/java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar"]
+ENTRYPOINT ["/docker-java-home/bin/java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar"]
 
 CMD ["-help"]

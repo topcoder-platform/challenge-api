@@ -7,6 +7,19 @@ const constants = require('../../app-constants')
 const models = require('../models')
 const errors = require('./errors')
 const util = require('util')
+const AWS = require('aws-sdk')
+const config = require('config')
+const m2mAuth = require('tc-core-library-js').auth.m2m
+const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
+const axios = require('axios')
+
+AWS.config.update({
+  s3: '2006-03-01', // S3 API version
+  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  region: config.AMAZON.AWS_REGION
+})
+const s3 = new AWS.S3()
 
 /**
  * Wrap async function to standard express function
@@ -154,7 +167,7 @@ function checkIfExists (source, term) {
 
 /**
  * Get Data by model id
- * @param {Object} modelName The dynamoose model name
+ * @param {String} modelName The dynamoose model name
  * @param {String} id The id value
  * @returns {Promise<void>}
  */
@@ -171,6 +184,21 @@ async function getById (modelName, id) {
       }
     })
   })
+}
+
+/**
+ * Get Data by model ids
+ * @param {String} modelName The dynamoose model name
+ * @param {Array} ids The ids
+ * @returns {Promise<Array>} the found entities
+ */
+async function getByIds (modelName, ids) {
+  const entities = []
+  const theIds = ids || []
+  for (const id of theIds) {
+    entities.push(await getById(modelName, id))
+  }
+  return entities
 }
 
 /**
@@ -201,9 +229,9 @@ async function create (modelName, data) {
     dbItem.save((err) => {
       if (err) {
         reject(err)
+      } else {
+        return resolve(dbItem)
       }
-
-      return resolve(dbItem)
     })
   })
 }
@@ -222,9 +250,9 @@ async function update (dbItem, data) {
     dbItem.save((err) => {
       if (err) {
         reject(err)
+      } else {
+        return resolve(dbItem)
       }
-
-      return resolve(dbItem)
     })
   })
 }
@@ -240,9 +268,9 @@ async function scan (modelName, scanParams) {
     models[modelName].scan(scanParams).exec((err, result) => {
       if (err) {
         reject(err)
+      } else {
+        return resolve(result.count === 0 ? [] : result)
       }
-
-      return resolve(result.count === 0 ? [] : result)
     })
   })
 }
@@ -282,6 +310,121 @@ async function validatePhases (phases) {
   }
 }
 
+/**
+ * Upload file to S3
+ * @param {String} attachmentId the attachment id
+ * @param {Buffer} data the file data
+ * @param {String} mimetype the MIME type
+ * @param {String} fileName the original file name
+ * @return {Promise} promise to upload file to S3
+ */
+async function uploadToS3 (attachmentId, data, mimetype, fileName) {
+  const params = {
+    Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET,
+    Key: attachmentId,
+    Body: data,
+    ContentType: mimetype,
+    Metadata: {
+      fileName
+    }
+  }
+  // Upload to S3
+  return s3.upload(params).promise()
+}
+
+/**
+ * Download file from S3
+ * @param {String} attachmentId the attachment id
+ * @return {Promise} promise resolved to downloaded data
+ */
+async function downloadFromS3 (attachmentId) {
+  const file = await s3.getObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+  return {
+    data: file.Body,
+    mimetype: file.ContentType
+  }
+}
+
+/**
+ * Delete file from S3
+ * @param {String} attachmentId the attachment id
+ * @return {Promise} promise resolved to deleted data
+ */
+async function deleteFromS3 (attachmentId) {
+  return s3.deleteObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+}
+
+/**
+ * Get M2M token.
+ * @returns {Promise<String>} the M2M token
+ */
+async function getM2MToken () {
+  return m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET)
+}
+
+/**
+ * Get challenge resources
+ * @param {String} challengeId the challenge id
+ * @returns {Promise<Array>} the challenge resources
+ */
+async function getChallengeResources (challengeId) {
+  const token = await getM2MToken()
+  const url = `${config.CHALLENGES_API_URL}/${challengeId}/resources`
+  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+  return res.data || []
+}
+
+/**
+ * Get all user groups
+ * @param {String} userId the user id
+ * @returns {Promise<Array>} the user groups
+ */
+async function getUserGroups (userId) {
+  const token = await getM2MToken()
+  let allGroups = []
+  // get search is paginated, we need to get all pages' data
+  let page = 1
+  while (true) {
+    const result = await axios.get(config.GROUPS_API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page,
+        memberId: userId,
+        membershipType: 'user'
+      }
+    })
+    const groups = result.data.result || []
+    if (groups.length === 0) {
+      break
+    }
+    allGroups = allGroups.concat(groups)
+    page += 1
+    if (result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return allGroups
+}
+
+/**
+ * Ensures there are no duplicate or null elements in given array.
+ * @param {Array} arr the array to check
+ * @param {String} name the array name
+ */
+function ensureNoDuplicateOrNullElements (arr, name) {
+  const a = arr || []
+  for (let i = 0; i < a.length; i += 1) {
+    if (_.isNil(a[i])) {
+      throw new errors.BadRequestError(`There is null element for ${name}.`)
+    }
+    for (let j = i + 1; j < a.length; j += 1) {
+      if (a[i] === a[j]) {
+        throw new errors.BadRequestError(`There are duplicate elements (${a[i]}) for ${name}.`)
+      }
+    }
+  }
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -290,10 +433,17 @@ module.exports = {
   hasAdminRole,
   toString,
   getById,
+  getByIds,
   create,
   update,
   scan,
   validateDuplicate,
   partialMatch,
-  validatePhases
+  validatePhases,
+  uploadToS3,
+  downloadFromS3,
+  deleteFromS3,
+  getChallengeResources,
+  getUserGroups,
+  ensureNoDuplicateOrNullElements
 }

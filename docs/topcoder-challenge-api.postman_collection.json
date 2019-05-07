@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5123222b-6618-4c47-a690-948b3557ce6f",
+		"_postman_id": "8f57467f-2adc-4cc8-ae5a-77c2fbbbd5d2",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -8900,7 +8900,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -8952,7 +8952,109 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"]\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure create challenge invalid tags",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": {\"tag1\": \"tag2\"},\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure create challenge invalid status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"invalid\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9003,7 +9105,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEB_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEB_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9054,7 +9156,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": []\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9105,7 +9207,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": []\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": []\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9207,7 +9309,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9309,7 +9411,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TYPEA_ID}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TYPEA_ID}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9360,7 +9462,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"inconsistent\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASED_ID}}\",\n        \t\"name\": \"phase-4\",\n    \t\t\"isActive\": false,\n\t    \t\"duration\": 2000000\n        },\n        {\n        \t\"id\": \"{{TYPEA_ID}}\",\n        \t\"name\": \"not-found\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"inconsistent\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASED_ID}}\",\n        \t\"name\": \"phase-4\",\n    \t\t\"isActive\": false,\n\t    \t\"duration\": 2000000\n        },\n        {\n        \t\"id\": \"{{TYPEA_ID}}\",\n        \t\"name\": \"not-found\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9411,7 +9513,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"invalid\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"invalid\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9462,7 +9564,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"invalid\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"invalid\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"markdown\": true,\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9531,10 +9633,705 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "upload attachment",
+					"item": [
+						{
+							"name": "upload attachment by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    pm.environment.set(\"ATTACHMENT_ID1\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "upload attachment by copilot",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    pm.environment.set(\"ATTACHMENT_ID2\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot1_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure upload attachment by normal user 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure upload attachment challenge not found 404",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TYPEA_ID}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TYPEA_ID}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure upload attachment by copilot not of challenge resource 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot2_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure upload attachment missing token 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure upload attachment wrong file name 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "wrong",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "download attachment",
+					"item": [
+						{
+							"name": "download attachment by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}",
+										"attachments",
+										"{{ATTACHMENT_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "download attachment by copilot",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot1_token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments",
+										"{{ATTACHMENT_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "download attachment by challenge registrant",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments",
+										"{{ATTACHMENT_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure download attachment challenge id mismatch 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TYPEA_ID}}/attachments/{{ATTACHMENT_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TYPEA_ID}}",
+										"attachments",
+										"{{ATTACHMENT_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure download attachment by expired token 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expire_token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}",
+										"attachments",
+										"{{ATTACHMENT_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure download attachment by invalid token 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer invalid"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}",
+										"attachments",
+										"{{ATTACHMENT_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure download attachment by none challenge registrant 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot2_token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments",
+										"{{ATTACHMENT_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure download attachment by anonymous user 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}",
+										"attachments",
+										"{{ATTACHMENT_ID2}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "22913a87-9231-4269-a929-a3f5eaa1e265",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "0bf2e29d-7be3-495d-b547-b32adeb54293",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "search challenge",
 					"item": [
 						{
-							"name": "search challenge",
+							"name": "search challenge by admin",
 							"event": [
 								{
 									"listen": "test",
@@ -9561,6 +10358,11 @@
 										"key": "Content-Type",
 										"value": "application/json",
 										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
 									}
 								],
 								"body": {
@@ -9568,7 +10370,7 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=2&createdBy=ghostar&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
 										"{{URL}}"
 									],
@@ -9578,11 +10380,12 @@
 									"query": [
 										{
 											"key": "perPage",
-											"value": "2"
+											"value": "10"
 										},
 										{
 											"key": "createdBy",
-											"value": "ghostar"
+											"value": "TonyJ",
+											"disabled": true
 										},
 										{
 											"key": "createdDateStart",
@@ -9590,7 +10393,277 @@
 										},
 										{
 											"key": "createdDateEnd",
-											"value": "2019-03-22T00:00:00Z"
+											"value": "2022-03-22T00:00:00Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge by copilot",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot1_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "createdBy",
+											"value": "TonyJ",
+											"disabled": true
+										},
+										{
+											"key": "createdDateStart",
+											"value": "2019-02-22T00:00:00Z"
+										},
+										{
+											"key": "createdDateEnd",
+											"value": "2022-03-22T00:00:00Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge by normal user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "createdBy",
+											"value": "TonyJ",
+											"disabled": true
+										},
+										{
+											"key": "createdDateStart",
+											"value": "2019-02-22T00:00:00Z"
+										},
+										{
+											"key": "createdDateEnd",
+											"value": "2022-03-22T00:00:00Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge by anonymous user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "createdBy",
+											"value": "TonyJ",
+											"disabled": true
+										},
+										{
+											"key": "createdDateStart",
+											"value": "2019-02-22T00:00:00Z"
+										},
+										{
+											"key": "createdDateEnd",
+											"value": "2022-03-22T00:00:00Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure search challenge invalid date 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=abc&createdDateEnd=2022-03-22T00:00:00Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "createdBy",
+											"value": "TonyJ",
+											"disabled": true
+										},
+										{
+											"key": "createdDateStart",
+											"value": "abc"
+										},
+										{
+											"key": "createdDateEnd",
+											"value": "2022-03-22T00:00:00Z"
 										}
 									]
 								}
@@ -9653,10 +10726,313 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "get challenge",
+					"item": [
+						{
+							"name": "get challenge 1 by anonymous user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c1b8d8ca-64df-494c-9b8a-8507058e8692",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get challenge 2 by copilot",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{copilot1_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get challenge 2 by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get challenge 2 by user without group access 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get challenge invalid id 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d24e0eab-d954-4abb-8444-8ef159337f07",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/invalid-id",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"invalid-id"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get challenge not found 404",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d24e0eab-d954-4abb-8444-8ef159337f07",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TYPEA_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TYPEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "update challenge",
 					"item": [
 						{
-							"name": "update challenge 1",
+							"name": "update challenge 1 by admin",
 							"event": [
 								{
 									"listen": "test",
@@ -9692,7 +11068,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -9708,7 +11084,7 @@
 							"response": []
 						},
 						{
-							"name": "update challenge 2",
+							"name": "update challenge 2 by copilot",
 							"event": [
 								{
 									"listen": "test",
@@ -9744,7 +11120,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -9754,6 +11130,110 @@
 									"path": [
 										"challenges",
 										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge invalid groups 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"],\n\t\"groups\": \"group1 group2\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge attachment not found 404",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{TYPEA_ID}}\"]\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
 									]
 								}
 							},
@@ -9796,7 +11276,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"invalid\": 123,\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"invalid\": 123,\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 2\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -9848,7 +11328,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -9900,7 +11380,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -9952,7 +11432,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"markdown\": false,\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TYPEA_ID}}",
@@ -9974,7 +11454,7 @@
 					"name": "partial update challenge",
 					"item": [
 						{
-							"name": "partial update challenge 1",
+							"name": "partial update challenge 1 by admin",
 							"event": [
 								{
 									"listen": "test",
@@ -10010,7 +11490,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-new-track\",\n\t\"name\": \"update-name\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 5000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 6000000\n        }\n\t]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-new-track\",\n\t\"name\": \"update-name\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 5000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 6000000\n        }\n\t],\n\t\"tags\": [\"tag1\"],\n\t\"forumId\": 456456,\n\t\"status\": \"Completed\",\n\t\"groups\": [],\n\t\"attachmentIds\": []\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -10026,7 +11506,7 @@
 							"response": []
 						},
 						{
-							"name": "partial update challenge 2",
+							"name": "partial update challenge 2 by copilot",
 							"event": [
 								{
 									"listen": "test",
@@ -10062,7 +11542,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"First to Finish\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"First to Finish\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -10072,6 +11552,110 @@
 									"path": [
 										"challenges",
 										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge duplicate groups 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-new-track\",\n\t\"name\": \"update-name\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 5000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 6000000\n        }\n\t],\n\t\"tags\": [\"tag1\"],\n\t\"forumId\": 456456,\n\t\"status\": \"Completed\",\n\t\"groups\": [\"g1\", \"g1\"],\n\t\"attachmentIds\": []\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge null group 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-new-track\",\n\t\"name\": \"update-name\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 5000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 6000000\n        }\n\t],\n\t\"tags\": [\"tag1\"],\n\t\"forumId\": 456456,\n\t\"status\": \"Completed\",\n\t\"groups\": [null],\n\t\"attachmentIds\": []\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
 									]
 								}
 							},
@@ -10287,200 +11871,6 @@
 						}
 					],
 					"_postman_isSubFolder": true
-				},
-				{
-					"name": "get challenge",
-					"item": [
-						{
-							"name": "get challenge 1",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "c1b8d8ca-64df-494c-9b8a-8507058e8692",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
-									"host": [
-										"{{URL}}"
-									],
-									"path": [
-										"challenges",
-										"{{CHALLENGE_ID1}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "get challenge 2",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"type": "text",
-										"value": "application/json"
-									},
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
-									"host": [
-										"{{URL}}"
-									],
-									"path": [
-										"challenges",
-										"{{CHALLENGE_ID2}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "failure get challenge invalid id 400",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "d24e0eab-d954-4abb-8444-8ef159337f07",
-										"exec": [
-											"pm.test(\"Status code is 400\", function () {",
-											"    pm.response.to.have.status(400);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"type": "text",
-										"value": "application/json"
-									},
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{URL}}/challenges/invalid-id",
-									"host": [
-										"{{URL}}"
-									],
-									"path": [
-										"challenges",
-										"invalid-id"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "failure get challenge not found 404",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "d24e0eab-d954-4abb-8444-8ef159337f07",
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.response.to.have.status(404);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"type": "text",
-										"value": "application/json"
-									},
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{URL}}/challenges/{{TYPEA_ID}}",
-									"host": [
-										"{{URL}}"
-									],
-									"path": [
-										"challenges",
-										"{{TYPEA_ID}}"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
 				}
 			]
 		},
@@ -10527,7 +11917,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
+							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
 								"{{URL}}"
 							],
@@ -10550,11 +11940,12 @@
 								},
 								{
 									"key": "createdDateEnd",
-									"value": "2019-03-22T00:00:00Z"
+									"value": "2022-03-22T00:00:00Z"
 								},
 								{
 									"key": "createdBy",
-									"value": "tonyj"
+									"value": "tonyj",
+									"disabled": true
 								},
 								{
 									"key": "perPage",
@@ -10611,7 +12002,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID2}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=ghostar",
+							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID2}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z&createdBy=ghostar",
 							"host": [
 								"{{URL}}"
 							],
@@ -10634,7 +12025,7 @@
 								},
 								{
 									"key": "createdDateEnd",
-									"value": "2019-03-22T00:00:00Z"
+									"value": "2022-03-22T00:00:00Z"
 								},
 								{
 									"key": "createdBy",

@@ -32,6 +32,10 @@ const initDB = async () => {
   for (const timelineTemplate of timelineTemplates) {
     await timelineTemplate.delete()
   }
+  const attachments = await helper.scan('Attachment')
+  for (const attachment of attachments) {
+    await attachment.delete()
+  }
 }
 
 initDB().then(() => {

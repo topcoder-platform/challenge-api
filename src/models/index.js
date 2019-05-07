@@ -6,18 +6,19 @@ const config = require('config')
 const dynamoose = require('dynamoose')
 
 dynamoose.AWS.config.update({
-  accessKeyId: config.DYNAMODB.AWS_ACCESS_KEY_ID,
-  secretAccessKey: config.DYNAMODB.AWS_SECRET_ACCESS_KEY,
-  region: config.DYNAMODB.AWS_REGION
+  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  region: config.AMAZON.AWS_REGION
 })
 
-if (config.DYNAMODB.IS_LOCAL) {
-  dynamoose.local(config.DYNAMODB.URL)
+if (config.AMAZON.IS_LOCAL_DB) {
+  dynamoose.local(config.AMAZON.DYNAMODB_URL)
 }
 
 dynamoose.setDefaults({
   create: false,
-  update: false
+  update: false,
+  waitForActive: false
 })
 
 module.exports = {
@@ -26,5 +27,6 @@ module.exports = {
   ChallengeSetting: dynamoose.model('ChallengeSetting', require('./ChallengeSetting')),
   AuditLog: dynamoose.model('AuditLog', require('./AuditLog')),
   Phase: dynamoose.model('Phase', require('./Phase')),
-  TimelineTemplate: dynamoose.model('TimelineTemplate', require('./TimelineTemplate'))
+  TimelineTemplate: dynamoose.model('TimelineTemplate', require('./TimelineTemplate')),
+  Attachment: dynamoose.model('Attachment', require('./Attachment'))
 }
