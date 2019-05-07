@@ -7,5 +7,4 @@ services:
     container_name: dynamodb
     ports:
       - "7777:7777"
-    command: "-inMemory -port 7777"
-
+    command: "-inMemory -sharedDb -port 7777"

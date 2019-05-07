@@ -5,7 +5,6 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
-const dynamoose = require('dynamoose')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
@@ -13,13 +12,52 @@ const constants = require('../../app-constants')
 const models = require('../models')
 
 /**
+ * Filter challenges by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Array} challenges the challenges to filter
+ * @returns {Array} the challenges that can be accessed by current user
+ */
+async function filterChallengesByGroupsAccess (currentUser, challenges) {
+  const res = []
+  let userGroups
+  for (const challenge of challenges) {
+    if (!challenge.groups || challenge.groups.length === 0 || (currentUser && helper.hasAdminRole(currentUser))) {
+      res.push(challenge)
+    } else if (currentUser) {
+      // get user groups if not yet
+      if (_.isNil(userGroups)) {
+        userGroups = await helper.getUserGroups(currentUser.userId)
+      }
+      // check if there is matched group
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.name === group))) {
+        res.push(challenge)
+      }
+    }
+  }
+  return res
+}
+
+/**
+ * Ensure the user can access the challenge by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
+  const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge])
+  if (filtered.length === 0) {
+    throw new errors.ForbiddenError('You are not allowed to access the challenge.')
+  }
+}
+
+/**
  * Search challenges
+ * @param {Object} currentUser the user who perform operation
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchChallenges (criteria) {
+async function searchChallenges (currentUser, criteria) {
   const list = await helper.scan('Challenge')
-  const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name) &&
+  let records = _.filter(list, e => helper.partialMatch(criteria.name, e.name) &&
     helper.partialMatch(criteria.description, e.description) &&
     (_.isUndefined(criteria.createdDateStart) || criteria.createdDateStart.getTime() <= e.created.getTime()) &&
     (_.isUndefined(criteria.createdDateEnd) || criteria.createdDateEnd.getTime() >= e.created.getTime()) &&
@@ -27,6 +65,7 @@ async function searchChallenges (criteria) {
     (_.isUndefined(criteria.updatedDateEnd) || (!_.isUndefined(e.updated) && criteria.updatedDateEnd.getTime() >= e.updated.getTime())) &&
     (_.isUndefined(criteria.createdBy) || criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase())
   )
+  records = await filterChallengesByGroupsAccess(currentUser, records)
   const total = records.length
   const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
 
@@ -44,6 +83,7 @@ async function searchChallenges (criteria) {
 }
 
 searchChallenges.schema = {
+  currentUser: Joi.any(),
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage(),
@@ -101,6 +141,11 @@ async function validateChallengeData (challenge) {
 async function createChallenge (currentUser, challenge) {
   await validateChallengeData(challenge)
   await helper.validatePhases(challenge.phases)
+  helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
+  helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
+
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(), created: new Date(), createdBy: currentUser.handle }, challenge))
@@ -135,7 +180,14 @@ createChallenge.schema = {
         type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
         value: Joi.number().positive().required()
       })).min(1).required()
-    })).min(1).required()
+    })).min(1).required(),
+    reviewType: Joi.string().required(),
+    markdown: Joi.boolean().required(),
+    tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
+    projectId: Joi.number().integer().positive().required(),
+    forumId: Joi.number().integer().positive().required(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
+    groups: Joi.array().items(Joi.string()) // group names
   }).required()
 }
 
@@ -168,11 +220,14 @@ async function populateSettings (data) {
 
 /**
  * Get challenge.
+ * @param {Object} currentUser the user who perform operation
  * @param {String} id the challenge id
  * @returns {Object} the challenge with given id
  */
-async function getChallenge (id) {
+async function getChallenge (currentUser, id) {
   const challenge = await helper.getById('Challenge', id)
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate type property based on the typeId
   const type = await helper.getById('ChallengeType', challenge.typeId)
@@ -183,6 +238,7 @@ async function getChallenge (id) {
 }
 
 getChallenge.schema = {
+  currentUser: Joi.any(),
   id: Joi.id()
 }
 
@@ -274,10 +330,32 @@ function isDifferentPrizeSets (prizeSets, otherPrizeSets) {
  * @returns {Object} the updated challenge
  */
 async function update (currentUser, challengeId, data, isFull) {
+  helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
+  helper.ensureNoDuplicateOrNullElements(data.attachmentIds, 'attachmentIds')
+  helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
+
   const challenge = await helper.getById('Challenge', challengeId)
+
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+
+  let newAttachments
+  if (isFull || !_.isUndefined(data.attachmentIds)) {
+    newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
+  }
 
   if (challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !helper.hasAdminRole(currentUser)) {
     throw new errors.ForbiddenError(`Only admin or challenge's copilot can perform modification.`)
+  }
+
+  // find out attachment ids to delete
+  const attachmentIdsToDelete = []
+  if (isFull || !_.isUndefined(data.attachmentIds)) {
+    _.forEach(challenge.attachments || [], (attachment) => {
+      if (!_.find(data.attachmentIds || [], (id) => id === attachment.id)) {
+        attachmentIdsToDelete.push(attachment.id)
+      }
+    })
   }
 
   await validateChallengeData(data)
@@ -288,7 +366,7 @@ async function update (currentUser, challengeId, data, isFull) {
   data.updated = new Date()
   data.updatedBy = currentUser.handle
   const updateDetails = {}
-  const transactionItems = []
+  const auditLogs = []
   _.each(data, (value, key) => {
     let op
     if (key === 'challengeSettings') {
@@ -306,6 +384,22 @@ async function update (currentUser, challengeId, data, isFull) {
         logger.info('update prize sets')
         op = '$PUT'
       }
+    } else if (key === 'tags') {
+      if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
+        _.intersection(challenge[key], value).length !== value.length) {
+        op = '$PUT'
+      }
+    } else if (key === 'attachmentIds') {
+      const oldIds = _.map(challenge.attachments || [], (a) => a.id)
+      if (oldIds.length !== value.length ||
+        _.intersection(oldIds, value).length !== value.length) {
+        op = '$PUT'
+      }
+    } else if (key === 'groups') {
+      if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
+        _.intersection(challenge[key], value).length !== value.length) {
+        op = '$PUT'
+      }
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
       op = '$PUT'
     }
@@ -314,24 +408,37 @@ async function update (currentUser, challengeId, data, isFull) {
       if (_.isUndefined(updateDetails[op])) {
         updateDetails[op] = {}
       }
-      updateDetails[op][key] = value
+      if (key === 'attachmentIds') {
+        updateDetails[op].attachments = newAttachments
+      } else {
+        updateDetails[op][key] = value
+      }
       if (key !== 'updated' && key !== 'updatedBy') {
-        transactionItems.push(models.AuditLog.transaction.create({
+        let oldValue
+        let newValue
+        if (key === 'attachmentIds') {
+          oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : 'NULL'
+          newValue = JSON.stringify(newAttachments)
+        } else {
+          oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
+          newValue = JSON.stringify(value)
+        }
+        auditLogs.push({
           id: uuid(),
           challengeId,
           fieldName: key,
-          oldValue: challenge[key] ? JSON.stringify(challenge[key]) : 'NULL',
-          newValue: JSON.stringify(value),
+          oldValue,
+          newValue,
           created: new Date(),
           createdBy: currentUser.handle
-        }))
+        })
       }
     }
   })
 
   if (isFull && _.isUndefined(data.challengeSettings) && challenge.challengeSettings) {
-    updateDetails['$DELETE'] = { challengeSettings: _.cloneDeep(challenge.challengeSettings) }
-    transactionItems.push(models.AuditLog.transaction.create({
+    updateDetails['$DELETE'] = { challengeSettings: null }
+    auditLogs.push({
       id: uuid(),
       challengeId,
       fieldName: 'challengeSettings',
@@ -339,15 +446,60 @@ async function update (currentUser, challengeId, data, isFull) {
       newValue: 'NULL',
       created: new Date(),
       createdBy: currentUser.handle
-    }))
+    })
     delete challenge.challengeSettings
   }
+  if (isFull && _.isUndefined(data.attachmentIds) && challenge.attachments) {
+    if (!updateDetails['$DELETE']) {
+      updateDetails['$DELETE'] = {}
+    }
+    updateDetails['$DELETE'].attachments = null
+    auditLogs.push({
+      id: uuid(),
+      challengeId,
+      fieldName: 'attachments',
+      oldValue: JSON.stringify(challenge.attachments),
+      newValue: 'NULL',
+      created: new Date(),
+      createdBy: currentUser.handle
+    })
+    delete challenge.attachments
+  }
+  if (isFull && _.isUndefined(data.groups) && challenge.groups) {
+    if (!updateDetails['$DELETE']) {
+      updateDetails['$DELETE'] = {}
+    }
+    updateDetails['$DELETE'].groups = null
+    auditLogs.push({
+      id: uuid(),
+      challengeId,
+      fieldName: 'groups',
+      oldValue: JSON.stringify(challenge.groups),
+      newValue: 'NULL',
+      created: new Date(),
+      createdBy: currentUser.handle
+    })
+    delete challenge.groups
+  }
 
-  transactionItems.push(models.Challenge.transaction.update({ id: challengeId }, updateDetails))
+  await models.Challenge.update({ id: challengeId }, updateDetails)
+  if (auditLogs.length > 0) {
+    await models.AuditLog.batchPut(auditLogs)
+  }
 
-  await dynamoose.transaction(transactionItems)
-
+  delete data.attachmentIds
   _.assign(challenge, data)
+  if (!_.isUndefined(newAttachments)) {
+    challenge.attachments = newAttachments
+  }
+
+  // delete unused attachments
+  for (const attachmentId of attachmentIdsToDelete) {
+    await helper.deleteFromS3(attachmentId)
+    const attachment = await helper.getById('Attachment', attachmentId)
+    await attachment.delete()
+  }
+
   return challenge
 }
 
@@ -365,7 +517,42 @@ async function fullyUpdateChallenge (currentUser, challengeId, data) {
 fullyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  data: createChallenge.schema.challenge
+  data: Joi.object().keys({
+    typeId: Joi.id(),
+    track: Joi.string().required(),
+    name: Joi.string().required(),
+    description: Joi.string().required(),
+    challengeSettings: Joi.array().items(Joi.object().keys({
+      type: Joi.id(),
+      value: Joi.string().required()
+    })).unique((a, b) => a.type === b.type),
+    timelineTemplateId: Joi.id(),
+    phases: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      name: Joi.string().required(),
+      description: Joi.string(),
+      predecessor: Joi.optionalId(),
+      isActive: Joi.boolean().required(),
+      duration: Joi.number().positive().required()
+    })).min(1).required(),
+    prizeSets: Joi.array().items(Joi.object().keys({
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
+      description: Joi.string(),
+      prizes: Joi.array().items(Joi.object().keys({
+        description: Joi.string(),
+        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        value: Joi.number().positive().required()
+      })).min(1).required()
+    })).min(1).required(),
+    reviewType: Joi.string().required(),
+    markdown: Joi.boolean().required(),
+    tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
+    projectId: Joi.number().integer().positive().required(),
+    forumId: Joi.number().integer().positive().required(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
+    attachmentIds: Joi.array().items(Joi.optionalId()),
+    groups: Joi.array().items(Joi.string()) // group names
+  }).required()
 }
 
 /**
@@ -408,7 +595,15 @@ partiallyUpdateChallenge.schema = {
         type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
         value: Joi.number().positive().required()
       })).min(1).required()
-    })).min(1)
+    })).min(1),
+    reviewType: Joi.string(),
+    markdown: Joi.boolean(),
+    tags: Joi.array().items(Joi.string().required()).min(1), // tag names
+    projectId: Joi.number().integer().positive(),
+    forumId: Joi.number().integer().positive(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)),
+    attachmentIds: Joi.array().items(Joi.optionalId()),
+    groups: Joi.array().items(Joi.string()) // group names
   }).required()
 }
 

@@ -2,7 +2,7 @@
 
 ## Postman tests
 - import Postman collection and environment in the docs folder to Postman
-- Just run the whole test cases under provided environment.
+- run tests from up to down in order
 
 ## DynamoDB Verification
 1. Open a new console and run the command `docker exec -ti dynamodb sh` to use `aws-cli`
@@ -15,4 +15,10 @@ aws dynamodb scan --table-name ChallengeSetting --endpoint-url http://localhost:
 aws dynamodb scan --table-name AuditLog --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name Phase --endpoint-url http://localhost:7777
 aws dynamodb scan --table-name TimelineTemplate --endpoint-url http://localhost:7777
+aws dynamodb scan --table-name Attachment --endpoint-url http://localhost:7777
 ```
+
+## S3 Verification
+
+Login to AWS Console, S3 service, view the bucket content.
+

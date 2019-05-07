@@ -48,6 +48,40 @@ const schema = new Schema({
     type: [Object],
     required: true
   },
+  reviewType: {
+    type: String,
+    required: true
+  },
+  markdown: {
+    type: Boolean,
+    required: true
+  },
+  // tag names
+  tags: {
+    type: Array,
+    required: true
+  },
+  projectId: {
+    type: Number,
+    required: true
+  },
+  forumId: {
+    type: Number,
+    required: true
+  },
+  status: {
+    type: String,
+    required: true
+  },
+  attachments: {
+    type: Array,
+    required: false
+  },
+  // group names
+  groups: {
+    type: Array,
+    required: false
+  },
   created: {
     type: Date,
     required: true

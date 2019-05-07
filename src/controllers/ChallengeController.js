@@ -11,7 +11,7 @@ const helper = require('../common/helper')
  * @param {Object} res the response
  */
 async function searchChallenges (req, res) {
-  const result = await service.searchChallenges(req.query)
+  const result = await service.searchChallenges(req.authUser, req.query)
   helper.setResHeaders(req, res, result)
   res.send(result.result)
 }
@@ -32,7 +32,7 @@ async function createChallenge (req, res) {
  * @param {Object} res the response
  */
 async function getChallenge (req, res) {
-  const result = await service.getChallenge(req.params.challengeId)
+  const result = await service.getChallenge(req.authUser, req.params.challengeId)
   res.send(result)
 }
 

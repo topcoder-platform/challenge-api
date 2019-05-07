@@ -12,11 +12,15 @@ const cors = require('cors')
 const HttpStatus = require('http-status-codes')
 const logger = require('./src/common/logger')
 const interceptor = require('express-interceptor')
+const fileUpload = require('express-fileupload')
 
 // setup express app
 const app = express()
 
 app.use(cors())
+app.use(fileUpload({
+  limits: { fileSize: config.FILE_UPLOAD_SIZE_LIMIT }
+}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('port', config.PORT)

@@ -25,6 +25,8 @@ info:
 
     - Copilots can **only** update entities they have created. (eg. copilot A
     cannot update a challenge created by copilot B)
+
+    - Non-admin users can access challenges with groups only if they belong to any of the groups
 host: api.topcoder.com
 basePath: /v5
 schemes:
@@ -239,7 +241,7 @@ paths:
       tags:
         - Challenges
       description: >
-        Partially update the challenge with the provided id.  Only the fields
+        Partially update the challenge with the provided id. Only the fields
         that are provided in the body will be changed.
       security:
         - bearer: []
@@ -1414,6 +1416,94 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
+  '/challenges/:challengeId/attachments':
+    post:
+      tags:
+        - Attachment
+      description: Upload attachment of challenge.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: attachment
+          in: formData
+          description: The attachment file
+          required: true
+          type: file
+      responses:
+        '200':
+          description: uploaded successful
+          schema:
+            $ref: '#/definitions/Attachment'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to upload attachment
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/challenges/:challengeId/attachments/:attachmentId':
+    get:
+      tags:
+        - Attachment
+      description: Download attachment of challenge.
+      produces:
+        - application/octet-stream
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The challenge id
+        - name: attachmentId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The attachment id
+      responses:
+        '200':
+          description: OK, attachment is downloaded
+        '400':
+          description: Bad request. Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to download attachment
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
 parameters:
   page:
     name: page
@@ -1541,6 +1631,34 @@ definitions:
                     type: string
                   value:
                     type: number
+      reviewType:
+        type: string
+        description: the review type
+      markdown:
+        type: boolean
+        description: the mark down flag
+      tags:
+        type: array
+        items:
+          type: string
+      projectId:
+        type: integer
+        description: the project id
+      forumId:
+        type: integer
+        description: the forum id
+      status:
+        type: string
+        description: the status
+        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+      attachments:
+        type: array
+        items:
+          $ref: '#/definitions/Attachment'
+      groups:
+        type: array
+        items:
+          type: string
       created:
         type: string
         format: date-time
@@ -1565,6 +1683,30 @@ definitions:
       - prizeSets
       - created
       - createdBy
+      - reviewType
+      - markdown
+      - tags
+      - projectId
+      - forumId
+      - status
+  Attachment:
+    type: object
+    properties:
+      id:
+        type: string
+        format: UUID
+      fileSize:
+        type: integer
+      fileName:
+        type: string
+      challengeId:
+        type: string
+        format: UUID
+    required:
+      - id
+      - fileSize
+      - fileName
+      - challengeId
   ChallengeTypeData:
     type: object
     properties:
@@ -1698,6 +1840,34 @@ definitions:
                     type: string
                   value:
                     type: number
+      reviewType:
+        type: string
+        description: the review type
+      markdown:
+        type: boolean
+        description: the mark down flag
+      tags:
+        type: array
+        items:
+          type: string
+      projectId:
+        type: integer
+        description: the project id
+      forumId:
+        type: integer
+        description: the forum id
+      status:
+        type: string
+        description: the status
+        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+      attachmentIds:
+        type: array
+        items:
+          type: string
+      groups:
+        type: array
+        items:
+          type: string
     required:
       - typeId
       - track
@@ -1706,33 +1876,110 @@ definitions:
       - timelineTemplateId
       - phases
       - prizeSets
+      - reviewType
+      - markdown
+      - tags
+      - projectId
+      - forumId
+      - status
   ChallengeResponseBodyForCreateOrUpdate:
     type: object
-    allOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            format: UUID
-            description: The challenge id.
-      - $ref: '#/definitions/ChallengeRequestBody'
-      - type: object
-        properties:
-          created:
-            type: string
-            format: date-time
-            description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
-          createdBy:
-            type: string
-            example: 'topcoder user'
-          updated:
-            type: string
-            format: date-time
-            description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
-          updatedBy:
-            type: string
-            example: 'topcoder user'
+    properties:
+      id:
+        type: string
+        format: UUID
+        description: The challenge id.
+      typeId:
+        type: string
+        format: UUID
+        example: 'challenge type id'
+      track:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      challengeSettings:
+        type: array
+        items:
+          properties:
+            type:
+              type: string
+              description: The challenge setting type
+              format: UUID
+              example: 'challenge setting id'
+            value:
+              type: string
+              description: The challenge setting value
+      timelineTemplateId:
+        type: string
+        format: UUID
+      phases:
+        type: array
+        items:
+          $ref: '#/definitions/Phase'
+      prizeSets:
+        type: array
+        items:
+          properties:
+            type:
+              type: string
+            description:
+              type: string
+            prizes:
+              type: array
+              items:
+                properties:
+                  description:
+                    type: string
+                  type:
+                    type: string
+                  value:
+                    type: number
+      reviewType:
+        type: string
+        description: the review type
+      markdown:
+        type: boolean
+        description: the mark down flag
+      tags:
+        type: array
+        items:
+          type: string
+      projectId:
+        type: integer
+        description: the project id
+      forumId:
+        type: integer
+        description: the forum id
+      status:
+        type: string
+        description: the status
+        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+      attachments:
+        type: array
+        items:
+          $ref: '#/definitions/Attachment'
+      groups:
+        type: array
+        items:
+          type: string
+      created:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      createdBy:
+        type: string
+        example: 'topcoder user'
+      updated:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      updatedBy:
+        type: string
+        example: 'topcoder user'
     required:
+      - id
       - typeId
       - track
       - name
@@ -1742,6 +1989,12 @@ definitions:
       - prizeSets
       - created
       - createdBy
+      - reviewType
+      - markdown
+      - tags
+      - projectId
+      - forumId
+      - status
   ErrorModel:
     type: object
     properties:

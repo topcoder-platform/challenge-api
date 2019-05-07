@@ -180,5 +180,21 @@ module.exports = {
       auth: 'jwt',
       access: [constants.UserRoles.Admin]
     }
+  },
+  '/challenges/:challengeId/attachments': {
+    post: {
+      controller: 'AttachmentController',
+      method: 'uploadAttachment',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot]
+    }
+  },
+  '/challenges/:challengeId/attachments/:attachmentId': {
+    get: {
+      controller: 'AttachmentController',
+      method: 'downloadAttachment',
+      auth: 'jwt'
+      // any authenticated role is allowed
+    }
   }
 }
