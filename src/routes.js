@@ -196,5 +196,11 @@ module.exports = {
       auth: 'jwt'
       // any authenticated role is allowed
     }
+  },
+  '/health': {
+    get: {
+      controller: 'HealthController',
+      method: 'checkHealth'
+    }
   }
 }

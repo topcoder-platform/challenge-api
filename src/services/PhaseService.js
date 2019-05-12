@@ -8,6 +8,7 @@ const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
+const constants = require('../../app-constants')
 
 /**
  * Search phases
@@ -42,7 +43,10 @@ async function createPhase (phase) {
     // validate preceding phase
     await helper.getById('Phase', phase.predecessor)
   }
-  return helper.create('Phase', _.assign({ id: uuid() }, phase))
+  const ret = await helper.create('Phase', _.assign({ id: uuid() }, phase))
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret)
+  return ret
 }
 
 createPhase.schema = {
@@ -93,7 +97,11 @@ async function update (phaseId, data, isFull) {
     phase.predecessor = data.predecessor
   }
 
-  return helper.update(phase, data)
+  const ret = await helper.update(phase, data)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengePhaseUpdated,
+    isFull ? ret : _.assignIn({ id: phaseId }, data))
+  return ret
 }
 
 /**
@@ -150,6 +158,8 @@ async function deletePhase (phaseId) {
     throw new errors.BadRequestError(`Can't delete phase ${phaseId} because it is preceding phase of other phases.`)
   }
   await ret.delete()
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, ret)
   return ret
 }
 

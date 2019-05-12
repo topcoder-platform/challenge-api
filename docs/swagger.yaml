@@ -1504,6 +1504,29 @@ paths:
           schema:
             $ref: '#/definitions/ErrorModel'
 
+  /health:
+    get:
+      tags:
+        - Health
+      description: |
+        Get health status of the app.
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              checksRun:
+                type: integer
+            required:
+              - checksRun
+        '503':
+          description: Service unavailable
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
 parameters:
   page:
     name: page

@@ -149,6 +149,9 @@ async function createChallenge (currentUser, challenge) {
 
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(), created: new Date(), createdBy: currentUser.handle }, challenge))
+
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
   return ret
 }
 
@@ -500,6 +503,9 @@ async function update (currentUser, challengeId, data, isFull) {
     await attachment.delete()
   }
 
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated,
+    isFull ? challenge : _.assignIn({ id: challengeId }, data))
   return challenge
 }
 

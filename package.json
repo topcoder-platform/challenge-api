@@ -31,7 +31,16 @@
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.4.1",
+    "tc-bus-api-wrapper": "topcoder-platform/tc-bus-api-wrapper.git",
     "uuid": "^3.3.2",
     "winston": "^3.1.0"
+  },
+  "standard": {
+    "ignore": [
+      "mock-api"
+    ]
+  },
+  "engines": {
+    "node": "10.x"
   }
 }

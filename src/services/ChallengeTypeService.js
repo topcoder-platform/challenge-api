@@ -7,6 +7,7 @@ const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
+const constants = require('../../app-constants')
 
 /**
  * Search challenge types
@@ -43,6 +44,8 @@ searchChallengeTypes.schema = {
 async function createChallengeType (type) {
   await helper.validateDuplicate('ChallengeType', 'name', type.name)
   const ret = await helper.create('ChallengeType', _.assign({ id: uuid() }, type))
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret)
   return ret
 }
 
@@ -82,7 +85,10 @@ async function fullyUpdateChallengeType (id, data) {
   if (_.isUndefined(data.description)) {
     type.description = undefined
   }
-  return helper.update(type, data)
+  const ret = await helper.update(type, data)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, ret)
+  return ret
 }
 
 fullyUpdateChallengeType.schema = {
@@ -105,7 +111,10 @@ async function partiallyUpdateChallengeType (id, data) {
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
   }
-  return helper.update(type, data)
+  const ret = await helper.update(type, data)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data))
+  return ret
 }
 
 partiallyUpdateChallengeType.schema = {

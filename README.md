@@ -22,6 +22,8 @@ The following parameters can be set in config files or in env variables:
 - TOKEN_CACHE_TIME: AUTH0 token cache time, used to get M2M token
 - AUTH0_CLIENT_ID: AUTH0 client id, used to get M2M token
 - AUTH0_CLIENT_SECRET: AUTH0 client secret, used to get M2M token
+- BUSAPI_URL: Bus API URL
+- KAFKA_ERROR_TOPIC: Kafka error topic used by bus API wrapper
 - AMAZON.AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting. Use local dynamodb you can set fake value
 - AMAZON.AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting. Use local dynamodb you can set fake value
 - AMAZON.AWS_REGION: The Amazon certificate region to use when connecting. Use local dynamodb you can set fake value
@@ -32,6 +34,7 @@ The following parameters can be set in config files or in env variables:
 - CHALLENGES_API_URL: TC challenges API base URL
 - GROUPS_API_URL: TC groups API base URL
 - COPILOT_RESOURCE_ROLE_IDS: copilot resource role ids allowed to upload attachment
+- HEALTH_CHECK_TIMEOUT: health check timeout in milliseconds
 
 
 Set the following environment variables so that the app can get TC M2M token (use 'set' insted of 'export' for Windows OS):
@@ -96,5 +99,6 @@ Refer to the verification document `Verification.md`
   challenge also have attachments field linking to its attachments,
   this will speed up challenge CRUDS operations.
 
-- updated swagger may be viewed and validated at `http://editor.swagger.io/`
+- In the app-constants.js Topics field, the used topics are using a test topic,
+  the suggested ones are commented out, because these topics are not created in TC dev Kafka yet.
 
