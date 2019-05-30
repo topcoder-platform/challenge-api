@@ -1,0 +1,9 @@
+[
+  {
+    "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "name": "timeline 1",
+    "description": "timeline 1 description",
+    "isActive": true,
+    "phases": ["Registration","Submission"]
+  }
+]

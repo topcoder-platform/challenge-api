@@ -7,7 +7,10 @@
     "start": "node app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "init-db": "node src/init-db.js"
+    "init-db": "node src/init-db.js",
+    "drop-tables": "node src/scripts/drop-tables.js",
+    "create-tables": "node src/scripts/create-tables.js",
+    "seed-tables": "node src/scripts/seed-tables.js"
   },
   "author": "TCSCODER",
   "license": "none",

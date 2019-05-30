@@ -1,0 +1,17 @@
+[
+  {
+    "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "name": "Registration",
+    "description": "Registration Phase",
+    "isActive": true,
+    "duration": 3
+  },
+  {
+    "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "name": "Submission",
+    "description": "Submission Phase",
+    "predecessor": "Registration",
+    "isActive": true,
+    "duration": 3
+  }
+]
