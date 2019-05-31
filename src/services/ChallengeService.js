@@ -177,7 +177,7 @@ createChallenge.schema = {
       description: Joi.string(),
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
-        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1).required(),
@@ -540,7 +540,7 @@ fullyUpdateChallenge.schema = {
       description: Joi.string(),
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
-        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1).required(),
@@ -592,7 +592,7 @@ partiallyUpdateChallenge.schema = {
       description: Joi.string(),
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
-        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1),
