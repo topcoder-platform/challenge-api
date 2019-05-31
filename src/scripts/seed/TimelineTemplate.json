@@ -14,7 +14,7 @@
     "phases": ["Registration","Submission", "Review", "Appeals", "Appeals Response", "Final Fixes", "Approval"]
   },
   {
-    "id": "592b0e63-5503-4d21-bb79-54202ff03135",
+    "id": "acf94fff-8e26-4617-b96c-61a46561623a",
     "name": "Idea/report generation",
     "description": "Idea/report generation",
     "isActive": true,
