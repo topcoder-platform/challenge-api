@@ -4,7 +4,7 @@
     "name": "Registration",
     "description": "Registration Phase",
     "isActive": true,
-    "duration": 3
+    "duration": 72
   },
   {
     "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
@@ -12,6 +12,46 @@
     "description": "Submission Phase",
     "predecessor": "Registration",
     "isActive": true,
-    "duration": 3
+    "duration": 72
+  },
+  {
+    "id": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+    "name": "Review",
+    "description": "Review Phase",
+    "predecessor": "Submission",
+    "isActive": true,
+    "duration": 48
+  },
+  {
+    "id": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+    "name": "Appeals",
+    "description": "Appeals Phase",
+    "predecessor": "Review",
+    "isActive": true,
+    "duration": 24
+  },
+  {
+    "id": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+    "name": "Appeals Response",
+    "description": "Appeals Response Phase",
+    "predecessor": "Appeals",
+    "isActive": true,
+    "duration": 24
+  },
+  {
+    "id": "3e2afca6-9542-4763-a135-96b33f12c082",
+    "name": "Final Fixes",
+    "description": "Final Fixes Phase",
+    "predecessor": "Appeals Response",
+    "isActive": true,
+    "duration": 24
+  },
+  {
+    "id": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+    "name": "Approval",
+    "description": "Approval Phase",
+    "predecessor": "Final Fixes",
+    "isActive": true,
+    "duration": 24
   }
 ]
