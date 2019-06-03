@@ -182,7 +182,6 @@ createChallenge.schema = {
       })).min(1).required()
     })).min(1).required(),
     reviewType: Joi.string().required(),
-    markdown: Joi.boolean().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     forumId: Joi.number().integer().positive().required(),
@@ -545,7 +544,6 @@ fullyUpdateChallenge.schema = {
       })).min(1).required()
     })).min(1).required(),
     reviewType: Joi.string().required(),
-    markdown: Joi.boolean().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     forumId: Joi.number().integer().positive().required(),
@@ -597,7 +595,6 @@ partiallyUpdateChallenge.schema = {
       })).min(1).required()
     })).min(1),
     reviewType: Joi.string(),
-    markdown: Joi.boolean(),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),

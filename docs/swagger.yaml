@@ -1634,9 +1634,6 @@ definitions:
       reviewType:
         type: string
         description: the review type
-      markdown:
-        type: boolean
-        description: the mark down flag
       tags:
         type: array
         items:
@@ -1684,7 +1681,6 @@ definitions:
       - created
       - createdBy
       - reviewType
-      - markdown
       - tags
       - projectId
       - forumId
@@ -1843,9 +1839,6 @@ definitions:
       reviewType:
         type: string
         description: the review type
-      markdown:
-        type: boolean
-        description: the mark down flag
       tags:
         type: array
         items:
@@ -1877,7 +1870,6 @@ definitions:
       - phases
       - prizeSets
       - reviewType
-      - markdown
       - tags
       - projectId
       - forumId
@@ -1939,9 +1931,6 @@ definitions:
       reviewType:
         type: string
         description: the review type
-      markdown:
-        type: boolean
-        description: the mark down flag
       tags:
         type: array
         items:
@@ -1990,7 +1979,6 @@ definitions:
       - created
       - createdBy
       - reviewType
-      - markdown
       - tags
       - projectId
       - forumId
