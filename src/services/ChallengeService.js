@@ -45,7 +45,7 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
 async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
   const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge])
   if (filtered.length === 0) {
-    throw new errors.ForbiddenError('You are not allowed to access the challenge.')
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
   }
 }
 
