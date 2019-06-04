@@ -19,9 +19,7 @@ const app = express()
 
 app.use(cors())
 app.use(fileUpload({
-  limits: { fileSize: config.FILE_UPLOAD_SIZE_LIMIT },
-  useTempFiles : true,
-  tempFileDir : config.FILE_UPLOAD_TEMP_DIR
+  limits: { fileSize: config.FILE_UPLOAD_SIZE_LIMIT }
 }))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))

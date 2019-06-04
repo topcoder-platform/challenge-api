@@ -22,3 +22,9 @@ aws dynamodb scan --table-name Attachment --endpoint-url http://localhost:7777
 
 Login to AWS Console, S3 service, view the bucket content.
 
+
+## Bus Event Verification
+
+- login `https://lauscher.topcoder-dev.com/` with credential `tonyj / appirio123`
+- then select topic to view, see app-constants.js Topics field for used topics, then click `View` button to view related messages
+

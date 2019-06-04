@@ -7,6 +7,7 @@ const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
+const constants = require('../../app-constants')
 
 /**
  * Search challenge settings
@@ -38,6 +39,9 @@ searchChallengeSettings.schema = {
 async function createChallengeSetting (setting) {
   await helper.validateDuplicate('ChallengeSetting', 'name', setting.name)
   const ret = await helper.create('ChallengeSetting', _.assign({ id: uuid() }, setting))
+
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeSettingCreated, ret)
   return ret
 }
 
@@ -72,7 +76,10 @@ async function updateChallengeSetting (id, data) {
   if (setting.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeSetting', 'name', data.name)
   }
-  return helper.update(setting, data)
+  const ret = await helper.update(setting, data)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeSettingUpdated, ret)
+  return ret
 }
 
 updateChallengeSetting.schema = {

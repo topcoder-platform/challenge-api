@@ -19,8 +19,31 @@ const challengeStatuses = {
   Completed: 'Completed'
 }
 
+const EVENT_ORIGINATOR = 'topcoder-challenges-api'
+
+const EVENT_MIME_TYPE = 'application/json'
+
+// using a testing topc, should be changed to use real topics in comments when they are created
+const Topics = {
+  ChallengeCreated: 'test.new.bus.events', // 'challenge.action.created',
+  ChallengeUpdated: 'test.new.bus.events', // 'challenge.action.updated',
+  ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
+  ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
+  ChallengeSettingCreated: 'test.new.bus.events', // 'challenge.action.setting.created',
+  ChallengeSettingUpdated: 'test.new.bus.events', // 'challenge.action.setting.updated',
+  ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
+  ChallengePhaseUpdated: 'test.new.bus.events', // 'challenge.action.phase.updated',
+  ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',
+  TimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.timeline.template.created',
+  TimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.timeline.template.updated',
+  TimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.timeline.template.deleted'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
-  challengeStatuses
+  challengeStatuses,
+  EVENT_ORIGINATOR,
+  EVENT_MIME_TYPE,
+  Topics
 }

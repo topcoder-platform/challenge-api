@@ -7,6 +7,7 @@ const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
+const constants = require('../../app-constants')
 
 /**
  * Search timeline templates.
@@ -39,7 +40,10 @@ async function createTimelineTemplate (timelineTemplate) {
   await helper.validateDuplicate('TimelineTemplate', 'name', timelineTemplate.name)
   await helper.validatePhases(timelineTemplate.phases)
 
-  return helper.create('TimelineTemplate', _.assign({ id: uuid() }, timelineTemplate))
+  const ret = await helper.create('TimelineTemplate', _.assign({ id: uuid() }, timelineTemplate))
+  // post bus event
+  await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, ret)
+  return ret
 }
 
 createTimelineTemplate.schema = {
@@ -94,7 +98,11 @@ async function update (timelineTemplateId, data, isFull) {
     timelineTemplate.description = data.description
   }
 
-  return helper.update(timelineTemplate, data)
+  const ret = await helper.update(timelineTemplate, data)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.TimelineTemplateUpdated,
+    isFull ? ret : _.assignIn({ id: timelineTemplateId }, data))
+  return ret
 }
 
 /**
@@ -159,6 +167,8 @@ partiallyUpdateTimelineTemplate.schema = {
 async function deleteTimelineTemplate (timelineTemplateId) {
   const ret = await helper.getById('TimelineTemplate', timelineTemplateId)
   await ret.delete()
+  // post bus event
+  await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, ret)
   return ret
 }
 
