@@ -33,7 +33,7 @@ module.exports = {
   FILE_UPLOAD_SIZE_LIMIT: process.env.FILE_UPLOAD_SIZE_LIMIT
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT) : 50 * 1024 * 1024, // 50M
   CHALLENGES_API_URL: process.env.CHALLENGES_API_URL || 'http://localhost:4000/v5/challenges',
-  GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://localhost:4000/v5/groups',
+  GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://api.topcoder-dev.com/v5/groups',
   // copilot resource role ids allowed to upload attachment
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],
