@@ -25,8 +25,8 @@ const EVENT_MIME_TYPE = 'application/json'
 
 // using a testing topc, should be changed to use real topics in comments when they are created
 const Topics = {
-  ChallengeCreated: 'test.new.bus.events', // 'challenge.action.created',
-  ChallengeUpdated: 'test.new.bus.events', // 'challenge.action.updated',
+  ChallengeCreated: 'challenge.action.created',
+  ChallengeUpdated: 'challenge.action.updated',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
   ChallengeSettingCreated: 'test.new.bus.events', // 'challenge.action.setting.created',
