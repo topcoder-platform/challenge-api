@@ -80,6 +80,14 @@ aws dynamodb scan --table-name TimelineTemplate --endpoint-url http://localhost:
 aws dynamodb scan --table-name Attachment --endpoint-url http://localhost:7777
 ```
 
+## Scripts
+1. Drop/delete tables: `npm run drop-tables`
+2. Creating tables: `npm run create-tables`
+3. Seed/Insert data to tables: `npm run seed-tables`
+
+### Notes
+- The seed data are located in `src/scripts/seed`
+
 ## Local Deployment
 
 - Install dependencies `npm install`

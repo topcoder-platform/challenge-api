@@ -52,10 +52,6 @@ const schema = new Schema({
     type: String,
     required: true
   },
-  markdown: {
-    type: Boolean,
-    required: true
-  },
   // tag names
   tags: {
     type: Array,

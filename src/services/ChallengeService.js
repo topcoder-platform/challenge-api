@@ -45,7 +45,7 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
 async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
   const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge])
   if (filtered.length === 0) {
-    throw new errors.ForbiddenError('You are not allowed to access the challenge.')
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
   }
 }
 
@@ -180,12 +180,11 @@ createChallenge.schema = {
       description: Joi.string(),
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
-        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1).required(),
     reviewType: Joi.string().required(),
-    markdown: Joi.boolean().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     forumId: Joi.number().integer().positive().required(),
@@ -546,12 +545,11 @@ fullyUpdateChallenge.schema = {
       description: Joi.string(),
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
-        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1).required(),
     reviewType: Joi.string().required(),
-    markdown: Joi.boolean().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     forumId: Joi.number().integer().positive().required(),
@@ -598,12 +596,11 @@ partiallyUpdateChallenge.schema = {
       description: Joi.string(),
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
-        type: Joi.string().valid(_.values(constants.prizeTypes)).required(),
+        type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1),
     reviewType: Joi.string(),
-    markdown: Joi.boolean(),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),

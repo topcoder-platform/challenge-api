@@ -7,18 +7,9 @@ const UserRoles = {
 }
 
 const prizeSetTypes = {
-  Code: 'Code',
-  F2F: 'First to Finish',
-  CheckPoint: 'Check Point',
-  MM: 'Marathon'
-}
-
-const prizeTypes = {
-  First: 'first place',
-  Second: 'second place',
-  Third: 'third place',
-  Fouth: 'fourth place',
-  Fifth: 'fifth place'
+  ChallengePrizes: 'Challenge prizes',
+  CopilotPayment: 'Copilot payment',
+  ReviewerPayment: 'Reviewer payment'
 }
 
 const challengeStatuses = {
@@ -51,7 +42,6 @@ const Topics = {
 module.exports = {
   UserRoles,
   prizeSetTypes,
-  prizeTypes,
   challengeStatuses,
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
