@@ -45,7 +45,13 @@ module.exports = (app) => {
 
         actions.push((req, res, next) => {
           if (req.authUser.isMachine) {
-            next(new errors.ForbiddenError('M2M is not supported.'))
+            // M2M
+            if (!req.authUser.scopes || !helper.checkIfExists(def.scopes, req.authUser.scopes)) {
+              next(new errors.ForbiddenError('You are not allowed to perform this action!'))
+            } else {
+              req.authUser.handle = config.M2M_AUDIT_HANDLE
+              next()
+            }
           } else {
             req.authUser.userId = String(req.authUser.userId)
             // User roles authorization
@@ -74,7 +80,10 @@ module.exports = (app) => {
           if (!req.authUser) {
             next()
           } else if (req.authUser.isMachine) {
-            next(new errors.ForbiddenError('M2M is not supported.'))
+            if (!def.scopes || !req.authUser.scopes || !helper.checkIfExists(def.scopes, req.authUser.scopes)) {
+              req.authUser = undefined
+            }
+            next()
           } else {
             req.authUser.userId = String(req.authUser.userId)
             next()

@@ -1,10 +1,7 @@
 version: '3'
 services:
   dynamodb:
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    container_name: dynamodb
+    image: tray/dynamodb-local
     ports:
       - "7777:7777"
-    command: "-inMemory -sharedDb -port 7777"
+    command: "-inMemory -port 7777"
