@@ -39,9 +39,11 @@ async function uploadAttachment (authUser, challengeId, files) {
   // ensure challenge exists
   await helper.getById('Challenge', challengeId)
 
-  // check authorization
-  if (!(await canUploadChallengeAttachment(authUser, challengeId))) {
-    throw new errors.ForbiddenError('You are not allowed to upload attachment of the challenge.')
+  if (!authUser.isMachine) {
+    // check authorization
+    if (!(await canUploadChallengeAttachment(authUser, challengeId))) {
+      throw new errors.ForbiddenError('You are not allowed to upload attachment of the challenge.')
+    }
   }
 
   const file = files.attachment
@@ -98,9 +100,11 @@ async function canDownloadChallengeAttachment (authUser, challengeId) {
  * @returns {Promise<Object>} the downloaded attachment data
  */
 async function downloadAttachment (authUser, challengeId, attachmentId) {
-  // check authorization
-  if (!(await canDownloadChallengeAttachment(authUser, challengeId))) {
-    throw new errors.ForbiddenError('You are not allowed to download attachment of the challenge.')
+  if (!authUser.isMachine) {
+    // check authorization
+    if (!(await canDownloadChallengeAttachment(authUser, challengeId))) {
+      throw new errors.ForbiddenError('You are not allowed to download attachment of the challenge.')
+    }
   }
   const attachment = await helper.getById('Attachment', attachmentId)
   if (attachment.challengeId !== challengeId) {

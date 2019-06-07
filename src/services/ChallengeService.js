@@ -21,7 +21,7 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
   for (const challenge of challenges) {
-    if (!challenge.groups || challenge.groups.length === 0 || (currentUser && helper.hasAdminRole(currentUser))) {
+    if (!challenge.groups || challenge.groups.length === 0 || (currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser)))) {
       res.push(challenge)
     } else if (currentUser) {
       // get user groups if not yet
@@ -346,8 +346,8 @@ async function update (currentUser, challengeId, data, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
-  if (challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !helper.hasAdminRole(currentUser)) {
-    throw new errors.ForbiddenError(`Only admin or challenge's copilot can perform modification.`)
+  if (challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
   }
 
   // find out attachment ids to delete

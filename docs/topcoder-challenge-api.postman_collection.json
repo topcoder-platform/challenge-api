@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4e17ab44-cafe-4aba-a5e5-060ac0204a20",
+		"_postman_id": "ff61aad3-5167-4ac5-b054-ee2ff3a3eb90",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -732,6 +732,109 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "create using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "020107ea-175f-4298-a6d6-b7a9520f0695",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"TEST_SETTING_M2M_ID\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_settings_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"setting-name-by-m2m\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeSettings",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure create using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "020107ea-175f-4298-a6d6-b7a9520f0695",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"setting-name-by-m2m-failure\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeSettings",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -774,10 +877,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -839,10 +938,6 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?invalid=-NAME-&page=2&perPage=2",
 									"host": [
@@ -904,10 +999,6 @@
 										"value": "Bearer invalid"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -964,10 +1055,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1029,10 +1116,128 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
+								"url": {
+									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "-NAME-"
+										},
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "perPage",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge setting using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1ac29d3f-3e7b-4de4-893c-8d5117b96f9e",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_settings_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "-NAME-"
+										},
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "perPage",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure search challenge setting using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1ac29d3f-3e7b-4de4-893c-8d5117b96f9e",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1100,10 +1305,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
 									"host": [
@@ -1152,10 +1353,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1204,10 +1401,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/invalid-id",
 									"host": [
@@ -1251,10 +1444,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1303,10 +1492,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1355,10 +1540,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1407,10 +1588,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/11111111-a41a-4b80-b6dd-90f3816ada99",
 									"host": [
@@ -1419,6 +1596,102 @@
 									"path": [
 										"challengeSettings",
 										"11111111-a41a-4b80-b6dd-90f3816ada99"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get challenge setting using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "44216e96-53cb-4b0a-93f8-cb64e2cfe3e5",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_settings_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings",
+										"{{SETTINGA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get challenge setting using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "44216e96-53cb-4b0a-93f8-cb64e2cfe3e5",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings",
+										"{{SETTINGA_ID}}"
 									]
 								}
 							},
@@ -1888,6 +2161,110 @@
 									"path": [
 										"challengeSettings",
 										"{{SETTINGA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update challenge setting using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "45556ec6-f562-47e9-818f-24f5c60f5b10",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_settings_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-name-by-m2m\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeSettings/{{TEST_SETTING_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings",
+										"{{TEST_SETTING_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge setting using m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "45556ec6-f562-47e9-818f-24f5c60f5b10",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-name-by-m2m\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeSettings/{{TEST_SETTING_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeSettings",
+										"{{TEST_SETTING_M2M_ID}}"
 									]
 								}
 							},
@@ -2523,6 +2900,109 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "create using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "986df394-b29e-42a6-83da-592eb3db1442",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"TEST_TYPE_M2M_ID\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_types_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure create using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "986df394-b29e-42a6-83da-592eb3db1442",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -2560,10 +3040,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes?name=-name-&description=cri&isActive=true",
 									"host": [
@@ -2620,10 +3096,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes?isActive=true&page=2&perPage=2",
 									"host": [
@@ -2680,10 +3152,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes?invalid=test",
 									"host": [
@@ -2738,10 +3206,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
 									"host": [
@@ -2785,10 +3249,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
 									"host": [
@@ -2832,10 +3292,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/invalid-id",
 									"host": [
@@ -2879,10 +3335,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{SETTINGA_ID}}",
 									"host": [
@@ -3313,6 +3765,110 @@
 									"path": [
 										"challengeTypes",
 										"{{TYPEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partial update challenge type using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c6ad399d-6048-445e-a0c1-b99395ce0b76",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_types_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"patch-by-m2m\",\n\t\"description\": \"patch-description\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes",
+										"{{TEST_TYPE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge type using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c6ad399d-6048-445e-a0c1-b99395ce0b76",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"patch-by-m2m\",\n\t\"description\": \"patch-description\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes",
+										"{{TEST_TYPE_M2M_ID}}"
 									]
 								}
 							},
@@ -3786,6 +4342,58 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "update challenge type using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4ea1db72-9445-4dae-a372-fcd7c8c9de80",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_types_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-by-m2m\",\n\t\"isActive\": false\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes",
+										"{{TEST_TYPE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -4255,6 +4863,109 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "create phase using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "09e1d09d-b72f-4809-ac29-c458b90cb631",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"TEST_PHASE_M2M_ID\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_phases_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"phase-by-m2m\",\n\t\"description\": \"m2m-description\",\n\t\"isActive\": true,\n\t\"duration\": 10000\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure create phase using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "09e1d09d-b72f-4809-ac29-c458b90cb631",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"phase-by-m2m\",\n\t\"description\": \"m2m-description\",\n\t\"isActive\": true,\n\t\"duration\": 10000\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -4297,10 +5008,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases?name=ph",
 									"host": [
@@ -4354,10 +5061,6 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -4405,10 +5108,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases?invalid=test",
 									"host": [
@@ -4457,10 +5156,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -4508,10 +5203,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -4559,10 +5250,6 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -4610,10 +5297,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -4621,6 +5304,112 @@
 									],
 									"path": [
 										"challengePhases"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge phases using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7fbd663d-76fb-4c4d-b7b6-0baf9ca6b86e",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_phases_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengePhases?name=ph",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "ph"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure search challenge phases using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7fbd663d-76fb-4c4d-b7b6-0baf9ca6b86e",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengePhases?name=ph",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "ph"
+										}
 									]
 								}
 							},
@@ -4667,10 +5456,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
 									"host": [
@@ -4719,10 +5504,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -4771,10 +5552,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/invalid-id",
 									"host": [
@@ -4818,10 +5595,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -4870,10 +5643,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -4922,10 +5691,6 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -4974,10 +5739,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -5026,10 +5787,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{TYPEA_ID}}",
 									"host": [
@@ -5038,6 +5795,102 @@
 									"path": [
 										"challengePhases",
 										"{{TYPEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get challenge phase using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3e3dd07c-3ce6-47fe-86eb-a0a01ea1cfec",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_phases_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get challenge phase using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3e3dd07c-3ce6-47fe-86eb-a0a01ea1cfec",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
 							},
@@ -5460,6 +6313,110 @@
 									"path": [
 										"challengePhases",
 										"{{PHASEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partial update challenge phase using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c6ad399d-6048-445e-a0c1-b99395ce0b76",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_phases_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-phase-by-m2m\",\n\t\"isActive\": true,\n\t\"duration\": 50000\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge phase using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c6ad399d-6048-445e-a0c1-b99395ce0b76",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-phase-by-m2m\",\n\t\"isActive\": true,\n\t\"duration\": 50000\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
 							},
@@ -5933,6 +6890,110 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "update challenge phase using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4ea1db72-9445-4dae-a372-fcd7c8c9de80",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_phases_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"new-phase-by-m2m\",\n\t\"isActive\": true,\n\t\"duration\": 20000\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge phase using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4ea1db72-9445-4dae-a372-fcd7c8c9de80",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"new-phase-by-m2m\",\n\t\"isActive\": true,\n\t\"duration\": 20000\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -6294,6 +7355,110 @@
 									"path": [
 										"challengePhases",
 										"{{SETTINGA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete challenge phase using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e547ddc3-44a5-413e-a9e7-f98bb2262398",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_phases_delete}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge phase using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e547ddc3-44a5-413e-a9e7-f98bb2262398",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengePhases",
+										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
 							},
@@ -6720,6 +7885,109 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "create timeline template using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "09e1d09d-b72f-4809-ac29-c458b90cb631",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"TEST_TEMPLATE_M2M_ID\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_timeline_templates_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"template-by-m2m\",\n    \"description\": \"desc-by-m2m\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASEA_ID}}\",\n        \"name\": \"new-phase-1\",\n        \"isActive\": true,\n        \"duration\": 20000\n      },\n      {\n        \"id\": \"{{PHASEB_ID}}\",\n        \"name\": \"new-PHASE-2\",\n        \"description\": \"add-description-in-put\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n    \t\"isActive\": true,\n\t    \"duration\": 10000\n      }\n    ]\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure create timeline template using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "09e1d09d-b72f-4809-ac29-c458b90cb631",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"template-by-m2m\",\n    \"description\": \"desc-by-m2m\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASEA_ID}}\",\n        \"name\": \"new-phase-1\",\n        \"isActive\": true,\n        \"duration\": 20000\n      },\n      {\n        \"id\": \"{{PHASEB_ID}}\",\n        \"name\": \"new-PHASE-2\",\n        \"description\": \"add-description-in-put\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n    \t\"isActive\": true,\n\t    \"duration\": 10000\n      }\n    ]\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -6762,10 +8030,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -6819,10 +8083,6 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=LA",
 									"host": [
@@ -6876,10 +8136,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?invalid=test",
 									"host": [
@@ -6928,10 +8184,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -6985,10 +8237,6 @@
 										"value": "Bearer invalid"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -7042,10 +8290,6 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -7099,10 +8343,112 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates?name=1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search timeline template using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7fbd663d-76fb-4c4d-b7b6-0baf9ca6b86e",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_timeline_templates_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/timelineTemplates?name=1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure search timeline template using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7fbd663d-76fb-4c4d-b7b6-0baf9ca6b86e",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -7162,10 +8508,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -7214,10 +8556,6 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEB_ID}}",
 									"host": [
@@ -7266,10 +8604,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/invalid-id",
 									"host": [
@@ -7318,10 +8652,6 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -7370,10 +8700,6 @@
 										"value": "Bearer invalid"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -7417,10 +8743,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -7469,10 +8791,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -7521,10 +8839,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{SETTINGA_ID}}",
 									"host": [
@@ -7533,6 +8847,102 @@
 									"path": [
 										"timelineTemplates",
 										"{{SETTINGA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get timeline template using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3e3dd07c-3ce6-47fe-86eb-a0a01ea1cfec",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_timeline_templates_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get timeline template using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3e3dd07c-3ce6-47fe-86eb-a0a01ea1cfec",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
 							},
@@ -7955,6 +9365,58 @@
 									"path": [
 										"timelineTemplates",
 										"{{TEMPLATEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partial update timeline template using m2m token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c6ad399d-6048-445e-a0c1-b99395ce0b76",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_timeline_templates_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"new-template-m2m\",\n    \"description\": \"new-desc-m2m\"\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
 							},
@@ -8485,6 +9947,110 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "update timeline template using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "09e1d09d-b72f-4809-ac29-c458b90cb631",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_timeline_templates_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-template-by-m2m\",\n    \"description\": \"update-desc-by-m2m\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASEA_ID}}\",\n        \"name\": \"new-phase-1\",\n        \"isActive\": true,\n        \"duration\": 20000\n      },\n      {\n        \"id\": \"{{PHASEB_ID}}\",\n        \"name\": \"new-PHASE-2\",\n        \"description\": \"add-description-in-put\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n    \t\"isActive\": true,\n\t    \"duration\": 10000\n      }\n    ]\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update timeline template using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "09e1d09d-b72f-4809-ac29-c458b90cb631",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"update-template-by-m2m\",\n    \"description\": \"update-desc-by-m2m\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASEA_ID}}\",\n        \"name\": \"new-phase-1\",\n        \"isActive\": true,\n        \"duration\": 20000\n      },\n      {\n        \"id\": \"{{PHASEB_ID}}\",\n        \"name\": \"new-PHASE-2\",\n        \"description\": \"add-description-in-put\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n    \t\"isActive\": true,\n\t    \"duration\": 10000\n      }\n    ]\n}\n"
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -8850,6 +10416,110 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "delete timeline template using m2m token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e547ddc3-44a5-413e-a9e7-f98bb2262398",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_timeline_templates_delete}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete timeline template using forbidden m2m token 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e547ddc3-44a5-413e-a9e7-f98bb2262398",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"timelineTemplates",
+										"{{TEST_TEMPLATE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -8900,7 +10570,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -8952,7 +10622,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -9628,6 +11298,58 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "create challenge using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"TEST_CHALLENGE_M2M_ID\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_create}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create-m2m\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -9667,7 +11389,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9717,7 +11439,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9766,7 +11488,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9815,7 +11537,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9864,7 +11586,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9907,7 +11629,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9956,7 +11678,7 @@
 										{
 											"key": "wrong",
 											"type": "file",
-											"src": ""
+											"src": []
 										}
 									]
 								},
@@ -9968,6 +11690,105 @@
 									"path": [
 										"challenges",
 										"{{CHALLENGE_ID1}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "upload attachment using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    pm.environment.set(\"TEST_ATTACHMENT_M2M_ID\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_create}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}",
+										"attachments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure upload attachment using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "attachment",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}/attachments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}",
 										"attachments"
 									]
 								}
@@ -10005,10 +11826,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -10049,10 +11866,6 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -10093,10 +11906,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -10137,10 +11946,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TYPEA_ID}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -10181,10 +11986,6 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -10225,10 +12026,6 @@
 										"value": "Bearer invalid"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -10269,10 +12066,6 @@
 										"value": "Bearer {{copilot2_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -10307,10 +12100,6 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -10321,6 +12110,86 @@
 										"{{CHALLENGE_ID2}}",
 										"attachments",
 										"{{ATTACHMENT_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "download attachment using m2m",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}/attachments/{{TEST_ATTACHMENT_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}",
+										"attachments",
+										"{{TEST_ATTACHMENT_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure download attachment using forbidden m2m 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}/attachments/{{TEST_ATTACHMENT_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}",
+										"attachments",
+										"{{TEST_ATTACHMENT_M2M_ID}}"
 									]
 								}
 							},
@@ -10389,10 +12258,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
@@ -10459,10 +12324,6 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
@@ -10529,10 +12390,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
@@ -10594,10 +12451,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
@@ -10659,10 +12512,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=abc&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
@@ -10724,10 +12573,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges?invalid=test-",
 									"host": [
@@ -10740,6 +12585,138 @@
 										{
 											"key": "invalid",
 											"value": "test-"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge using m2m with read scope",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "createdBy",
+											"value": "TonyJ",
+											"disabled": true
+										},
+										{
+											"key": "createdDateStart",
+											"value": "2019-02-22T00:00:00Z"
+										},
+										{
+											"key": "createdDateEnd",
+											"value": "2022-03-22T00:00:00Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search challenge using m2m without read scope(same as anonymous user)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "createdBy",
+											"value": "TonyJ",
+											"disabled": true
+										},
+										{
+											"key": "createdDateStart",
+											"value": "2019-02-22T00:00:00Z"
+										},
+										{
+											"key": "createdDateEnd",
+											"value": "2022-03-22T00:00:00Z"
 										}
 									]
 								}
@@ -10782,10 +12759,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
 									"host": [
@@ -10834,10 +12807,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -10886,10 +12855,6 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -10938,10 +12903,6 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -10985,10 +12946,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/invalid-id",
 									"host": [
@@ -11032,10 +12989,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TYPEA_ID}}",
 									"host": [
@@ -11046,6 +12999,151 @@
 										"{{TYPEA_ID}}"
 									]
 								}
+							},
+							"response": []
+						},
+						{
+							"name": "get challenge using m2m token with read scope",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get challenge 2 using m2m token without scope 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get challenge 2 using invalid token 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0a63d8e6-2604-4836-9d3a-1f4f5b099305",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer invalid"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								},
+								"description": "it will be consided as anonymous user"
 							},
 							"response": []
 						}
@@ -11092,7 +13190,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -11144,7 +13242,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -11196,7 +13294,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"],\n\t\"groups\": \"group1 group2\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"],\n\t\"groups\": \"group1 group2\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -11248,7 +13346,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Code\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{TYPEA_ID}}\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{TYPEA_ID}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -11300,7 +13398,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"invalid\": 123,\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
+									"raw": "{\n\t\"invalid\": 123,\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -11352,7 +13450,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -11404,7 +13502,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -11456,7 +13554,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Code\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TYPEA_ID}}",
@@ -11466,6 +13564,110 @@
 									"path": [
 										"challenges",
 										"{{TYPEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update challenge using m2m token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-update-m2m\",\n\t\"description\": \"test-update-m2m\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge using forbidden m2m token 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-update-m2m\",\n\t\"description\": \"test-update-m2m\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}"
 									]
 								}
 							},
@@ -11566,7 +13768,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"First to Finish\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -11892,6 +14094,58 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "failure partial update challenge using forbidden m2m token 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"new-update-m2m\",\n\t\"description\": \"patch-update-m2m\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{TEST_CHALLENGE_M2M_ID}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -11936,10 +14190,6 @@
 								"value": "Bearer {{admin_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
@@ -12021,10 +14271,6 @@
 								"value": "Bearer {{admin_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID2}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z&createdBy=ghostar",
 							"host": [
@@ -12095,10 +14341,6 @@
 								"value": "Bearer {{user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
@@ -12168,10 +14410,6 @@
 								"value": "Bearer {{expire_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
@@ -12241,10 +14479,6 @@
 								"value": "Bearer {{admin_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&invalid=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
@@ -12273,6 +14507,168 @@
 								{
 									"key": "createdBy",
 									"value": "tonyj"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search using m2m token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9fd8c9f4-13e3-47d0-9c78-1e544521d97d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{m2m_challenge_audit_logs_read}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challengeAuditLogs"
+							],
+							"query": [
+								{
+									"key": "challengeId",
+									"value": "{{CHALLENGE_ID1}}"
+								},
+								{
+									"key": "fieldName",
+									"value": "n",
+									"disabled": true
+								},
+								{
+									"key": "createdDateStart",
+									"value": "2019-02-22T00:00:00Z"
+								},
+								{
+									"key": "createdDateEnd",
+									"value": "2022-03-22T00:00:00Z"
+								},
+								{
+									"key": "createdBy",
+									"value": "tonyj",
+									"disabled": true
+								},
+								{
+									"key": "perPage",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "failure search using forbidden m2m token 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9fd8c9f4-13e3-47d0-9c78-1e544521d97d",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{m2m_challenges_read}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challengeAuditLogs"
+							],
+							"query": [
+								{
+									"key": "challengeId",
+									"value": "{{CHALLENGE_ID1}}"
+								},
+								{
+									"key": "fieldName",
+									"value": "n",
+									"disabled": true
+								},
+								{
+									"key": "createdDateStart",
+									"value": "2019-02-22T00:00:00Z"
+								},
+								{
+									"key": "createdDateEnd",
+									"value": "2022-03-22T00:00:00Z"
+								},
+								{
+									"key": "createdBy",
+									"value": "tonyj",
+									"disabled": true
+								},
+								{
+									"key": "perPage",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
 								}
 							]
 						}
@@ -12314,10 +14710,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{URL}}/health",
 							"host": [

@@ -76,6 +76,9 @@ function getPageLink (req, page) {
  */
 function setResHeaders (req, res, result) {
   const totalPages = Math.ceil(result.total / result.perPage)
+  if (result.page > 1) {
+    res.set('X-Prev-Page', result.page - 1)
+  }
   if (result.page < totalPages) {
     res.set('X-Next-Page', result.page + 1)
   }
@@ -179,12 +182,12 @@ async function getById (modelName, id) {
   return new Promise((resolve, reject) => {
     models[modelName].query('id').eq(id).exec((err, result) => {
       if (err) {
-        reject(err)
+        return reject(err)
       }
       if (result.length > 0) {
         return resolve(result[0])
       } else {
-        reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`))
+        return reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`))
       }
     })
   })
@@ -232,7 +235,7 @@ async function create (modelName, data) {
     const dbItem = new models[modelName](data)
     dbItem.save((err) => {
       if (err) {
-        reject(err)
+        return reject(err)
       } else {
         return resolve(dbItem)
       }
@@ -253,7 +256,7 @@ async function update (dbItem, data) {
   return new Promise((resolve, reject) => {
     dbItem.save((err) => {
       if (err) {
-        reject(err)
+        return reject(err)
       } else {
         return resolve(dbItem)
       }
@@ -271,7 +274,7 @@ async function scan (modelName, scanParams) {
   return new Promise((resolve, reject) => {
     models[modelName].scan(scanParams).exec((err, result) => {
       if (err) {
-        reject(err)
+        return reject(err)
       } else {
         return resolve(result.count === 0 ? [] : result)
       }
