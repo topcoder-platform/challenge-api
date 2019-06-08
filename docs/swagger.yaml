@@ -21,12 +21,16 @@ info:
 
     ## Access levels
 
+    - M2M token is supported, all non-public-accessed endpoint can be accessed using M2M token with proper scopes.
+
     - Only admins and copilots can create/update an entity.
 
     - Copilots can **only** update entities they have created. (eg. copilot A
     cannot update a challenge created by copilot B)
 
     - Non-admin users can access challenges with groups only if they belong to any of the groups
+
+    - It will be considered as admin user if using valid M2M token(having read challenge scope) to list challenges or retrieve challenge by id
 host: api.topcoder.com
 basePath: /v5
 schemes:

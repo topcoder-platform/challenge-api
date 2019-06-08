@@ -33,11 +33,55 @@ module.exports = {
   FILE_UPLOAD_SIZE_LIMIT: process.env.FILE_UPLOAD_SIZE_LIMIT
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT) : 50 * 1024 * 1024, // 50M
   CHALLENGES_API_URL: process.env.CHALLENGES_API_URL || 'http://localhost:4000/v5/challenges',
-  GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://api.topcoder-dev.com/v5/groups',
+  GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://localhost:4000/v5/groups',
   // copilot resource role ids allowed to upload attachment
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],
 
   // health check timeout in milliseconds
-  HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000
+  HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
+
+  SCOPES: {
+    CHALLENGES: {
+      READ: process.env.SCOPE_CHALLENGES_READ || 'read:challenges',
+      CREATE: process.env.SCOPE_CHALLENGES_CREATE || 'create:challenges',
+      UPDATE: process.env.SCOPE_CHALLENGES_UPDATE || 'update:challenges',
+      ALL: process.env.SCOPE_CHALLENGES_ALL || 'all:challenges'
+    },
+    CHALLENGE_TYPES: {
+      CREATE: process.env.SCOPE_CHALLENGE_TYPES_CREATE || 'create:challenge_types',
+      UPDATE: process.env.SCOPE_CHALLENGE_TYPES_UPDATE || 'update:challenge_types',
+      ALL: process.env.SCOPE_CHALLENGE_TYPES_ALL || 'all:challenge_types'
+    },
+    CHALLENGE_SETTINGS: {
+      READ: process.env.SCOPE_CHALLENGE_SETTINGS_READ || 'read:challenge_settings',
+      CREATE: process.env.SCOPE_CHALLENGE_SETTINGS_CREATE || 'create:challenge_settings',
+      UPDATE: process.env.SCOPE_CHALLENGE_SETTINGS_UPDATE || 'update:challenge_settings',
+      ALL: process.env.SCOPE_CHALLENGE_SETTINGS_ALL || 'all:challenge_settings'
+    },
+    CHALLENGE_AUDIT_LOGS: {
+      READ: process.env.SCOPE_CHALLENGE_AUDIT_LOGS_READ || 'read:challenge_audit_logs'
+    },
+    CHALLENGE_PHASES: {
+      READ: process.env.SCOPE_CHALLENGE_PHASES_READ || 'read:challenge_phases',
+      CREATE: process.env.SCOPE_CHALLENGE_PHASES_CREATE || 'create:challenge_phases',
+      DELETE: process.env.SCOPE_CHALLENGE_PHASES_DELETE || 'delete:challenge_phases',
+      UPDATE: process.env.SCOPE_CHALLENGE_PHASES_UPDATE || 'update:challenge_phases',
+      ALL: process.env.SCOPE_CHALLENGE_PHASES_ALL || 'all:challenge_phases'
+    },
+    TIMELINE_TEMPLATES: {
+      READ: process.env.SCOPE_TIMELINE_TEMPLATES_READ || 'read:timeline_templates',
+      CREATE: process.env.SCOPE_TIMELINE_TEMPLATES_CREATE || 'create:timeline_templates',
+      DELETE: process.env.SCOPE_TIMELINE_TEMPLATES_DELETE || 'delete:timeline_templates',
+      UPDATE: process.env.SCOPE_TIMELINE_TEMPLATES_UPDATE || 'update:timeline_templates',
+      ALL: process.env.SCOPE_TIMELINE_TEMPLATES_ALL || 'all:timeline_templates'
+    },
+    CHALLENGE_ATTACHMENTS: {
+      READ: process.env.SCOPE_CHALLENGE_ATTACHMENTS_READ || 'read:challenge_attachments',
+      CREATE: process.env.SCOPE_CHALLENGE_ATTACHMENTS_CREATE || 'create:challenge_attachments',
+      ALL: process.env.SCOPE_CHALLENGE_ATTACHMENTS_ALL || 'all:challenge_attachments'
+    }
+  },
+
+  M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'TopcoderService'
 }
