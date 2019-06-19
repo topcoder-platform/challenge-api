@@ -148,7 +148,7 @@ async function createChallenge (currentUser, challenge) {
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   const ret = await helper.create('Challenge', _.assign({
-    id: uuid(), created: new Date(), createdBy: currentUser.handle }, challenge))
+    id: uuid(), created: new Date(), createdBy: currentUser.handle || currentUser.sub }, challenge))
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
@@ -187,7 +187,7 @@ createChallenge.schema = {
     reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
-    forumId: Joi.number().integer().positive().required(),
+    forumId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()) // group names
   }).required()
@@ -234,7 +234,7 @@ async function getChallenge (currentUser, id) {
   // populate type property based on the typeId
   const type = await helper.getById('ChallengeType', challenge.typeId)
   challenge.type = type.name
-  delete challenge.typeId
+  // delete challenge.typeId
 
   return populateSettings(challenge)
 }
@@ -366,7 +366,7 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   data.updated = new Date()
-  data.updatedBy = currentUser.handle
+  data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
   const auditLogs = []
   _.each(data, (value, key) => {
@@ -552,7 +552,7 @@ fullyUpdateChallenge.schema = {
     reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
-    forumId: Joi.number().integer().positive().required(),
+    forumId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()) // group names
