@@ -127,8 +127,6 @@ module.exports = {
     get: {
       controller: 'ChallengePhaseController',
       method: 'searchPhases',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       scopes: [CHALLENGE_PHASES.READ, CHALLENGE_PHASES.ALL]
     },
     post: {
@@ -173,8 +171,6 @@ module.exports = {
     get: {
       controller: 'TimelineTemplateController',
       method: 'searchTimelineTemplates',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       scopes: [TIMELINE_TEMPLATES.READ, TIMELINE_TEMPLATES.ALL]
     },
     post: {

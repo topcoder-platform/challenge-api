@@ -9,7 +9,8 @@ const UserRoles = {
 const prizeSetTypes = {
   ChallengePrizes: 'Challenge prizes',
   CopilotPayment: 'Copilot payment',
-  ReviewerPayment: 'Reviewer payment'
+  ReviewerPayment: 'Reviewer payment',
+  CheckpointPrizes: 'Checkpoint prizes'
 }
 
 const challengeStatuses = {

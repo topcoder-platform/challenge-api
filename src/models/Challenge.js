@@ -63,7 +63,7 @@ const schema = new Schema({
   },
   forumId: {
     type: Number,
-    required: true
+    required: false
   },
   status: {
     type: String,
