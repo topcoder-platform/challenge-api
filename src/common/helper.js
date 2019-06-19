@@ -156,7 +156,7 @@ function checkIfExists (source, term) {
   source = source.map(s => s.toLowerCase())
 
   if (_.isString(term)) {
-    terms = term.split(' ')
+    terms = term.toLowerCase().split(' ')
   } else if (_.isArray(term)) {
     terms = term.map(t => t.toLowerCase())
   } else {
