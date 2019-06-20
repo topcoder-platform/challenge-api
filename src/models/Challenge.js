@@ -65,6 +65,10 @@ const schema = new Schema({
     type: Number,
     required: false
   },
+  startDate: {
+    type: Date,
+    required: true
+  },
   status: {
     type: String,
     required: true

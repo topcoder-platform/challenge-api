@@ -1671,6 +1671,10 @@ definitions:
       forumId:
         type: integer
         description: the forum id
+      startDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
       status:
         type: string
         description: the status
@@ -1876,6 +1880,10 @@ definitions:
       forumId:
         type: integer
         description: the forum id
+      startDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
       status:
         type: string
         description: the status
@@ -1968,6 +1976,10 @@ definitions:
       forumId:
         type: integer
         description: the forum id
+      startDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
       status:
         type: string
         description: the status

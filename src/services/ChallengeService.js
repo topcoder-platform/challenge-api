@@ -188,6 +188,7 @@ createChallenge.schema = {
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     forumId: Joi.number().integer().positive(),
+    startDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()) // group names
   }).required()
@@ -553,6 +554,7 @@ fullyUpdateChallenge.schema = {
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     forumId: Joi.number().integer().positive(),
+    startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()) // group names
@@ -591,6 +593,7 @@ partiallyUpdateChallenge.schema = {
       isActive: Joi.boolean().required(),
       duration: Joi.number().positive().required()
     })).min(1),
+    startDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
