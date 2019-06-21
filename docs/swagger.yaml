@@ -53,6 +53,23 @@ paths:
       parameters:
         - $ref: '#/parameters/page'
         - $ref: '#/parameters/perPage'
+        - name: id
+          in: query
+          description: Filter by id, exact match
+          required: false
+          type: string
+          format: UUID
+        - name: typeId
+          in: query
+          description: Filter by type id, exact match
+          required: false
+          type: string
+          format: UUID
+        - name: track
+          in: query
+          description: Filter by track, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
         - name: name
           in: query
           description: Filter by name, case-insensitive, partial matches are allowed.
@@ -60,32 +77,83 @@ paths:
           type: string
         - name: description
           in: query
-          description: Filter by description.  Partial matches are allowed.
+          description: Filter by description, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+        - name: timelineTemplateId
+          in: query
+          description: Filter by timeline template id, exact match
+          required: false
+          type: string
+          format: UUID
+        - name: reviewType
+          in: query
+          description: Filter by review type, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+        - name: tag
+          in: query
+          description: Filter by tag name, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+        - name: projectId
+          in: query
+          description: Filter by project id, exact match.
+          required: false
+          type: integer
+        - name: forumId
+          in: query
+          description: Filter by forum id, exact match.
+          required: false
+          type: integer
+        - name: legacyId
+          in: query
+          description: Filter by legacy id, exact match.
+          required: false
+          type: integer
+        - name: status
+          in: query
+          description: Filter by status, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+          enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        - name: group
+          in: query
+          description: Filter by group name, case-insensitive, partial matches are allowed.
           required: false
           type: string
         - name: createdDateStart
           in: query
-          description: Filter by createdDate (lower bound of date range)
+          description: Filter by created date (lower bound of date range)
           required: false
           type: string
+          format: date-time
         - name: createdDateEnd
           in: query
-          description: Filter by createdDate (upper bound of date range)
+          description: Filter by created date (upper bound of date range)
           required: false
           type: string
+          format: date-time
         - name: updatedDateStart
           in: query
-          description: Filter by updatedDate (lower bound of date range)
+          description: Filter by updated date (lower bound of date range)
           required: false
           type: string
+          format: date-time
         - name: updatedDateEnd
           in: query
-          description: Filter by updatedDate (upper bound of date range)
+          description: Filter by updated date (upper bound of date range)
           required: false
           type: string
+          format: date-time
         - name: createdBy
           in: query
-          description: Filter by 'createdBy' field
+          description: Filter by 'createdBy' field, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+        - name: updatedBy
+          in: query
+          description: Filter by 'updatedBy' field, case-insensitive, partial matches are allowed.
           required: false
           type: string
       responses:

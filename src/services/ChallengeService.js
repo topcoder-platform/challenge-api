@@ -5,11 +5,13 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
+const config = require('config')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 const models = require('../models')
+const HttpStatus = require('http-status-codes')
 
 /**
  * Filter challenges by groups access
@@ -56,18 +58,55 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  * @returns {Object} the search result
  */
 async function searchChallenges (currentUser, criteria) {
-  const list = await helper.scan('Challenge')
-  let records = _.filter(list, e => helper.partialMatch(criteria.name, e.name) &&
-    helper.partialMatch(criteria.description, e.description) &&
-    (_.isUndefined(criteria.createdDateStart) || criteria.createdDateStart.getTime() <= e.created.getTime()) &&
-    (_.isUndefined(criteria.createdDateEnd) || criteria.createdDateEnd.getTime() >= e.created.getTime()) &&
-    (_.isUndefined(criteria.updatedDateStart) || (!_.isUndefined(e.updated) && criteria.updatedDateStart.getTime() <= e.updated.getTime())) &&
-    (_.isUndefined(criteria.updatedDateEnd) || (!_.isUndefined(e.updated) && criteria.updatedDateEnd.getTime() >= e.updated.getTime())) &&
-    (_.isUndefined(criteria.createdBy) || criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase())
-  )
-  records = await filterChallengesByGroupsAccess(currentUser, records)
-  const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  // construct ES query
+  const boolQuery = []
+  _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'createdDateStart', 'createdDateEnd',
+    'updatedDateStart', 'updatedDateEnd']), (value, key) => {
+    const filter = { match_phrase: {} }
+    filter.match_phrase[key] = value
+    boolQuery.push(filter)
+  })
+  if (criteria.tag) {
+    boolQuery.push({ match_phrase: { tags: criteria.tag } })
+  }
+  if (criteria.group) {
+    boolQuery.push({ match_phrase: { groups: criteria.group } })
+  }
+  if (criteria.createdDateStart) {
+    boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } })
+  }
+  if (criteria.createdDateEnd) {
+    boolQuery.push({ range: { created: { lte: criteria.createdDateEnd } } })
+  }
+  if (criteria.updatedDateStart) {
+    boolQuery.push({ range: { updated: { gte: criteria.updatedDateStart } } })
+  }
+  if (criteria.updatedDateEnd) {
+    boolQuery.push({ range: { updated: { lte: criteria.updatedDateEnd } } })
+  }
+
+  const esQuery = {
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    size: criteria.perPage,
+    from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
+    body: {
+      query: {
+        bool: {
+          filter: boolQuery
+        }
+      },
+      sort: [{ 'created': { 'order': 'asc' } }]
+    }
+  }
+
+  // get ES client
+  const esClient = helper.getESClient()
+  // Search with constructed query
+  const docs = await esClient.search(esQuery)
+  // Extract data from hits
+  const total = docs.hits.total
+  const result = _.map(docs.hits.hits, item => item._source)
 
   const typeList = await helper.scan('ChallengeType')
   const typeMap = new Map()
@@ -87,13 +126,25 @@ searchChallenges.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage(),
+    id: Joi.optionalId(),
+    typeId: Joi.optionalId(),
+    track: Joi.string(),
     name: Joi.string(),
     description: Joi.string(),
+    timelineTemplateId: Joi.optionalId(),
+    reviewType: Joi.string(),
+    tag: Joi.string(),
+    projectId: Joi.number().integer().positive(),
+    forumId: Joi.number().integer().positive(),
+    legacyId: Joi.number().integer().positive(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)),
+    group: Joi.string(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
     updatedDateStart: Joi.date(),
     updatedDateEnd: Joi.date(),
-    createdBy: Joi.string()
+    createdBy: Joi.string(),
+    updatedBy: Joi.string()
   })
 }
 
@@ -187,6 +238,7 @@ createChallenge.schema = {
     reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
+    legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
@@ -228,7 +280,24 @@ async function populateSettings (data) {
  * @returns {Object} the challenge with given id
  */
 async function getChallenge (currentUser, id) {
-  const challenge = await helper.getById('Challenge', id)
+  const esClient = helper.getESClient()
+
+  // get challenge from Elasticsearch
+  let challenge
+  try {
+    challenge = await esClient.getSource({
+      index: config.get('ES.ES_INDEX'),
+      type: config.get('ES.ES_TYPE'),
+      id
+    })
+  } catch (e) {
+    if (e.statusCode === HttpStatus.NOT_FOUND) {
+      throw new errors.NotFoundError(`Challenge of id ${id} is not found.`)
+    } else {
+      throw e
+    }
+  }
+
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
@@ -347,7 +416,7 @@ async function update (currentUser, challengeId, data, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
-  if (challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase()) {
     throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
   }
 
@@ -433,7 +502,7 @@ async function update (currentUser, challengeId, data, isFull) {
           oldValue,
           newValue,
           created: new Date(),
-          createdBy: currentUser.handle
+          createdBy: currentUser.handle || currentUser.sub
         })
       }
     }
@@ -448,9 +517,11 @@ async function update (currentUser, challengeId, data, isFull) {
       oldValue: JSON.stringify(challenge.challengeSettings),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle
+      createdBy: currentUser.handle || currentUser.sub
     })
     delete challenge.challengeSettings
+    // send null to Elasticsearch to clear the field
+    data.challengeSettings = null
   }
   if (isFull && _.isUndefined(data.attachmentIds) && challenge.attachments) {
     if (!updateDetails['$DELETE']) {
@@ -464,9 +535,11 @@ async function update (currentUser, challengeId, data, isFull) {
       oldValue: JSON.stringify(challenge.attachments),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle
+      createdBy: currentUser.handle || currentUser.sub
     })
     delete challenge.attachments
+    // send null to Elasticsearch to clear the field
+    data.attachments = null
   }
   if (isFull && _.isUndefined(data.groups) && challenge.groups) {
     if (!updateDetails['$DELETE']) {
@@ -480,9 +553,29 @@ async function update (currentUser, challengeId, data, isFull) {
       oldValue: JSON.stringify(challenge.groups),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle
+      createdBy: currentUser.handle || currentUser.sub
     })
     delete challenge.groups
+    // send null to Elasticsearch to clear the field
+    data.groups = null
+  }
+  if (isFull && _.isUndefined(data.legacyId) && challenge.legacyId) {
+    if (!updateDetails['$DELETE']) {
+      updateDetails['$DELETE'] = {}
+    }
+    updateDetails['$DELETE'].legacyId = null
+    auditLogs.push({
+      id: uuid(),
+      challengeId,
+      fieldName: 'legacyId',
+      oldValue: JSON.stringify(challenge.legacyId),
+      newValue: 'NULL',
+      created: new Date(),
+      createdBy: currentUser.handle || currentUser.sub
+    })
+    delete challenge.legacyId
+    // send null to Elasticsearch to clear the field
+    data.legacyId = null
   }
 
   await models.Challenge.update({ id: challengeId }, updateDetails)
@@ -494,6 +587,7 @@ async function update (currentUser, challengeId, data, isFull) {
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
+    data.attachments = newAttachments
   }
 
   // delete unused attachments
@@ -553,6 +647,7 @@ fullyUpdateChallenge.schema = {
     reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
+    legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
@@ -607,6 +702,7 @@ partiallyUpdateChallenge.schema = {
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
+    legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()) // group names

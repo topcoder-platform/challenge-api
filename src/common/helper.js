@@ -13,9 +13,13 @@ const m2mAuth = require('tc-core-library-js').auth.m2m
 const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
 const axios = require('axios')
 const busApi = require('tc-bus-api-wrapper')
+const elasticsearch = require('elasticsearch')
 
 // Bus API Client
 let busApiClient
+
+// Elasticsearch client
+let esClient
 
 AWS.config.update({
   s3: config.AMAZON.S3_API_VERSION,
@@ -464,6 +468,35 @@ async function postBusEvent (topic, payload) {
   })
 }
 
+/**
+ * Get ES Client
+ * @return {Object} Elasticsearch Client Instance
+ */
+function getESClient () {
+  if (esClient) {
+    return esClient
+  }
+  const esHost = config.get('ES.HOST')
+  // AWS ES configuration is different from other providers
+  if (/.*amazonaws.*/.test(esHost)) {
+    esClient = elasticsearch.Client({
+      apiVersion: config.get('ES.API_VERSION'),
+      hosts: esHost,
+      connectionClass: require('http-aws-es'), // eslint-disable-line global-require
+      amazonES: {
+        region: config.get('AMAZON.AWS_REGION'),
+        credentials: new AWS.EnvironmentCredentials('AWS')
+      }
+    })
+  } else {
+    esClient = new elasticsearch.Client({
+      apiVersion: config.get('ES.API_VERSION'),
+      hosts: esHost
+    })
+  }
+  return esClient
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -485,5 +518,6 @@ module.exports = {
   getChallengeResources,
   getUserGroups,
   ensureNoDuplicateOrNullElements,
-  postBusEvent
+  postBusEvent,
+  getESClient
 }
