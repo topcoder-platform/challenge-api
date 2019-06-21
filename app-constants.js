@@ -9,7 +9,8 @@ const UserRoles = {
 const prizeSetTypes = {
   ChallengePrizes: 'Challenge prizes',
   CopilotPayment: 'Copilot payment',
-  ReviewerPayment: 'Reviewer payment'
+  ReviewerPayment: 'Reviewer payment',
+  CheckpointPrizes: 'Checkpoint prizes'
 }
 
 const challengeStatuses = {
@@ -25,8 +26,8 @@ const EVENT_MIME_TYPE = 'application/json'
 
 // using a testing topc, should be changed to use real topics in comments when they are created
 const Topics = {
-  ChallengeCreated: 'test.new.bus.events', // 'challenge.action.created',
-  ChallengeUpdated: 'test.new.bus.events', // 'challenge.action.updated',
+  ChallengeCreated: 'challenge.notification.create',
+  ChallengeUpdated: 'challenge.notification.update',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
   ChallengeSettingCreated: 'test.new.bus.events', // 'challenge.action.setting.created',

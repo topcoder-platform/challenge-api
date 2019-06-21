@@ -238,8 +238,9 @@ createChallenge.schema = {
     reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
-    forumId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
+    forumId: Joi.number().integer().positive(),
+    startDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()) // group names
   }).required()
@@ -303,7 +304,7 @@ async function getChallenge (currentUser, id) {
   // populate type property based on the typeId
   const type = await helper.getById('ChallengeType', challenge.typeId)
   challenge.type = type.name
-  delete challenge.typeId
+  // delete challenge.typeId
 
   return populateSettings(challenge)
 }
@@ -646,8 +647,9 @@ fullyUpdateChallenge.schema = {
     reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
-    forumId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
+    forumId: Joi.number().integer().positive(),
+    startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()) // group names
@@ -686,6 +688,7 @@ partiallyUpdateChallenge.schema = {
       isActive: Joi.boolean().required(),
       duration: Joi.number().positive().required()
     })).min(1),
+    startDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
