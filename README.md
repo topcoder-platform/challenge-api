@@ -30,6 +30,11 @@ The following parameters can be set in config files or in env variables:
 - AMAZON.IS_LOCAL_DB: Use Amazon DynamoDB Local or server.
 - AMAZON.DYNAMODB_URL: The local url if using Amazon DynamoDB Local
 - AMAZON.ATTACHMENT_S3_BUCKET: the AWS S3 bucket to store attachments
+- ES: config object for Elasticsearch
+- ES.HOST: Elasticsearch host
+- ES.API_VERSION: Elasticsearch API version
+- ES.ES_INDEX: Elasticsearch index name
+- ES.ES_TYPE: Elasticsearch index type
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
 - CHALLENGES_API_URL: TC challenges API base URL
 - GROUPS_API_URL: TC groups API base URL
@@ -67,7 +72,7 @@ Go to `mock-api` folder and run command `npm run start` to start the mock-api li
 1. Drop/delete tables: `npm run drop-tables`
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
-4. Initialize database in default environment: `npm run init-db`
+4. Initialize/Clear database in default environment: `npm run init-db`
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `ChallengeSetting`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
 
 ### Notes

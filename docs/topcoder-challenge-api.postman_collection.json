@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ff61aad3-5167-4ac5-b054-ee2ff3a3eb90",
+		"_postman_id": "6a28e634-7139-4084-b9eb-3318062e035c",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -877,6 +877,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -938,6 +942,10 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?invalid=-NAME-&page=2&perPage=2",
 									"host": [
@@ -999,6 +1007,10 @@
 										"value": "Bearer invalid"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1055,6 +1067,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1116,6 +1132,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1177,6 +1197,10 @@
 										"value": "Bearer {{m2m_challenge_settings_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1238,6 +1262,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
 									"host": [
@@ -1305,6 +1333,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
 									"host": [
@@ -1353,6 +1385,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1401,6 +1437,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/invalid-id",
 									"host": [
@@ -1444,6 +1484,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1492,6 +1536,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1540,6 +1588,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
 									"host": [
@@ -1588,6 +1640,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/11111111-a41a-4b80-b6dd-90f3816ada99",
 									"host": [
@@ -1636,6 +1692,10 @@
 										"value": "Bearer {{m2m_challenge_settings_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
 									"host": [
@@ -1684,6 +1744,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
 									"host": [
@@ -3040,6 +3104,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes?name=-name-&description=cri&isActive=true",
 									"host": [
@@ -3096,6 +3164,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes?isActive=true&page=2&perPage=2",
 									"host": [
@@ -3152,6 +3224,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes?invalid=test",
 									"host": [
@@ -3206,6 +3282,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
 									"host": [
@@ -3249,6 +3329,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
 									"host": [
@@ -3292,6 +3376,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/invalid-id",
 									"host": [
@@ -3335,6 +3423,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{SETTINGA_ID}}",
 									"host": [
@@ -5008,6 +5100,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases?name=ph",
 									"host": [
@@ -5061,6 +5157,10 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -5108,6 +5208,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases?invalid=test",
 									"host": [
@@ -5156,6 +5260,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -5203,6 +5311,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -5250,6 +5362,10 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -5297,6 +5413,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases",
 									"host": [
@@ -5344,6 +5464,10 @@
 										"value": "Bearer {{m2m_challenge_phases_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases?name=ph",
 									"host": [
@@ -5397,6 +5521,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases?name=ph",
 									"host": [
@@ -5456,6 +5584,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
 									"host": [
@@ -5504,6 +5636,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -5552,6 +5688,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/invalid-id",
 									"host": [
@@ -5595,6 +5735,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -5643,6 +5787,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -5691,6 +5839,10 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -5739,6 +5891,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
 									"host": [
@@ -5787,6 +5943,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{TYPEA_ID}}",
 									"host": [
@@ -5835,6 +5995,10 @@
 										"value": "Bearer {{m2m_challenge_phases_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
@@ -5883,6 +6047,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
@@ -8030,6 +8198,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8083,6 +8255,10 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=LA",
 									"host": [
@@ -8136,6 +8312,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?invalid=test",
 									"host": [
@@ -8184,6 +8364,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8237,6 +8421,10 @@
 										"value": "Bearer invalid"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8290,6 +8478,10 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8343,6 +8535,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8396,6 +8592,10 @@
 										"value": "Bearer {{m2m_timeline_templates_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8449,6 +8649,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates?name=1",
 									"host": [
@@ -8508,6 +8712,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -8556,6 +8764,10 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEB_ID}}",
 									"host": [
@@ -8604,6 +8816,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/invalid-id",
 									"host": [
@@ -8652,6 +8868,10 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -8700,6 +8920,10 @@
 										"value": "Bearer invalid"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -8743,6 +8967,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -8791,6 +9019,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
 									"host": [
@@ -8839,6 +9071,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{SETTINGA_ID}}",
 									"host": [
@@ -8887,6 +9123,10 @@
 										"value": "Bearer {{m2m_timeline_templates_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
@@ -8935,6 +9175,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
@@ -10570,7 +10814,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"legacyId\": 123456,\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -11389,7 +11633,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11439,7 +11683,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11488,7 +11732,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11537,7 +11781,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11586,7 +11830,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11629,7 +11873,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11678,7 +11922,7 @@
 										{
 											"key": "wrong",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11728,7 +11972,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11777,7 +12021,7 @@
 										{
 											"key": "attachment",
 											"type": "file",
-											"src": []
+											"src": ""
 										}
 									]
 								},
@@ -11826,6 +12070,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -11866,6 +12114,10 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -11906,6 +12158,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -11946,6 +12202,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TYPEA_ID}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -11986,6 +12246,10 @@
 										"value": "Bearer {{expire_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -12026,6 +12290,10 @@
 										"value": "Bearer invalid"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}/attachments/{{ATTACHMENT_ID1}}",
 									"host": [
@@ -12066,6 +12334,10 @@
 										"value": "Bearer {{copilot2_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -12100,6 +12372,10 @@
 							"request": {
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}/attachments/{{ATTACHMENT_ID2}}",
 									"host": [
@@ -12140,6 +12416,10 @@
 										"value": "Bearer {{m2m_challenge_attachments_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}/attachments/{{TEST_ATTACHMENT_M2M_ID}}",
 									"host": [
@@ -12180,6 +12460,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TEST_CHALLENGE_M2M_ID}}/attachments/{{TEST_ATTACHMENT_M2M_ID}}",
 									"host": [
@@ -12258,8 +12542,12 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?page=1&perPage=10&id={{ES_CHALLENGE_ID}}&typeId={{ES_TYPE_ID}}&track=coDE&name=TEST&description=a b&timelineTemplateId={{ES_TIMELINE_TEMPLATE_ID}}&reviewType=code&tag=tag2&projectId=12&forumId=45&legacyId=55&status=Active&group=g1&createdDateStart=2017-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z&updatedDateStart=2017-02-22T00:00:00Z&updatedDateEnd=2028-02-22T00:00:00Z&createdBy=admin&updatedBy=user",
 									"host": [
 										"{{URL}}"
 									],
@@ -12268,21 +12556,88 @@
 									],
 									"query": [
 										{
+											"key": "page",
+											"value": "1"
+										},
+										{
 											"key": "perPage",
 											"value": "10"
 										},
 										{
-											"key": "createdBy",
-											"value": "TonyJ",
-											"disabled": true
+											"key": "id",
+											"value": "{{ES_CHALLENGE_ID}}"
+										},
+										{
+											"key": "typeId",
+											"value": "{{ES_TYPE_ID}}"
+										},
+										{
+											"key": "track",
+											"value": "coDE"
+										},
+										{
+											"key": "name",
+											"value": "TEST"
+										},
+										{
+											"key": "description",
+											"value": "a b"
+										},
+										{
+											"key": "timelineTemplateId",
+											"value": "{{ES_TIMELINE_TEMPLATE_ID}}"
+										},
+										{
+											"key": "reviewType",
+											"value": "code"
+										},
+										{
+											"key": "tag",
+											"value": "tag2"
+										},
+										{
+											"key": "projectId",
+											"value": "12"
+										},
+										{
+											"key": "forumId",
+											"value": "45"
+										},
+										{
+											"key": "legacyId",
+											"value": "55"
+										},
+										{
+											"key": "status",
+											"value": "Active"
+										},
+										{
+											"key": "group",
+											"value": "g1"
 										},
 										{
 											"key": "createdDateStart",
-											"value": "2019-02-22T00:00:00Z"
+											"value": "2017-02-22T00:00:00Z"
 										},
 										{
 											"key": "createdDateEnd",
 											"value": "2022-03-22T00:00:00Z"
+										},
+										{
+											"key": "updatedDateStart",
+											"value": "2017-02-22T00:00:00Z"
+										},
+										{
+											"key": "updatedDateEnd",
+											"value": "2028-02-22T00:00:00Z"
+										},
+										{
+											"key": "createdBy",
+											"value": "admin"
+										},
+										{
+											"key": "updatedBy",
+											"value": "user"
 										}
 									]
 								}
@@ -12324,8 +12679,12 @@
 										"value": "Bearer {{copilot1_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2017-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
 										"{{URL}}"
 									],
@@ -12344,7 +12703,7 @@
 										},
 										{
 											"key": "createdDateStart",
-											"value": "2019-02-22T00:00:00Z"
+											"value": "2017-02-22T00:00:00Z"
 										},
 										{
 											"key": "createdDateEnd",
@@ -12390,8 +12749,12 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2017-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
 										"{{URL}}"
 									],
@@ -12410,7 +12773,7 @@
 										},
 										{
 											"key": "createdDateStart",
-											"value": "2019-02-22T00:00:00Z"
+											"value": "2017-02-22T00:00:00Z"
 										},
 										{
 											"key": "createdDateEnd",
@@ -12451,8 +12814,12 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2017-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
 										"{{URL}}"
 									],
@@ -12471,7 +12838,7 @@
 										},
 										{
 											"key": "createdDateStart",
-											"value": "2019-02-22T00:00:00Z"
+											"value": "2017-02-22T00:00:00Z"
 										},
 										{
 											"key": "createdDateEnd",
@@ -12512,6 +12879,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=abc&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
@@ -12573,6 +12944,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges?invalid=test-",
 									"host": [
@@ -12626,8 +13001,12 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2016-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
 										"{{URL}}"
 									],
@@ -12646,7 +13025,7 @@
 										},
 										{
 											"key": "createdDateStart",
-											"value": "2019-02-22T00:00:00Z"
+											"value": "2016-02-22T00:00:00Z"
 										},
 										{
 											"key": "createdDateEnd",
@@ -12692,8 +13071,12 @@
 										"value": "Bearer {{m2m_challenge_attachments_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
-									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+									"raw": "{{URL}}/challenges?perPage=10&createdDateStart=2017-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 									"host": [
 										"{{URL}}"
 									],
@@ -12712,7 +13095,7 @@
 										},
 										{
 											"key": "createdDateStart",
-											"value": "2019-02-22T00:00:00Z"
+											"value": "2017-02-22T00:00:00Z"
 										},
 										{
 											"key": "createdDateEnd",
@@ -12729,6 +13112,157 @@
 				{
 					"name": "get challenge",
 					"item": [
+						{
+							"name": "get ES challenge by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c1b8d8ca-64df-494c-9b8a-8507058e8692",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{ES_CHALLENGE_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{ES_CHALLENGE_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get ES challenge by M2M",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c1b8d8ca-64df-494c-9b8a-8507058e8692",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_read}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{ES_CHALLENGE_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{ES_CHALLENGE_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure get ES challenge by anonymous user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c1b8d8ca-64df-494c-9b8a-8507058e8692",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{ES_CHALLENGE_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{ES_CHALLENGE_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
 						{
 							"name": "get challenge 1 by anonymous user",
 							"event": [
@@ -12759,6 +13293,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
 									"host": [
@@ -12807,6 +13345,10 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -12855,6 +13397,10 @@
 										"value": "Bearer {{admin_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -12903,6 +13449,10 @@
 										"value": "Bearer {{user_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -12946,6 +13496,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/invalid-id",
 									"host": [
@@ -12989,6 +13543,10 @@
 										"value": "application/json"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{TYPEA_ID}}",
 									"host": [
@@ -13037,6 +13595,10 @@
 										"value": "Bearer {{m2m_challenges_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -13085,6 +13647,10 @@
 										"value": "Bearer {{m2m_challenge_attachments_read}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -13133,6 +13699,10 @@
 										"value": "Bearer invalid"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
 									"host": [
@@ -13190,7 +13760,59 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Active\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update challenge 1 with attachment by M2M",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_update}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID1}}\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -13716,7 +14338,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-new-track\",\n\t\"name\": \"update-name\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 5000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 6000000\n        }\n\t],\n\t\"tags\": [\"tag1\"],\n\t\"forumId\": 456456,\n\t\"status\": \"Completed\",\n\t\"groups\": [],\n\t\"attachmentIds\": []\n}"
+									"raw": "{\n\t\"legacyId\": 789789\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -14190,6 +14812,10 @@
 								"value": "Bearer {{admin_token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
@@ -14271,6 +14897,10 @@
 								"value": "Bearer {{admin_token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID2}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z&createdBy=ghostar",
 							"host": [
@@ -14341,6 +14971,10 @@
 								"value": "Bearer {{user_token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
@@ -14410,6 +15044,10 @@
 								"value": "Bearer {{expire_token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
@@ -14479,6 +15117,10 @@
 								"value": "Bearer {{admin_token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&invalid=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
@@ -14548,6 +15190,10 @@
 								"value": "Bearer {{m2m_challenge_audit_logs_read}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
@@ -14629,6 +15275,10 @@
 								"value": "Bearer {{m2m_challenges_read}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
@@ -14710,6 +15360,10 @@
 								"value": "application/json"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{URL}}/health",
 							"host": [

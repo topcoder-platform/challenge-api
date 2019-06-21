@@ -29,6 +29,15 @@ module.exports = {
     ATTACHMENT_S3_BUCKET: process.env.ATTACHMENT_S3_BUCKET || 'my-testing-bucket-12345',
     S3_API_VERSION: process.env.S3_API_VERSION || '2006-03-01'
   },
+
+  ES: {
+    // above AWS_REGION is used if we use AWS ES
+    HOST: process.env.ES_HOST || 'localhost:9200',
+    API_VERSION: process.env.ES_API_VERSION || '6.3',
+    ES_INDEX: process.env.ES_INDEX || 'challenge',
+    ES_TYPE: process.env.ES_TYPE || '_doc' // ES 6.x accepts only 1 Type per index and it's mandatory to define it
+  },
+
   // in bytes
   FILE_UPLOAD_SIZE_LIMIT: process.env.FILE_UPLOAD_SIZE_LIMIT
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT) : 50 * 1024 * 1024, // 50M
