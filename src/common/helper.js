@@ -12,7 +12,7 @@ const config = require('config')
 const m2mAuth = require('tc-core-library-js').auth.m2m
 const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
 const axios = require('axios')
-const busApi = require('tc-bus-api-wrapper')
+const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 
 // Bus API Client
@@ -314,8 +314,7 @@ async function validatePhases (phases) {
   _.each(records, r => {
     map.set(r.id, r)
   })
-  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive ||
-    !_.isEqual(_.pick(map.get(p.id), 'id', 'name', 'description', 'predecessor', 'isActive'), _.omit(p, 'duration')))
+  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive)
   if (invalidPhases.length > 0) {
     throw new errors.BadRequestError(`The following phases are invalid or inactive: ${toString(invalidPhases)}`)
   }

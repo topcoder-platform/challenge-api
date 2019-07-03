@@ -106,7 +106,8 @@ async function searchChallenges (currentUser, criteria) {
   const docs = await esClient.search(esQuery)
   // Extract data from hits
   const total = docs.hits.total
-  const result = _.map(docs.hits.hits, item => item._source)
+  let result = _.map(docs.hits.hits, item => item._source)
+  result = await filterChallengesByGroupsAccess(currentUser, result)
 
   const typeList = await helper.scan('ChallengeType')
   const typeMap = new Map()
