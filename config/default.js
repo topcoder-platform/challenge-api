@@ -33,7 +33,7 @@ module.exports = {
   ES: {
     // above AWS_REGION is used if we use AWS ES
     HOST: process.env.ES_HOST || 'localhost:9200',
-    API_VERSION: process.env.ES_API_VERSION || '6.3',
+    API_VERSION: process.env.ES_API_VERSION || '6.7',
     ES_INDEX: process.env.ES_INDEX || 'challenge',
     ES_TYPE: process.env.ES_TYPE || '_doc' // ES 6.x accepts only 1 Type per index and it's mandatory to define it
   },

@@ -87,3 +87,5 @@ app.use((err, req, res, next) => {
 app.listen(app.get('port'), () => {
   logger.info(`Express server listening on port ${app.get('port')}`)
 })
+
+module.exports = app

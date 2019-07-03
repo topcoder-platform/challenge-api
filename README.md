@@ -5,6 +5,7 @@
 - nodejs https://nodejs.org/en/ (v10)
 - DynamoDB
 - AWS S3
+- Elasticsearch v6
 - Docker, Docker Compose
 
 ## Configuration
@@ -52,9 +53,20 @@ Set the following environment variables so that the app can get TC M2M token (us
 
 Also properly configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, ATTACHMENT_S3_BUCKET, IS_LOCAL_DB config parameters.
 
-## DynamoDB Setup
-We can use DynamoDB setup on Docker for testing purpose. Just run `docker-compose up` in `local` folder.
-You can also use your own AWS DynamoDB service for testing purpose.
+Test configuration is at `config/test.js`. You don't need to change them.
+The following test parameters can be set in config file or in env variables:
+
+- ADMIN_TOKEN: admin token
+- COPILOT_TOKEN: copilot token
+- USER_TOKEN: user token
+- EXPIRED_TOKEN: expired token
+- INVALID_TOKEN: invalid token
+- M2M_FULL_ACCESS_TOKEN: M2M full access token
+- M2M_READ_ACCESS_TOKEN: M2M read access token
+- M2M_UPDATE_ACCESS_TOKEN: M2M update (including 'delete') access token
+
+## Local Elasticsearch and DynamoDB setup
+In the `local` folder, run `docker-compose up`
 
 ## AWS S3 Setup
 Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
@@ -74,6 +86,7 @@ Go to `mock-api` folder and run command `npm run start` to start the mock-api li
 3. Seed/Insert data to tables: `npm run seed-tables`
 4. Initialize/Clear database in default environment: `npm run init-db`
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `ChallengeSetting`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
+6. Create Elasticsearch index: `npm run init-db`, or to re-create index: `npm run init-db force`
 
 ### Notes
 - The seed data are located in `src/scripts/seed`
@@ -83,11 +96,47 @@ Go to `mock-api` folder and run command `npm run start` to start the mock-api li
 - Install dependencies `npm install`
 - Run lint `npm run lint`
 - Run lint fix `npm run lint:fix`
+- initialize Elasticsearch, create configured Elasticsearch index if not present: `npm run init-es`,
+  or re-create the index: `npm run init-es force`
 - Create tables `npm run create-tables`
 - Clear and init db `npm run init-db`
 - Start app `npm start`
 - App is running at `http://localhost:3000`
 - Start mock-api, go to `mock-api` folder and `npm start`, mock api is running at `http://localhost:4000`
+
+## Running tests
+
+Before running tests, DynamoDB tables should be created, ES index should be initialized, mock API should be started and
+various config parameters are properly set.
+Seeding db data is not needed.
+
+### Running unit tests
+
+To run unit tests alone
+
+```bash
+npm run test
+```
+
+To run unit tests with coverage report
+
+```bash
+npm run test:cov
+```
+
+### Running integration tests
+
+To run integration tests alone
+
+```bash
+npm run e2e
+```
+
+To run integration tests with coverage report
+
+```bash
+npm run e2e:cov
+```
 
 ## Verification
 Refer to the verification document `Verification.md`
