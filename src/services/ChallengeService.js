@@ -13,6 +13,8 @@ const constants = require('../../app-constants')
 const models = require('../models')
 const HttpStatus = require('http-status-codes')
 
+const esClient = helper.getESClient()
+
 /**
  * Filter challenges by groups access
  * @param {Object} currentUser the user who perform operation
@@ -100,8 +102,6 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  // get ES client
-  const esClient = helper.getESClient()
   // Search with constructed query
   const docs = await esClient.search(esQuery)
   // Extract data from hits
@@ -204,6 +204,15 @@ async function createChallenge (currentUser, challenge) {
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
+
+  // Create in ES
+  await esClient.create({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: ret.id,
+    body: ret
+  })
   return ret
 }
 
@@ -281,8 +290,6 @@ async function populateSettings (data) {
  * @returns {Object} the challenge with given id
  */
 async function getChallenge (currentUser, id) {
-  const esClient = helper.getESClient()
-
   // get challenge from Elasticsearch
   let challenge
   try {
@@ -598,9 +605,10 @@ async function update (currentUser, challengeId, data, isFull) {
     await attachment.delete()
   }
 
+  const result = isFull ? challenge : _.assignIn({ id: challengeId }, data)
+
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated,
-    isFull ? challenge : _.assignIn({ id: challengeId }, data))
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, result)
   return challenge
 }
 

@@ -36,6 +36,7 @@ The following parameters can be set in config files or in env variables:
 - ES.API_VERSION: Elasticsearch API version
 - ES.ES_INDEX: Elasticsearch index name
 - ES.ES_TYPE: Elasticsearch index type
+- ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
 - CHALLENGES_API_URL: TC challenges API base URL
 - GROUPS_API_URL: TC groups API base URL
@@ -64,12 +65,14 @@ The following test parameters can be set in config file or in env variables:
 - M2M_FULL_ACCESS_TOKEN: M2M full access token
 - M2M_READ_ACCESS_TOKEN: M2M read access token
 - M2M_UPDATE_ACCESS_TOKEN: M2M update (including 'delete') access token
-
-## Local Elasticsearch and DynamoDB setup
-In the `local` folder, run `docker-compose up`
+- S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
 
 ## AWS S3 Setup
 Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
+
+## Local services setup
+In the `local` folder, run `docker-compose up`
+It starts Elasticsearch, DynamoDB and S3 compatible server.
 
 ## Mock api
 For postman verification, please use the mock api under mock-api folder. It provides mock endpoint to fetch challenge resources and groups.
@@ -106,12 +109,15 @@ Go to `mock-api` folder and run command `npm run start` to start the mock-api li
 
 ## Running tests
 
-Before running tests, DynamoDB tables should be created, ES index should be initialized, mock API should be started and
-various config parameters are properly set.
+### Prepare
+- Start Local services.
+- Start Mock API.
+- Create DynamoDB tables.
+- Initialize ES index.
+- Various config parameters should be properly set.
 Seeding db data is not needed.
 
 ### Running unit tests
-
 To run unit tests alone
 
 ```bash
@@ -125,7 +131,6 @@ npm run test:cov
 ```
 
 ### Running integration tests
-
 To run integration tests alone
 
 ```bash

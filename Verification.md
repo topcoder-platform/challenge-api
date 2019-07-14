@@ -11,6 +11,9 @@ Run command `npm run view-data <ModelName>` to view table data, ModelName can be
 
 Login to AWS Console, S3 service, view the bucket content.
 
+## ElasticSearch Verification
+
+Run command `npm run view-es-data` to view data store in ES.
 
 ## Bus Event Verification
 
