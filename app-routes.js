@@ -59,6 +59,8 @@ module.exports = (app) => {
               if (def.access && !helper.checkIfExists(def.access, req.authUser.roles)) {
                 next(new errors.ForbiddenError('You are not allowed to perform this action!'))
               } else {
+                // user token is used in create/update challenge to ensure user can create/update challenge under specific project
+                req.userToken = req.headers.authorization.split(' ')[1]
                 next()
               }
             } else {

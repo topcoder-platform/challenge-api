@@ -61,11 +61,15 @@ async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'createdDateStart', 'createdDateEnd',
-    'updatedDateStart', 'updatedDateEnd']), (value, key) => {
+    'updatedDateStart', 'updatedDateEnd', 'memberId']), (value, key) => {
     const filter = { match_phrase: {} }
     filter.match_phrase[key] = value
     boolQuery.push(filter)
   })
+  if (criteria.memberId) {
+    const ids = await helper.listChallengesByMember(criteria.memberId)
+    boolQuery.push({ terms: { id: ids } })
+  }
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
@@ -145,7 +149,8 @@ searchChallenges.schema = {
     updatedDateStart: Joi.date(),
     updatedDateEnd: Joi.date(),
     createdBy: Joi.string(),
-    updatedBy: Joi.string()
+    updatedBy: Joi.string(),
+    memberId: Joi.number().integer().positive()
   })
 }
 
@@ -188,9 +193,11 @@ async function validateChallengeData (challenge) {
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
+ * @param {String} userToken the user token
  * @returns {Object} the created challenge
  */
-async function createChallenge (currentUser, challenge) {
+async function createChallenge (currentUser, challenge, userToken) {
+  await helper.ensureProjectExist(challenge.projectId, userToken)
   await validateChallengeData(challenge)
   await helper.validatePhases(challenge.phases)
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
@@ -244,7 +251,8 @@ createChallenge.schema = {
     startDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()) // group names
-  }).required()
+  }).required(),
+  userToken: Joi.any()
 }
 
 /**
@@ -399,10 +407,15 @@ function isDifferentPrizeSets (prizeSets, otherPrizeSets) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
+ * @param {String} userToken the user token
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update (currentUser, challengeId, data, isFull) {
+async function update (currentUser, challengeId, data, userToken, isFull) {
+  if (data.projectId) {
+    await helper.ensureProjectExist(data.projectId, userToken)
+  }
+
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(data.attachmentIds, 'attachmentIds')
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
@@ -609,10 +622,11 @@ async function update (currentUser, challengeId, data, isFull) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
+ * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function fullyUpdateChallenge (currentUser, challengeId, data) {
-  return update(currentUser, challengeId, data, true)
+async function fullyUpdateChallenge (currentUser, challengeId, data, userToken) {
+  return update(currentUser, challengeId, data, userToken, true)
 }
 
 fullyUpdateChallenge.schema = {
@@ -654,7 +668,8 @@ fullyUpdateChallenge.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()) // group names
-  }).required()
+  }).required(),
+  userToken: Joi.any()
 }
 
 /**
@@ -662,10 +677,11 @@ fullyUpdateChallenge.schema = {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
+ * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function partiallyUpdateChallenge (currentUser, challengeId, data) {
-  return update(currentUser, challengeId, data)
+async function partiallyUpdateChallenge (currentUser, challengeId, data, userToken) {
+  return update(currentUser, challengeId, data, userToken)
 }
 
 partiallyUpdateChallenge.schema = {
@@ -707,7 +723,8 @@ partiallyUpdateChallenge.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()) // group names
-  }).required()
+  }).required(),
+  userToken: Joi.any()
 }
 
 module.exports = {

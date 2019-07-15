@@ -156,6 +156,11 @@ paths:
           description: Filter by 'updatedBy' field, case-insensitive, partial matches are allowed.
           required: false
           type: string
+        - name: memberId
+          in: query
+          description: Filter by member, only return challenges this member can access to
+          required: false
+          type: string
       responses:
         '200':
           description: OK

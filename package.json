@@ -9,6 +9,7 @@
     "lint:fix": "standard --fix",
     "init-es": "node src/init-es.js",
     "init-db": "node src/init-db.js",
+    "sync-es": "node src/scripts/sync-es.js",
     "drop-tables": "node src/scripts/drop-tables.js",
     "create-tables": "node src/scripts/create-tables.js",
     "seed-tables": "node src/scripts/seed-tables.js",

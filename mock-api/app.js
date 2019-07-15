@@ -1,10 +1,12 @@
 /**
  * The application entry point for mock API
  */
+
 const express = require('express')
 const cors = require('cors')
 const config = require('config')
 const winston = require('winston')
+const helper = require('../src/common/helper')
 
 const app = express()
 app.set('port', config.PORT)
@@ -12,8 +14,8 @@ app.set('port', config.PORT)
 app.use(cors())
 
 // get challenge resources
-app.get('/v5/challenges/:challengeId/resources', (req, res) => {
-  const challengeId = req.params.challengeId
+app.get('/v5/resources', (req, res) => {
+  const challengeId = req.query.challengeId
   winston.info(`Get resources of challenge id ${challengeId}`)
 
   const resources = [{
@@ -32,6 +34,52 @@ app.get('/v5/challenges/:challengeId/resources', (req, res) => {
 
   winston.info(`Challenge resources: ${JSON.stringify(resources, null, 4)}`)
   res.json(resources)
+})
+
+// get challenges member can access to
+app.get('/v5/resources/:memberId/challenges', (req, res) => {
+  const memberId = req.params.memberId
+  if (memberId === '40309246' || memberId === '151743') {
+    helper.scan('Challenge')
+      .then(result => {
+        const ret = []
+        for (const element of result) {
+          if (memberId === '151743') {
+            if (element.createdBy === 'Ghostar') {
+              ret.push(element.id)
+            }
+          } else {
+            ret.push(element.id)
+          }
+        }
+        res.json(ret)
+      })
+      .catch(e => {
+        winston.error(e)
+        res.json([])
+      })
+  } else {
+    res.json([])
+  }
+})
+
+// get project by id
+app.get('/v4/projects/:projectId', (req, res) => {
+  const projectId = req.params.projectId
+  if (projectId === '111' || projectId === '123' || projectId === '112233') {
+    res.end()
+  } else if (projectId === '200') {
+    res.status(403).send({
+      id: '6e97fe68-f89c-4c45-b25b-d17933a3c4b9',
+      result: {
+        success: false,
+        status: 403,
+        content: { message: 'You do not have permissions to perform this action' }
+      }
+    })
+  } else {
+    res.status(404).end()
+  }
 })
 
 // search groups

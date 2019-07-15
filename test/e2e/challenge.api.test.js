@@ -152,6 +152,28 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.message, `No challenge type found with id: ${notFoundId}.`)
     })
 
+    it(`create challenge - user doesn't have permission to create challenge under specific project`, async () => {
+      const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+      challengeData.projectId = 200
+      const response = await chai.request(app)
+        .post(basePath)
+        .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
+        .send(challengeData)
+      should.equal(response.status, 403)
+      should.equal(response.body.message, 'You do not have permissions to perform this action')
+    })
+
+    it(`create challenge - project not found`, async () => {
+      const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+      challengeData.projectId = 100000
+      const response = await chai.request(app)
+        .post(basePath)
+        .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
+        .send(challengeData)
+      should.equal(response.status, 400)
+      should.equal(response.body.message, `Project with id: ${challengeData.projectId} doesn't exist`)
+    })
+
     it('create challenge - invalid track', async () => {
       const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
       challengeData.track = [1, 2]
@@ -341,7 +363,8 @@ describe('challenge API E2E tests', () => {
           group: data.challenge.groups[0],
           createdDateStart: '1992-01-02',
           createdDateEnd: '2022-01-02',
-          createdBy: data.challenge.createdBy
+          createdBy: data.challenge.createdBy,
+          memberId: 40309246
         })
       should.equal(response.status, 200)
       should.equal(response.headers['x-page'], '1')
@@ -401,6 +424,40 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.length, 0)
     })
 
+    it('search challenges successfully 3', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.M2M_READ_ACCESS_TOKEN}`)
+        .query({
+          page: 1,
+          perPage: 10,
+          id: data.challenge.id,
+          typeId: data.challenge.typeId,
+          track: data.challenge.track,
+          name: data.challenge.name.substring(2).trim().toUpperCase(),
+          description: data.challenge.description,
+          timelineTemplateId: data.challenge.timelineTemplateId,
+          reviewType: data.challenge.reviewType,
+          tag: data.challenge.tags[0],
+          projectId: data.challenge.projectId,
+          forumId: data.challenge.forumId,
+          legacyId: data.challenge.legacyId,
+          status: data.challenge.status,
+          group: data.challenge.groups[0],
+          createdDateStart: '1992-01-02',
+          createdDateEnd: '2022-01-02',
+          createdBy: data.challenge.createdBy,
+          memberId: 23124329
+        })
+      should.equal(response.status, 200)
+      should.equal(response.headers['x-page'], '1')
+      should.equal(response.headers['x-per-page'], '10')
+      should.equal(response.headers['x-total'], '0')
+      should.equal(response.headers['x-total-pages'], '0')
+
+      should.equal(response.body.length, 0)
+    })
+
     it('search challenges - invalid page', async () => {
       const response = await chai.request(app)
         .get(basePath)
@@ -408,6 +465,15 @@ describe('challenge API E2E tests', () => {
         .query({ page: -1 })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"page" must be larger than or equal to 1')
+    })
+
+    it('search challenges - invalid memberId', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .query({ memberId: 'abcde' })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"memberId" must be a number')
     })
 
     it('search challenges - invalid perPage', async () => {
@@ -611,6 +677,30 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.message, '"challengeId" must be a valid GUID')
     })
 
+    it('fully update challenge - project not found', async () => {
+      const body = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+      body.projectId = 100000
+
+      const response = await chai.request(app)
+        .put(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .send(body)
+      should.equal(response.status, 400)
+      should.equal(response.body.message, `Project with id: ${body.projectId} doesn't exist`)
+    })
+
+    it(`fully update challenge - user doesn't have permission to update challenge under specific project`, async () => {
+      const body = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+      body.projectId = 200
+
+      const response = await chai.request(app)
+        .put(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .send(body)
+      should.equal(response.status, 403)
+      should.equal(response.body.message, 'You do not have permissions to perform this action')
+    })
+
     it('fully update challenge - null name', async () => {
       const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
       challengeData.name = null
@@ -765,6 +855,24 @@ describe('challenge API E2E tests', () => {
         .send({ name: 'testing2' })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"challengeId" must be a valid GUID')
+    })
+
+    it('partially update challenge - project not found', async () => {
+      const response = await chai.request(app)
+        .patch(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .send({ projectId: 100000 })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, `Project with id: 100000 doesn't exist`)
+    })
+
+    it(`partially update challenge - user doesn't have permission to update challenge under specific project`, async () => {
+      const response = await chai.request(app)
+        .patch(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .send({ projectId: 200 })
+      should.equal(response.status, 403)
+      should.equal(response.body.message, 'You do not have permissions to perform this action')
     })
 
     it('partially update challenge - null name', async () => {
