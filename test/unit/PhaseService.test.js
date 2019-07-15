@@ -2,9 +2,6 @@
  * Unit tests of phase service
  */
 
-// During the test the env variable is set to test
-process.env.NODE_ENV = 'test'
-
 require('../../app-bootstrap')
 const uuid = require('uuid/v4')
 const chai = require('chai')

@@ -2,9 +2,6 @@
  * E2E tests of timeline template API
  */
 
-// During the test the env variable is set to test
-process.env.NODE_ENV = 'test'
-
 require('../../app-bootstrap')
 const config = require('config')
 const uuid = require('uuid/v4')

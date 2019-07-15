@@ -2,9 +2,6 @@
  * E2E tests of challenge API
  */
 
-// During the test the env variable is set to test
-process.env.NODE_ENV = 'test'
-
 require('../../app-bootstrap')
 const _ = require('lodash')
 const config = require('config')

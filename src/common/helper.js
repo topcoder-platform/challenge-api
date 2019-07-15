@@ -1,6 +1,7 @@
 /**
  * This file defines helper methods
  */
+const Joi = require('joi')
 const _ = require('lodash')
 const querystring = require('querystring')
 const constants = require('../../app-constants')
@@ -20,6 +21,9 @@ let busApiClient
 
 // Elasticsearch client
 let esClient
+
+// validate ES refresh method
+validateESRefreshMethod(config.ES.ES_REFRESH)
 
 AWS.config.update({
   s3: config.AMAZON.S3_API_VERSION,
@@ -497,6 +501,7 @@ function getESClient () {
 }
 
 /**
+<<<<<<< HEAD
  * Ensure project exist
  * @param {String} projectId the project id
  * @param {String} userToken the user token
@@ -535,6 +540,17 @@ async function listChallengesByMember (memberId) {
   return res.data || []
 }
 
+/**
+ * Check if ES refresh method is valid.
+ *
+ * @param {String} method method to be tested
+ * @returns {String} method valid method
+ */
+async function validateESRefreshMethod (method) {
+  Joi.attempt(method, Joi.string().label('ES_REFRESH').valid(['true', 'false', 'wait_for']))
+  return method
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -559,5 +575,6 @@ module.exports = {
   postBusEvent,
   getESClient,
   ensureProjectExist,
-  listChallengesByMember
+  listChallengesByMember,
+  validateESRefreshMethod
 }
