@@ -38,8 +38,9 @@ The following parameters can be set in config files or in env variables:
 - ES.ES_TYPE: Elasticsearch index type
 - ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
-- CHALLENGES_API_URL: TC challenges API base URL
+- RESOURCES_API_URL: TC resources API base URL
 - GROUPS_API_URL: TC groups API base URL
+- PROJECTS_API_URL: TC projects API base URL
 - COPILOT_RESOURCE_ROLE_IDS: copilot resource role ids allowed to upload attachment
 - HEALTH_CHECK_TIMEOUT: health check timeout in milliseconds
 - SCOPES: the configurable M2M token scopes, refer `config/default.js` for more details
@@ -76,6 +77,7 @@ It starts Elasticsearch, DynamoDB and S3 compatible server.
 
 ## Mock api
 For postman verification, please use the mock api under mock-api folder. It provides mock endpoint to fetch challenge resources and groups.
+You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
 Go to `mock-api` folder and run command `npm run start` to start the mock-api listening on port 4000
 
 ## Create Tables
@@ -90,6 +92,7 @@ Go to `mock-api` folder and run command `npm run start` to start the mock-api li
 4. Initialize/Clear database in default environment: `npm run init-db`
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `ChallengeSetting`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
 6. Create Elasticsearch index: `npm run init-db`, or to re-create index: `npm run init-db force`
+7. Synchronize ES data and DynamoDB data: `npm run sync-es`
 
 ### Notes
 - The seed data are located in `src/scripts/seed`
@@ -115,6 +118,7 @@ Go to `mock-api` folder and run command `npm run start` to start the mock-api li
 - Create DynamoDB tables.
 - Initialize ES index.
 - Various config parameters should be properly set.
+
 Seeding db data is not needed.
 
 ### Running unit tests

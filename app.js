@@ -58,7 +58,7 @@ require('./app-routes')(app)
 app.use((err, req, res, next) => {
   logger.logFullError(err, req.signature || `${req.method} ${req.url}`)
   const errorResponse = {}
-  const status = err.isJoi ? HttpStatus.BAD_REQUEST : (err.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR)
+  const status = err.isJoi ? HttpStatus.BAD_REQUEST : (err.httpStatus || _.get(err, 'response.status') || HttpStatus.INTERNAL_SERVER_ERROR)
 
   if (_.isArray(err.details)) {
     if (err.isJoi) {
@@ -73,6 +73,11 @@ app.use((err, req, res, next) => {
       })
     }
   }
+  if (_.get(err, 'response.status')) {
+    // extra error message from axios http response(v4 and v5 tc api)
+    errorResponse.message = _.get(err, 'response.data.result.content.message') || _.get(err, 'response.data.message')
+  }
+
   if (_.isUndefined(errorResponse.message)) {
     if (err.message && status !== HttpStatus.INTERNAL_SERVER_ERROR) {
       errorResponse.message = err.message

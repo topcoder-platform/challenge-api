@@ -4,6 +4,7 @@
 
 require('../../app-bootstrap')
 const _ = require('lodash')
+const config = require('config')
 const uuid = require('uuid/v4')
 const chai = require('chai')
 const fs = require('fs')
@@ -92,6 +93,30 @@ describe('challenge service unit tests', () => {
         await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
       } catch (e) {
         should.equal(e.message, `No challenge type found with id: ${notFoundId}.`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it(`create challenge - user doesn't have permission to create challenge under specific project`, async () => {
+      const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+      challengeData.projectId = 200
+      try {
+        await service.createChallenge({ userId: '16096823' }, challengeData, config.COPILOT_TOKEN)
+      } catch (e) {
+        should.equal(e.response.data.result.content.message, 'You do not have permissions to perform this action')
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('create challenge - project not found', async () => {
+      const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+      challengeData.projectId = 100000
+      try {
+        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      } catch (e) {
+        should.equal(e.message, `Project with id: ${challengeData.projectId} doesn't exist`)
         return
       }
       throw new Error('should not reach here')
@@ -237,7 +262,8 @@ describe('challenge service unit tests', () => {
         group: data.challenge.groups[0],
         createdDateStart: '1992-01-02',
         createdDateEnd: '2022-01-02',
-        createdBy: data.challenge.createdBy
+        createdBy: data.challenge.createdBy,
+        memberId: 40309246
       })
       should.equal(res.total, 1)
       should.equal(res.page, 1)
@@ -288,11 +314,49 @@ describe('challenge service unit tests', () => {
       should.equal(result.result.length, 0)
     })
 
+    it('search challenges successfully 3', async () => {
+      const res = await service.searchChallenges({ isMachine: true }, {
+        page: 1,
+        perPage: 10,
+        id: data.challenge.id,
+        typeId: data.challenge.typeId,
+        track: data.challenge.track,
+        name: data.challenge.name.substring(2).trim().toUpperCase(),
+        description: data.challenge.description,
+        timelineTemplateId: data.challenge.timelineTemplateId,
+        reviewType: data.challenge.reviewType,
+        tag: data.challenge.tags[0],
+        projectId: data.challenge.projectId,
+        forumId: data.challenge.forumId,
+        legacyId: data.challenge.legacyId,
+        status: data.challenge.status,
+        group: data.challenge.groups[0],
+        createdDateStart: '1992-01-02',
+        createdDateEnd: '2022-01-02',
+        createdBy: data.challenge.createdBy,
+        memberId: 23124329
+      })
+      should.equal(res.total, 0)
+      should.equal(res.page, 1)
+      should.equal(res.perPage, 10)
+      should.equal(res.result.length, 0)
+    })
+
     it('search challenges - invalid name', async () => {
       try {
         await service.searchChallenges({ isMachine: true }, { name: ['invalid'] })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('search challenges - invalid memberId', async () => {
+      try {
+        await service.searchChallenges({ isMachine: true }, { memberId: 'abcde' })
+      } catch (e) {
+        should.equal(e.message.indexOf('"memberId" must be a number') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -495,6 +559,30 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
+    it(`fully update challenge - project not found`, async () => {
+      try {
+        const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+        challengeData.projectId = 100000
+        await service.fullyUpdateChallenge({ userId: '16096823' }, id, challengeData, config.COPILOT_TOKEN)
+      } catch (e) {
+        should.equal(e.message, `Project with id: 100000 doesn't exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it(`fully update challenge - user doesn't have permission to update challenge under specific project`, async () => {
+      try {
+        const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+        challengeData.projectId = 200
+        await service.fullyUpdateChallenge({ userId: '16096823' }, id, challengeData, config.COPILOT_TOKEN)
+      } catch (e) {
+        should.equal(e.response.data.result.content.message, 'You do not have permissions to perform this action')
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
     it('fully update challenge - null name', async () => {
       try {
         const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
@@ -588,6 +676,26 @@ describe('challenge service unit tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
+    })
+
+    it(`partially update challenge - project not found`, async () => {
+      try {
+        await service.partiallyUpdateChallenge({ userId: '16096823' }, id, { projectId: 100000 }, config.COPILOT_TOKEN)
+      } catch (e) {
+        should.equal(e.message, `Project with id: 100000 doesn't exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it(`partially update challenge - user doesn't have permission to update challenge under specific project`, async () => {
+      try {
+        await service.partiallyUpdateChallenge({ userId: '16096823' }, id, { projectId: 200 }, config.COPILOT_TOKEN)
+      } catch (e) {
+        should.equal(e.response.data.result.content.message, 'You do not have permissions to perform this action')
+        return
+      }
+      throw new Error('should not reach here')
     })
 
     it('partially update challenge - timeline template not found', async () => {

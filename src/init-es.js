@@ -27,7 +27,18 @@ const initES = async () => {
     logger.info(`The index ${config.ES.ES_INDEX} exists.`)
   } else {
     logger.info(`The index ${config.ES.ES_INDEX} will be created.`)
-    await client.indices.create({ index: config.ES.ES_INDEX })
+
+    const body = { mappings: {} }
+    body.mappings[config.get('ES.ES_TYPE')] = {
+      properties: {
+        id: { type: 'keyword' }
+      }
+    }
+
+    await client.indices.create({
+      index: config.ES.ES_INDEX,
+      body
+    })
   }
 }
 

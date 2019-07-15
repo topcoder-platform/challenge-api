@@ -383,7 +383,7 @@ async function getM2MToken () {
  */
 async function getChallengeResources (challengeId) {
   const token = await getM2MToken()
-  const url = `${config.CHALLENGES_API_URL}/${challengeId}/resources`
+  const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}`
   const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
 }
@@ -501,6 +501,46 @@ function getESClient () {
 }
 
 /**
+<<<<<<< HEAD
+ * Ensure project exist
+ * @param {String} projectId the project id
+ * @param {String} userToken the user token
+ */
+async function ensureProjectExist (projectId, userToken) {
+  let token
+  if (!userToken) {
+    token = await getM2MToken()
+  }
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  try {
+    if (userToken) {
+      await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } })
+    } else {
+      await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    }
+  } catch (err) {
+    if (err.response.status === 404) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
+}
+
+/**
+ * Lists challenge ids that given member has access to.
+ * @param {Number} memberId the member id
+ * @returns {Promise<Array>} an array of challenge ids represents challenges that given member has access to.
+ */
+async function listChallengesByMember (memberId) {
+  const token = await getM2MToken()
+  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges`
+  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+  return res.data || []
+}
+
+/**
  * Check if ES refresh method is valid.
  *
  * @param {String} method method to be tested
@@ -534,5 +574,7 @@ module.exports = {
   ensureNoDuplicateOrNullElements,
   postBusEvent,
   getESClient,
+  ensureProjectExist,
+  listChallengesByMember,
   validateESRefreshMethod
 }
