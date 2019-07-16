@@ -17,7 +17,17 @@ const fileUpload = require('express-fileupload')
 // setup express app
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  exposedHeaders: [
+    'X-Prev-Page',
+    'X-Next-Page',
+    'X-Page',
+    'X-Per-Page',
+    'X-Total',
+    'X-Total-Pages',
+    'Link'
+  ]
+}))
 app.use(fileUpload({
   limits: { fileSize: config.FILE_UPLOAD_SIZE_LIMIT }
 }))
