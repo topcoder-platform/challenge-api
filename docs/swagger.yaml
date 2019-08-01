@@ -1760,6 +1760,10 @@ definitions:
         type: array
         items:
           type: string
+      gitRepoURLs:
+        type: array
+        items:
+          type: string
       created:
         type: string
         format: date-time
@@ -2062,6 +2066,10 @@ definitions:
         items:
           $ref: '#/definitions/Attachment'
       groups:
+        type: array
+        items:
+          type: string
+      gitRepoURLs:
         type: array
         items:
           type: string

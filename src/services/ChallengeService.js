@@ -78,6 +78,9 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.group) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
+  if (criteria.gitRepoURL) {
+    boolQuery.push({ match_phrase: { gitRepoURLs: criteria.gitRepoURL } })
+  }
   if (criteria.createdDateStart) {
     boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } })
   }
@@ -144,6 +147,7 @@ searchChallenges.schema = {
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
+    gitRepoURL: Joi.string().uri(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
     updatedDateStart: Joi.date(),
@@ -259,7 +263,8 @@ createChallenge.schema = {
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-    groups: Joi.array().items(Joi.string()) // group names
+    groups: Joi.array().items(Joi.string()), // group names
+    gitRepoURLs: Joi.array().items(Joi.string().uri())
   }).required(),
   userToken: Joi.any()
 }
@@ -426,6 +431,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(data.attachmentIds, 'attachmentIds')
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
+  helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
 
@@ -489,6 +495,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         op = '$PUT'
       }
     } else if (key === 'groups') {
+      if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
+        _.intersection(challenge[key], value).length !== value.length) {
+        op = '$PUT'
+      }
+    } else if (key === 'gitRepoURLs') {
       if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
         _.intersection(challenge[key], value).length !== value.length) {
         op = '$PUT'
@@ -579,6 +590,24 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     delete challenge.groups
     // send null to Elasticsearch to clear the field
     data.groups = null
+  }
+  if (isFull && _.isUndefined(data.gitRepoURLs) && challenge.gitRepoURLs) {
+    if (!updateDetails['$DELETE']) {
+      updateDetails['$DELETE'] = {}
+    }
+    updateDetails['$DELETE'].gitRepoURLs = null
+    auditLogs.push({
+      id: uuid(),
+      challengeId,
+      fieldName: 'gitRepoURLs',
+      oldValue: JSON.stringify(challenge.gitRepoURLs),
+      newValue: 'NULL',
+      created: new Date(),
+      createdBy: currentUser.handle || currentUser.sub
+    })
+    delete challenge.gitRepoURLs
+    // send null to Elasticsearch to clear the field
+    data.gitRepoURLs = null
   }
   if (isFull && _.isUndefined(data.legacyId) && challenge.legacyId) {
     if (!updateDetails['$DELETE']) {
@@ -730,7 +759,8 @@ partiallyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachmentIds: Joi.array().items(Joi.optionalId()),
-    groups: Joi.array().items(Joi.string()) // group names
+    groups: Joi.array().items(Joi.string()), // group names
+    gitRepoURLs: Joi.array().items(Joi.string().uri())
   }).required(),
   userToken: Joi.any()
 }

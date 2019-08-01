@@ -82,6 +82,10 @@ const schema = new Schema({
     type: Array,
     required: false
   },
+  gitRepoURLs: {
+    type: Array,
+    required: false
+  },
   created: {
     type: Date,
     required: true
