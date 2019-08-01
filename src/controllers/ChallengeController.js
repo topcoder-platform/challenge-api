@@ -11,7 +11,7 @@ const helper = require('../common/helper')
  * @param {Object} res the response
  */
 async function searchChallenges (req, res) {
-  const result = await service.searchChallenges(req.query)
+  const result = await service.searchChallenges(req.authUser, req.query)
   helper.setResHeaders(req, res, result)
   res.send(result.result)
 }
@@ -22,7 +22,7 @@ async function searchChallenges (req, res) {
  * @param {Object} res the response
  */
 async function createChallenge (req, res) {
-  const result = await service.createChallenge(req.authUser, req.body)
+  const result = await service.createChallenge(req.authUser, req.body, req.userToken)
   res.status(HttpStatus.CREATED).send(result)
 }
 
@@ -32,7 +32,7 @@ async function createChallenge (req, res) {
  * @param {Object} res the response
  */
 async function getChallenge (req, res) {
-  const result = await service.getChallenge(req.params.challengeId)
+  const result = await service.getChallenge(req.authUser, req.params.challengeId)
   res.send(result)
 }
 
@@ -42,7 +42,7 @@ async function getChallenge (req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateChallenge (req, res) {
-  const result = await service.fullyUpdateChallenge(req.authUser, req.params.challengeId, req.body)
+  const result = await service.fullyUpdateChallenge(req.authUser, req.params.challengeId, req.body, req.userToken)
   res.send(result)
 }
 
@@ -52,7 +52,7 @@ async function fullyUpdateChallenge (req, res) {
  * @param {Object} res the response
  */
 async function partiallyUpdateChallenge (req, res) {
-  const result = await service.partiallyUpdateChallenge(req.authUser, req.params.challengeId, req.body)
+  const result = await service.partiallyUpdateChallenge(req.authUser, req.params.challengeId, req.body, req.userToken)
   res.send(result)
 }
 

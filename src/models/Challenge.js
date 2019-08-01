@@ -36,6 +36,56 @@ const schema = new Schema({
     type: [Object],
     required: false
   },
+  timelineTemplateId: {
+    type: String,
+    required: true
+  },
+  phases: {
+    type: Array,
+    required: true
+  },
+  prizeSets: {
+    type: [Object],
+    required: true
+  },
+  reviewType: {
+    type: String,
+    required: true
+  },
+  // tag names
+  tags: {
+    type: Array,
+    required: true
+  },
+  projectId: {
+    type: Number,
+    required: true
+  },
+  forumId: {
+    type: Number,
+    required: false
+  },
+  startDate: {
+    type: Date,
+    required: true
+  },
+  status: {
+    type: String,
+    required: true
+  },
+  attachments: {
+    type: Array,
+    required: false
+  },
+  // group names
+  groups: {
+    type: Array,
+    required: false
+  },
+  gitRepoURLs: {
+    type: Array,
+    required: false
+  },
   created: {
     type: Date,
     required: true

@@ -1,11 +1,37 @@
 /**
  * This file defines helper methods
  */
+const Joi = require('joi')
 const _ = require('lodash')
 const querystring = require('querystring')
 const constants = require('../../app-constants')
 const models = require('../models')
 const errors = require('./errors')
+const util = require('util')
+const AWS = require('aws-sdk')
+const config = require('config')
+const m2mAuth = require('tc-core-library-js').auth.m2m
+const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
+const axios = require('axios')
+const busApi = require('topcoder-bus-api-wrapper')
+const elasticsearch = require('elasticsearch')
+
+// Bus API Client
+let busApiClient
+
+// Elasticsearch client
+let esClient
+
+// validate ES refresh method
+validateESRefreshMethod(config.ES.ES_REFRESH)
+
+AWS.config.update({
+  s3: config.AMAZON.S3_API_VERSION,
+  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  region: config.AMAZON.AWS_REGION
+})
+const s3 = new AWS.S3()
 
 /**
  * Wrap async function to standard express function
@@ -58,6 +84,9 @@ function getPageLink (req, page) {
  */
 function setResHeaders (req, res, result) {
   const totalPages = Math.ceil(result.total / result.perPage)
+  if (result.page > 1) {
+    res.set('X-Prev-Page', result.page - 1)
+  }
   if (result.page < totalPages) {
     res.set('X-Next-Page', result.page + 1)
   }
@@ -92,6 +121,34 @@ function hasAdminRole (authUser) {
 }
 
 /**
+ * Remove invalid properties from the object and hide long arrays
+ * @param {Object} obj the object
+ * @returns {Object} the new object with removed properties
+ * @private
+ */
+function _sanitizeObject (obj) {
+  try {
+    return JSON.parse(JSON.stringify(obj, (name, value) => {
+      if (_.isArray(value) && value.length > 30) {
+        return `Array(${value.length})`
+      }
+      return value
+    }))
+  } catch (e) {
+    return obj
+  }
+}
+
+/**
+ * Convert the object into user-friendly string which is used in error message.
+ * @param {Object} obj the object
+ * @returns {String} the string value
+ */
+function toString (obj) {
+  return util.inspect(_sanitizeObject(obj), { breakLength: Infinity })
+}
+
+/**
  * Check if exists.
  *
  * @param {Array} source the array in which to search for the term
@@ -107,7 +164,7 @@ function checkIfExists (source, term) {
   source = source.map(s => s.toLowerCase())
 
   if (_.isString(term)) {
-    terms = term.split(' ')
+    terms = term.toLowerCase().split(' ')
   } else if (_.isArray(term)) {
     terms = term.map(t => t.toLowerCase())
   } else {
@@ -125,7 +182,7 @@ function checkIfExists (source, term) {
 
 /**
  * Get Data by model id
- * @param {Object} modelName The dynamoose model name
+ * @param {String} modelName The dynamoose model name
  * @param {String} id The id value
  * @returns {Promise<void>}
  */
@@ -133,15 +190,30 @@ async function getById (modelName, id) {
   return new Promise((resolve, reject) => {
     models[modelName].query('id').eq(id).exec((err, result) => {
       if (err) {
-        reject(err)
+        return reject(err)
       }
       if (result.length > 0) {
         return resolve(result[0])
       } else {
-        reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`))
+        return reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`))
       }
     })
   })
+}
+
+/**
+ * Get Data by model ids
+ * @param {String} modelName The dynamoose model name
+ * @param {Array} ids The ids
+ * @returns {Promise<Array>} the found entities
+ */
+async function getByIds (modelName, ids) {
+  const entities = []
+  const theIds = ids || []
+  for (const id of theIds) {
+    entities.push(await getById(modelName, id))
+  }
+  return entities
 }
 
 /**
@@ -171,10 +243,10 @@ async function create (modelName, data) {
     const dbItem = new models[modelName](data)
     dbItem.save((err) => {
       if (err) {
-        reject(err)
+        return reject(err)
+      } else {
+        return resolve(dbItem)
       }
-
-      return resolve(dbItem)
     })
   })
 }
@@ -192,10 +264,10 @@ async function update (dbItem, data) {
   return new Promise((resolve, reject) => {
     dbItem.save((err) => {
       if (err) {
-        reject(err)
+        return reject(err)
+      } else {
+        return resolve(dbItem)
       }
-
-      return resolve(dbItem)
     })
   })
 }
@@ -210,10 +282,10 @@ async function scan (modelName, scanParams) {
   return new Promise((resolve, reject) => {
     models[modelName].scan(scanParams).exec((err, result) => {
       if (err) {
-        reject(err)
+        return reject(err)
+      } else {
+        return resolve(result.count === 0 ? [] : result)
       }
-
-      return resolve(result.count === 0 ? [] : result)
     })
   })
 }
@@ -236,16 +308,273 @@ function partialMatch (filter, value) {
   }
 }
 
+/**
+ * Perform validation on phases.
+ * @param {Array} phases the phases data.
+ */
+async function validatePhases (phases) {
+  const records = await scan('Phase')
+  const map = new Map()
+  _.each(records, r => {
+    map.set(r.id, r)
+  })
+  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive)
+  if (invalidPhases.length > 0) {
+    throw new errors.BadRequestError(`The following phases are invalid or inactive: ${toString(invalidPhases)}`)
+  }
+}
+
+/**
+ * Upload file to S3
+ * @param {String} attachmentId the attachment id
+ * @param {Buffer} data the file data
+ * @param {String} mimetype the MIME type
+ * @param {String} fileName the original file name
+ * @return {Promise} promise to upload file to S3
+ */
+async function uploadToS3 (attachmentId, data, mimetype, fileName) {
+  const params = {
+    Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET,
+    Key: attachmentId,
+    Body: data,
+    ContentType: mimetype,
+    Metadata: {
+      fileName
+    }
+  }
+  // Upload to S3
+  return s3.upload(params).promise()
+}
+
+/**
+ * Download file from S3
+ * @param {String} attachmentId the attachment id
+ * @return {Promise} promise resolved to downloaded data
+ */
+async function downloadFromS3 (attachmentId) {
+  const file = await s3.getObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+  return {
+    data: file.Body,
+    mimetype: file.ContentType
+  }
+}
+
+/**
+ * Delete file from S3
+ * @param {String} attachmentId the attachment id
+ * @return {Promise} promise resolved to deleted data
+ */
+async function deleteFromS3 (attachmentId) {
+  return s3.deleteObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+}
+
+/**
+ * Get M2M token.
+ * @returns {Promise<String>} the M2M token
+ */
+async function getM2MToken () {
+  return m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET)
+}
+
+/**
+ * Get challenge resources
+ * @param {String} challengeId the challenge id
+ * @returns {Promise<Array>} the challenge resources
+ */
+async function getChallengeResources (challengeId) {
+  const token = await getM2MToken()
+  const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}`
+  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+  return res.data || []
+}
+
+/**
+ * Get all user groups
+ * @param {String} userId the user id
+ * @returns {Promise<Array>} the user groups
+ */
+async function getUserGroups (userId) {
+  const token = await getM2MToken()
+  let allGroups = []
+  // get search is paginated, we need to get all pages' data
+  let page = 1
+  while (true) {
+    const result = await axios.get(config.GROUPS_API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page,
+        memberId: userId,
+        membershipType: 'user'
+      }
+    })
+    const groups = result.data.result || []
+    if (groups.length === 0) {
+      break
+    }
+    allGroups = allGroups.concat(groups)
+    page += 1
+    if (result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return allGroups
+}
+
+/**
+ * Ensures there are no duplicate or null elements in given array.
+ * @param {Array} arr the array to check
+ * @param {String} name the array name
+ */
+function ensureNoDuplicateOrNullElements (arr, name) {
+  const a = arr || []
+  for (let i = 0; i < a.length; i += 1) {
+    if (_.isNil(a[i])) {
+      throw new errors.BadRequestError(`There is null element for ${name}.`)
+    }
+    for (let j = i + 1; j < a.length; j += 1) {
+      if (a[i] === a[j]) {
+        throw new errors.BadRequestError(`There are duplicate elements (${a[i]}) for ${name}.`)
+      }
+    }
+  }
+}
+
+/**
+ * Get Bus API Client
+ * @return {Object} Bus API Client Instance
+ */
+function getBusApiClient () {
+  // if there is no bus API client instance, then create a new instance
+  if (!busApiClient) {
+    busApiClient = busApi(_.pick(config,
+      ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME',
+        'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'BUSAPI_URL',
+        'KAFKA_ERROR_TOPIC', 'AUTH0_PROXY_SERVER_URL']))
+  }
+
+  return busApiClient
+}
+
+/**
+ * Post bus event.
+ * @param {String} topic the event topic
+ * @param {Object} payload the event payload
+ */
+async function postBusEvent (topic, payload) {
+  const client = getBusApiClient()
+  await client.postEvent({
+    topic,
+    originator: constants.EVENT_ORIGINATOR,
+    timestamp: new Date().toISOString(),
+    'mime-type': constants.EVENT_MIME_TYPE,
+    payload
+  })
+}
+
+/**
+ * Get ES Client
+ * @return {Object} Elasticsearch Client Instance
+ */
+function getESClient () {
+  if (esClient) {
+    return esClient
+  }
+  const esHost = config.get('ES.HOST')
+  // AWS ES configuration is different from other providers
+  if (/.*amazonaws.*/.test(esHost)) {
+    esClient = elasticsearch.Client({
+      apiVersion: config.get('ES.API_VERSION'),
+      hosts: esHost,
+      connectionClass: require('http-aws-es'), // eslint-disable-line global-require
+      amazonES: {
+        region: config.get('AMAZON.AWS_REGION'),
+        credentials: new AWS.EnvironmentCredentials('AWS')
+      }
+    })
+  } else {
+    esClient = new elasticsearch.Client({
+      apiVersion: config.get('ES.API_VERSION'),
+      hosts: esHost
+    })
+  }
+  return esClient
+}
+
+/**
+<<<<<<< HEAD
+ * Ensure project exist
+ * @param {String} projectId the project id
+ * @param {String} userToken the user token
+ */
+async function ensureProjectExist (projectId, userToken) {
+  let token
+  if (!userToken) {
+    token = await getM2MToken()
+  }
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  try {
+    if (userToken) {
+      await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } })
+    } else {
+      await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    }
+  } catch (err) {
+    if (_.get(err.response.status) === 404) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
+}
+
+/**
+ * Lists challenge ids that given member has access to.
+ * @param {Number} memberId the member id
+ * @returns {Promise<Array>} an array of challenge ids represents challenges that given member has access to.
+ */
+async function listChallengesByMember (memberId) {
+  const token = await getM2MToken()
+  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges`
+  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+  return res.data || []
+}
+
+/**
+ * Check if ES refresh method is valid.
+ *
+ * @param {String} method method to be tested
+ * @returns {String} method valid method
+ */
+async function validateESRefreshMethod (method) {
+  Joi.attempt(method, Joi.string().label('ES_REFRESH').valid(['true', 'false', 'wait_for']))
+  return method
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
   setResHeaders,
   checkIfExists,
   hasAdminRole,
+  toString,
   getById,
+  getByIds,
   create,
   update,
   scan,
   validateDuplicate,
-  partialMatch
+  partialMatch,
+  validatePhases,
+  uploadToS3,
+  downloadFromS3,
+  deleteFromS3,
+  getChallengeResources,
+  getUserGroups,
+  ensureNoDuplicateOrNullElements,
+  postBusEvent,
+  getESClient,
+  ensureProjectExist,
+  listChallengesByMember,
+  validateESRefreshMethod
 }

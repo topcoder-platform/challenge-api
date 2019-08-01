@@ -1,0 +1,23 @@
+[
+  {
+    "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "name": "Standard Code",
+    "description": "Standard Code challenge timeline",
+    "isActive": true,
+    "phases": ["Registration","Submission", "Review", "Appeals", "Appeals Response"]
+  },
+  {
+    "id": "592b0e63-5503-4d21-bb79-54202ff03135",
+    "name": "Code with final fixes",
+    "description": "Code challenge with final fixe phase",
+    "isActive": true,
+    "phases": ["Registration","Submission", "Review", "Appeals", "Appeals Response", "Final Fixes", "Approval"]
+  },
+  {
+    "id": "acf94fff-8e26-4617-b96c-61a46561623a",
+    "name": "Idea/report generation",
+    "description": "Idea/report generation",
+    "isActive": true,
+    "phases": ["Registration","Submission", "Review"]
+  }
+]

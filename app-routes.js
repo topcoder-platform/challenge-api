@@ -30,27 +30,65 @@ module.exports = (app) => {
         next()
       })
 
-      // add Authenticator check if route has auth
+      actions.push((req, res, next) => {
+        if (_.get(req, 'query.token')) {
+          _.set(req, 'headers.authorization', `Bearer ${_.trim(req.query.token)}`)
+        }
+        next()
+      })
+
       if (def.auth) {
+        // add Authenticator/Authorization check if route has auth
         actions.push((req, res, next) => {
           authenticator(_.pick(config, ['AUTH_SECRET', 'VALID_ISSUERS']))(req, res, next)
         })
 
         actions.push((req, res, next) => {
           if (req.authUser.isMachine) {
-            next(new errors.ForbiddenError('M2M is not supported.'))
+            // M2M
+            if (!req.authUser.scopes || !helper.checkIfExists(def.scopes, req.authUser.scopes)) {
+              next(new errors.ForbiddenError('You are not allowed to perform this action!'))
+            } else {
+              req.authUser.handle = config.M2M_AUDIT_HANDLE
+              next()
+            }
           } else {
             req.authUser.userId = String(req.authUser.userId)
-            // User
+            // User roles authorization
             if (req.authUser.roles) {
-              if (!helper.checkIfExists(def.access, req.authUser.roles)) {
+              if (def.access && !helper.checkIfExists(def.access, req.authUser.roles)) {
                 next(new errors.ForbiddenError('You are not allowed to perform this action!'))
               } else {
+                // user token is used in create/update challenge to ensure user can create/update challenge under specific project
+                req.userToken = req.headers.authorization.split(' ')[1]
                 next()
               }
             } else {
               next(new errors.ForbiddenError('You are not authorized to perform this action'))
             }
+          }
+        })
+      } else {
+        // public API, but still try to authenticate token if provided, but allow missing/invalid token
+        actions.push((req, res, next) => {
+          const interceptRes = {}
+          interceptRes.status = () => interceptRes
+          interceptRes.json = () => interceptRes
+          interceptRes.send = () => next()
+          authenticator(_.pick(config, ['AUTH_SECRET', 'VALID_ISSUERS']))(req, interceptRes, next)
+        })
+
+        actions.push((req, res, next) => {
+          if (!req.authUser) {
+            next()
+          } else if (req.authUser.isMachine) {
+            if (!def.scopes || !req.authUser.scopes || !helper.checkIfExists(def.scopes, req.authUser.scopes)) {
+              req.authUser = undefined
+            }
+            next()
+          } else {
+            req.authUser.userId = String(req.authUser.userId)
+            next()
           }
         })
       }

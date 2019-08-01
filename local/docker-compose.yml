@@ -1,11 +1,21 @@
 version: '3'
 services:
   dynamodb:
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    container_name: dynamodb
+    image: tray/dynamodb-local
     ports:
       - "7777:7777"
     command: "-inMemory -port 7777"
-
+  esearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.0"
+    ports:
+      - "9200:9200"
+    environment:
+      - "discovery.type=single-node"
+  minio1:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: "FAKE_ACCESS_KEY"
+      MINIO_SECRET_KEY: "FAKE_SECRET_ACCESS_KEY"
+    command: "server /data"

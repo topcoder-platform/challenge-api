@@ -12,11 +12,25 @@ const cors = require('cors')
 const HttpStatus = require('http-status-codes')
 const logger = require('./src/common/logger')
 const interceptor = require('express-interceptor')
+const fileUpload = require('express-fileupload')
 
 // setup express app
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  exposedHeaders: [
+    'X-Prev-Page',
+    'X-Next-Page',
+    'X-Page',
+    'X-Per-Page',
+    'X-Total',
+    'X-Total-Pages',
+    'Link'
+  ]
+}))
+app.use(fileUpload({
+  limits: { fileSize: config.FILE_UPLOAD_SIZE_LIMIT }
+}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('port', config.PORT)
@@ -37,6 +51,7 @@ app.use(interceptor((req, res) => {
       }
       if (obj && obj.result && obj.result.content && obj.result.content.message) {
         const ret = { message: obj.result.content.message }
+        res.statusCode = 401
         send(JSON.stringify(ret))
       } else {
         send(body)
@@ -53,7 +68,7 @@ require('./app-routes')(app)
 app.use((err, req, res, next) => {
   logger.logFullError(err, req.signature || `${req.method} ${req.url}`)
   const errorResponse = {}
-  const status = err.isJoi ? HttpStatus.BAD_REQUEST : (err.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR)
+  const status = err.isJoi ? HttpStatus.BAD_REQUEST : (err.httpStatus || _.get(err, 'response.status') || HttpStatus.INTERNAL_SERVER_ERROR)
 
   if (_.isArray(err.details)) {
     if (err.isJoi) {
@@ -68,6 +83,11 @@ app.use((err, req, res, next) => {
       })
     }
   }
+  if (_.get(err, 'response.status')) {
+    // extra error message from axios http response(v4 and v5 tc api)
+    errorResponse.message = _.get(err, 'response.data.result.content.message') || _.get(err, 'response.data.message')
+  }
+
   if (_.isUndefined(errorResponse.message)) {
     if (err.message && status !== HttpStatus.INTERNAL_SERVER_ERROR) {
       errorResponse.message = err.message
@@ -82,3 +102,5 @@ app.use((err, req, res, next) => {
 app.listen(app.get('port'), () => {
   logger.info(`Express server listening on port ${app.get('port')}`)
 })
+
+module.exports = app
