@@ -81,6 +81,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(result.createdBy, 'sub')
       should.exist(result.startDate)
       should.exist(result.created)
@@ -216,6 +218,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(result.createdBy, 'admin')
       should.exist(result.startDate)
       should.exist(result.created)
@@ -260,6 +264,7 @@ describe('challenge service unit tests', () => {
         legacyId: data.challenge.legacyId,
         status: data.challenge.status,
         group: data.challenge.groups[0],
+        gitRepoURL: data.challenge.gitRepoURLs[0],
         createdDateStart: '1992-01-02',
         createdDateEnd: '2022-01-02',
         createdBy: data.challenge.createdBy,
@@ -301,6 +306,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(result.createdBy, 'admin')
       should.exist(result.startDate)
       should.exist(result.created)
@@ -331,6 +338,7 @@ describe('challenge service unit tests', () => {
         legacyId: data.challenge.legacyId,
         status: data.challenge.status,
         group: data.challenge.groups[0],
+        gitRepoURL: data.challenge.gitRepoURLs[0],
         createdDateStart: '1992-01-02',
         createdDateEnd: '2022-01-02',
         createdBy: data.challenge.createdBy,
@@ -522,6 +530,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(result.attachments.length, 1)
       should.equal(result.attachments[0].id, attachment.id)
       should.equal(result.attachments[0].fileSize, attachment.fileSize)
@@ -670,6 +680,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(!result.attachments || result.attachments.length === 0, true)
       should.equal(result.createdBy, 'sub')
       should.equal(result.updatedBy, 'sub3')

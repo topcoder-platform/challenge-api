@@ -68,6 +68,7 @@ async function createData () {
     startDate: new Date(),
     status: constants.challengeStatuses.Active,
     groups: ['group1'],
+    gitRepoURLs: ['https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B'],
     created: new Date(),
     createdBy: 'admin'
   })
