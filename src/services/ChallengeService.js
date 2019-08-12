@@ -704,7 +704,8 @@ fullyUpdateChallenge.schema = {
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
-    groups: Joi.array().items(Joi.string()) // group names
+    groups: Joi.array().items(Joi.string()), // group names
+    gitRepoURLs: Joi.array().items(Joi.string().uri())
   }).required(),
   userToken: Joi.any()
 }
