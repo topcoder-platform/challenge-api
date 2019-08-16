@@ -66,11 +66,11 @@ async function searchChallenges (currentUser, criteria) {
     'updatedDateStart', 'updatedDateEnd', 'memberId']), (value, key) => {
     const filter = { match_phrase: {} }
     filter.match_phrase[key] = value
-    if (currentUser.handle) {
-      filter.match_phrase.createdBy = currentUser.handle
-    }
     boolQuery.push(filter)
   })
+  if (currentUser.handle) {
+    boolQuery.push({ match_phrase: { createdBy: currentUser.handle } })
+  }
   if (criteria.memberId) {
     const ids = await helper.listChallengesByMember(criteria.memberId)
     boolQuery.push({ terms: { _id: ids } })
