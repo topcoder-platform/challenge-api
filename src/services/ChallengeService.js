@@ -66,6 +66,9 @@ async function searchChallenges (currentUser, criteria) {
     'updatedDateStart', 'updatedDateEnd', 'memberId']), (value, key) => {
     const filter = { match_phrase: {} }
     filter.match_phrase[key] = value
+    if (currentUser.handle) {
+      filter.match_phrase.createdBy = currentUser.handle
+    }
     boolQuery.push(filter)
   })
   if (criteria.memberId) {
