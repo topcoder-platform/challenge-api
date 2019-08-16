@@ -98,10 +98,20 @@ async function searchChallenges (currentUser, criteria) {
   const shouldQuery = []
 
   if (currentUser.handle) {
-    shouldQuery.push({ filter: { match_phrase: { createdBy: currentUser.handle } } })
+    shouldQuery.push({
+      bool: {
+        filter: [
+          { match_phrase: { createdBy: currentUser.handle } }
+        ]
+      }
+    })
   }
 
-  shouldQuery.push({ filter: boolQuery })
+  shouldQuery.push({
+    bool: {
+      filter: boolQuery
+    }
+  })
 
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
