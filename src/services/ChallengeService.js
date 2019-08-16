@@ -68,9 +68,7 @@ async function searchChallenges (currentUser, criteria) {
     filter.match_phrase[key] = value
     boolQuery.push(filter)
   })
-  if (currentUser.handle) {
-    boolQuery.push({ match_phrase: { createdBy: currentUser.handle } })
-  }
+
   if (criteria.memberId) {
     const ids = await helper.listChallengesByMember(criteria.memberId)
     boolQuery.push({ terms: { _id: ids } })
@@ -97,6 +95,14 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ range: { updated: { lte: criteria.updatedDateEnd } } })
   }
 
+  const shouldQuery = []
+
+  if (currentUser.handle) {
+    shouldQuery.push({ match_phrase: { createdBy: currentUser.handle } })
+  }
+
+  shouldQuery.push({ filter: boolQuery })
+
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
     type: config.get('ES.ES_TYPE'),
@@ -105,7 +111,7 @@ async function searchChallenges (currentUser, criteria) {
     body: {
       query: {
         bool: {
-          filter: boolQuery
+          should: shouldQuery
         }
       },
       sort: [{ 'created': { 'order': 'asc' } }]
