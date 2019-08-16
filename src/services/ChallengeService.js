@@ -95,10 +95,10 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ range: { updated: { lte: criteria.updatedDateEnd } } })
   }
 
-  const mustQuery = []
+  const shouldQuery = []
 
   if (currentUser.handle) {
-    mustQuery.push({
+    shouldQuery.push({
       bool: {
         filter: [
           { match_phrase: { createdBy: currentUser.handle } }
@@ -107,7 +107,7 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  mustQuery.push({
+  shouldQuery.push({
     bool: {
       filter: boolQuery
     }
@@ -121,7 +121,7 @@ async function searchChallenges (currentUser, criteria) {
     body: {
       query: {
         bool: {
-          must: mustQuery
+          should: shouldQuery
         }
       },
       sort: [{ 'created': { 'order': 'asc' } }]
