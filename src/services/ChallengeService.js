@@ -70,6 +70,7 @@ async function searchChallenges (currentUser, criteria) {
   })
   if (criteria.memberId) {
     const ids = await helper.listChallengesByMember(criteria.memberId)
+    console.log(ids)
     boolQuery.push({ terms: { id: ids } })
   }
   if (criteria.tag) {
