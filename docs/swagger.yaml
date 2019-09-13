@@ -1764,6 +1764,20 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
       created:
         type: string
         format: date-time
@@ -1973,6 +1987,20 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
     required:
       - typeId
       - track
@@ -2073,6 +2101,20 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
       created:
         type: string
         format: date-time

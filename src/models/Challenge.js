@@ -86,6 +86,11 @@ const schema = new Schema({
     type: Array,
     required: false
   },
+  // winners
+  winners: {
+    type: [Object],
+    required: false
+  },
   created: {
     type: Date,
     required: true

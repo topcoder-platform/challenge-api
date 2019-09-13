@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2ce9137e-3a64-455b-8d3d-de11a98100a5",
+		"_postman_id": "30c82f8e-c529-4e77-8ac5-e426f6c22563",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12064,6 +12064,58 @@
 							"response": []
 						},
 						{
+							"name": "update challenge 1 with winners by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 3456789,\n\t\t\t\"handle\": \"tonyj\",\n\t\t\t\"placement\": 2\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Completed\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "update challenge 2 by copilot",
 							"event": [
 								{
@@ -12100,7 +12152,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\"]\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID4}}\",\n\t\"track\": \"update-track-1\",\n\t\"name\": \"update-name-1\",\n\t\"description\": \"update-description-1\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"id\": \"{{PHASEA_ID}}\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 1000000\n        },\n        {\n            \"id\": \"{{PHASEB_ID}}\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"{{PHASEA_ID}}\",\n            \"isActive\": true,\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n    \"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 3456789,\n\t\t\t\"handle\": \"tonyj\",\n\t\t\t\"placement\": 4\n\t\t}\n\t],\n\t\"reviewType\": \"review type 222\",\n\t\"tags\": [\"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"status\": \"Active\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -12634,6 +12686,318 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "update challenge 1 with winners by admin Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 3456789,\n\t\t\t\"handle\": \"tonyj\",\n\t\t\t\"placement\": 2\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Completed\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge from active to completed status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 3456789,\n\t\t\t\"handle\": \"tonyj\",\n\t\t\t\"placement\": 2\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Active\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge with winners - Duplicate member with placement",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Completed\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge with winners array - same member with multiple placements",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 2\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Completed\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge with winners array - multiple members with one placement",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 3456789,\n\t\t\t\"handle\": \"tonyj\",\n\t\t\t\"placement\": 1\n\t\t}\n\t],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Completed\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge with empty winners array",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 10000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 600\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 300\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"winners\": [],\n\t\"reviewType\": \"review type 2\",\n\t\"tags\": [\"tag1\", \"tag3\", \"tag4\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456456,\n\t\"legacyId\": 112233,\n\t\"status\": \"Completed\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -12679,6 +13043,58 @@
 								"body": {
 									"mode": "raw",
 									"raw": "{\n\t\"legacyId\": 789789\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partial update challenge 1 with winners by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t \"winners\": [\n        {\n            \"userId\": 12345678,\n            \"handle\": \"thomaskranitsas\",\n            \"placement\": 1\n        },\n        {\n            \"userId\": 3456789,\n            \"handle\": \"tonyy\",\n            \"placement\": 2\n        }\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
@@ -13208,6 +13624,266 @@
 									"path": [
 										"challenges",
 										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge  from active to completed status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"Active\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge - Duplicate member with placement",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t}\n\t]\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge - same member with multiple placements",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 2\n\t\t}\n\t]\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge - multiple members with one placement",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \t\"winners\": [\n\t\t{\n\t\t\t\"userId\": 12345678,\n\t\t\t\"handle\": \"thomaskranitsas\",\n\t\t\t\"placement\": 1\n\t\t},\n\t\t{\n\t\t\t\"userId\": 3456789,\n\t\t\t\"handle\": \"tonyj\",\n\t\t\t\"placement\": 1\n\t\t}\n\t]\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure partial update challenge - with empty winners array",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"winners\": []\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
 									]
 								}
 							},

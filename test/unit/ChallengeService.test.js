@@ -9,6 +9,7 @@ const uuid = require('uuid/v4')
 const chai = require('chai')
 const fs = require('fs')
 const path = require('path')
+const constants = require('../../app-constants')
 const service = require('../../src/services/ChallengeService')
 const AttachmentService = require('../../src/services/AttachmentService')
 const testHelper = require('../testHelper')
@@ -20,7 +21,20 @@ const attachmentContent = fs.readFileSync(path.join(__dirname, '../attachment.tx
 describe('challenge service unit tests', () => {
   // created entity id
   let id
+  let id2
   let attachment
+  const winners = [
+    {
+      userId: 12345678,
+      handle: 'thomaskranitsas',
+      placement: 1
+    },
+    {
+      userId: 3456789,
+      handle: 'tonyj',
+      placement: 2
+    }
+  ]
   // generated data
   let data
   const notFoundId = uuid()
@@ -83,6 +97,48 @@ describe('challenge service unit tests', () => {
       should.equal(result.groups[0], data.challenge.groups[0])
       should.equal(result.gitRepoURLs.length, 1)
       should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
+      should.equal(result.createdBy, 'sub')
+      should.exist(result.startDate)
+      should.exist(result.created)
+    })
+
+    it('create challenge successfully with completed status', async () => {
+      const result = await service.createChallenge({ isMachine: true, sub: 'sub' },
+        _.omit(data.completedChallenge, ['id', 'created', 'createdBy']))
+      should.exist(result.id)
+      id2 = result.id
+      should.equal(result.typeId, data.completedChallenge.typeId)
+      should.equal(result.track, data.completedChallenge.track)
+      should.equal(result.name, data.completedChallenge.name)
+      should.equal(result.description, data.completedChallenge.description)
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.completedChallenge.challengeSettings[0].type)
+      should.equal(result.challengeSettings[0].value, data.completedChallenge.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
+      should.equal(result.phases.length, 1)
+      should.equal(result.phases[0].id, data.completedChallenge.phases[0].id)
+      should.equal(result.phases[0].name, data.completedChallenge.phases[0].name)
+      should.equal(result.phases[0].description, data.completedChallenge.phases[0].description)
+      should.equal(result.phases[0].isActive, data.completedChallenge.phases[0].isActive)
+      should.equal(result.phases[0].duration, data.completedChallenge.phases[0].duration)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.completedChallenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.completedChallenge.tags[0])
+      should.equal(result.projectId, data.completedChallenge.projectId)
+      should.equal(result.legacyId, data.completedChallenge.legacyId)
+      should.equal(result.forumId, data.completedChallenge.forumId)
+      should.equal(result.status, data.completedChallenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.completedChallenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.completedChallenge.gitRepoURLs[0])
       should.equal(result.createdBy, 'sub')
       should.exist(result.startDate)
       should.exist(result.created)
@@ -544,6 +600,65 @@ describe('challenge service unit tests', () => {
       should.exist(result.updated)
     })
 
+    it('fully update challenge with winners successfully', async () => {
+      const challengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
+      challengeData.projectId = 112233
+      challengeData.legacyId = 445566
+      challengeData.attachmentIds = [attachment.id]
+      challengeData.winners = winners
+      const result = await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
+      should.equal(result.id, id2)
+      should.equal(result.typeId, data.completedChallenge.typeId)
+      should.equal(result.track, data.completedChallenge.track)
+      should.equal(result.name, data.completedChallenge.name)
+      should.equal(result.description, data.completedChallenge.description)
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.completedChallenge.challengeSettings[0].type)
+      should.equal(result.challengeSettings[0].value, data.completedChallenge.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
+      should.equal(result.phases.length, 1)
+      should.equal(result.phases[0].id, data.completedChallenge.phases[0].id)
+      should.equal(result.phases[0].name, data.completedChallenge.phases[0].name)
+      should.equal(result.phases[0].description, data.completedChallenge.phases[0].description)
+      should.equal(result.phases[0].isActive, data.completedChallenge.phases[0].isActive)
+      should.equal(result.phases[0].duration, data.completedChallenge.phases[0].duration)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.completedChallenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.completedChallenge.tags[0])
+      should.equal(result.projectId, 112233)
+      should.equal(result.legacyId, 445566)
+      should.equal(result.forumId, data.completedChallenge.forumId)
+      should.equal(result.status, data.completedChallenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.completedChallenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.completedChallenge.gitRepoURLs[0])
+      should.equal(result.attachments.length, 1)
+      should.equal(result.attachments[0].id, attachment.id)
+      should.equal(result.attachments[0].fileSize, attachment.fileSize)
+      should.equal(result.attachments[0].fileName, attachment.fileName)
+      should.equal(result.attachments[0].challengeId, attachment.challengeId)
+      should.equal(result.winners.length, 2)
+      should.equal(result.winners[0].userId, winners[0].userId)
+      should.equal(result.winners[0].handle, winners[0].handle)
+      should.equal(result.winners[0].placement, winners[0].placement)
+      should.equal(result.winners[1].userId, winners[1].userId)
+      should.equal(result.winners[1].handle, winners[1].handle)
+      should.equal(result.winners[1].placement, winners[1].placement)
+      should.equal(result.createdBy, 'sub')
+      should.equal(result.updatedBy, 'sub2')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.exist(result.updated)
+    })
+
     it('fully update challenge - not found', async () => {
       try {
         const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
@@ -640,6 +755,97 @@ describe('challenge service unit tests', () => {
       }
       throw new Error('should not reach here')
     })
+
+    it('fully update challenge - Completed to Active status', async () => {
+      try {
+        const challengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
+        challengeData.status = constants.challengeStatuses.Active
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('Cannot change Completed challenge status to Active status') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge - set winners with non-completed Active status', async () => {
+      try {
+        const challengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+        challengeData.winners = winners
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('Cannot set winners for challenge with non-completed Active status') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge - Duplicate member with placement 1', async () => {
+      try {
+        const challengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
+        challengeData.winners = [{
+          userId: 12345678,
+          handle: 'thomaskranitsas',
+          placement: 1
+        },
+        {
+          userId: 12345678,
+          handle: 'thomaskranitsas',
+          placement: 1
+        }]
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('Duplicate member with placement') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge - Only one member can have placement 1', async () => {
+      try {
+        const challengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
+        challengeData.winners = [
+          {
+            userId: 12345678,
+            handle: 'thomaskranitsas',
+            placement: 1
+          },
+          {
+            userId: 3456789,
+            handle: 'tonyj',
+            placement: 1
+          }
+        ]
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('Only one member can have a placement') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge - The same member 12345678 cannot have multiple placements', async () => {
+      try {
+        const challengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
+        challengeData.winners = [
+          {
+            userId: 12345678,
+            handle: 'thomaskranitsas',
+            placement: 1
+          },
+          {
+            userId: 12345678,
+            handle: 'thomaskranitsas',
+            placement: 2
+          }
+        ]
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('The same member 12345678 cannot have multiple placements') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
   })
 
   describe('partially update challenge tests', () => {
@@ -683,6 +889,58 @@ describe('challenge service unit tests', () => {
       should.equal(result.gitRepoURLs.length, 1)
       should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(!result.attachments || result.attachments.length === 0, true)
+      should.equal(result.createdBy, 'sub')
+      should.equal(result.updatedBy, 'sub3')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.exist(result.updated)
+    })
+
+    it('partially update challenge successfully with winners', async () => {
+      const result = await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+        winners: [{
+          userId: 12345678,
+          handle: 'thomaskranitsas',
+          placement: 1
+        }]
+      })
+      should.equal(result.id, id2)
+      should.equal(result.typeId, data.completedChallenge.typeId)
+      should.equal(result.track, data.completedChallenge.track)
+      should.equal(result.name, data.completedChallenge.name)
+      should.equal(result.description, data.completedChallenge.description)
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.completedChallenge.challengeSettings[0].type)
+      should.equal(result.challengeSettings[0].value, data.completedChallenge.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
+      should.equal(result.phases.length, 1)
+      should.equal(result.phases[0].id, data.completedChallenge.phases[0].id)
+      should.equal(result.phases[0].name, data.completedChallenge.phases[0].name)
+      should.equal(result.phases[0].description, data.completedChallenge.phases[0].description)
+      should.equal(result.phases[0].isActive, data.completedChallenge.phases[0].isActive)
+      should.equal(result.phases[0].duration, data.completedChallenge.phases[0].duration)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.completedChallenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.completedChallenge.tags[0])
+      should.equal(result.projectId, 112233)
+      should.equal(result.legacyId, 445566)
+      should.equal(result.forumId, data.completedChallenge.forumId)
+      should.equal(result.status, data.completedChallenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.completedChallenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.completedChallenge.gitRepoURLs[0])
+      should.equal(result.winners.length, 1)
+      should.equal(result.winners[0].userId, winners[0].userId)
+      should.equal(result.winners[0].handle, winners[0].handle)
+      should.equal(result.winners[0].placement, winners[0].placement)
       should.equal(result.createdBy, 'sub')
       should.equal(result.updatedBy, 'sub3')
       should.exist(result.startDate)
@@ -801,6 +1059,97 @@ describe('challenge service unit tests', () => {
         })
       } catch (e) {
         should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge - Completed to Active status', async () => {
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+          status: constants.challengeStatuses.Active
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('Cannot change Completed challenge status to Active status') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge - set winners with non-completed Active status', async () => {
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+          winners
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('Cannot set winners for challenge with non-completed Active status') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge - Duplicate member with placement 1', async () => {
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+          winners: [{
+            userId: 12345678,
+            handle: 'thomaskranitsas',
+            placement: 1
+          },
+          {
+            userId: 12345678,
+            handle: 'thomaskranitsas',
+            placement: 1
+          }]
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('Duplicate member with placement') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge - Only one member can have placement 1', async () => {
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+          winners: [
+            {
+              userId: 12345678,
+              handle: 'thomaskranitsas',
+              placement: 1
+            },
+            {
+              userId: 3456789,
+              handle: 'tonyj',
+              placement: 1
+            }
+          ]
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('Only one member can have a placement') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge - The same member 12345678 cannot have multiple placements', async () => {
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+          winners: [
+            {
+              userId: 12345678,
+              handle: 'thomaskranitsas',
+              placement: 1
+            },
+            {
+              userId: 12345678,
+              handle: 'thomaskranitsas',
+              placement: 2
+            }
+          ]
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('The same member 12345678 cannot have multiple placements') >= 0, true)
         return
       }
       throw new Error('should not reach here')

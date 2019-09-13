@@ -1,6 +1,7 @@
 /**
  * This file defines common helper methods used for tests
  */
+const _ = require('lodash')
 const uuid = require('uuid/v4')
 const config = require('config')
 const helper = require('../src/common/helper')
@@ -13,6 +14,7 @@ let challengeSetting
 let phase
 let timelineTemplate
 let challenge
+let completedChallenge
 
 /**
  * Create test data
@@ -42,7 +44,8 @@ async function createData () {
     isActive: true,
     phases: [phase]
   })
-  challenge = await helper.create('Challenge', {
+
+  const challengeData = {
     id: uuid(),
     typeId: challengeType.id,
     track: 'track',
@@ -71,13 +74,26 @@ async function createData () {
     gitRepoURLs: ['https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B'],
     created: new Date(),
     createdBy: 'admin'
-  })
+  }
+
+  challenge = await helper.create('Challenge', challengeData)
+  completedChallenge = await helper.create('Challenge', _.assign(challengeData, { id: uuid(), status: constants.challengeStatuses.Completed }))
+
   // create challenge in Elasticsearch
   await esClient.create({
     index: config.ES.ES_INDEX,
     type: config.ES.ES_TYPE,
     id: challenge.id,
     body: challenge,
+    refresh: 'true' // refresh ES so that it is visible for read operations instantly
+  })
+
+  // create completedChallenge in Elasticsearch
+  await esClient.create({
+    index: config.ES.ES_INDEX,
+    type: config.ES.ES_TYPE,
+    id: completedChallenge.id,
+    body: completedChallenge,
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
   })
 }
@@ -94,7 +110,16 @@ async function clearData () {
     refresh: 'true' // refresh ES so that it is effective for read operations instantly
   })
 
+  // remove completedChallenge in Elasticsearch
+  await esClient.delete({
+    index: config.ES.ES_INDEX,
+    type: config.ES.ES_TYPE,
+    id: completedChallenge.id,
+    refresh: 'true' // refresh ES so that it is effective for read operations instantly
+  })
+
   await challenge.delete()
+  await completedChallenge.delete()
   await timelineTemplate.delete()
   await phase.delete()
   await challengeSetting.delete()
@@ -110,7 +135,8 @@ function getData () {
     challengeSetting: challengeSetting.originalItem(),
     phase: phase.originalItem(),
     timelineTemplate: timelineTemplate.originalItem(),
-    challenge: challenge.originalItem()
+    challenge: challenge.originalItem(),
+    completedChallenge: completedChallenge.originalItem()
   }
 }
 

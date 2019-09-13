@@ -501,7 +501,6 @@ function getESClient () {
 }
 
 /**
-<<<<<<< HEAD
  * Ensure project exist
  * @param {String} projectId the project id
  * @param {String} userToken the user token

@@ -437,6 +437,31 @@ function isDifferentPrizeSets (prizeSets, otherPrizeSets) {
 }
 
 /**
+ * Validate the winners array.
+ * @param {Array} winners the Winner Array
+ */
+function validateWinners (winners) {
+  for (const winner of winners) {
+    const diffWinners = _.differenceWith(winners, [winner], _.isEqual)
+    if (diffWinners.length + 1 !== winners.length) {
+      throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
+    }
+
+    // find another member with the placement
+    const placementExists = _.find(diffWinners, function (w) { return w.placement === winner.placement })
+    if (placementExists && (placementExists.userId !== winner.userId || placementExists.handle !== winner.handle)) {
+      throw new errors.BadRequestError(`Only one member can have a placement: ${winner.placement}`)
+    }
+
+    // find another placement for a member
+    const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId })
+    if (memberExists && memberExists.placement !== winner.placement) {
+      throw new errors.BadRequestError(`The same member ${winner.userId} cannot have multiple placements`)
+    }
+  }
+}
+
+/**
  * Update challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -480,8 +505,20 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   await validateChallengeData(data)
+  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Canceled) && data.status && data.status !== challenge.status) {
+    throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
+  }
+
+  if (data.winners && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
+    throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
+  }
+
   if (data.phases) {
     await helper.validatePhases(data.phases)
+  }
+
+  if (data.winners && data.winners.length) {
+    await validateWinners(data.winners)
   }
 
   data.updated = new Date()
@@ -524,6 +561,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     } else if (key === 'gitRepoURLs') {
       if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
         _.intersection(challenge[key], value).length !== value.length) {
+        op = '$PUT'
+      }
+    } else if (key === 'winners') {
+      if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
+      _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length) {
         op = '$PUT'
       }
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
@@ -649,6 +691,24 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     // send null to Elasticsearch to clear the field
     data.legacyId = null
   }
+  if (isFull && _.isUndefined(data.winners) && challenge.winners) {
+    if (!updateDetails['$DELETE']) {
+      updateDetails['$DELETE'] = {}
+    }
+    updateDetails['$DELETE'].winners = null
+    auditLogs.push({
+      id: uuid(),
+      challengeId,
+      fieldName: 'winners',
+      oldValue: JSON.stringify(challenge.winners),
+      newValue: 'NULL',
+      created: new Date(),
+      createdBy: currentUser.handle || currentUser.sub
+    })
+    delete challenge.winners
+    // send null to Elasticsearch to clear the field
+    data.winners = null
+  }
 
   await models.Challenge.update({ id: challengeId }, updateDetails)
   if (auditLogs.length > 0) {
@@ -727,7 +787,12 @@ fullyUpdateChallenge.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri())
+    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    winners: Joi.array().items(Joi.object().keys({
+      userId: Joi.number().integer().positive().required(),
+      handle: Joi.string().required(),
+      placement: Joi.number().integer().positive().required()
+    })).min(1)
   }).required(),
   userToken: Joi.any()
 }
@@ -783,7 +848,12 @@ partiallyUpdateChallenge.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri())
+    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    winners: Joi.array().items(Joi.object().keys({
+      userId: Joi.number().integer().positive().required(),
+      handle: Joi.string().required(),
+      placement: Joi.number().integer().positive().required()
+    })).min(1)
   }).required(),
   userToken: Joi.any()
 }
