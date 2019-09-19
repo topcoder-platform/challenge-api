@@ -27,8 +27,8 @@ validateESRefreshMethod(config.ES.ES_REFRESH)
 
 AWS.config.update({
   s3: config.AMAZON.S3_API_VERSION,
-  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
-  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  // accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  // secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
   region: config.AMAZON.AWS_REGION
 })
 const s3 = new AWS.S3()
