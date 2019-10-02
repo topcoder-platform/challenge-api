@@ -18,7 +18,7 @@ const testHelper = require('../testHelper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = '/challenges'
+const basePath = `/${config.API_VERSION}/challenges`
 
 const attachmentContent = fs.readFileSync(path.join(__dirname, '../attachment.txt'))
 
