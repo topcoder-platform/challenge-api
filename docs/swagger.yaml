@@ -1900,6 +1900,10 @@ definitions:
       createdBy:
         type: string
         example: 'topcoder user'
+      memberId:
+        type: string
+        description: 'The member ID'
+        example: '12345678'
     required:
       - id
       - challengeId
