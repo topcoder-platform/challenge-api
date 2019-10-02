@@ -598,7 +598,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
           oldValue,
           newValue,
           created: new Date(),
-          createdBy: currentUser.handle || currentUser.sub
+          createdBy: currentUser.handle || currentUser.sub,
+          memberId: currentUser.userId || null
         })
       }
     }
@@ -613,7 +614,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       oldValue: JSON.stringify(challenge.challengeSettings),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle || currentUser.sub
+      createdBy: currentUser.handle || currentUser.sub,
+      memberId: currentUser.userId || null
     })
     delete challenge.challengeSettings
     // send null to Elasticsearch to clear the field
@@ -631,7 +633,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       oldValue: JSON.stringify(challenge.attachments),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle || currentUser.sub
+      createdBy: currentUser.handle || currentUser.sub,
+      memberId: currentUser.userId || null
     })
     delete challenge.attachments
     // send null to Elasticsearch to clear the field
@@ -649,7 +652,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       oldValue: JSON.stringify(challenge.groups),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle || currentUser.sub
+      createdBy: currentUser.handle || currentUser.sub,
+      memberId: currentUser.userId || null
     })
     delete challenge.groups
     // send null to Elasticsearch to clear the field
@@ -667,7 +671,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       oldValue: JSON.stringify(challenge.gitRepoURLs),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle || currentUser.sub
+      createdBy: currentUser.handle || currentUser.sub,
+      memberId: currentUser.userId || null
     })
     delete challenge.gitRepoURLs
     // send null to Elasticsearch to clear the field
@@ -685,7 +690,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       oldValue: JSON.stringify(challenge.legacyId),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle || currentUser.sub
+      createdBy: currentUser.handle || currentUser.sub,
+      memberId: currentUser.userId || null
     })
     delete challenge.legacyId
     // send null to Elasticsearch to clear the field
@@ -703,7 +709,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       oldValue: JSON.stringify(challenge.winners),
       newValue: 'NULL',
       created: new Date(),
-      createdBy: currentUser.handle || currentUser.sub
+      createdBy: currentUser.handle || currentUser.sub,
+      memberId: currentUser.userId || null
     })
     delete challenge.winners
     // send null to Elasticsearch to clear the field

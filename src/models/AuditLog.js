@@ -35,6 +35,9 @@ const schema = new Schema({
   createdBy: {
     type: String,
     required: true
+  },
+  memberId: {
+    type: String
   }
 },
 {
