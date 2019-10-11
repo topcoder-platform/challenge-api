@@ -132,7 +132,18 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   // Search with constructed query
-  const docs = await esClient.search(esQuery)
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    // Catch error when the ES is fresh and has no data
+    docs = {
+      hits: {
+        total: 0,
+        hits: []
+      }
+    }
+  }
   // Extract data from hits
   const total = docs.hits.total
   let result = _.map(docs.hits.hits, item => item._source)
