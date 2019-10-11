@@ -95,7 +95,7 @@ async function searchChallenges (currentUser, criteria) {
 
   const accessQuery = []
 
-  if (currentUser.handle) {
+  if (!_.isUndefined(currentUser) && currentUser.handle) {
     accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
   }
 
