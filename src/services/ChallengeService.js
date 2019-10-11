@@ -127,7 +127,7 @@ async function searchChallenges (currentUser, criteria) {
           must: mustQuery
         }
       },
-      sort: [{ 'created': { 'order': 'asc', 'ignore_unmapped': true } }]
+      sort: [{ 'created': { 'order': 'asc', 'unmapped_type': 'String' } }]
     }
   }
 
