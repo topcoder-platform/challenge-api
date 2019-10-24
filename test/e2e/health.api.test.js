@@ -14,7 +14,7 @@ chai.use(chaiHttp)
 describe('health API tests', () => {
   it('Check health successfully', async () => {
     const response = await chai.request(app)
-      .get(`/${config.API_VERSION}/health`)
+      .get(`/${config.API_VERSION}/challenges/health`)
     should.equal(response.status, 200)
     should.equal(response.body.checksRun >= 1, true)
   })

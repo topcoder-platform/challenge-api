@@ -28,6 +28,12 @@ module.exports = {
       scopes: [CHALLENGES.CREATE, CHALLENGES.ALL]
     }
   },
+  '/challenges/health': {
+    get: {
+      controller: 'HealthController',
+      method: 'checkHealth'
+    }
+  },
   '/challenges/:challengeId': {
     get: {
       controller: 'ChallengeController',
@@ -226,12 +232,6 @@ module.exports = {
       method: 'downloadAttachment',
       auth: 'jwt', // any authenticated role is allowed
       scopes: [CHALLENGE_ATTACHMENTS.READ, CHALLENGE_ATTACHMENTS.ALL]
-    }
-  },
-  '/health': {
-    get: {
-      controller: 'HealthController',
-      method: 'checkHealth'
     }
   }
 }
