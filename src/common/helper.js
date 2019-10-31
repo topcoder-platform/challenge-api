@@ -534,7 +534,7 @@ async function ensureProjectExist (projectId, userToken) {
  */
 async function listChallengesByMember (memberId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}/resources/${memberId}/challenges`
+  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges`
   const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
 }
