@@ -4,6 +4,7 @@
 const _ = require('lodash')
 const uuid = require('uuid/v4')
 const config = require('config')
+const moment = require('moment')
 const helper = require('../src/common/helper')
 const constants = require('../app-constants')
 
@@ -76,6 +77,7 @@ async function createData () {
     createdBy: 'admin'
   }
 
+  challengeData.endDate = moment(challengeData.startDate).add(phase.duration, 'hours')
   challenge = await helper.create('Challenge', challengeData)
   completedChallenge = await helper.create('Challenge', _.assign(challengeData, { id: uuid(), status: constants.challengeStatuses.Completed }))
 

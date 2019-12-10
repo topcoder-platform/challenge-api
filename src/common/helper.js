@@ -15,6 +15,7 @@ const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_
 const axios = require('axios')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
+const moment = require('moment')
 
 // Bus API Client
 let busApiClient
@@ -528,6 +529,30 @@ async function ensureProjectExist (projectId, userToken) {
 }
 
 /**
+ * Calculates challenge end date based on udation of its phases
+ * @param {any} challenge
+ */
+function calculateChallengeEndDate (challenge, data) {
+  if (!data) {
+    data = challenge
+  }
+  let phase = data.phases.slice(-1)[0]
+  if (!phase || (!data.startDate && !challenge.startDate)) {
+    return data.startDate || challenge.startDate
+  }
+  const phases = challenge.phases.reduce((obj, elem) => {
+    obj[elem.id] = elem
+    return obj
+  }, {})
+  let result = moment(data.startDate || challenge.startDate)
+  while (phase) {
+    result.add(phase.duration, 'hours')
+    phase = phase.predecessor && phases[phase.predecessor]
+  }
+  return result
+}
+
+/**
  * Lists challenge ids that given member has access to.
  * @param {Number} memberId the member id
  * @returns {Promise<Array>} an array of challenge ids represents challenges that given member has access to.
@@ -574,6 +599,7 @@ module.exports = {
   postBusEvent,
   getESClient,
   ensureProjectExist,
+  calculateChallengeEndDate,
   listChallengesByMember,
   validateESRefreshMethod
 }

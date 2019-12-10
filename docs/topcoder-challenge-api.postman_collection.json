@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "30c82f8e-c529-4e77-8ac5-e426f6c22563",
+		"_postman_id": "cc848049-3081-46ab-9ad4-cef64e913ef4",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -275,6 +275,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -837,6 +838,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -1265,6 +1267,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -1698,6 +1701,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -2271,9 +2275,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "ChallengeTypes",
@@ -2545,6 +2551,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -3005,6 +3012,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3171,6 +3179,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3349,6 +3358,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3875,6 +3885,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -4396,9 +4407,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "ChallengePhases",
@@ -4968,6 +4981,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -5363,6 +5377,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -5844,6 +5859,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -6370,6 +6386,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -6943,6 +6960,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -7412,9 +7430,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "TimelineTemplates",
@@ -7937,6 +7957,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -8102,6 +8123,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -8583,6 +8605,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -9057,6 +9080,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -9687,6 +9711,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -10156,9 +10181,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Challenges",
@@ -10204,7 +10231,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"privateDescription\": \"private test description\",\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"id\": \"{{PHASEA_ID}}\",\n        \t\"name\": \"new-phase-1\",\n        \t\"isActive\": true,\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"id\": \"{{PHASEB_ID}}\",\n        \t\"name\": \"new-PHASE-2\",\n        \t\"description\": \"add-description-in-put\",\n\t    \t\"predecessor\": \"{{PHASEA_ID}}\",\n    \t\t\"isActive\": true,\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -11088,6 +11115,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -11532,6 +11560,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -11954,6 +11983,7 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -13000,6 +13030,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -13156,6 +13187,58 @@
 									"path": [
 										"challenges",
 										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partial update to endDate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03483bad-dfb2-45d1-bf42-35dd3bd46dad",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\t\"phases\": [\n        {\n            \"id\": \"fd787a39-ab10-450c-beb1-7b7e1e0609c4\",\n            \"name\": \"new-phase-1\",\n            \"isActive\": true,\n            \"duration\": 100\n        },\n        {\n            \"id\": \"ea4bd72c-d385-4a06-ac29-0a09df7449f2\",\n            \"name\": \"new-PHASE-2\",\n            \"description\": \"add-description-in-put\",\n            \"predecessor\": \"fd787a39-ab10-450c-beb1-7b7e1e0609c4\",\n            \"isActive\": true,\n            \"duration\": 200\n        }\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
 									]
 								}
 							},
@@ -13890,6 +13973,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -14314,6 +14398,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -14939,11 +15024,86 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "search startData & endDate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f5c58f0-3b8c-4a8a-a6c8-2df8bd6d2cf0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges?page=1&perPage=10&startDateStart=2019-06-01T00:00:00Z&startDateEnd=2019-06-30T23:59:59Z&endDateStart=2361-01-01T00:00:00Z&endDateEnd=2361-12-31T23:59:59Z",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "perPage",
+											"value": "10"
+										},
+										{
+											"key": "startDateStart",
+											"value": "2019-06-01T00:00:00Z"
+										},
+										{
+											"key": "startDateEnd",
+											"value": "2019-06-30T23:59:59Z"
+										},
+										{
+											"key": "endDateStart",
+											"value": "2361-01-01T00:00:00Z"
+										},
+										{
+											"key": "endDateEnd",
+											"value": "2361-12-31T23:59:59Z"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "AuditLogs",
@@ -15468,7 +15628,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "HealthCheck",
@@ -15537,7 +15698,9 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

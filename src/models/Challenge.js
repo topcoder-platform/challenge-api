@@ -32,6 +32,10 @@ const schema = new Schema({
     type: String,
     required: true
   },
+  privateDescription: {
+    type: String,
+    required: false
+  },
   challengeSettings: {
     type: [Object],
     required: false
@@ -66,6 +70,10 @@ const schema = new Schema({
     required: false
   },
   startDate: {
+    type: Date,
+    required: true
+  },
+  endDate: {
     type: Date,
     required: true
   },

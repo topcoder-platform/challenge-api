@@ -117,11 +117,45 @@ paths:
           required: false
           type: string
           enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        - name: currentPhaseId
+          in: query
+          description: Filter by id of the current phase
+          required: false
+          type: string
+        - name: currentPhaseName
+          in: query
+          description: Filter by name of the current phase
+          required: false
+          type: string
         - name: group
           in: query
           description: Filter by group name, case-insensitive, partial matches are allowed.
           required: false
           type: string
+        - name: startDateStart
+          in: query
+          description: Filter by start date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: startDateEnd
+          in: query
+          description: Filter by start date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: endDateStart
+          in: query
+          description: Filter by end date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: endDateEnd
+          in: query
+          description: Filter by end date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
         - name: createdDateStart
           in: query
           description: Filter by created date (lower bound of date range)
@@ -1695,6 +1729,9 @@ definitions:
         type: string
       description:
         type: string
+      privateDescription:
+        type: string
+        description: returned only if the user is registered on the challenge.
       challengeSettings:
         type: array
         items:
@@ -1925,6 +1962,8 @@ definitions:
         type: string
       description:
         type: string
+      privateDescription:
+        type: string
       challengeSettings:
         type: array
         items:
@@ -2034,6 +2073,8 @@ definitions:
       name:
         type: string
       description:
+        type: string
+      privateDescription:
         type: string
       challengeSettings:
         type: array

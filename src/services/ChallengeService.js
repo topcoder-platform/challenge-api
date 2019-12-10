@@ -63,7 +63,8 @@ async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'createdDateStart', 'createdDateEnd',
-    'updatedDateStart', 'updatedDateEnd', 'memberId']), (value, key) => {
+    'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
+    'currentPhaseId', 'currentPhaseName']), (value, key) => {
     const filter = { match_phrase: {} }
     filter.match_phrase[key] = value
     boolQuery.push(filter)
@@ -78,6 +79,12 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.gitRepoURL) {
     boolQuery.push({ match_phrase: { gitRepoURLs: criteria.gitRepoURL } })
   }
+  if (criteria.currentPhaseId) {
+    boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
+  }
+  if (criteria.currentPhaseName) {
+    boolQuery.push({ match_phrase: { 'currentPhase.name': criteria.currentPhaseName } })
+  }
   if (criteria.createdDateStart) {
     boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } })
   }
@@ -89,6 +96,18 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.updatedDateEnd) {
     boolQuery.push({ range: { updated: { lte: criteria.updatedDateEnd } } })
+  }
+  if (criteria.startDateStart) {
+    boolQuery.push({ range: { startDate: { gte: criteria.startDateStart } } })
+  }
+  if (criteria.startDateEnd) {
+    boolQuery.push({ range: { startDate: { lte: criteria.startDateEnd } } })
+  }
+  if (criteria.endDateStart) {
+    boolQuery.push({ range: { endDate: { gte: criteria.endDateStart } } })
+  }
+  if (criteria.endDateEnd) {
+    boolQuery.push({ range: { endDate: { lte: criteria.endDateEnd } } })
   }
 
   const mustQuery = []
@@ -149,6 +168,14 @@ async function searchChallenges (currentUser, criteria) {
   let result = _.map(docs.hits.hits, item => item._source)
   result = await filterChallengesByGroupsAccess(currentUser, result)
 
+  // Hide privateDescription for non-register challenges
+  const ids = await helper.listChallengesByMember(currentUser.userId)
+  result = _.each(result, (val) => {
+    if (!_.includes(ids, val.id)) {
+      _.unset(val, 'privateDescription')
+    }
+  })
+
   const typeList = await helper.scan('ChallengeType')
   const typeMap = new Map()
   _.each(typeList, e => {
@@ -181,6 +208,12 @@ searchChallenges.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
     gitRepoURL: Joi.string().uri(),
+    startDateStart: Joi.date(),
+    startDateEnd: Joi.date(),
+    endDateStart: Joi.date(),
+    endDateEnd: Joi.date(),
+    currentPhaseId: Joi.optionalId(),
+    currentPhaseName: Joi.string(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
     updatedDateStart: Joi.date(),
@@ -243,9 +276,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
+  challenge.endDate = helper.calculateChallengeEndDate(challenge)
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(), created: new Date(), createdBy: currentUser.handle || currentUser.sub }, challenge))
-
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
 
@@ -267,6 +300,7 @@ createChallenge.schema = {
     track: Joi.string().required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
+    privateDescription: Joi.string(),
     challengeSettings: Joi.array().items(Joi.object().keys({
       type: Joi.id(),
       value: Joi.string().required()
@@ -351,7 +385,6 @@ async function getChallenge (currentUser, id) {
       throw e
     }
   }
-
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
@@ -359,6 +392,15 @@ async function getChallenge (currentUser, id) {
   const type = await helper.getById('ChallengeType', challenge.typeId)
   challenge.type = type.name
   // delete challenge.typeId
+
+  // Remove privateDescription for unregistered users
+  if (currentUser) {
+    const ids = await helper.listChallengesByMember(currentUser.userId)
+    if (!_.includes(ids, challenge.id)) {
+    }
+  } else {
+    _.unset(challenge, 'privateDescription')
+  }
 
   return populateSettings(challenge)
 }
@@ -526,6 +568,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   if (data.phases) {
     await helper.validatePhases(data.phases)
+    data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
 
   if (data.winners && data.winners.length) {
@@ -774,6 +817,7 @@ fullyUpdateChallenge.schema = {
     track: Joi.string().required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
+    privateDescription: Joi.string(),
     challengeSettings: Joi.array().items(Joi.object().keys({
       type: Joi.id(),
       value: Joi.string().required()
@@ -802,6 +846,7 @@ fullyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date(),
+    endDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()), // group names
@@ -835,6 +880,7 @@ partiallyUpdateChallenge.schema = {
     track: Joi.string(),
     name: Joi.string(),
     description: Joi.string(),
+    privateDescription: Joi.string(),
     challengeSettings: Joi.array().items(Joi.object().keys({
       type: Joi.string().required(),
       value: Joi.string().required()
@@ -849,6 +895,7 @@ partiallyUpdateChallenge.schema = {
       duration: Joi.number().positive().required()
     })).min(1),
     startDate: Joi.date(),
+    endDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
