@@ -169,12 +169,16 @@ async function searchChallenges (currentUser, criteria) {
   result = await filterChallengesByGroupsAccess(currentUser, result)
 
   // Hide privateDescription for non-register challenges
-  const ids = await helper.listChallengesByMember(currentUser.userId)
-  result = _.each(result, (val) => {
-    if (!_.includes(ids, val.id)) {
-      _.unset(val, 'privateDescription')
-    }
-  })
+  if (currentUser) {
+    const ids = await helper.listChallengesByMember(currentUser.userId)
+    result = _.each(result, (val) => {
+      if (!_.includes(ids, val.id)) {
+        _.unset(val, 'privateDescription')
+      }
+    })
+  } else {
+    result = _.each(result, val => _.unset(val, 'privateDescription'))
+  }
 
   const typeList = await helper.scan('ChallengeType')
   const typeMap = new Map()
