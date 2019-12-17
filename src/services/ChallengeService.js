@@ -125,11 +125,13 @@ async function searchChallenges (currentUser, criteria) {
     accessQuery.push({ terms: { _id: ids } })
   }
 
-  mustQuery.push({
-    bool: {
-      should: accessQuery
-    }
-  })
+  if (accessQuery) {
+    mustQuery.push({
+      bool: {
+        should: accessQuery
+      }
+    })
+  }
 
   if (boolQuery.length > 0) {
     mustQuery.push({
@@ -145,11 +147,11 @@ async function searchChallenges (currentUser, criteria) {
     size: criteria.perPage,
     from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
     body: {
-      query: {
+      query: mustQuery.length > 0 ? {
         bool: {
           must: mustQuery
         }
-      },
+      } : {},
       sort: [{ 'created': { 'order': 'asc', 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
