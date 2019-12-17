@@ -125,7 +125,7 @@ async function searchChallenges (currentUser, criteria) {
     accessQuery.push({ terms: { _id: ids } })
   }
 
-  if (accessQuery) {
+  if (accessQuery.length > 0) {
     mustQuery.push({
       bool: {
         should: accessQuery
