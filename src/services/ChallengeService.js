@@ -131,11 +131,13 @@ async function searchChallenges (currentUser, criteria) {
     }
   })
 
-  mustQuery.push({
-    bool: {
-      filter: boolQuery
-    }
-  })
+  if (boolQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        filter: boolQuery
+      }
+    })
+  }
 
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
