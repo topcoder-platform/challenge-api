@@ -65,9 +65,11 @@ async function searchChallenges (currentUser, criteria) {
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
     'currentPhaseId', 'currentPhaseName']), (value, key) => {
-    const filter = { match_phrase: {} }
-    filter.match_phrase[key] = value
-    boolQuery.push(filter)
+    if (!_.isUndefined(value)) {
+      const filter = { match_phrase: {} }
+      filter.match_phrase[key] = value
+      boolQuery.push(filter)
+    }
   })
 
   if (criteria.tag) {
