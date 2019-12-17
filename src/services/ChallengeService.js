@@ -151,7 +151,9 @@ async function searchChallenges (currentUser, criteria) {
         bool: {
           must: mustQuery
         }
-      } : {},
+      } : {
+        match_all: {}
+      },
       sort: [{ 'created': { 'order': 'asc', 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
