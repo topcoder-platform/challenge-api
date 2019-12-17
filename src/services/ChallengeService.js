@@ -158,7 +158,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.info('Query Object', esQuery);
+  logger.info('Query Object', esQuery)
 
   // Search with constructed query
   let docs
