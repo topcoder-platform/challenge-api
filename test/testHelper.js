@@ -65,7 +65,7 @@ async function createData () {
       }]
     }],
     reviewType: 'review type',
-    tags: ['tag1'],
+    tags: ['tag3'],
     projectId: 111,
     legacyId: 222,
     forumId: 333,

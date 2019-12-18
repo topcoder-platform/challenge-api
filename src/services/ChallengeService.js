@@ -62,7 +62,7 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'createdDateStart', 'createdDateEnd',
+  _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
     'currentPhaseId', 'currentPhaseName']), (value, key) => {
     if (!_.isUndefined(value)) {
@@ -341,6 +341,7 @@ createChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date().required(),
+    endDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri())

@@ -519,7 +519,7 @@ async function ensureProjectExist (projectId, userToken) {
       await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
     }
   } catch (err) {
-    if (_.get(err.response.status) === 404) {
+    if (_.get(err, 'response.status') === 404) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
     } else {
       // re-throw other error
