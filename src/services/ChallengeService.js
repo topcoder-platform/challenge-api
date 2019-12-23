@@ -402,10 +402,16 @@ async function getChallenge (currentUser, id) {
   }
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
-
+  // FIXME: Temporarily hard coded as the migrad
   // populate type property based on the typeId
-  const type = await helper.getById('ChallengeType', challenge.typeId)
-  challenge.type = type.name
+  try {
+    const type = await helper.getById('ChallengeType', challenge.typeId)
+    challenge.type = type.name
+  } catch (e) {
+    challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10'
+    const type = await helper.getById('ChallengeType', challenge.typeId)
+    challenge.type = type.name
+  }
   // delete challenge.typeId
 
   // Remove privateDescription for unregistered users
