@@ -176,8 +176,7 @@ async function searchChallenges (currentUser, criteria) {
   // Extract data from hits
   const total = docs.hits.total
   let result = _.map(docs.hits.hits, item => item._source)
-  // TODO: Put this back
-  // result = await filterChallengesByGroupsAccess(currentUser, result)
+  result = await filterChallengesByGroupsAccess(currentUser, result)
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
