@@ -196,7 +196,7 @@ async function searchChallenges (currentUser, criteria) {
     typeMap.set(e.id, e.name)
   })
   _.each(result, element => {
-    element.type = typeMap.get(element.typeId)
+    element.type = typeMap.get(element.typeId) || 'Code'
     delete element.typeId
   })
 
