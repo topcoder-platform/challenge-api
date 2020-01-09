@@ -343,7 +343,7 @@ createChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date().required(),
-    endDate: Joi.date().required(),
+    endDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri())
