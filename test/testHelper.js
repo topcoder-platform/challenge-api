@@ -25,7 +25,9 @@ async function createData () {
     id: uuid(),
     name: `type-${new Date().getTime()}`,
     description: 'desc',
-    isActive: true
+    isActive: true,
+    abbreviation: 'abbr',
+    legacyId: 123
   })
   challengeSetting = await helper.create('ChallengeSetting', {
     id: uuid(),
@@ -86,7 +88,7 @@ async function createData () {
     index: config.ES.ES_INDEX,
     type: config.ES.ES_TYPE,
     id: challenge.id,
-    body: challenge,
+    body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, challenge.originalItem()),
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
   })
 
@@ -95,7 +97,7 @@ async function createData () {
     index: config.ES.ES_INDEX,
     type: config.ES.ES_TYPE,
     id: completedChallenge.id,
-    body: completedChallenge,
+    body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, completedChallenge.originalItem()),
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
   })
 }

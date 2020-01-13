@@ -100,6 +100,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.createdBy, 'sub')
       should.exist(result.startDate)
       should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('create challenge successfully with completed status', async () => {
@@ -142,6 +144,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.createdBy, 'sub')
       should.exist(result.startDate)
       should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('create challenge - type not found', async () => {
@@ -279,6 +283,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.createdBy, 'admin')
       should.exist(result.startDate)
       should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('get challenge - not found', async () => {
@@ -367,6 +373,8 @@ describe('challenge service unit tests', () => {
       should.equal(result.createdBy, 'admin')
       should.exist(result.startDate)
       should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('search challenges successfully 2', async () => {

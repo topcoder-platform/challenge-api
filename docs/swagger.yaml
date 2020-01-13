@@ -423,6 +423,16 @@ paths:
           description: Filter by isActive flag.
           required: false
           type: boolean
+        - name: abbreviation
+          in: query
+          description: Filter by abbreviation.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: legacyId
+          in: query
+          description: Filter by legacy id.
+          required: false
+          type: integer
       responses:
         '200':
           description: OK
@@ -496,7 +506,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -579,7 +589,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -633,7 +643,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -1815,6 +1825,12 @@ definitions:
               type: integer
               description: the winner placement
               example: 1
+      numOfSubmissions:
+        type: integer
+        description: number of submissions
+      numOfRegistrants:
+        type: integer
+        description: number of registrants
       created:
         type: string
         format: date-time
@@ -1871,9 +1887,14 @@ definitions:
         type: string
       isActive:
         type: boolean
+      abbreviation:
+        type: string
+      legacyId:
+        type: integer
     required:
       - name
       - isActive
+      - abbreviation
   ChallengeSettingsData:
     type: object
     properties:
@@ -2160,6 +2181,12 @@ definitions:
               type: integer
               description: the winner placement
               example: 1
+      numOfSubmissions:
+        type: integer
+        description: number of submissions
+      numOfRegistrants:
+        type: integer
+        description: number of registrants
       created:
         type: string
         format: date-time

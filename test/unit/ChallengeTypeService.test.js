@@ -13,9 +13,13 @@ describe('challenge type service unit tests', () => {
   // created entity ids
   let id
   let id2
-  // random names
+  // random values
   const name = `test1${new Date().getTime()}`
   const name2 = `test2${new Date().getTime()}`
+  const abbreviation = `abb1${new Date().getTime()}`
+  const abbreviation2 = `abb2${new Date().getTime()}`
+  const legacyId = new Date().getTime()
+  const legacyId2 = legacyId + 123
   const notFoundId = uuid()
 
   describe('create challenge type tests', () => {
@@ -23,11 +27,15 @@ describe('challenge type service unit tests', () => {
       const result = await service.createChallengeType({
         name,
         description: 'desc',
-        isActive: true
+        isActive: true,
+        abbreviation,
+        legacyId
       })
       should.equal(result.name, name)
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
+      should.equal(result.abbreviation, abbreviation)
+      should.equal(result.legacyId, legacyId)
       should.exist(result.id)
       id = result.id
     })
@@ -36,11 +44,15 @@ describe('challenge type service unit tests', () => {
       const result = await service.createChallengeType({
         name: name2,
         description: 'desc2',
-        isActive: false
+        isActive: false,
+        abbreviation: abbreviation2,
+        legacyId: legacyId2
       })
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
       should.equal(result.isActive, false)
+      should.equal(result.abbreviation, abbreviation2)
+      should.equal(result.legacyId, legacyId2)
       should.exist(result.id)
       id2 = result.id
     })
@@ -50,10 +62,42 @@ describe('challenge type service unit tests', () => {
         await service.createChallengeType({
           name,
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'abb12'
         })
       } catch (e) {
         should.equal(e.message, `ChallengeType with name: ${name} already exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('create challenge type - abbreviation already used', async () => {
+      try {
+        await service.createChallengeType({
+          name: `name-abc-${new Date().getTime()}`,
+          description: 'desc',
+          isActive: false,
+          abbreviation
+        })
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('create challenge type - legacyId already used', async () => {
+      try {
+        await service.createChallengeType({
+          name: `name-abc-${new Date().getTime()}`,
+          description: 'desc',
+          isActive: false,
+          abbreviation: `name-abb-${new Date().getTime()}`,
+          legacyId
+        })
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with legacyId: ${legacyId} already exist`)
         return
       }
       throw new Error('should not reach here')
@@ -63,10 +107,25 @@ describe('challenge type service unit tests', () => {
       try {
         await service.createChallengeType({
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'abb'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is required') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('create challenge type - missing abbreviation', async () => {
+      try {
+        await service.createChallengeType({
+          name: 'nnnnn',
+          description: 'desc',
+          isActive: false
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('"abbreviation" is required') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -77,7 +136,8 @@ describe('challenge type service unit tests', () => {
         await service.createChallengeType({
           name: ['xx'],
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'abb'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
@@ -91,10 +151,27 @@ describe('challenge type service unit tests', () => {
         await service.createChallengeType({
           name: 'some name',
           description: 'desc',
-          isActive: 'abc'
+          isActive: 'abc',
+          abbreviation: 'abb'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"isActive" must be a boolean') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('create challenge type - invalid legacyId', async () => {
+      try {
+        await service.createChallengeType({
+          name: 'some name',
+          description: 'desc',
+          isActive: true,
+          abbreviation: 'abb',
+          legacyId: 'abc'
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('"legacyId" must be a number') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -106,6 +183,7 @@ describe('challenge type service unit tests', () => {
           name: 'some name',
           description: 'desc',
           isActive: false,
+          abbreviation: 'abb',
           other: 123
         })
       } catch (e) {
@@ -123,6 +201,8 @@ describe('challenge type service unit tests', () => {
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
       should.equal(result.isActive, false)
+      should.equal(result.abbreviation, abbreviation2)
+      should.equal(result.legacyId, legacyId2)
     })
 
     it('get challenge type - not found', async () => {
@@ -153,7 +233,9 @@ describe('challenge type service unit tests', () => {
         perPage: 10,
         name: name2.substring(1).toUpperCase(),
         description: 'desc',
-        isActive: false
+        isActive: false,
+        abbreviation: abbreviation2,
+        legacyId: legacyId2
       })
       should.equal(result.total, 1)
       should.equal(result.page, 1)
@@ -163,6 +245,8 @@ describe('challenge type service unit tests', () => {
       should.equal(result.result[0].name, name2)
       should.equal(result.result[0].description, 'desc2')
       should.equal(result.result[0].isActive, false)
+      should.equal(result.result[0].abbreviation, abbreviation2)
+      should.equal(result.result[0].legacyId, legacyId2)
     })
 
     it('search challenge types successfully 2', async () => {
@@ -239,12 +323,16 @@ describe('challenge type service unit tests', () => {
       const result = await service.fullyUpdateChallengeType(id2, {
         name: `${name2}-updated`,
         description: 'desc222',
-        isActive: true
+        isActive: true,
+        abbreviation: `${abbreviation2}-updated`,
+        legacyId: legacyId2
       })
       should.equal(result.id, id2)
       should.equal(result.name, `${name2}-updated`)
       should.equal(result.description, 'desc222')
       should.equal(result.isActive, true)
+      should.equal(result.abbreviation, `${abbreviation2}-updated`)
+      should.equal(result.legacyId, legacyId2)
     })
 
     it('fully update challenge type - name already used', async () => {
@@ -252,10 +340,42 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(id2, {
           name,
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab121212'
         })
       } catch (e) {
         should.equal(e.message, `ChallengeType with name: ${name} already exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge type - abbreviation already used', async () => {
+      try {
+        await service.fullyUpdateChallengeType(id2, {
+          name: `test-name-123-${new Date().getTime()}`,
+          description: 'desc',
+          isActive: false,
+          abbreviation
+        })
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge type - legacyId already used', async () => {
+      try {
+        await service.fullyUpdateChallengeType(id2, {
+          name: `test-name-123-${new Date().getTime()}`,
+          description: 'desc',
+          isActive: false,
+          abbreviation: `test-abb-123-${new Date().getTime()}`,
+          legacyId
+        })
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with legacyId: ${legacyId} already exist`)
         return
       }
       throw new Error('should not reach here')
@@ -266,7 +386,8 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(notFoundId, {
           name: 'slkdjflskjdf',
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
@@ -280,7 +401,8 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType('invalid', {
           name: 'slkdjflskjdf',
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"id" must be a valid GUID') >= 0, true)
@@ -294,7 +416,8 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(id, {
           name: null,
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
@@ -308,7 +431,8 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(id, {
           name: { invalid: 'x' },
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
@@ -322,10 +446,42 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(id, {
           name: 'some name',
           description: ['desc'],
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"description" must be a string') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge type - invalid abbreviation', async () => {
+      try {
+        await service.fullyUpdateChallengeType(id, {
+          name: 'some name',
+          description: 'desc',
+          isActive: false,
+          abbreviation: ['ab']
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('"abbreviation" must be a string') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('fully update challenge type - invalid legacyId', async () => {
+      try {
+        await service.fullyUpdateChallengeType(id, {
+          name: 'some name',
+          description: 'desc',
+          isActive: false,
+          abbreviation: 'ab',
+          legacyId: 'abc'
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('"legacyId" must be a number') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -336,7 +492,8 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(id, {
           name: '',
           description: 'desc',
-          isActive: false
+          isActive: false,
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is not allowed to be empty') >= 0, true)
@@ -350,7 +507,8 @@ describe('challenge type service unit tests', () => {
         await service.fullyUpdateChallengeType(id, {
           name: 'asdfsadfsdf',
           description: 'desc',
-          isActive: 'invalid'
+          isActive: 'invalid',
+          abbreviation: 'ab'
         })
       } catch (e) {
         should.equal(e.message.indexOf('"isActive" must be a boolean') >= 0, true)
@@ -370,6 +528,8 @@ describe('challenge type service unit tests', () => {
       should.equal(result.name, `${name2}-33`)
       should.equal(result.description, 'desc33')
       should.equal(result.isActive, true)
+      should.equal(result.abbreviation, `${abbreviation2}-updated`)
+      should.equal(result.legacyId, legacyId2)
     })
 
     it('partially update challenge type - name already used', async () => {
@@ -379,6 +539,30 @@ describe('challenge type service unit tests', () => {
         })
       } catch (e) {
         should.equal(e.message, `ChallengeType with name: ${name} already exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge type - abbreviation already used', async () => {
+      try {
+        await service.partiallyUpdateChallengeType(id2, {
+          abbreviation
+        })
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('partially update challenge type - legacyId already used', async () => {
+      try {
+        await service.partiallyUpdateChallengeType(id2, {
+          legacyId
+        })
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with legacyId: ${legacyId} already exist`)
         return
       }
       throw new Error('should not reach here')

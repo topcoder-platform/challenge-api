@@ -12,4 +12,8 @@ module.exports = {
     IS_LOCAL_DB: process.env.IS_LOCAL_DB ? process.env.IS_LOCAL_DB === 'true' : true,
     DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:7777'
   },
+
+  ES: {
+    ES_REFRESH: process.env.ES_REFRESH || 'true'
+  },
 };

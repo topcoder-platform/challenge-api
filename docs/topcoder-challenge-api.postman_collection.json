@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "cc848049-3081-46ab-9ad4-cef64e913ef4",
+		"_postman_id": "3b34a306-acae-410b-b48c-cafb1441a5cf",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2328,7 +2328,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"name\": \"type-name-1\",\n\t\"description\": \"descritpion1\",\n\t\"isActive\": true\n}"
+											"raw": "{\n\t\"name\": \"type-name-1\",\n\t\"description\": \"descritpion1\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb1\",\n\t\"legacyId\": 111\n}"
 										},
 										"url": {
 											"raw": "{{URL}}/challengeTypes",
@@ -2380,7 +2380,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"name\": \"type-name-2\",\n\t\"isActive\": true\n}"
+											"raw": "{\n\t\"name\": \"type-name-2\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb2\",\n\t\"legacyId\": 222\n}"
 										},
 										"url": {
 											"raw": "{{URL}}/challengeTypes",
@@ -2432,7 +2432,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"name\": \"type-name-3\",\n\t\"description\": \"descritpion3\",\n\t\"isActive\": true\n}"
+											"raw": "{\n\t\"name\": \"type-name-3\",\n\t\"description\": \"descritpion3\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb3\",\n\t\"legacyId\": 333\n}"
 										},
 										"url": {
 											"raw": "{{URL}}/challengeTypes",
@@ -2484,7 +2484,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"name\": \"type-name-4\",\n\t\"isActive\": false\n}"
+											"raw": "{\n\t\"name\": \"type-name-4\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb4\",\n\t\"legacyId\": 444\n}"
 										},
 										"url": {
 											"raw": "{{URL}}/challengeTypes",
@@ -2536,7 +2536,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"name\": \"type-name-5\",\n\t\"description\": \"descritpion5\",\n\t\"isActive\": false\n}"
+											"raw": "{\n\t\"name\": \"type-name-5\",\n\t\"description\": \"descritpion5\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb5\",\n\t\"legacyId\": 555\n}"
 										},
 										"url": {
 											"raw": "{{URL}}/challengeTypes",
@@ -2592,7 +2592,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb123\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2644,7 +2644,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-admin\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"create-by-admin\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb456\",\n\t\"legacyId\": 456\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2695,7 +2695,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"description\": \"failure\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"description\": \"failure\",\n\t\"isActive\": true,\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2741,7 +2741,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2792,7 +2792,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2843,7 +2843,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2894,7 +2894,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"type-NAME-1\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"name\": \"type-NAME-1\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb121212\",\n\t\"legacyId\": 123121212\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2946,7 +2946,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb565656\",\n\t\"legacyId\": 123565656\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -2997,7 +2997,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes",
@@ -3049,7 +3049,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes?name=-name-&description=cri&isActive=true",
+									"raw": "{{URL}}/challengeTypes?name=-name-&description=cri&isActive=true&abbreviation=abb&legacyId=123",
 									"host": [
 										"{{URL}}"
 									],
@@ -3068,6 +3068,14 @@
 										{
 											"key": "isActive",
 											"value": "true"
+										},
+										{
+											"key": "abbreviation",
+											"value": "abb"
+										},
+										{
+											"key": "legacyId",
+											"value": "123"
 										}
 									]
 								}
@@ -3401,7 +3409,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
+									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\",\n\t\"legacyId\": 123787811\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
@@ -3453,7 +3461,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"description\": \"add-description\",\n\t\"isActive\": true\n}"
+									"raw": "{\n\t\"description\": \"add-description\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abbxxxyyzz11\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
@@ -3781,6 +3789,58 @@
 							"response": []
 						},
 						{
+							"name": "failure partial update challenge type duplicate abbreviation 409",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0cdf6f5f-d4d3-4d01-9ecd-856c2e03eb20",
+										"exec": [
+											"pm.test(\"Status code is 409\", function () {",
+											"    pm.response.to.have.status(409);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"abbreviation\": \"abbxxxyyzz11\"\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes",
+										"{{TYPEA_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "partial update challenge type using m2m",
 							"event": [
 								{
@@ -3928,7 +3988,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name-1\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-name-1789\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb789\",\n\t\"legacyId\": 789\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
@@ -3980,7 +4040,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb56756\",\n\t\"legacyId\": 12356756\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
@@ -4032,7 +4092,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/invalid-id",
@@ -4084,7 +4144,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test-name\",\n\t\"description\": 12345,\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"test-name\",\n\t\"description\": 12345,\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": \"abc\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
@@ -4183,7 +4243,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
@@ -4235,7 +4295,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
@@ -4287,7 +4347,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{SETTINGA_ID}}",
@@ -4339,7 +4399,59 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"TYPE-name-2\",\n\t\"description\": \"description\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"TYPE-name-2\",\n\t\"description\": \"description\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abbaaabb34342\",\n\t\"legacyId\": 12322338899\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challengeTypes",
+										"{{TYPEB_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure update challenge type duplicate legacyId 409",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "867406cc-7f20-4aa4-b3d0-40082ba72d7d",
+										"exec": [
+											"pm.test(\"Status code is 409\", function () {",
+											"    pm.response.to.have.status(409);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"TYPE-name-2-aaaa-bb\",\n\t\"description\": \"description\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abbaxxabb34342\",\n\t\"legacyId\": 789\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
@@ -4391,7 +4503,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-by-m2m\",\n\t\"isActive\": false\n}"
+									"raw": "{\n\t\"name\": \"update-by-m2m-aabbcc\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb29293939\",\n\t\"legacyId\": 12329293939\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",

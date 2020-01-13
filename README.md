@@ -78,7 +78,7 @@ It starts Elasticsearch, DynamoDB and S3 compatible server.
 ## Mock api
 For postman verification, please use the mock api under mock-api folder. It provides mock endpoint to fetch challenge resources and groups.
 You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
-Go to `mock-api` folder and run command `npm run start` to start the mock-api listening on port 4000
+Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mock-api listening on port 4000
 
 ## Create Tables
 1. Make sure DynamoDB are running as per instructions above.

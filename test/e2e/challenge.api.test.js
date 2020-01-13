@@ -106,6 +106,8 @@ describe('challenge API E2E tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.createdBy)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('create challenge successfully with completed status', async () => {
@@ -150,6 +152,8 @@ describe('challenge API E2E tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.createdBy)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('create challenge - missing token', async () => {
@@ -368,6 +372,8 @@ describe('challenge API E2E tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.createdBy)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('get challenge - forbidden', async () => {
@@ -464,6 +470,8 @@ describe('challenge API E2E tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.createdBy)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
     })
 
     it('search challenges successfully 2', async () => {

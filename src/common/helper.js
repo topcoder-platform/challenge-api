@@ -227,7 +227,7 @@ async function getByIds (modelName, ids) {
 async function validateDuplicate (modelName, name, value) {
   const list = await scan(modelName)
   for (let i = 0; i < list.length; i++) {
-    if (list[i][name].toLowerCase() === value.toLowerCase()) {
+    if (list[i][name] && String(list[i][name]).toLowerCase() === String(value).toLowerCase()) {
       throw new errors.ConflictError(`${modelName} with ${name}: ${value} already exist`)
     }
   }
