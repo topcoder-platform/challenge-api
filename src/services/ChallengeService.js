@@ -500,10 +500,12 @@ async function getChallenge (currentUser, id) {
   // delete challenge.typeId
 
   // Remove privateDescription for unregistered users
-  if (currentUser && !currentUser.isMachine) {
-    const ids = await helper.listChallengesByMember(currentUser.userId)
-    if (!_.includes(ids, challenge.id)) {
-      _.unset(challenge, 'privateDescription')
+  if (currentUser) {
+    if (!currentUser.isMachine) {
+      const ids = await helper.listChallengesByMember(currentUser.userId)
+      if (!_.includes(ids, challenge.id)) {
+        _.unset(challenge, 'privateDescription')
+      }
     }
   } else {
     _.unset(challenge, 'privateDescription')
