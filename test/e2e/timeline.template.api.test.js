@@ -25,13 +25,14 @@ describe('timeline template API E2E tests', () => {
   const notFoundId = uuid()
   // reference data
   let phase
+  const predecessor = uuid()
 
   before(async () => {
     phase = await helper.create('Phase', {
       id: uuid(),
       name: `phase${new Date().getTime()}`, // random name
       description: 'desc',
-      isActive: true,
+      isOpen: true,
       duration: 123
     })
   })
@@ -49,7 +50,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 201)
       const result = response.body
@@ -59,11 +60,9 @@ describe('timeline template API E2E tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('create timeline template successfully 2', async () => {
@@ -74,7 +73,7 @@ describe('timeline template API E2E tests', () => {
           name: name2,
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 201)
       const result = response.body
@@ -84,11 +83,9 @@ describe('timeline template API E2E tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, false)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('create timeline template - missing token', async () => {
@@ -98,7 +95,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'No token provided.')
@@ -112,7 +109,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'No token provided.')
@@ -126,7 +123,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'Failed to authenticate token.')
@@ -140,7 +137,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'Failed to authenticate token.')
@@ -154,7 +151,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 403)
       should.equal(response.body.message, 'You are not allowed to perform this action!')
@@ -168,7 +165,7 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 409)
       should.equal(response.body.message, `TimelineTemplate with name: ${name} already exist`)
@@ -181,7 +178,7 @@ describe('timeline template API E2E tests', () => {
         .send({
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" is required')
@@ -195,7 +192,7 @@ describe('timeline template API E2E tests', () => {
           name: ['xx'],
           description: 'desc',
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" must be a string')
@@ -209,7 +206,7 @@ describe('timeline template API E2E tests', () => {
           name: 'ghghguue',
           description: ['desc'],
           isActive: true,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"description" must be a string')
@@ -223,10 +220,10 @@ describe('timeline template API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          phases: [{ name: 'invalid' }]
+          phases: [{ defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"id" is required')
+      should.equal(response.body.message, '"phaseId" is required')
     })
 
     it('create timeline template - unexpected field', async () => {
@@ -237,7 +234,7 @@ describe('timeline template API E2E tests', () => {
           name: 'flskjdf',
           description: 'desc',
           isActive: true,
-          phases: [phase],
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }],
           other: 'def'
         })
       should.equal(response.status, 400)
@@ -257,11 +254,9 @@ describe('timeline template API E2E tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('get timeline template - forbidden', async () => {
@@ -309,11 +304,9 @@ describe('timeline template API E2E tests', () => {
       should.equal(result[0].description, 'desc')
       should.equal(result[0].isActive, true)
       should.equal(result[0].phases.length, 1)
-      should.equal(result[0].phases[0].id, phase.id)
-      should.equal(result[0].phases[0].name, phase.name)
-      should.equal(result[0].phases[0].description, phase.description)
-      should.equal(result[0].phases[0].isActive, phase.isActive)
-      should.equal(result[0].phases[0].duration, phase.duration)
+      should.equal(result[0].phases[0].phaseId, phase.id)
+      should.equal(result[0].phases[0].predecessor, predecessor)
+      should.equal(result[0].phases[0].defaultDuration, 123)
     })
 
     it('search timeline templates successfully 2', async () => {
@@ -366,7 +359,7 @@ describe('timeline template API E2E tests', () => {
           name: `${name}-updated`,
           description: 'desc222',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 200)
       const result = response.body
@@ -375,11 +368,9 @@ describe('timeline template API E2E tests', () => {
       should.equal(result.description, 'desc222')
       should.equal(result.isActive, false)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('fully update timeline template - name already used', async () => {
@@ -390,7 +381,7 @@ describe('timeline template API E2E tests', () => {
           name: name2,
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 409)
       should.equal(response.body.message, `TimelineTemplate with name: ${name2} already exist`)
@@ -404,7 +395,7 @@ describe('timeline template API E2E tests', () => {
           name: 'xlkjfeug',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 403)
       should.equal(response.body.message, 'You are not allowed to perform this action!')
@@ -418,7 +409,7 @@ describe('timeline template API E2E tests', () => {
           name: 'fjgjgjg',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 404)
       should.equal(response.body.message, `TimelineTemplate with id: ${notFoundId} doesn't exist`)
@@ -432,7 +423,7 @@ describe('timeline template API E2E tests', () => {
           name: 'fjgjgjg',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"timelineTemplateId" must be a valid GUID')
@@ -446,7 +437,7 @@ describe('timeline template API E2E tests', () => {
           name: null,
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" must be a string')
@@ -460,7 +451,7 @@ describe('timeline template API E2E tests', () => {
           name: { invalid: 123 },
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" must be a string')
@@ -474,7 +465,7 @@ describe('timeline template API E2E tests', () => {
           name: '',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" is not allowed to be empty')
@@ -488,7 +479,7 @@ describe('timeline template API E2E tests', () => {
           name: 'slkdjfhhghg',
           description: 'desc',
           isActive: [],
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"isActive" must be a boolean')
@@ -511,11 +502,9 @@ describe('timeline template API E2E tests', () => {
       should.equal(result.description, 'desc33')
       should.equal(result.isActive, false)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('partially update timeline template - name already used', async () => {

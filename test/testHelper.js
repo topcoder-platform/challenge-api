@@ -13,6 +13,7 @@ const esClient = helper.getESClient()
 let challengeType
 let challengeSetting
 let phase
+let phase2
 let timelineTemplate
 let challenge
 let completedChallenge
@@ -37,15 +38,29 @@ async function createData () {
     id: uuid(),
     name: `phase-${new Date().getTime()}`,
     description: 'desc',
-    isActive: true,
+    isOpen: true,
     duration: 123
+  })
+  phase2 = await helper.create('Phase', {
+    id: uuid(),
+    name: `phase2-${new Date().getTime()}`,
+    description: 'desc',
+    isOpen: true,
+    duration: 432
   })
   timelineTemplate = await helper.create('TimelineTemplate', {
     id: uuid(),
     name: `tt-${new Date().getTime()}`,
     description: 'desc',
     isActive: true,
-    phases: [phase]
+    phases: [{
+      phaseId: phase.id,
+      defaultDuration: 10000
+    }, {
+      phaseId: phase2.id,
+      predecessor: phase.id,
+      defaultDuration: 20000
+    }]
   })
 
   const challengeData = {
@@ -79,7 +94,7 @@ async function createData () {
     createdBy: 'admin'
   }
 
-  challengeData.endDate = moment(challengeData.startDate).add(phase.duration, 'hours')
+  challengeData.endDate = moment(challengeData.startDate).add(phase.duration, 'seconds')
   challenge = await helper.create('Challenge', challengeData)
   completedChallenge = await helper.create('Challenge', _.assign(challengeData, { id: uuid(), status: constants.challengeStatuses.Completed }))
 
@@ -126,6 +141,7 @@ async function clearData () {
   await completedChallenge.delete()
   await timelineTemplate.delete()
   await phase.delete()
+  await phase2.delete()
   await challengeSetting.delete()
   await challengeType.delete()
 }
@@ -138,14 +154,23 @@ function getData () {
     challengeType: challengeType.originalItem(),
     challengeSetting: challengeSetting.originalItem(),
     phase: phase.originalItem(),
+    phase2: phase2.originalItem(),
     timelineTemplate: timelineTemplate.originalItem(),
     challenge: challenge.originalItem(),
     completedChallenge: completedChallenge.originalItem()
   }
 }
 
+/**
+ * Get dates difference in milliseconds
+ */
+function getDatesDiff (d1, d2) {
+  return new Date(d1).getTime() - new Date(d2).getTime()
+}
+
 module.exports = {
   createData,
   clearData,
-  getData
+  getData,
+  getDatesDiff
 }

@@ -108,7 +108,7 @@ Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mo
 - Clear and init db `npm run init-db`
 - Start app `npm start`
 - App is running at `http://localhost:3000`
-- Start mock-api, go to `mock-api` folder and `npm start`, mock api is running at `http://localhost:4000`
+- Start mock-api, go to `mock-api` folder, run `npm i` and `npm start`, mock api is running at `http://localhost:4000`
 
 ## Running tests
 

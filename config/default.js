@@ -65,6 +65,13 @@ module.exports = {
       UPDATE: process.env.SCOPE_CHALLENGE_TYPES_UPDATE || 'update:challenge_types',
       ALL: process.env.SCOPE_CHALLENGE_TYPES_ALL || 'all:challenge_types'
     },
+    CHALLENGE_TYPE_TIMELINE_TEMPLATES: {
+      READ: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_READ || 'read:challenge_type_timeline_templates',
+      CREATE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_CREATE || 'create:challenge_type_timeline_templates',
+      UPDATE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_UPDATE || 'update:challenge_type_timeline_templates',
+      DELETE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_DELETE || 'delete:challenge_type_timeline_templates',
+      ALL: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_ALL || 'all:challenge_type_timeline_templates'
+    },
     CHALLENGE_SETTINGS: {
       READ: process.env.SCOPE_CHALLENGE_SETTINGS_READ || 'read:challenge_settings',
       CREATE: process.env.SCOPE_CHALLENGE_SETTINGS_CREATE || 'create:challenge_settings',

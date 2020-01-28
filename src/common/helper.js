@@ -314,14 +314,17 @@ function partialMatch (filter, value) {
  * @param {Array} phases the phases data.
  */
 async function validatePhases (phases) {
+  if (!phases || phases.length === 0) {
+    return
+  }
   const records = await scan('Phase')
   const map = new Map()
   _.each(records, r => {
     map.set(r.id, r)
   })
-  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive)
+  const invalidPhases = _.filter(phases, p => !map.has(p.phaseId))
   if (invalidPhases.length > 0) {
-    throw new errors.BadRequestError(`The following phases are invalid or inactive: ${toString(invalidPhases)}`)
+    throw new errors.BadRequestError(`The following phases are invalid: ${toString(invalidPhases)}`)
   }
 }
 
@@ -529,7 +532,7 @@ async function ensureProjectExist (projectId, userToken) {
 }
 
 /**
- * Calculates challenge end date based on udation of its phases
+ * Calculates challenge end date based on its phases
  * @param {any} challenge
  */
 function calculateChallengeEndDate (challenge, data) {
@@ -546,10 +549,10 @@ function calculateChallengeEndDate (challenge, data) {
   }, {})
   let result = moment(data.startDate || challenge.startDate)
   while (phase) {
-    result.add(phase.duration, 'hours')
+    result.add(phase.duration || 0, 'seconds')
     phase = phase.predecessor && phases[phase.predecessor]
   }
-  return result
+  return result.toDate()
 }
 
 /**

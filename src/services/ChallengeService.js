@@ -12,6 +12,7 @@ const errors = require('../common/errors')
 const constants = require('../../app-constants')
 const models = require('../models')
 const HttpStatus = require('http-status-codes')
+const moment = require('moment')
 
 const esClient = helper.getESClient()
 
@@ -274,6 +275,86 @@ async function validateChallengeData (challenge) {
 }
 
 /**
+ * Populate challenge phases.
+ * @param {Array} phases the phases to populate
+ * @param {Date} startDate the challenge start date
+ * @param {String} timelineTemplateId the timeline template id
+ */
+async function populatePhases (phases, startDate, timelineTemplateId) {
+  if (!phases || phases.length === 0) {
+    return
+  }
+  const template = await helper.getById('TimelineTemplate', timelineTemplateId)
+  // generate phase instance ids
+  for (let i = 0; i < phases.length; i += 1) {
+    phases[i].id = uuid()
+  }
+  for (let i = 0; i < phases.length; i += 1) {
+    const phase = phases[i]
+    const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
+    if (templatePhase) {
+      // use default duration if not provided
+      if (!phase.duration) {
+        phase.duration = templatePhase.defaultDuration
+      }
+      // set predecessor
+      if (templatePhase.predecessor) {
+        const prePhase = _.find(phases, (p) => p.phaseId === templatePhase.predecessor)
+        if (!prePhase) {
+          throw new errors.BadRequestError(`Predecessor ${templatePhase.predecessor} not found from given phases.`)
+        }
+        phase.predecessor = prePhase.id
+      }
+    }
+  }
+
+  // calculate dates
+  if (!startDate) {
+    return
+  }
+  const done = []
+  for (let i = 0; i < phases.length; i += 1) {
+    done.push(false)
+  }
+  let doing = true
+  while (doing) {
+    doing = false
+    for (let i = 0; i < phases.length; i += 1) {
+      if (!done[i]) {
+        const phase = phases[i]
+        if (!phase.predecessor) {
+          phase.scheduledStartDate = startDate
+          phase.scheduledEndDate = moment(startDate).add(phase.duration || 0, 'seconds').toDate()
+          phase.actualStartDate = phase.scheduledStartDate
+          phase.actualEndDate = phase.scheduledEndDate
+          done[i] = true
+          doing = true
+        } else {
+          const preIndex = _.findIndex(phases, (p) => p.id === phase.predecessor)
+          if (preIndex < 0) {
+            throw new Error(`Invalid phase predecessor: ${phase.predecessor}`)
+          }
+          if (done[preIndex]) {
+            phase.scheduledStartDate = phases[preIndex].scheduledEndDate
+            phase.scheduledEndDate = moment(phase.scheduledStartDate).add(phase.duration || 0, 'seconds').toDate()
+            phase.actualStartDate = phase.scheduledStartDate
+            phase.actualEndDate = phase.scheduledEndDate
+            done[i] = true
+            doing = true
+          }
+        }
+      }
+    }
+  }
+  // validate that all dates are calculated
+  for (let i = 0; i < phases.length; i += 1) {
+    if (!done[i]) {
+      throw new Error(`Invalid phase predecessor: ${phases[i].predecessor}`)
+    }
+  }
+}
+
+/**
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
@@ -289,6 +370,9 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
+
+  // populate phases
+  await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
 
   challenge.endDate = helper.calculateChallengeEndDate(challenge)
   const ret = await helper.create('Challenge', _.assign({
@@ -326,12 +410,8 @@ createChallenge.schema = {
     })).unique((a, b) => a.type === b.type),
     timelineTemplateId: Joi.id(),
     phases: Joi.array().items(Joi.object().keys({
-      id: Joi.id(),
-      name: Joi.string().required(),
-      description: Joi.string(),
-      predecessor: Joi.optionalId(),
-      isActive: Joi.boolean().required(),
-      duration: Joi.number().positive().required()
+      phaseId: Joi.id(),
+      duration: Joi.number().positive()
     })).min(1).required(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -594,6 +674,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   if (data.phases) {
     await helper.validatePhases(data.phases)
+    // populate phases
+    await populatePhases(data.phases, data.startDate || challenge.startDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
 
@@ -850,12 +932,8 @@ fullyUpdateChallenge.schema = {
     })).unique((a, b) => a.type === b.type),
     timelineTemplateId: Joi.id(),
     phases: Joi.array().items(Joi.object().keys({
-      id: Joi.id(),
-      name: Joi.string().required(),
-      description: Joi.string(),
-      predecessor: Joi.optionalId(),
-      isActive: Joi.boolean().required(),
-      duration: Joi.number().positive().required()
+      phaseId: Joi.id(),
+      duration: Joi.number().positive()
     })).min(1).required(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -913,12 +991,8 @@ partiallyUpdateChallenge.schema = {
     })).unique((a, b) => a.type === b.type),
     timelineTemplateId: Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
-      id: Joi.id(),
-      name: Joi.string().required(),
-      description: Joi.string(),
-      predecessor: Joi.optionalId(),
-      isActive: Joi.boolean().required(),
-      duration: Joi.number().positive().required()
+      phaseId: Joi.id(),
+      duration: Joi.number().positive()
     })).min(1),
     startDate: Joi.date(),
     endDate: Joi.date(),

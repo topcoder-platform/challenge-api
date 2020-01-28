@@ -1,5 +1,5 @@
 /**
- * This defines Phase model.
+ * This defines ChallengeType-TimelineTemplate mapping model.
  */
 
 const dynamoose = require('dynamoose')
@@ -12,20 +12,12 @@ const schema = new Schema({
     hashKey: true,
     required: true
   },
-  name: {
+  typeId: {
     type: String,
     required: true
   },
-  description: {
+  timelineTemplateId: {
     type: String,
-    required: false
-  },
-  isOpen: {
-    type: Boolean,
-    required: true
-  },
-  duration: {
-    type: Number,
     required: true
   }
 },

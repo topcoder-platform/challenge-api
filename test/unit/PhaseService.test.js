@@ -23,12 +23,12 @@ describe('phase service unit tests', () => {
       const result = await service.createPhase({
         name,
         description: 'desc',
-        isActive: true,
+        isOpen: true,
         duration: 123
       })
       should.equal(result.name, name)
       should.equal(result.description, 'desc')
-      should.equal(result.isActive, true)
+      should.equal(result.isOpen, true)
       should.equal(result.duration, 123)
       should.exist(result.id)
       id = result.id
@@ -38,33 +38,15 @@ describe('phase service unit tests', () => {
       const result = await service.createPhase({
         name: name2,
         description: 'desc2',
-        predecessor: id,
-        isActive: false,
+        isOpen: false,
         duration: 456
       })
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, false)
+      should.equal(result.isOpen, false)
       should.equal(result.duration, 456)
       should.exist(result.id)
       id2 = result.id
-    })
-
-    it('create phase - predecessor not found', async () => {
-      try {
-        await service.createPhase({
-          name: 'fjifgutuyob234',
-          description: 'desc2',
-          predecessor: notFoundId,
-          isActive: false,
-          duration: 456
-        })
-      } catch (e) {
-        should.equal(e.message, `Phase with id: ${notFoundId} doesn't exist`)
-        return
-      }
-      throw new Error('should not reach here')
     })
 
     it('create phase - name already used', async () => {
@@ -72,7 +54,7 @@ describe('phase service unit tests', () => {
         await service.createPhase({
           name,
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -86,7 +68,7 @@ describe('phase service unit tests', () => {
       try {
         await service.createPhase({
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -101,7 +83,7 @@ describe('phase service unit tests', () => {
         await service.createPhase({
           name: ['xx'],
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -116,7 +98,7 @@ describe('phase service unit tests', () => {
         await service.createPhase({
           name: 'some name',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: -456
         })
       } catch (e) {
@@ -131,7 +113,7 @@ describe('phase service unit tests', () => {
         await service.createPhase({
           name: 'some name',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456,
           other: 123
         })
@@ -149,8 +131,7 @@ describe('phase service unit tests', () => {
       should.equal(result.id, id2)
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, false)
+      should.equal(result.isOpen, false)
       should.equal(result.duration, 456)
     })
 
@@ -185,8 +166,7 @@ describe('phase service unit tests', () => {
       should.equal(result.result[0].id, id2)
       should.equal(result.result[0].name, name2)
       should.equal(result.result[0].description, 'desc2')
-      should.equal(result.result[0].predecessor, id)
-      should.equal(result.result[0].isActive, false)
+      should.equal(result.result[0].isOpen, false)
       should.equal(result.result[0].duration, 456)
     })
 
@@ -244,15 +224,13 @@ describe('phase service unit tests', () => {
       const result = await service.fullyUpdatePhase(id2, {
         name: `${name2}-updated`,
         description: 'desc222',
-        predecessor: id,
-        isActive: true,
+        isOpen: true,
         duration: 789
       })
       should.equal(result.id, id2)
       should.equal(result.name, `${name2}-updated`)
       should.equal(result.description, 'desc222')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, true)
+      should.equal(result.isOpen, true)
       should.equal(result.duration, 789)
     })
 
@@ -261,7 +239,7 @@ describe('phase service unit tests', () => {
         await service.fullyUpdatePhase(id2, {
           name,
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -276,7 +254,7 @@ describe('phase service unit tests', () => {
         await service.fullyUpdatePhase(notFoundId, {
           name: 'slkdjflskjdf',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -291,7 +269,7 @@ describe('phase service unit tests', () => {
         await service.fullyUpdatePhase('invalid', {
           name: 'slkdjflskjdf',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -306,7 +284,7 @@ describe('phase service unit tests', () => {
         await service.fullyUpdatePhase(id, {
           name: null,
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -321,7 +299,7 @@ describe('phase service unit tests', () => {
         await service.fullyUpdatePhase(id, {
           name: { invalid: 'x' },
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -336,7 +314,7 @@ describe('phase service unit tests', () => {
         await service.fullyUpdatePhase(id, {
           name: '',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       } catch (e) {
@@ -346,16 +324,16 @@ describe('phase service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('fully update phase - invalid isActive', async () => {
+    it('fully update phase - invalid isOpen', async () => {
       try {
         await service.fullyUpdatePhase(id, {
           name: 'asdfsadfsdf',
           description: 'desc',
-          isActive: 'invalid',
+          isOpen: 'invalid',
           duration: 456
         })
       } catch (e) {
-        should.equal(e.message.indexOf('"isActive" must be a boolean') >= 0, true)
+        should.equal(e.message.indexOf('"isOpen" must be a boolean') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -372,8 +350,7 @@ describe('phase service unit tests', () => {
       should.equal(result.id, id2)
       should.equal(result.name, `${name2}-33`)
       should.equal(result.description, 'desc33')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, true)
+      should.equal(result.isOpen, true)
       should.equal(result.duration, 111)
     })
 
@@ -431,16 +408,6 @@ describe('phase service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update phase - invalid predecessor', async () => {
-      try {
-        await service.partiallyUpdatePhase(id, { predecessor: 'abc' })
-      } catch (e) {
-        should.equal(e.message.indexOf('"predecessor" must be a valid GUID') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('partially update phase - empty name', async () => {
       try {
         await service.partiallyUpdatePhase(id, { name: '' })
@@ -463,16 +430,6 @@ describe('phase service unit tests', () => {
   })
 
   describe('remove phase tests', () => {
-    it('remove phase - there is dependent phase', async () => {
-      try {
-        await service.deletePhase(id)
-      } catch (e) {
-        should.equal(e.message, `Can't delete phase ${id} because it is preceding phase of other phases.`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('remove phase successfully 1', async () => {
       await service.deletePhase(id2)
     })

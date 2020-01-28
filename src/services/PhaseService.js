@@ -7,7 +7,6 @@ const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
-const errors = require('../common/errors')
 const constants = require('../../app-constants')
 
 /**
@@ -39,10 +38,6 @@ searchPhases.schema = {
  */
 async function createPhase (phase) {
   await helper.validateDuplicate('Phase', 'name', phase.name)
-  if (phase.predecessor) {
-    // validate preceding phase
-    await helper.getById('Phase', phase.predecessor)
-  }
   const ret = await helper.create('Phase', _.assign({ id: uuid() }, phase))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret)
@@ -53,8 +48,7 @@ createPhase.schema = {
   phase: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
-    predecessor: Joi.optionalId(),
-    isActive: Joi.boolean().required(),
+    isOpen: Joi.boolean().required(),
     duration: Joi.number().positive().required()
   }).required()
 }
@@ -86,15 +80,9 @@ async function update (phaseId, data, isFull) {
     await helper.validateDuplicate('Phase', 'name', data.name)
   }
 
-  if (data.predecessor && data.predecessor !== phase.predecessor) {
-    // validate preceding phase
-    await helper.getById('Phase', data.predecessor)
-  }
-
   if (isFull) {
-    // description and predecessor are optional fields, can be undefined
+    // description is optional field, can be undefined
     phase.description = data.description
-    phase.predecessor = data.predecessor
   }
 
   const ret = await helper.update(phase, data)
@@ -119,8 +107,7 @@ fullyUpdatePhase.schema = {
   data: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
-    predecessor: Joi.optionalId(),
-    isActive: Joi.boolean().required(),
+    isOpen: Joi.boolean().required(),
     duration: Joi.number().positive().required()
   }).required()
 }
@@ -140,8 +127,7 @@ partiallyUpdatePhase.schema = {
   data: Joi.object().keys({
     name: Joi.string(),
     description: Joi.string(),
-    predecessor: Joi.optionalId(),
-    isActive: Joi.boolean(),
+    isOpen: Joi.boolean(),
     duration: Joi.number().positive()
   }).required()
 }
@@ -153,10 +139,6 @@ partiallyUpdatePhase.schema = {
  */
 async function deletePhase (phaseId) {
   const ret = await helper.getById('Phase', phaseId)
-  const list = await helper.scan('Phase', { predecessor: phaseId })
-  if (list.length > 0) {
-    throw new errors.BadRequestError(`Can't delete phase ${phaseId} because it is preceding phase of other phases.`)
-  }
   await ret.delete()
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, ret)
