@@ -13,9 +13,9 @@ This microservice provides access and interaction with all sorts of Challenge da
 ## Related repos
 
 - [Resources API](https://github.com/topcoder-platform/resources-api)
-- [ES Processor](https://github.com/topcoder-platform/challenge-processor-es)
-- [Legacy Processor](https://github.com/topcoder-platform/legacy-challenge-processor)
-- [Legacy Migration Script](https://github.com/topcoder-platform/legacy-challenge-migration-script)
+- [ES Processor](https://github.com/topcoder-platform/challenge-processor-es) - Updates data in ElasticSearch
+- [Legacy Processor](https://github.com/topcoder-platform/legacy-challenge-processor) - Moves data from DynamoDB back to Informix
+- [Legacy Migration Script](https://github.com/topcoder-platform/legacy-challenge-migration-script) - Moves data from Informix to DynamoDB
 - [Frontend App](https://github.com/topcoder-platform/challenge-engine-ui)
 
 ## Prerequisites
