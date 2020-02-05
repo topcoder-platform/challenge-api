@@ -92,7 +92,7 @@ module.exports = {
   '/challengeTimelines': {
     get: {
       controller: 'ChallengeTypeTimelineTemplateController',
-      method: 'searchChallengeTypeTimelineTemplates',
+      method: 'searchChallengeTypeTimelineTemplates'
       // auth: 'jwt',
       // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       // scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
@@ -108,10 +108,10 @@ module.exports = {
   '/challengeTimelines/:challengeTypeTimelineTemplateId': {
     get: {
       controller: 'ChallengeTypeTimelineTemplateController',
-      method: 'getChallengeTypeTimelineTemplate',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
+      method: 'getChallengeTypeTimelineTemplate'
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
     },
     put: {
       controller: 'ChallengeTypeTimelineTemplateController',
