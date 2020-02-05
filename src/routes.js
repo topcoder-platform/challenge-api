@@ -93,9 +93,9 @@ module.exports = {
     get: {
       controller: 'ChallengeTypeTimelineTemplateController',
       method: 'searchChallengeTypeTimelineTemplates',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
     },
     post: {
       controller: 'ChallengeTypeTimelineTemplateController',
