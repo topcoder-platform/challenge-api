@@ -1,5 +1,5 @@
 /**
- * This defines AuditLog model.
+ * This defines ChallengeType-TimelineTemplate mapping model.
  */
 
 const dynamoose = require('dynamoose')
@@ -12,32 +12,13 @@ const schema = new Schema({
     hashKey: true,
     required: true
   },
-  challengeId: {
+  typeId: {
     type: String,
     required: true
   },
-  fieldName: {
+  timelineTemplateId: {
     type: String,
     required: true
-  },
-  oldValue: {
-    type: String,
-    required: true
-  },
-  newValue: {
-    type: String,
-    required: true
-  },
-  created: {
-    type: Date,
-    required: true
-  },
-  createdBy: {
-    type: String,
-    required: true
-  },
-  memberId: {
-    type: String
   }
 },
 {

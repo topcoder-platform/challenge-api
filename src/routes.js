@@ -6,6 +6,7 @@ const constants = require('../app-constants')
 const { SCOPES: {
   CHALLENGES,
   CHALLENGE_TYPES,
+  CHALLENGE_TYPE_TIMELINE_TEMPLATES,
   CHALLENGE_SETTINGS,
   CHALLENGE_AUDIT_LOGS,
   CHALLENGE_PHASES,
@@ -26,6 +27,12 @@ module.exports = {
       auth: 'jwt',
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       scopes: [CHALLENGES.CREATE, CHALLENGES.ALL]
+    }
+  },
+  '/challenges/health': {
+    get: {
+      controller: 'HealthController',
+      method: 'checkHealth'
     }
   },
   '/challenges/:challengeId': {
@@ -80,6 +87,45 @@ module.exports = {
       auth: 'jwt',
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       scopes: [CHALLENGE_TYPES.UPDATE, CHALLENGE_TYPES.ALL]
+    }
+  },
+  '/challengeTimelines': {
+    get: {
+      controller: 'ChallengeTypeTimelineTemplateController',
+      method: 'searchChallengeTypeTimelineTemplates'
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
+    },
+    post: {
+      controller: 'ChallengeTypeTimelineTemplateController',
+      method: 'createChallengeTypeTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.CREATE, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
+    }
+  },
+  '/challengeTimelines/:challengeTypeTimelineTemplateId': {
+    get: {
+      controller: 'ChallengeTypeTimelineTemplateController',
+      method: 'getChallengeTypeTimelineTemplate'
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.READ, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
+    },
+    put: {
+      controller: 'ChallengeTypeTimelineTemplateController',
+      method: 'fullyUpdateChallengeTypeTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.UPDATE, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
+    },
+    delete: {
+      controller: 'ChallengeTypeTimelineTemplateController',
+      method: 'deleteChallengeTypeTimelineTemplate',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.DELETE, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
     }
   },
   '/challengeSettings': {
@@ -226,12 +272,6 @@ module.exports = {
       method: 'downloadAttachment',
       auth: 'jwt', // any authenticated role is allowed
       scopes: [CHALLENGE_ATTACHMENTS.READ, CHALLENGE_ATTACHMENTS.ALL]
-    }
-  },
-  '/health': {
-    get: {
-      controller: 'HealthController',
-      method: 'checkHealth'
     }
   }
 }

@@ -117,11 +117,45 @@ paths:
           required: false
           type: string
           enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        - name: currentPhaseId
+          in: query
+          description: Filter by id of the current phase
+          required: false
+          type: string
+        - name: currentPhaseName
+          in: query
+          description: Filter by name of the current phase
+          required: false
+          type: string
         - name: group
           in: query
           description: Filter by group name, case-insensitive, partial matches are allowed.
           required: false
           type: string
+        - name: startDateStart
+          in: query
+          description: Filter by start date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: startDateEnd
+          in: query
+          description: Filter by start date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: endDateStart
+          in: query
+          description: Filter by end date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: endDateEnd
+          in: query
+          description: Filter by end date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
         - name: createdDateStart
           in: query
           description: Filter by created date (lower bound of date range)
@@ -389,6 +423,16 @@ paths:
           description: Filter by isActive flag.
           required: false
           type: boolean
+        - name: abbreviation
+          in: query
+          description: Filter by abbreviation.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: legacyId
+          in: query
+          description: Filter by legacy id.
+          required: false
+          type: integer
       responses:
         '200':
           description: OK
@@ -462,7 +506,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -545,7 +589,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -599,7 +643,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -1407,6 +1451,232 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
+  /challengeTimelines:
+    get:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: |
+        Retrieve challenge type timeline templates in the system.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: typeId
+          in: query
+          description: Filter by challenge type id
+          required: false
+          type: string
+        - name: timelineTemplateId
+          in: query
+          description: Filter by timeline template id
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the timeline templates
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: |
+        Create a new challenge type timeline template in the system. Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplateData'
+      responses:
+        '201':
+          description: Created - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            create the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other timeline template has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /challengeTimelines/:challengeTypeTimelineTemplateId:
+    get:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: Retrieve the challenge type timeline template with provided id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeTimelineTemplateId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge type timeline template to retrieve
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Entity not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: Update the challenge type timeline template with the specified id. Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeTimelineTemplateId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge type timeline template to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplateData'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Entity not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other timeline template has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    delete:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: Delete the challenge type timeline template with provided id. Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeTimelineTemplateId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge type timeline template to be deleted
+      responses:
+        '200':
+          description: Deleted - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            delete the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Entity not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
   /challengeAuditLogs:
     get:
       tags:
@@ -1681,6 +1951,20 @@ definitions:
       - $ref: '#/definitions/TimelineTemplateData'
     required:
       - id
+  ChallengeTypeTimelineTemplate:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The challenge type timeline template id.
+            format: UUID
+      - $ref: '#/definitions/ChallengeTypeTimelineTemplateData'
+    required:
+      - id
+      - typeId
+      - timelineTemplateId
   ChallengeData:
     type: object
     properties:
@@ -1695,6 +1979,9 @@ definitions:
         type: string
       description:
         type: string
+      privateDescription:
+        type: string
+        description: returned only if the user is registered on the challenge.
       challengeSettings:
         type: array
         items:
@@ -1764,6 +2051,26 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
+      numOfSubmissions:
+        type: integer
+        description: number of submissions
+      numOfRegistrants:
+        type: integer
+        description: number of registrants
       created:
         type: string
         format: date-time
@@ -1820,9 +2127,14 @@ definitions:
         type: string
       isActive:
         type: boolean
+      abbreviation:
+        type: string
+      legacyId:
+        type: integer
     required:
       - name
       - isActive
+      - abbreviation
   ChallengeSettingsData:
     type: object
     properties:
@@ -1833,21 +2145,38 @@ definitions:
   PhaseData:
     type: object
     properties:
+      phaseId:
+        type: string
+        format: UUID
+      predecessor:
+        type: string
+        format: UUID
       name:
         type: string
       description:
         type: string
-      predecessor:
-        type: string
-        format: UUID
-      isActive:
+      isOpen:
         type: boolean
       duration:
         type: number
-    required:
-      - name
-      - isActive
-      - duration
+      defaultDuration:
+        type: number
+      scheduledStartDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      scheduledEndDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      actualStartDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      actualEndDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
   TimelineTemplateData:
     type: object
     properties:
@@ -1865,6 +2194,18 @@ definitions:
       - name
       - isActive
       - phases
+  ChallengeTypeTimelineTemplateData:
+    type: object
+    properties:
+      typeId:
+        type: string
+        format: UUID
+      timelineTemplateId:
+        type: string
+        format: UUID
+    required:
+      - typeId
+      - timelineTemplateId
   AuditLogEntry:
     type: object
     properties:
@@ -1886,6 +2227,10 @@ definitions:
       createdBy:
         type: string
         example: 'topcoder user'
+      memberId:
+        type: string
+        description: 'The member ID'
+        example: '12345678'
     required:
       - id
       - challengeId
@@ -1906,6 +2251,8 @@ definitions:
       name:
         type: string
       description:
+        type: string
+      privateDescription:
         type: string
       challengeSettings:
         type: array
@@ -1973,6 +2320,20 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
     required:
       - typeId
       - track
@@ -2002,6 +2363,8 @@ definitions:
       name:
         type: string
       description:
+        type: string
+      privateDescription:
         type: string
       challengeSettings:
         type: array
@@ -2073,6 +2436,26 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
+      numOfSubmissions:
+        type: integer
+        description: number of submissions
+      numOfRegistrants:
+        type: integer
+        description: number of registrants
       created:
         type: string
         format: date-time

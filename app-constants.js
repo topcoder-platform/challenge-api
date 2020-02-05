@@ -37,7 +37,10 @@ const Topics = {
   ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',
   TimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.timeline.template.created',
   TimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.timeline.template.updated',
-  TimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.timeline.template.deleted'
+  TimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.timeline.template.deleted',
+  ChallengeTypeTimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.created',
+  ChallengeTypeTimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.updated',
+  ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.type.timeline.template.deleted'
 }
 
 module.exports = {

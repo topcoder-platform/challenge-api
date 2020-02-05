@@ -32,6 +32,10 @@ const schema = new Schema({
     type: String,
     required: true
   },
+  privateDescription: {
+    type: String,
+    required: false
+  },
   challengeSettings: {
     type: [Object],
     required: false
@@ -69,6 +73,10 @@ const schema = new Schema({
     type: Date,
     required: true
   },
+  endDate: {
+    type: Date,
+    required: true
+  },
   status: {
     type: String,
     required: true
@@ -84,6 +92,11 @@ const schema = new Schema({
   },
   gitRepoURLs: {
     type: Array,
+    required: false
+  },
+  // winners
+  winners: {
+    type: [Object],
     required: false
   },
   created: {

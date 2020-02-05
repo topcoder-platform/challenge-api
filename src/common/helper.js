@@ -15,6 +15,7 @@ const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_
 const axios = require('axios')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
+const moment = require('moment')
 
 // Bus API Client
 let busApiClient
@@ -27,8 +28,8 @@ validateESRefreshMethod(config.ES.ES_REFRESH)
 
 AWS.config.update({
   s3: config.AMAZON.S3_API_VERSION,
-  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
-  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  // accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  // secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
   region: config.AMAZON.AWS_REGION
 })
 const s3 = new AWS.S3()
@@ -226,7 +227,7 @@ async function getByIds (modelName, ids) {
 async function validateDuplicate (modelName, name, value) {
   const list = await scan(modelName)
   for (let i = 0; i < list.length; i++) {
-    if (list[i][name].toLowerCase() === value.toLowerCase()) {
+    if (list[i][name] && String(list[i][name]).toLowerCase() === String(value).toLowerCase()) {
       throw new errors.ConflictError(`${modelName} with ${name}: ${value} already exist`)
     }
   }
@@ -313,14 +314,17 @@ function partialMatch (filter, value) {
  * @param {Array} phases the phases data.
  */
 async function validatePhases (phases) {
+  if (!phases || phases.length === 0) {
+    return
+  }
   const records = await scan('Phase')
   const map = new Map()
   _.each(records, r => {
     map.set(r.id, r)
   })
-  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive)
+  const invalidPhases = _.filter(phases, p => !map.has(p.phaseId))
   if (invalidPhases.length > 0) {
-    throw new errors.BadRequestError(`The following phases are invalid or inactive: ${toString(invalidPhases)}`)
+    throw new errors.BadRequestError(`The following phases are invalid: ${toString(invalidPhases)}`)
   }
 }
 
@@ -501,7 +505,6 @@ function getESClient () {
 }
 
 /**
-<<<<<<< HEAD
  * Ensure project exist
  * @param {String} projectId the project id
  * @param {String} userToken the user token
@@ -519,13 +522,37 @@ async function ensureProjectExist (projectId, userToken) {
       await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
     }
   } catch (err) {
-    if (_.get(err.response.status) === 404) {
+    if (_.get(err, 'response.status') === 404) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
     } else {
       // re-throw other error
       throw err
     }
   }
+}
+
+/**
+ * Calculates challenge end date based on its phases
+ * @param {any} challenge
+ */
+function calculateChallengeEndDate (challenge, data) {
+  if (!data) {
+    data = challenge
+  }
+  let phase = data.phases.slice(-1)[0]
+  if (!phase || (!data.startDate && !challenge.startDate)) {
+    return data.startDate || challenge.startDate
+  }
+  const phases = challenge.phases.reduce((obj, elem) => {
+    obj[elem.id] = elem
+    return obj
+  }, {})
+  let result = moment(data.startDate || challenge.startDate)
+  while (phase) {
+    result.add(phase.duration || 0, 'seconds')
+    phase = phase.predecessor && phases[phase.predecessor]
+  }
+  return result.toDate()
 }
 
 /**
@@ -575,6 +602,7 @@ module.exports = {
   postBusEvent,
   getESClient,
   ensureProjectExist,
+  calculateChallengeEndDate,
   listChallengesByMember,
   validateESRefreshMethod
 }

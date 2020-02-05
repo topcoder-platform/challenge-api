@@ -94,7 +94,7 @@ module.exports = (app) => {
       }
 
       actions.push(method)
-      app[verb](path, helper.autoWrapExpress(actions))
+      app[verb](`/${config.API_VERSION}${path}`, helper.autoWrapExpress(actions))
     })
   })
 

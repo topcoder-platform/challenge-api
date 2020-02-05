@@ -17,6 +17,8 @@ chai.use(chaiHttp)
 
 const attachmentContent = fs.readFileSync(path.join(__dirname, '../attachment.txt'))
 
+const baseUrl = `/${config.API_VERSION}/challenges`
+
 describe('attachment API E2E tests', () => {
   // created attachment id
   let id
@@ -36,7 +38,7 @@ describe('attachment API E2E tests', () => {
   describe('upload attachment API tests', () => {
     it('upload attachment successfully', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 200)
@@ -50,7 +52,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - missing token', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 401)
       should.equal(response.body.message, 'No token provided.')
@@ -58,7 +60,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - invalid bearer format', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', 'invalid format')
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 401)
@@ -67,7 +69,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - invalid token', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.INVALID_TOKEN}`)
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 401)
@@ -76,7 +78,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - expired token', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.EXPIRED_TOKEN}`)
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 401)
@@ -85,7 +87,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - invalid attachment', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .attach('invalid', attachmentContent, 'attachment.txt')
       should.equal(response.status, 400)
@@ -94,7 +96,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - challenge not found', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${notFoundId}/attachments`)
+        .post(`${baseUrl}/${notFoundId}/attachments`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 404)
@@ -103,7 +105,7 @@ describe('attachment API E2E tests', () => {
 
     it('upload attachment - forbidden', async () => {
       const response = await chai.request(app)
-        .post(`/challenges/${data.challenge.id}/attachments`)
+        .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.USER_TOKEN}`)
         .attach('attachment', attachmentContent, 'attachment.txt')
       should.equal(response.status, 403)
@@ -114,7 +116,7 @@ describe('attachment API E2E tests', () => {
   describe('download attachment API tests', () => {
     it('download attachment successfully', async () => {
       const response = await chai.request(app)
-        .get(`/challenges/${data.challenge.id}/attachments/${id}`)
+        .get(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 200)
       should.equal(response.text, 'test') // attachment content is 'test'
@@ -122,7 +124,7 @@ describe('attachment API E2E tests', () => {
 
     it('download attachment - forbidden', async () => {
       const response = await chai.request(app)
-        .get(`/challenges/${data.challenge.id}/attachments/${id}`)
+        .get(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
         .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
       should.equal(response.status, 403)
       should.equal(response.body.message, 'You are not allowed to download attachment of the challenge.')
@@ -130,7 +132,7 @@ describe('attachment API E2E tests', () => {
 
     it('download attachment - attachment not found', async () => {
       const response = await chai.request(app)
-        .get(`/challenges/${data.challenge.id}/attachments/${notFoundId}`)
+        .get(`${baseUrl}/${data.challenge.id}/attachments/${notFoundId}`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 404)
       should.equal(response.body.message, `Attachment with id: ${notFoundId} doesn't exist`)
@@ -138,7 +140,7 @@ describe('attachment API E2E tests', () => {
 
     it('download attachment - challenge id mismatched', async () => {
       const response = await chai.request(app)
-        .get(`/challenges/${notFoundId}/attachments/${id}`)
+        .get(`${baseUrl}/${notFoundId}/attachments/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 400)
       should.equal(response.body.message, 'The attachment challengeId does not match the path challengeId.')
@@ -146,7 +148,7 @@ describe('attachment API E2E tests', () => {
 
     it('download attachment - invalid id', async () => {
       const response = await chai.request(app)
-        .get(`/challenges/${notFoundId}/attachments/invalid`)
+        .get(`${baseUrl}/${notFoundId}/attachments/invalid`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 400)
       should.equal(response.body.message, '"attachmentId" must be a valid GUID')

@@ -5,6 +5,7 @@
 module.exports = {
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
   PORT: process.env.PORT || 3000,
+  API_VERSION: process.env.API_VERSION || 'v5',
   AUTH_SECRET: process.env.AUTH_SECRET || 'mysecret',
   VALID_ISSUERS: process.env.VALID_ISSUERS || '["https://api.topcoder-dev.com", "https://api.topcoder.com", "https://topcoder-dev.auth0.com/"]',
 
@@ -63,6 +64,13 @@ module.exports = {
       CREATE: process.env.SCOPE_CHALLENGE_TYPES_CREATE || 'create:challenge_types',
       UPDATE: process.env.SCOPE_CHALLENGE_TYPES_UPDATE || 'update:challenge_types',
       ALL: process.env.SCOPE_CHALLENGE_TYPES_ALL || 'all:challenge_types'
+    },
+    CHALLENGE_TYPE_TIMELINE_TEMPLATES: {
+      READ: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_READ || 'read:challenge_type_timeline_templates',
+      CREATE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_CREATE || 'create:challenge_type_timeline_templates',
+      UPDATE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_UPDATE || 'update:challenge_type_timeline_templates',
+      DELETE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_DELETE || 'delete:challenge_type_timeline_templates',
+      ALL: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_ALL || 'all:challenge_type_timeline_templates'
     },
     CHALLENGE_SETTINGS: {
       READ: process.env.SCOPE_CHALLENGE_SETTINGS_READ || 'read:challenge_settings',

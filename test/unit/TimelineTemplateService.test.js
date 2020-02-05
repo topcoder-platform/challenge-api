@@ -20,14 +20,15 @@ describe('timeline template service unit tests', () => {
   const notFoundId = uuid()
   // reference data
   let phase
+  const predecessor = uuid()
 
   before(async () => {
     phase = await helper.create('Phase', {
       id: uuid(),
       name: `phase${new Date().getTime()}`, // random name
       description: 'desc',
-      isActive: true,
-      duration: 123
+      isOpen: true,
+      duration: 12
     })
   })
 
@@ -41,7 +42,7 @@ describe('timeline template service unit tests', () => {
         name,
         description: 'desc',
         isActive: true,
-        phases: [phase]
+        phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
       })
       should.exist(result.id)
       id = result.id
@@ -49,11 +50,9 @@ describe('timeline template service unit tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('create timeline template successfully 2', async () => {
@@ -61,7 +60,7 @@ describe('timeline template service unit tests', () => {
         name: name2,
         description: 'desc',
         isActive: false,
-        phases: [phase]
+        phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
       })
       should.exist(result.id)
       id2 = result.id
@@ -69,11 +68,9 @@ describe('timeline template service unit tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, false)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('create timeline template - name already used', async () => {
@@ -82,7 +79,7 @@ describe('timeline template service unit tests', () => {
           name,
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message, `TimelineTemplate with name: ${name} already exist`)
@@ -96,7 +93,7 @@ describe('timeline template service unit tests', () => {
         await service.createTimelineTemplate({
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is required') >= 0, true)
@@ -111,7 +108,7 @@ describe('timeline template service unit tests', () => {
           name: ['xx'],
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
@@ -126,10 +123,10 @@ describe('timeline template service unit tests', () => {
           name: 'jjghurturt34',
           description: 'desc',
           isActive: false,
-          phases: [{ id: phase.id, name: phase.name, isActive: false, duration: 345 }]
+          phases: [{ phaseId: notFoundId, defaultDuration: 123 }]
         })
       } catch (e) {
-        should.equal(e.message.indexOf('phases are invalid or inactive') >= 0, true)
+        should.equal(e.message.indexOf('phases are invalid') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -156,7 +153,7 @@ describe('timeline template service unit tests', () => {
           name: 'some name 1232323',
           description: 'desc',
           isActive: false,
-          phases: [phase],
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }],
           other: 123
         })
       } catch (e) {
@@ -175,11 +172,9 @@ describe('timeline template service unit tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('get timeline template - not found', async () => {
@@ -215,11 +210,9 @@ describe('timeline template service unit tests', () => {
       should.equal(result.result[0].description, 'desc')
       should.equal(result.result[0].isActive, true)
       should.equal(result.result[0].phases.length, 1)
-      should.equal(result.result[0].phases[0].id, phase.id)
-      should.equal(result.result[0].phases[0].name, phase.name)
-      should.equal(result.result[0].phases[0].description, phase.description)
-      should.equal(result.result[0].phases[0].isActive, phase.isActive)
-      should.equal(result.result[0].phases[0].duration, phase.duration)
+      should.equal(result.result[0].phases[0].phaseId, phase.id)
+      should.equal(result.result[0].phases[0].predecessor, predecessor)
+      should.equal(result.result[0].phases[0].defaultDuration, 123)
     })
 
     it('search timeline templates successfully 2', async () => {
@@ -277,18 +270,16 @@ describe('timeline template service unit tests', () => {
         name: `${name}-updated`,
         description: 'desc222',
         isActive: false,
-        phases: [phase]
+        phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
       })
       should.equal(result.id, id)
       should.equal(result.name, `${name}-updated`)
       should.equal(result.description, 'desc222')
       should.equal(result.isActive, false)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('fully update timeline template - name already used', async () => {
@@ -297,7 +288,7 @@ describe('timeline template service unit tests', () => {
           name: name2,
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message, `TimelineTemplate with name: ${name2} already exist`)
@@ -312,7 +303,7 @@ describe('timeline template service unit tests', () => {
           name: 'slkdjflskjdf',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message, `TimelineTemplate with id: ${notFoundId} doesn't exist`)
@@ -327,7 +318,7 @@ describe('timeline template service unit tests', () => {
           name: 'slkdjflskjdf',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"timelineTemplateId" must be a valid GUID') >= 0, true)
@@ -342,7 +333,7 @@ describe('timeline template service unit tests', () => {
           name: null,
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
@@ -357,7 +348,7 @@ describe('timeline template service unit tests', () => {
           name: { invalid: 'x' },
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
@@ -372,7 +363,7 @@ describe('timeline template service unit tests', () => {
           name: '',
           description: 'desc',
           isActive: false,
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is not allowed to be empty') >= 0, true)
@@ -387,7 +378,7 @@ describe('timeline template service unit tests', () => {
           name: 'asdfsadfsdf',
           description: 'desc',
           isActive: 'invalid',
-          phases: [phase]
+          phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
         should.equal(e.message.indexOf('"isActive" must be a boolean') >= 0, true)
@@ -422,11 +413,9 @@ describe('timeline template service unit tests', () => {
       should.equal(result.description, 'desc33')
       should.equal(result.isActive, false)
       should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, phase.id)
-      should.equal(result.phases[0].name, phase.name)
-      should.equal(result.phases[0].description, phase.description)
-      should.equal(result.phases[0].isActive, phase.isActive)
-      should.equal(result.phases[0].duration, phase.duration)
+      should.equal(result.phases[0].phaseId, phase.id)
+      should.equal(result.phases[0].predecessor, predecessor)
+      should.equal(result.phases[0].defaultDuration, 123)
     })
 
     it('partially update timeline template - name already used', async () => {

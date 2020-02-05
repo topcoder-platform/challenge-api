@@ -6,8 +6,8 @@ const config = require('config')
 const dynamoose = require('dynamoose')
 
 dynamoose.AWS.config.update({
-  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
-  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  // accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  // secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
   region: config.AMAZON.AWS_REGION
 })
 
@@ -24,6 +24,7 @@ dynamoose.setDefaults({
 module.exports = {
   Challenge: dynamoose.model('Challenge', require('./Challenge')),
   ChallengeType: dynamoose.model('ChallengeType', require('./ChallengeType')),
+  ChallengeTypeTimelineTemplate: dynamoose.model('ChallengeTypeTimelineTemplate', require('./ChallengeTypeTimelineTemplate')),
   ChallengeSetting: dynamoose.model('ChallengeSetting', require('./ChallengeSetting')),
   AuditLog: dynamoose.model('AuditLog', require('./AuditLog')),
   Phase: dynamoose.model('Phase', require('./Phase')),

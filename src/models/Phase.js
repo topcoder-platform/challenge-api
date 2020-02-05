@@ -20,11 +20,7 @@ const schema = new Schema({
     type: String,
     required: false
   },
-  predecessor: {
-    type: String,
-    required: false
-  },
-  isActive: {
+  isOpen: {
     type: Boolean,
     required: true
   },

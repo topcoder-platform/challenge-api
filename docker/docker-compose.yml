@@ -1,0 +1,7 @@
+version: '3'
+services:
+  challenge-api:
+    image: challenge-api:latest
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
