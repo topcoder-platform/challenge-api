@@ -25,8 +25,9 @@ const esClient = helper.getESClient()
 async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
+  const needToCheckForGroupAccess = currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)
   for (const challenge of challenges) {
-    if (!challenge.groups || challenge.groups.length === 0 || (currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser)))) {
+    if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
     } else if (currentUser) {
       // get user groups if not yet
@@ -177,9 +178,7 @@ async function searchChallenges (currentUser, criteria) {
   // Extract data from hits
   const total = docs.hits.total
   let result = _.map(docs.hits.hits, item => item._source)
-  console.log(`hits before filtering by groups access: ${result.length}`)
   result = await filterChallengesByGroupsAccess(currentUser, result)
-  console.log(`hits after filtering by groups access: ${result.length}`)
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
