@@ -177,10 +177,12 @@ async function searchChallenges (currentUser, criteria) {
   // Extract data from hits
   const total = docs.hits.total
   let result = _.map(docs.hits.hits, item => item._source)
+  console.log(`hits before filtering by groups access: ${result.length}`)
   result = await filterChallengesByGroupsAccess(currentUser, result)
+  console.log(`hits after filtering by groups access: ${result.length}`)
 
   // Hide privateDescription for non-register challenges
-  if (currentUser && !currentUser.isMachine) {
+  if (currentUser) {
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       const ids = await helper.listChallengesByMember(currentUser.userId)
       result = _.each(result, (val) => {
