@@ -885,6 +885,10 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.winners = null
   }
 
+  console.log('------------------')
+  console.log(updateDetails)
+  console.log('------------------')
+
   await models.Challenge.update({ id: challengeId }, updateDetails)
   if (auditLogs.length > 0) {
     await models.AuditLog.batchPut(auditLogs)
