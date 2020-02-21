@@ -96,7 +96,7 @@ const schema = new Schema({
   },
   // winners
   winners: {
-    type: [Object],
+    type: Array,
     required: false
   },
   created: {

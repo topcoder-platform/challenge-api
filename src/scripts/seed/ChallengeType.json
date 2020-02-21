@@ -220,7 +220,7 @@
     "name": "Automated Testing",
     "description": "Automated Testing",
     "isActive": true,
-    "abbreviation": null,
+    "abbreviation": "AUTOMATED_TESTING",
     "legacyId": 41
   }
 ]
