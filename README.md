@@ -2,6 +2,11 @@
 
 This microservice provides access and interaction with all sorts of Challenge data.
 
+### Development deployment status
+[![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop)
+### Production deployment status
+[![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master)
+
 ## Swagger definition
 
 - [Swagger](https://api.topcoder.com/v5/challenges/docs/)
