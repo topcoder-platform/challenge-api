@@ -64,7 +64,7 @@ app.get('/v5/resources/:memberId/challenges', (req, res) => {
 })
 
 // get project by id
-app.get('/v4/projects/:projectId', (req, res) => {
+app.get('/v5/projects/:projectId', (req, res) => {
   const projectId = req.params.projectId
   if (projectId === '111' || projectId === '123' || projectId === '112233') {
     res.end()
