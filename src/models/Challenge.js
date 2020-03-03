@@ -48,6 +48,10 @@ const schema = new Schema({
     type: Array,
     required: true
   },
+  terms: {
+    type: [Object],
+    required: false
+  },
   prizeSets: {
     type: [Object],
     required: true

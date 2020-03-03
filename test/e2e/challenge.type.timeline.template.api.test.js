@@ -221,12 +221,15 @@ describe('challenge type timeline template API E2E tests', () => {
       should.equal(result.timelineTemplateId, timelineTemplate.id)
     })
 
-    it('get challenge type timeline template - forbidden', async () => {
+    it('get challenge type timeline template - M2M update access token', async () => {
       const response = await chai.request(app)
         .get(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
-      should.equal(response.status, 403)
-      should.equal(response.body.message, 'You are not allowed to perform this action!')
+      should.equal(response.status, 200)
+      const result = response.body
+      should.equal(result.id, id)
+      should.equal(result.typeId, type.id)
+      should.equal(result.timelineTemplateId, timelineTemplate.id)
     })
 
     it('get challenge type timeline template - not found', async () => {

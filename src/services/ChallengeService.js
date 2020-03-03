@@ -370,12 +370,18 @@ async function createChallenge (currentUser, challenge, userToken) {
   await helper.validatePhases(challenge.phases)
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
+  helper.ensureNoDuplicateOrNullElements(challenge.termsIds, 'termsIds')
 
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
   await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
+
+  // populate challenge terms
+  const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
+  challenge.terms = await helper.getChallengeTerms(_.union(projectTerms, challenge.termsIds))
+  delete challenge.termsIds
 
   challenge.endDate = helper.calculateChallengeEndDate(challenge)
   const ret = await helper.create('Challenge', _.assign({
@@ -434,7 +440,8 @@ createChallenge.schema = {
     endDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri())
+    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    termsIds: Joi.array().items(Joi.number().strict(true).positive()).default([])
   }).required(),
   userToken: Joi.any()
 }
@@ -664,6 +671,22 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
   }
 
+  // Validate the challenge terms
+  let newTermsOfUse
+  if (!_.isUndefined(data.termsIds)) {
+    helper.ensureNoDuplicateOrNullElements(data.termsIds, 'termsIds')
+
+    // Get the project default terms
+    const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId)
+
+    // Make sure that the default project terms were not removed
+    const removedTerms = _.difference(defaultTerms, data.termsIds)
+    if (removedTerms.length !== 0) {
+      throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
+    }
+    newTermsOfUse = await helper.getChallengeTerms(_.union(data.termsIds, defaultTerms))
+  }
+
   // find out attachment ids to delete
   const attachmentIdsToDelete = []
   if (isFull || !_.isUndefined(data.attachmentIds)) {
@@ -748,6 +771,12 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length) {
         op = '$PUT'
       }
+    } else if (key === 'termsIds') {
+      const oldIds = _.map(challenge.terms || [], (t) => t.id)
+      if (oldIds.length !== value.length ||
+        _.intersection(oldIds, value).length !== value.length) {
+        op = '$PUT'
+      }
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
       op = '$PUT'
     }
@@ -758,6 +787,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       }
       if (key === 'attachmentIds') {
         updateDetails[op].attachments = newAttachments
+      } else if (key === 'termsIds') {
+        updateDetails[op].terms = newTermsOfUse
       } else {
         updateDetails[op][key] = value
       }
@@ -767,6 +798,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         if (key === 'attachmentIds') {
           oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : 'NULL'
           newValue = JSON.stringify(newAttachments)
+        } else if (key === 'termsIds') {
+          oldValue = challenge.terms ? JSON.stringify(challenge.terms) : 'NULL'
+          newValue = JSON.stringify(newTermsOfUse)
         } else {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
           newValue = JSON.stringify(value)
@@ -774,7 +808,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         auditLogs.push({
           id: uuid(),
           challengeId,
-          fieldName: key,
+          fieldName: key === 'termsIds' ? 'terms' : key,
           oldValue,
           newValue,
           created: new Date(),
@@ -909,10 +943,16 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   console.log('after creating audit log')
 
   delete data.attachmentIds
+  delete data.termsIds
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
     data.attachments = newAttachments
+  }
+
+  if (!_.isUndefined(newTermsOfUse)) {
+    challenge.terms = newTermsOfUse
+    data.terms = newTermsOfUse
   }
 
   // delete unused attachments
@@ -983,7 +1023,8 @@ fullyUpdateChallenge.schema = {
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
-    })).min(1)
+    })).min(1),
+    termsIds: Joi.array().items(Joi.number().strict(true).positive()).required().allow([])
   }).required(),
   userToken: Joi.any()
 }
@@ -1042,7 +1083,8 @@ partiallyUpdateChallenge.schema = {
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
-    })).min(1)
+    })).min(1),
+    termsIds: Joi.array().items(Joi.number().strict(true).positive()).allow([])
   }).required(),
   userToken: Joi.any()
 }

@@ -6,6 +6,7 @@ const express = require('express')
 const cors = require('cors')
 const config = require('config')
 const winston = require('winston')
+const _ = require('lodash')
 const helper = require('../src/common/helper')
 
 const app = express()
@@ -67,7 +68,10 @@ app.get('/v5/resources/:memberId/challenges', (req, res) => {
 app.get('/v5/projects/:projectId', (req, res) => {
   const projectId = req.params.projectId
   if (projectId === '111' || projectId === '123' || projectId === '112233') {
-    res.end()
+    res.json({
+      projectId,
+      terms: [21343, 20723]
+    })
   } else if (projectId === '200') {
     res.status(403).send({
       id: '6e97fe68-f89c-4c45-b25b-d17933a3c4b9',
@@ -114,6 +118,72 @@ app.get('/v5/groups', (req, res) => {
 
   winston.info(`Result: ${JSON.stringify(result, null, 4)}`)
   res.json(result)
+})
+
+// terms API
+app.get('/v5/terms/:termId', (req, res) => {
+  const termId = req.params.termId
+  winston.info(`Get terms of use details, termsId = ${termId}`)
+
+  const terms = {
+    21343: {
+      id: 21343,
+      title: 'Competition Non-Disclosure Agreement',
+      url: '',
+      text: 'docusign NDA',
+      docusignTemplateId: '0c5b7081-1fff-4484-a20f-824c97a03b9b',
+      agreeabilityType: 'DocuSignable'
+    },
+    21203: {
+      id: 21203,
+      title: 'Non-Agreeable Terms Test',
+      url: 'www.example.com',
+      text: 'You will need to request access to join these challenges.  Please email support@topcoder.com to request access.',
+      agreeabilityType: 'Non-electronically-agreeable'
+    },
+    21213: {
+      id: 21213,
+      title: 'test 1',
+      url: '',
+      text: 'sf sfsfsdfsd sdf',
+      agreeabilityType: 'Electronically-agreeable'
+    },
+    20645: {
+      id: 20645,
+      title: '2008 TCO Marathon Match Competition Official Rules',
+      url: 'http://topcoder.com/mm-terms',
+      text: 'Marathon Competition Official Rules and Regulations',
+      agreeabilityType: 'Electronically-agreeable'
+    },
+    20646: {
+      id: 20646,
+      title: '2008 TCO Studio Competition Rules',
+      url: 'http://topcoder.com/studio-terms',
+      text: 'Studio Design Official Rules and Regulations',
+      agreeabilityType: 'Electronically-agreeable'
+    },
+    20653: {
+      id: 20653,
+      title: 'Open AIM Developer Challenge Rules',
+      url: 'http://topcoder.com/open-aim-terms',
+      text: 'OPEN AIM DEVELOPER CHALLENGE, POWERED BY TOPCODER - Powered by Topcoder',
+      agreeabilityType: 'Electronically-agreeable'
+    },
+    20723: {
+      id: 20723,
+      title: 'Subcontractor Services Agreement 2009-09-02',
+      url: 'http://www.topcoder.com/i/terms/Subcontractor+Services+Agreement+2009-09-02.pdf',
+      text: 'Subcontractor Services Agreement 2009-09-02. This agreement is unavailable in text format.  Please download the PDF to read its contents',
+      agreeabilityType: 'Non-electronically-agreeable'
+    }
+  }
+
+  if(!_.isUndefined(terms[termId])) {
+    winston.info(`Terms details : ${JSON.stringify(terms[termId])}`)
+    res.json(terms[termId])
+  } else {
+    res.status(404).end()
+  }
 })
 
 app.use((req, res) => {

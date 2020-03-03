@@ -2065,6 +2065,25 @@ definitions:
               type: integer
               description: the winner placement
               example: 1
+      terms:
+        type: array
+        items:
+          properties:
+            id:
+              type: integer
+              description: The terms of use id
+            agreeabilityType:
+              type: string
+              description: the terms of use agreeability type
+            title:
+              type: string
+              description: the terms of use title
+            url:
+              type: string
+              description: the terms of use url
+            templateId:
+              type: string
+              description: the template id of the terms of use (only valid when the terms agreeability type is 'Docusignable')
       numOfSubmissions:
         type: integer
         description: number of submissions
@@ -2254,6 +2273,11 @@ definitions:
         type: string
       privateDescription:
         type: string
+      termsIds:
+        type : array
+        description: The ids of the terms of use to add for the challenge
+        items:
+         type: number
       challengeSettings:
         type: array
         items:
@@ -2450,6 +2474,25 @@ definitions:
               type: integer
               description: the winner placement
               example: 1
+      terms:
+        type: array
+        items:
+          properties:
+            id:
+              type: integer
+              description: The terms of use id
+            agreeabilityType:
+              type: string
+              description: the terms of use agreeability type
+            title:
+              type: string
+              description: the terms of use title
+            url:
+              type: string
+              description: the terms of use url
+            templateId:
+              type: string
+              description: the template id of the terms of use (only valid when the terms agreeability type is 'Docusignable')
       numOfSubmissions:
         type: integer
         description: number of submissions
