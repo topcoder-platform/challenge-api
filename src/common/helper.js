@@ -604,7 +604,7 @@ async function getChallengeTerms (termsIds) {
   for (let id of termsIds) {
     // Get the terms details from the API
     try {
-      const res = await axios.get(`${config.TERMS_API_URL}/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+      const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
       terms.push(_.assign({
         id: res.data.id,
         agreeabilityType: res.data.agreeabilityType,
