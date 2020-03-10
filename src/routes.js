@@ -139,10 +139,10 @@ module.exports = {
     },
     post: {
       controller: 'ChallengeSettingController',
-      method: 'createChallengeSetting',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_SETTINGS.CREATE, CHALLENGE_SETTINGS.ALL]
+      method: 'createChallengeSetting'
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_SETTINGS.CREATE, CHALLENGE_SETTINGS.ALL]
     }
   },
   '/challengeSettings/:challengeSettingId': {
