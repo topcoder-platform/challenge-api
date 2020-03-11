@@ -1024,7 +1024,7 @@ fullyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    termsIds: Joi.array().items(Joi.number().strict(true).positive()).required().allow([])
+    termsIds: Joi.array().items(Joi.id()).required().allow([])
   }).required(),
   userToken: Joi.any()
 }
@@ -1084,7 +1084,7 @@ partiallyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    termsIds: Joi.array().items(Joi.number().strict(true).positive()).allow([])
+    termsIds: Joi.array().items(Joi.id()).allow([])
   }).required(),
   userToken: Joi.any()
 }
