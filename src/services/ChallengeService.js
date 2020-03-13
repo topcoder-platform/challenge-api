@@ -288,6 +288,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
     return
   }
   const template = await helper.getById('TimelineTemplate', timelineTemplateId)
+  const phaseDefinitions = await helper.scan('Phase')
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
     phases[i].id = uuid()
@@ -295,7 +296,8 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   for (let i = 0; i < phases.length; i += 1) {
     const phase = phases[i]
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
-    phase.name = _.get(templatePhase, 'name')
+    const phaseDefinition = _.find(phaseDefinitions, (p) => p.id === phase.phaseId)
+    phase.name = _.get(phaseDefinition, 'name')
     phase.isOpen = false
     if (templatePhase) {
       // use default duration if not provided
