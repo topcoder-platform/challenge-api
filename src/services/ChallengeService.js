@@ -295,6 +295,8 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   for (let i = 0; i < phases.length; i += 1) {
     const phase = phases[i]
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
+    phase.name = templatePhase.name
+    phase.isOpen = false
     if (templatePhase) {
       // use default duration if not provided
       if (!phase.duration) {
