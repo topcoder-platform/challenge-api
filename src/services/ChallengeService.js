@@ -25,10 +25,14 @@ const esClient = helper.getESClient()
 async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
+  console.log('currentUser', currentUser)
   const needToCheckForGroupAccess = currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)
+  console.log('needToCheckForGroupAccess', needToCheckForGroupAccess)
   for (const challenge of challenges) {
+    console.log('challenge.groups', challenge.groups)
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
+      console.log('Has access')
     } else if (currentUser) {
       // get user groups if not yet
       if (_.isNil(userGroups)) {
