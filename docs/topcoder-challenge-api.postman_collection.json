@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "60490ab3-d1fa-40a4-a43e-75d0f60f60fe",
+		"_postman_id": "ca243c01-e6a0-408c-97a9-3e326903fdfc",
 		"name": "topcoder-challenge-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2971,7 +2971,7 @@
 							"response": []
 						},
 						{
-							"name": "failure create missing parameter 400",
+							"name": "failure create missing parameter name 400",
 							"event": [
 								{
 									"listen": "test",
@@ -14084,7 +14084,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines?",
+									"raw": "{{URL}}/challengeTimelines",
 									"host": [
 										"{{URL}}"
 									],
@@ -14967,8 +14967,8 @@
 									"script": {
 										"id": "4ea1db72-9445-4dae-a372-fcd7c8c9de80",
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
 											"});"
 										],
 										"type": "text/javascript"
