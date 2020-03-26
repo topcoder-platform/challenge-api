@@ -70,7 +70,7 @@ app.get('/v5/projects/:projectId', (req, res) => {
   if (projectId === '111' || projectId === '123' || projectId === '112233') {
     res.json({
       projectId,
-      terms: [21343, 20723]
+      terms: ['0fcb41d1-ec7c-44bb-8f3b-f017a61cd708', 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb']
     })
   } else if (projectId === '200') {
     res.status(403).send({
@@ -126,51 +126,51 @@ app.get('/v5/terms/:termId', (req, res) => {
   winston.info(`Get terms of use details, termsId = ${termId}`)
 
   const terms = {
-    21343: {
-      id: 21343,
+    '0fcb41d1-ec7c-44bb-8f3b-f017a61cd708': {
+      id: '0fcb41d1-ec7c-44bb-8f3b-f017a61cd708',
       title: 'Competition Non-Disclosure Agreement',
       url: '',
       text: 'docusign NDA',
       docusignTemplateId: '0c5b7081-1fff-4484-a20f-824c97a03b9b',
       agreeabilityType: 'DocuSignable'
     },
-    21203: {
-      id: 21203,
+    '8a0207fc-ac9b-47e7-af1b-81d1ccaf0afc': {
+      id: '8a0207fc-ac9b-47e7-af1b-81d1ccaf0afc',
       title: 'Non-Agreeable Terms Test',
       url: 'www.example.com',
       text: 'You will need to request access to join these challenges.  Please email support@topcoder.com to request access.',
       agreeabilityType: 'Non-electronically-agreeable'
     },
-    21213: {
-      id: 21213,
+    '453c7c5c-c872-4672-9e78-5162d70903d3': {
+      id: '453c7c5c-c872-4672-9e78-5162d70903d3',
       title: 'test 1',
       url: '',
       text: 'sf sfsfsdfsd sdf',
       agreeabilityType: 'Electronically-agreeable'
     },
-    20645: {
-      id: 20645,
+    '28841de8-2f42-486f-beac-21d46a832ab6': {
+      id: '28841de8-2f42-486f-beac-21d46a832ab6',
       title: '2008 TCO Marathon Match Competition Official Rules',
       url: 'http://topcoder.com/mm-terms',
       text: 'Marathon Competition Official Rules and Regulations',
       agreeabilityType: 'Electronically-agreeable'
     },
-    20646: {
-      id: 20646,
+    'fb7e4a66-03d3-4918-b328-b1f277b0590b': {
+      id: 'fb7e4a66-03d3-4918-b328-b1f277b0590b',
       title: '2008 TCO Studio Competition Rules',
       url: 'http://topcoder.com/studio-terms',
       text: 'Studio Design Official Rules and Regulations',
       agreeabilityType: 'Electronically-agreeable'
     },
-    20653: {
-      id: 20653,
+    '13bbb3cb-6779-4dc8-9787-26411dfb7925': {
+      id: '13bbb3cb-6779-4dc8-9787-26411dfb7925',
       title: 'Open AIM Developer Challenge Rules',
       url: 'http://topcoder.com/open-aim-terms',
       text: 'OPEN AIM DEVELOPER CHALLENGE, POWERED BY TOPCODER - Powered by Topcoder',
       agreeabilityType: 'Electronically-agreeable'
     },
-    20723: {
-      id: 20723,
+    'be0652ae-8b28-4e91-9b42-8ad00b31e9cb': {
+      id: 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb',
       title: 'Subcontractor Services Agreement 2009-09-02',
       url: 'http://www.topcoder.com/i/terms/Subcontractor+Services+Agreement+2009-09-02.pdf',
       text: 'Subcontractor Services Agreement 2009-09-02. This agreement is unavailable in text format.  Please download the PDF to read its contents',
@@ -178,7 +178,7 @@ app.get('/v5/terms/:termId', (req, res) => {
     }
   }
 
-  if(!_.isUndefined(terms[termId])) {
+  if (!_.isUndefined(terms[termId])) {
     winston.info(`Terms details : ${JSON.stringify(terms[termId])}`)
     res.json(terms[termId])
   } else {
@@ -193,7 +193,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   winston.error(err)
   res.status(500).json({
-    error: err.message,
+    error: err.message
   })
 })
 

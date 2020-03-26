@@ -2277,7 +2277,8 @@ definitions:
         type : array
         description: The ids of the terms of use to add for the challenge
         items:
-         type: number
+         type: string
+         format: UUID
       challengeSettings:
         type: array
         items:
