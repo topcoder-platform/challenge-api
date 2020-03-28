@@ -29,6 +29,7 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
   console.log('needToCheckForGroupAccess', needToCheckForGroupAccess)
   for (const challenge of challenges) {
+    challenge.groups = _.filter(challenge.groups, g => _.toString(g).toLowerCase() !== 'null')
     console.log('challenge.groups', challenge.groups)
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
