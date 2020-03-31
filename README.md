@@ -1,12 +1,33 @@
 # Topcoder Challenge API
 
-## Dependencies
+This microservice provides access and interaction with all sorts of Challenge data.
 
-- nodejs https://nodejs.org/en/ (v10)
-- DynamoDB
-- AWS S3
-- Elasticsearch v6
-- Docker, Docker Compose
+### Deployment status
+Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop) Prod: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master)
+
+## Swagger definition
+
+- [Swagger](https://api.topcoder.com/v5/challenges/docs/)
+
+## Intended use
+
+- Production API
+
+## Related repos
+
+- [Resources API](https://github.com/topcoder-platform/resources-api)
+- [ES Processor](https://github.com/topcoder-platform/challenge-processor-es) - Updates data in ElasticSearch
+- [Legacy Processor](https://github.com/topcoder-platform/legacy-challenge-processor) - Moves data from DynamoDB back to Informix
+- [Legacy Migration Script](https://github.com/topcoder-platform/legacy-challenge-migration-script) - Moves data from Informix to DynamoDB
+- [Frontend App](https://github.com/topcoder-platform/challenge-engine-ui)
+
+## Prerequisites
+- [NodeJS](https://nodejs.org/en/) (v10)
+- [DynamoDB](https://aws.amazon.com/dynamodb/)
+- [AWS S3](https://aws.amazon.com/s3/)
+- [Elasticsearch v6](https://www.elastic.co/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
 ## Configuration
 
@@ -41,51 +62,15 @@ The following parameters can be set in config files or in env variables:
 - RESOURCES_API_URL: TC resources API base URL
 - GROUPS_API_URL: TC groups API base URL
 - PROJECTS_API_URL: TC projects API base URL
+- TERMS_API_URL: TC Terms API Base URL
 - COPILOT_RESOURCE_ROLE_IDS: copilot resource role ids allowed to upload attachment
 - HEALTH_CHECK_TIMEOUT: health check timeout in milliseconds
 - SCOPES: the configurable M2M token scopes, refer `config/default.js` for more details
 - M2M_AUDIT_HANDLE: the audit name used when perform create/update operation using M2M token
 
-Set the following environment variables so that the app can get TC M2M token (use 'set' insted of 'export' for Windows OS):
+You can find sample `.env` files inside the `/docs` directory.
 
-- export AUTH0_CLIENT_ID=8QovDh27SrDu1XSs68m21A1NBP8isvOt
-- export AUTH0_CLIENT_SECRET=3QVxxu20QnagdH-McWhVz0WfsQzA1F8taDdGDI4XphgpEYZPcMTF4lX3aeOIeCzh
-- export AUTH0_URL=https://topcoder-dev.auth0.com/oauth/token
-- export AUTH0_AUDIENCE=https://m2m.topcoder-dev.com/
-
-Also properly configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, ATTACHMENT_S3_BUCKET, IS_LOCAL_DB config parameters.
-
-Test configuration is at `config/test.js`. You don't need to change them.
-The following test parameters can be set in config file or in env variables:
-
-- ADMIN_TOKEN: admin token
-- COPILOT_TOKEN: copilot token
-- USER_TOKEN: user token
-- EXPIRED_TOKEN: expired token
-- INVALID_TOKEN: invalid token
-- M2M_FULL_ACCESS_TOKEN: M2M full access token
-- M2M_READ_ACCESS_TOKEN: M2M read access token
-- M2M_UPDATE_ACCESS_TOKEN: M2M update (including 'delete') access token
-- S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
-
-## AWS S3 Setup
-Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
-
-## Local services setup
-In the `local` folder, run `docker-compose up`
-It starts Elasticsearch, DynamoDB and S3 compatible server.
-
-## Mock api
-For postman verification, please use the mock api under mock-api folder. It provides mock endpoint to fetch challenge resources and groups.
-You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
-Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mock-api listening on port 4000
-
-## Create Tables
-1. Make sure DynamoDB are running as per instructions above.
-2. Make sure you have configured all config parameters. Refer [Configuration](#configuration)
-3. Run `npm run create-tables` to create tables.
-
-## Scripts
+## Available commands
 1. Drop/delete tables: `npm run drop-tables`
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
@@ -99,6 +84,22 @@ Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mo
 
 ## Local Deployment
 
+### AWS S3 Setup
+Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
+
+### Local services setup
+In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB and S3 compatible server.
+
+### Create Tables
+1. Make sure DynamoDB are running as per instructions above.
+2. Make sure you have configured all config parameters. Refer [Configuration](#configuration)
+3. Run `npm run create-tables` to create tables.
+
+### Mock API
+The provided mock API provides mock endpoint to fetch challenge resources and groups so you don't have to deploy the related services locally.
+You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
+Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mock-api listening on port 4000
+
 - Install dependencies `npm install`
 - Run lint `npm run lint`
 - Run lint fix `npm run lint:fix`
@@ -110,7 +111,26 @@ Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mo
 - App is running at `http://localhost:3000`
 - Start mock-api, go to `mock-api` folder, run `npm i` and `npm start`, mock api is running at `http://localhost:4000`
 
+## Production deployment
+
+- TBD
+
 ## Running tests
+
+### Configuration
+
+Test configuration is at `config/test.js`. You don't need to change them.
+The following test parameters can be set in config file or in env variables:
+
+- ADMIN_TOKEN: admin token
+- COPILOT_TOKEN: copilot token
+- USER_TOKEN: user token
+- EXPIRED_TOKEN: expired token
+- INVALID_TOKEN: invalid token
+- M2M_FULL_ACCESS_TOKEN: M2M full access token
+- M2M_READ_ACCESS_TOKEN: M2M read access token
+- M2M_UPDATE_ACCESS_TOKEN: M2M update (including 'delete') access token
+- S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
 
 ### Prepare
 - Start Local services.
@@ -159,4 +179,3 @@ Refer to the verification document `Verification.md`
 
 - In the app-constants.js Topics field, the used topics are using a test topic,
   the suggested ones are commented out, because these topics are not created in TC dev Kafka yet.
-

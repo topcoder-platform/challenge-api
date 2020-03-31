@@ -48,6 +48,10 @@ const schema = new Schema({
     type: Array,
     required: true
   },
+  terms: {
+    type: [Object],
+    required: false
+  },
   prizeSets: {
     type: [Object],
     required: true
@@ -96,7 +100,7 @@ const schema = new Schema({
   },
   // winners
   winners: {
-    type: [Object],
+    type: Array,
     required: false
   },
   created: {

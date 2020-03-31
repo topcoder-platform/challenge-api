@@ -16,6 +16,7 @@ const axios = require('axios')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 const moment = require('moment')
+const HttpStatus = require('http-status-codes')
 
 // Bus API Client
 let busApiClient
@@ -522,7 +523,7 @@ async function ensureProjectExist (projectId, userToken) {
       await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
     }
   } catch (err) {
-    if (_.get(err, 'response.status') === 404) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
     } else {
       // re-throw other error
@@ -578,6 +579,51 @@ async function validateESRefreshMethod (method) {
   return method
 }
 
+/**
+ * This functions gets the default terms of use for a given project id
+ *
+ * @param {Number} projectId The id of the project for which to get the default terms of use
+ * @returns {Promise<Array<Number>>} An array containing the ids of the default project terms of use
+ */
+async function getProjectDefaultTerms (projectId) {
+  const token = await getM2MToken()
+  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
+  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+  return res.data.terms
+}
+
+/**
+ * This function gets the challenge terms array with the terms data
+ * The terms data is retrieved from the terms API using the specified terms ids
+ *
+ * @param {Array<Number>} termsIds The array of terms ids to retrieve from terms API
+ */
+async function getChallengeTerms (termsIds) {
+  const terms = []
+  const token = await getM2MToken()
+  for (let id of termsIds) {
+    // Get the terms details from the API
+    try {
+      const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
+      terms.push(_.assign({
+        id: res.data.id,
+        agreeabilityType: res.data.agreeabilityType,
+        title: res.data.title,
+        url: res.data.url
+      }, _.isNil(res.data.docusignTemplateId) ? null : { templateId: res.data.docusignTemplateId }))
+    } catch (e) {
+      if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
+        throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)
+      } else {
+        // re-throw other error
+        throw e
+      }
+    }
+  }
+
+  return terms
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -604,5 +650,7 @@ module.exports = {
   ensureProjectExist,
   calculateChallengeEndDate,
   listChallengesByMember,
-  validateESRefreshMethod
+  validateESRefreshMethod,
+  getProjectDefaultTerms,
+  getChallengeTerms
 }

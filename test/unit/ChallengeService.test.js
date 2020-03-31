@@ -81,7 +81,8 @@ describe('challenge service unit tests', () => {
 
   describe('create challenge tests', () => {
     it('create challenge successfully', async () => {
-      const challengeData = testChallengeData
+      const challengeData = _.cloneDeep(testChallengeData)
+      challengeData.termsIds = [] // to check if default project terms are added
       const result = await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
       should.exist(result.id)
       id = result.id
@@ -138,6 +139,8 @@ describe('challenge service unit tests', () => {
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
     })
 
     it('create challenge successfully with completed status', async () => {
@@ -198,6 +201,118 @@ describe('challenge service unit tests', () => {
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
+    })
+
+    it('create challenge with additional terms successfully', async () => {
+      const challengeData = _.cloneDeep(testChallengeData)
+      challengeData.termsIds = [data.additionalTerm.id]
+      const result = await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      should.exist(result.id)
+      should.equal(result.typeId, data.challenge.typeId)
+      should.equal(result.track, data.challenge.track)
+      should.equal(result.name, data.challenge.name)
+      should.equal(result.description, data.challenge.description)
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.challenge.challengeSettings[0].type)
+      should.equal(result.challengeSettings[0].value, data.challenge.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      should.equal(result.phases.length, 2)
+      should.exist(result.phases[0].id)
+      should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.exist(result.phases[1].id)
+      should.equal(result.phases[1].phaseId, data.phase2.id)
+      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.challenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.challenge.tags[0])
+      should.equal(result.projectId, data.challenge.projectId)
+      should.equal(result.legacyId, data.challenge.legacyId)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, data.challenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
+      should.equal(result.createdBy, 'sub')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
+      should.equal(result.terms.length, 3)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.union(data.defaultProjectTerms, [data.additionalTerm])), true)
+    })
+
+    it('should not create challenge with duplicate terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [20653, 20653]
+      try {
+        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      } catch (e) {
+        should.equal(e.message, `There are duplicate elements (20653) for termsIds.`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not create challenge with non existing terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [20653, 7777777]
+      try {
+        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      } catch (e) {
+        should.equal(e.message, `Terms of use identified by the id 7777777 does not exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not create challenge with invalid terms ids data type', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = ['20653']
+      try {
+        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('"0" must be a number') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not create challenge with negative terms id', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [-20653]
+      try {
+        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('"0" must be a positive number') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
     })
 
     it('create challenge - type not found', async () => {
@@ -340,6 +455,66 @@ describe('challenge service unit tests', () => {
       should.equal(result.numOfRegistrants, 0)
     })
 
+    it('get challenge successfully with terms', async () => {
+      const result = await service.getChallenge({ isMachine: true }, id)
+      const challengeData = _.cloneDeep(testChallengeData)
+      should.equal(result.typeId, data.challenge.typeId)
+      should.equal(result.track, data.challenge.track)
+      should.equal(result.name, data.challenge.name)
+      should.equal(result.description, data.challenge.description)
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.challengeSetting.name)
+      should.equal(result.challengeSettings[0].value, data.challenge.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      should.equal(result.phases.length, 2)
+      should.exist(result.phases[0].id)
+      should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.exist(result.phases[1].id)
+      should.equal(result.phases[1].phaseId, data.phase2.id)
+      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.challenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.challenge.tags[0])
+      should.equal(result.projectId, data.challenge.projectId)
+      should.equal(result.legacyId, data.challenge.legacyId)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, data.challenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
+      should.equal(result.createdBy, 'sub')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
+    })
+
     it('get challenge - not found', async () => {
       try {
         await service.getChallenge({ isMachine: true }, notFoundId)
@@ -465,6 +640,76 @@ describe('challenge service unit tests', () => {
       should.equal(res.page, 1)
       should.equal(res.perPage, 10)
       should.equal(res.result.length, 0)
+    })
+
+    it('search challenges successfully 4 - with terms', async () => {
+      const res = await service.searchChallenges({ isMachine: true }, {
+        page: 1,
+        perPage: 10,
+        id: id
+      })
+      const challengeData = _.cloneDeep(testChallengeData)
+      should.equal(res.total, 1)
+      should.equal(res.page, 1)
+      should.equal(res.perPage, 10)
+      should.equal(res.result.length, 1)
+      const result = res.result[0]
+
+      should.equal(result.type, data.challengeType.name)
+      should.equal(result.track, challengeData.track)
+      should.equal(result.name, challengeData.name)
+      should.equal(result.description, challengeData.description)
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.challengeSetting.name)
+      should.equal(result.challengeSettings[0].value, challengeData.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, challengeData.timelineTemplateId)
+      should.equal(result.phases.length, 2)
+      should.exist(result.phases[0].id)
+      should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.exist(result.phases[1].id)
+      should.equal(result.phases[1].phaseId, data.phase2.id)
+      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.challenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.challenge.tags[0])
+      should.equal(result.projectId, data.challenge.projectId)
+      should.equal(result.legacyId, data.challenge.legacyId)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, data.challenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
+      should.equal(result.createdBy, 'sub')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
     })
 
     it('search challenges - invalid name', async () => {
@@ -615,6 +860,7 @@ describe('challenge service unit tests', () => {
       challengeData.projectId = 112233
       challengeData.legacyId = 445566
       challengeData.attachmentIds = [attachment.id]
+      challengeData.termsIds = _.union(_.map(data.defaultProjectTerms, t => t.id), [data.additionalTerm.id])
       const result = await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
       should.equal(result.id, id)
       should.equal(result.typeId, data.challenge.typeId)
@@ -675,6 +921,8 @@ describe('challenge service unit tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
+      should.equal(result.terms.length, 3)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.union(data.defaultProjectTerms, [data.additionalTerm])), true)
     })
 
     it('fully update challenge with winners successfully', async () => {
@@ -682,6 +930,7 @@ describe('challenge service unit tests', () => {
       challengeData.projectId = 112233
       challengeData.legacyId = 445566
       challengeData.attachmentIds = [attachment.id]
+      challengeData.termsIds = _.map(data.defaultProjectTerms, t => t.id)
       challengeData.winners = winners
       const result = await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
       should.equal(result.id, id2)
@@ -750,6 +999,68 @@ describe('challenge service unit tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
+    })
+
+    it('should not fully update challenge with duplicate terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [20653, 20653]
+      try {
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message, `There are duplicate elements (20653) for termsIds.`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not fully update challenge when removing default project terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [20653]
+      try {
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message, `Default project terms ${_.map(data.defaultProjectTerms, t => t.id)} should not be removed`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not fully update challenge with non existing terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [21343, 20723, 7777777]
+      try {
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message, `Terms of use identified by the id 7777777 does not exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not fully update challenge with invalid terms ids data type', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = ['20653']
+      try {
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('"0" must be a number') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not fully update challenge with negative terms id', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [-20653]
+      try {
+        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('"0" must be a positive number') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
     })
 
     it('fully update challenge - not found', async () => {
@@ -1004,6 +1315,8 @@ describe('challenge service unit tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
+      should.equal(result.terms.length, 3)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.union(data.defaultProjectTerms, [data.additionalTerm])), true)
     })
 
     it('partially update challenge successfully with winners', async () => {
@@ -1073,6 +1386,132 @@ describe('challenge service unit tests', () => {
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
+    })
+
+    it('partially update challenge terms', async () => {
+      const challengeData = testChallengeData
+      const result = await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+        termsIds: _.map(data.defaultProjectTerms, t => t.id)
+      })
+      should.equal(result.id, id)
+      should.equal(result.typeId, data.challenge.typeId)
+      should.equal(result.track, 'track 333')
+      should.equal(result.name, data.challenge.name)
+      should.equal(result.description, 'updated desc')
+      should.equal(result.challengeSettings.length, 1)
+      should.equal(result.challengeSettings[0].type, data.challenge.challengeSettings[0].type)
+      should.equal(result.challengeSettings[0].value, data.challenge.challengeSettings[0].value)
+      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      should.equal(result.phases.length, 2)
+      should.exist(result.phases[0].id)
+      should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
+      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.exist(result.phases[1].id)
+      should.equal(result.phases[1].phaseId, data.phase2.id)
+      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000)
+      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
+        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, data.challenge.reviewType)
+      should.equal(result.tags.length, 1)
+      should.equal(result.tags[0], data.challenge.tags[0])
+      should.equal(result.projectId, 112233)
+      should.equal(result.legacyId, 445566)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, data.challenge.status)
+      should.equal(result.groups.length, 1)
+      should.equal(result.groups[0], data.challenge.groups[0])
+      should.equal(result.gitRepoURLs.length, 1)
+      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
+      should.equal(!result.attachments || result.attachments.length === 0, true)
+      should.equal(result.createdBy, 'sub')
+      should.equal(result.updatedBy, 'sub3')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.exist(result.updated)
+      should.equal(result.terms.length, 2)
+      should.equal(testHelper.deepCompareArrays(result.terms, data.defaultProjectTerms), true)
+    })
+
+    it('should not partially update challenge with duplicate terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [20653, 20653]
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message, `There are duplicate elements (20653) for termsIds.`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not partially update challenge when removing default project terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [20653]
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message, `Default project terms ${_.map(data.defaultProjectTerms, t => t.id)} should not be removed`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not partially update challenge with non existing terms', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = _.union(_.map(data.defaultProjectTerms, t => t.id), [7777777])
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message, `Terms of use identified by the id 7777777 does not exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not partially update challenge with invalid terms ids data type', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = ['20653']
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('"0" must be a number') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('should not partially update challenge with negative terms id', async () => {
+      const challengeData = _.clone(testChallengeData)
+      challengeData.termsIds = [-20653]
+      try {
+        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
+      } catch (e) {
+        should.equal(e.message.indexOf('"0" must be a positive number') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
     })
 
     it(`partially update challenge - project not found`, async () => {

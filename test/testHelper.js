@@ -19,6 +19,17 @@ let challenge
 let completedChallenge
 
 /**
+ * function to deeply compare arrays  regardeless of the order
+ *
+ * @param {Array} arr1 The first array to compare
+ * @param {Array} arr2 The second array to compare
+ * @returns {Boolean} The flag indicating whether the arrays have the same content regardless of the order
+ */
+const deepCompareArrays = (arr1, arr2) => {
+  return _(arr1).xorWith(arr2, _.isEqual).isEmpty()
+}
+
+/**
  * Create test data
  */
 async function createData () {
@@ -86,6 +97,7 @@ async function createData () {
     projectId: 111,
     legacyId: 222,
     forumId: 333,
+    termsIds: [21343, 20723],
     startDate: new Date(),
     status: constants.challengeStatuses.Active,
     groups: ['group1'],
@@ -115,6 +127,28 @@ async function createData () {
     body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, completedChallenge.originalItem()),
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
   })
+}
+
+const defaultProjectTerms = [
+  {
+    id: 21343,
+    agreeabilityType: 'DocuSignable',
+    title: 'Competition Non-Disclosure Agreement',
+    url: '',
+    templateId: '0c5b7081-1fff-4484-a20f-824c97a03b9b'
+  },
+  {
+    id: 20723,
+    agreeabilityType: 'Non-electronically-agreeable',
+    title: 'Subcontractor Services Agreement 2009-09-02',
+    url: 'http://www.topcoder.com/i/terms/Subcontractor+Services+Agreement+2009-09-02.pdf'
+  }]
+
+const additionalTerm = {
+  id: 20645,
+  agreeabilityType: 'Electronically-agreeable',
+  title: '2008 TCO Marathon Match Competition Official Rules',
+  url: 'http://topcoder.com/mm-terms'
 }
 
 /**
@@ -157,7 +191,9 @@ function getData () {
     phase2: phase2.originalItem(),
     timelineTemplate: timelineTemplate.originalItem(),
     challenge: challenge.originalItem(),
-    completedChallenge: completedChallenge.originalItem()
+    completedChallenge: completedChallenge.originalItem(),
+    defaultProjectTerms,
+    additionalTerm
   }
 }
 
@@ -172,5 +208,6 @@ module.exports = {
   createData,
   clearData,
   getData,
-  getDatesDiff
+  getDatesDiff,
+  deepCompareArrays
 }

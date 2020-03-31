@@ -13,9 +13,15 @@ const HttpStatus = require('http-status-codes')
 const logger = require('./src/common/logger')
 const interceptor = require('express-interceptor')
 const fileUpload = require('express-fileupload')
+const YAML = require('yamljs')
+const swaggerUi = require('swagger-ui-express')
+const challengeAPISwaggerDoc = YAML.load('./docs/swagger.yaml')
 
 // setup express app
 const app = express()
+
+// serve challenge V5 API swagger definition
+app.use('/v5/challenges/docs', swaggerUi.serve, swaggerUi.setup(challengeAPISwaggerDoc))
 
 app.use(cors({
   exposedHeaders: [

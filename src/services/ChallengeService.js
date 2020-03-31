@@ -25,9 +25,15 @@ const esClient = helper.getESClient()
 async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
+  console.log('currentUser', currentUser)
+  const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
+  console.log('needToCheckForGroupAccess', needToCheckForGroupAccess)
   for (const challenge of challenges) {
-    if (!challenge.groups || challenge.groups.length === 0 || (currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser)))) {
+    challenge.groups = _.filter(challenge.groups, g => _.toString(g).toLowerCase() !== 'null')
+    console.log('challenge.groups', challenge.groups)
+    if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
+      console.log('Has access')
     } else if (currentUser) {
       // get user groups if not yet
       if (_.isNil(userGroups)) {
@@ -181,12 +187,14 @@ async function searchChallenges (currentUser, criteria) {
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
-    const ids = await helper.listChallengesByMember(currentUser.userId)
-    result = _.each(result, (val) => {
-      if (!_.includes(ids, val.id)) {
-        _.unset(val, 'privateDescription')
-      }
-    })
+    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      const ids = await helper.listChallengesByMember(currentUser.userId)
+      result = _.each(result, (val) => {
+        if (!_.includes(ids, val.id)) {
+          _.unset(val, 'privateDescription')
+        }
+      })
+    }
   } else {
     result = _.each(result, val => _.unset(val, 'privateDescription'))
   }
@@ -285,6 +293,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
     return
   }
   const template = await helper.getById('TimelineTemplate', timelineTemplateId)
+  const phaseDefinitions = await helper.scan('Phase')
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
     phases[i].id = uuid()
@@ -292,6 +301,9 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   for (let i = 0; i < phases.length; i += 1) {
     const phase = phases[i]
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
+    const phaseDefinition = _.find(phaseDefinitions, (p) => p.id === phase.phaseId)
+    phase.name = _.get(phaseDefinition, 'name')
+    phase.isOpen = false
     if (templatePhase) {
       // use default duration if not provided
       if (!phase.duration) {
@@ -367,12 +379,18 @@ async function createChallenge (currentUser, challenge, userToken) {
   await helper.validatePhases(challenge.phases)
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
+  helper.ensureNoDuplicateOrNullElements(challenge.termsIds, 'termsIds')
 
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
   await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
+
+  // populate challenge terms
+  const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
+  challenge.terms = await helper.getChallengeTerms(_.union(projectTerms, challenge.termsIds))
+  delete challenge.termsIds
 
   challenge.endDate = helper.calculateChallengeEndDate(challenge)
   const ret = await helper.create('Challenge', _.assign({
@@ -431,7 +449,8 @@ createChallenge.schema = {
     endDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri())
+    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    termsIds: Joi.array().items(Joi.id()).default([])
   }).required(),
   userToken: Joi.any()
 }
@@ -642,18 +661,39 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
   helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
+  console.log('Before fetching challenge')
   const challenge = await helper.getById('Challenge', challengeId)
-
+  console.log('After fetching challenge')
   // check groups authorization
+  console.log('Before checking group access')
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  console.log('After checking group access')
 
+  console.log('before fetching attachments')
   let newAttachments
   if (isFull || !_.isUndefined(data.attachmentIds)) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
+  console.log('after fetching attachments')
 
   if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase()) {
     throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
+  }
+
+  // Validate the challenge terms
+  let newTermsOfUse
+  if (!_.isUndefined(data.termsIds)) {
+    helper.ensureNoDuplicateOrNullElements(data.termsIds, 'termsIds')
+
+    // Get the project default terms
+    const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId)
+
+    // Make sure that the default project terms were not removed
+    const removedTerms = _.difference(defaultTerms, data.termsIds)
+    if (removedTerms.length !== 0) {
+      throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
+    }
+    newTermsOfUse = await helper.getChallengeTerms(_.union(data.termsIds, defaultTerms))
   }
 
   // find out attachment ids to delete
@@ -666,26 +706,33 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     })
   }
 
+  console.log('before validateChallengeData(data)')
   await validateChallengeData(data)
   if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Canceled) && data.status && data.status !== challenge.status) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
+  console.log('after validateChallengeData(data)')
 
   if (data.winners && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
   }
 
+  console.log('before validatePhases(data.phases)')
   if (data.phases) {
     await helper.validatePhases(data.phases)
     // populate phases
     await populatePhases(data.phases, data.startDate || challenge.startDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
+  console.log('after validatePhases(data.phases)')
 
+  console.log('before validateWinners(data.winners)')
   if (data.winners && data.winners.length) {
     await validateWinners(data.winners)
   }
+  console.log('after validateWinners(data.winners)')
 
+  console.log('before constructing the query')
   data.updated = new Date()
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
@@ -733,6 +780,12 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length) {
         op = '$PUT'
       }
+    } else if (key === 'termsIds') {
+      const oldIds = _.map(challenge.terms || [], (t) => t.id)
+      if (oldIds.length !== value.length ||
+        _.intersection(oldIds, value).length !== value.length) {
+        op = '$PUT'
+      }
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
       op = '$PUT'
     }
@@ -743,6 +796,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       }
       if (key === 'attachmentIds') {
         updateDetails[op].attachments = newAttachments
+      } else if (key === 'termsIds') {
+        updateDetails[op].terms = newTermsOfUse
       } else {
         updateDetails[op][key] = value
       }
@@ -752,6 +807,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         if (key === 'attachmentIds') {
           oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : 'NULL'
           newValue = JSON.stringify(newAttachments)
+        } else if (key === 'termsIds') {
+          oldValue = challenge.terms ? JSON.stringify(challenge.terms) : 'NULL'
+          newValue = JSON.stringify(newTermsOfUse)
         } else {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
           newValue = JSON.stringify(value)
@@ -759,7 +817,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         auditLogs.push({
           id: uuid(),
           challengeId,
-          fieldName: key,
+          fieldName: key === 'termsIds' ? 'terms' : key,
           oldValue,
           newValue,
           created: new Date(),
@@ -881,17 +939,29 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     // send null to Elasticsearch to clear the field
     data.winners = null
   }
+  console.log('after constructing the query')
 
+  console.log('before update')
   await models.Challenge.update({ id: challengeId }, updateDetails)
+  console.log('after update')
+  console.log('before creating audit log')
+
   if (auditLogs.length > 0) {
     await models.AuditLog.batchPut(auditLogs)
   }
+  console.log('after creating audit log')
 
   delete data.attachmentIds
+  delete data.termsIds
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
     data.attachments = newAttachments
+  }
+
+  if (!_.isUndefined(newTermsOfUse)) {
+    challenge.terms = newTermsOfUse
+    data.terms = newTermsOfUse
   }
 
   // delete unused attachments
@@ -901,7 +971,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await attachment.delete()
   }
 
-  const result = isFull ? challenge : _.assignIn({ id: challengeId }, data)
+  const result = isFull ? challenge : _.assignIn({ id: challengeId, legacyId: challenge.legacyId }, data)
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, result)
@@ -962,7 +1032,8 @@ fullyUpdateChallenge.schema = {
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
-    })).min(1)
+    })).min(1),
+    termsIds: Joi.array().items(Joi.id()).required().allow([])
   }).required(),
   userToken: Joi.any()
 }
@@ -1021,7 +1092,8 @@ partiallyUpdateChallenge.schema = {
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
-    })).min(1)
+    })).min(1),
+    termsIds: Joi.array().items(Joi.id()).allow([])
   }).required(),
   userToken: Joi.any()
 }

@@ -22,8 +22,9 @@ module.exports = {
   KAFKA_ERROR_TOPIC: process.env.KAFKA_ERROR_TOPIC || 'common.error.reporting',
 
   AMAZON: {
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || 'FAKE_ACCESS_KEY',
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || 'FAKE_SECRET_ACCESS_KEY',
+    // Uncomment for local deployment
+    // AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || 'FAKE_ACCESS_KEY',
+    // AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || 'FAKE_SECRET_ACCESS_KEY',
     AWS_REGION: process.env.AWS_REGION || 'ap-northeast-1',
     IS_LOCAL_DB: process.env.IS_LOCAL_DB ? process.env.IS_LOCAL_DB === 'true' : true,
     DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:7777',
@@ -45,7 +46,8 @@ module.exports = {
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT) : 50 * 1024 * 1024, // 50M
   RESOURCES_API_URL: process.env.RESOURCES_API_URL || 'http://localhost:4000/v5/resources',
   GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://localhost:4000/v5/groups',
-  PROJECTS_API_URL: process.env.PROJECTS_API_URL || 'http://localhost:4000/v4/projects',
+  PROJECTS_API_URL: process.env.PROJECTS_API_URL || 'http://localhost:4000/v5/projects',
+  TERMS_API_URL: process.env.TERMS_API_URL || 'http://localhost:4000/v5/terms',
   // copilot resource role ids allowed to upload attachment
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],

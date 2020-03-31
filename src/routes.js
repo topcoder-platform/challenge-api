@@ -131,17 +131,18 @@ module.exports = {
   '/challengeSettings': {
     get: {
       controller: 'ChallengeSettingController',
-      method: 'searchChallengeSettings',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_SETTINGS.READ, CHALLENGE_SETTINGS.ALL]
+      method: 'searchChallengeSettings'
+      // TODO: We may not need auth here. Temporarily disabling auth
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_SETTINGS.READ, CHALLENGE_SETTINGS.ALL]
     },
     post: {
       controller: 'ChallengeSettingController',
-      method: 'createChallengeSetting',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_SETTINGS.CREATE, CHALLENGE_SETTINGS.ALL]
+      method: 'createChallengeSetting'
+      // auth: 'jwt',
+      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      // scopes: [CHALLENGE_SETTINGS.CREATE, CHALLENGE_SETTINGS.ALL]
     }
   },
   '/challengeSettings/:challengeSettingId': {
