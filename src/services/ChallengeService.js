@@ -82,7 +82,7 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
-  if (criteria.group) {
+  if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
   if (criteria.gitRepoURL) {
@@ -121,10 +121,16 @@ async function searchChallenges (currentUser, criteria) {
 
   const mustQuery = []
 
+  let mustNotQuery
+
   const accessQuery = []
 
   if (!_.isUndefined(currentUser) && currentUser.handle) {
     accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
+  }
+
+  if (_.isUndefined(currentUser)) {
+    mustNotQuery = { exists: { field: 'groups' } }
   }
 
   if (criteria.memberId) {
@@ -154,9 +160,10 @@ async function searchChallenges (currentUser, criteria) {
     size: criteria.perPage,
     from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
     body: {
-      query: mustQuery.length > 0 ? {
+      query: mustQuery.length > 0 || !_.isUndefined(mustNotQuery) ? {
         bool: {
-          must: mustQuery
+          must: mustQuery,
+          must_not: mustNotQuery
         }
       } : {
         match_all: {}
