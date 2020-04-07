@@ -14,7 +14,8 @@ const schema = new Schema({
   },
   legacyId: {
     type: Number,
-    required: false
+    required: false,
+    index: true
   },
   typeId: {
     type: String,
