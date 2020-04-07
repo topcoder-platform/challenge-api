@@ -446,7 +446,6 @@ createChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date().required(),
-    endDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri()),
@@ -1023,7 +1022,6 @@ fullyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     startDate: Joi.date(),
-    endDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
     groups: Joi.array().items(Joi.string()), // group names
@@ -1033,7 +1031,7 @@ fullyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    termsIds: Joi.array().items(Joi.id()).required().allow([])
+    termsIds: Joi.array().items(Joi.id().optional()).optional().allow([])
   }).required(),
   userToken: Joi.any()
 }
@@ -1069,7 +1067,6 @@ partiallyUpdateChallenge.schema = {
       duration: Joi.number().positive()
     })).min(1),
     startDate: Joi.date(),
-    endDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
@@ -1093,7 +1090,7 @@ partiallyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    termsIds: Joi.array().items(Joi.id()).allow([])
+    termsIds: Joi.array().items(Joi.id().optional()).optional().allow([])
   }).required(),
   userToken: Joi.any()
 }
