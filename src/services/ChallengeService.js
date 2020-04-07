@@ -13,6 +13,7 @@ const constants = require('../../app-constants')
 const models = require('../models')
 const HttpStatus = require('http-status-codes')
 const moment = require('moment')
+const phaseService = require('./PhaseService')
 
 const esClient = helper.getESClient()
 
@@ -207,6 +208,9 @@ async function searchChallenges (currentUser, criteria) {
   _.each(result, element => {
     element.type = typeMap.get(element.typeId) || 'Code'
     delete element.typeId
+  })
+  _.each(result, async element => {
+    await getPhasesAndPopulate(element)
   })
 
   return { total, page: criteria.page, perPage: criteria.perPage, result: await populateSettings(result) }
@@ -482,6 +486,20 @@ async function populateSettings (data) {
 }
 
 /**
+ * Populate phase data from phase API.
+ * @param {Object} the challenge entity
+ */
+async function getPhasesAndPopulate (data) {
+  _.each(data.phases, async p => {
+    const phase = await phaseService.getPhase(p.id)
+    p.name = phase.name
+    if (phase.description) {
+      p.description = phase.description
+    }
+  })
+}
+
+/**
  * Get challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} id the challenge id
@@ -528,6 +546,8 @@ async function getChallenge (currentUser, id) {
   } else {
     _.unset(challenge, 'privateDescription')
   }
+
+  getPhasesAndPopulate(challenge)
 
   return populateSettings(challenge)
 }
@@ -952,6 +972,14 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   delete data.attachmentIds
   delete data.termsIds
+  if (data.phases) {
+    _.each(data.phases, p => {
+      delete p.name
+      if (p.description) {
+        delete p.description
+      }
+    })
+  }
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
