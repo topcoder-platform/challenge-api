@@ -14,9 +14,7 @@ const schema = new Schema({
   },
   legacyId: {
     type: Number,
-    required: false,
-    rangeKey: true,
-    index: true
+    required: false
   },
   typeId: {
     type: String,
@@ -122,8 +120,7 @@ const schema = new Schema({
     required: false
   }
 },
-{
-  throughput: { read: 4, write: 2 }
-})
+{ throughput: 'ON_DEMAND' }
+)
 
 module.exports = schema
