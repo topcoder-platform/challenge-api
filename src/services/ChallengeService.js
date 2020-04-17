@@ -689,7 +689,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (data.groups) {
     await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
   }
-  
+
   console.log('before fetching attachments')
   let newAttachments
   if (isFull || !_.isUndefined(data.attachmentIds)) {
