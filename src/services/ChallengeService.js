@@ -515,7 +515,7 @@ async function populateSettings (data) {
  */
 async function getPhasesAndPopulate (data) {
   _.each(data.phases, async p => {
-    const phase = await phaseService.getPhase(p.id)
+    const phase = await phaseService.getPhase(p.phaseId)
     p.name = phase.name
     if (phase.description) {
       p.description = phase.description
