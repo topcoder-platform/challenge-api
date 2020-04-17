@@ -34,6 +34,7 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 Configuration for the application is at `config/default.js`.
 The following parameters can be set in config files or in env variables:
 
+- READONLY: sets the API in read-only mode. POST/PUT/PATCH/DELETE operations will return 403 Forbidden
 - LOG_LEVEL: the log level, default is 'debug'
 - PORT: the server port, default is 3000
 - AUTH_SECRET: The authorization secret used during token verification.
