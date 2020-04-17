@@ -61,6 +61,23 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
 }
 
 /**
+ * Ensure the user can access the groups being updated to
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} data the challenge data to be updated
+ * @param {String} challenge the original challenge data
+ */
+
+async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge) {
+  const userGroups = await helper.getUserGroups(currentUser.userId)
+  const userGroupsNames = _.map(userGroups, group => group.name)
+  const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
+  const filtered = updatedGroups.filter(g => !userGroupsNames.includes(g))
+  if (filtered.length > 0) {
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
+  }
+}
+
+/**
  * Search challenges
  * @param {Object} currentUser the user who perform operation
  * @param {Object} criteria the search criteria
@@ -668,6 +685,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
   console.log('After checking group access')
 
+  // check groups access to be updated group values
+  if (data.groups) {
+    await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
+  }
+  
   console.log('before fetching attachments')
   let newAttachments
   if (isFull || !_.isUndefined(data.attachmentIds)) {
