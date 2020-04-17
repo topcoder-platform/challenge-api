@@ -171,18 +171,25 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  const finalQuery = {
+    bool: {}
+  }
+
+  if (mustQuery.length > 0) {
+    finalQuery.bool.must = { ...mustQuery }
+  }
+
+  if (!_.isUndefined(mustNotQuery)) {
+    finalQuery.bool.must_not = { ...mustNotQuery }
+  }
+
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
     type: config.get('ES.ES_TYPE'),
     size: criteria.perPage,
     from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
     body: {
-      query: mustQuery.length > 0 || !_.isUndefined(mustNotQuery) ? {
-        bool: {
-          must: mustQuery,
-          must_not: mustNotQuery
-        }
-      } : {
+      query: mustQuery.length > 0 || !_.isUndefined(mustNotQuery) ? finalQuery : {
         match_all: {}
       },
       sort: [{ 'created': { 'order': 'asc', 'missing': '_last', 'unmapped_type': 'String' } }]
