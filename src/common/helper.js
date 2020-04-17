@@ -17,6 +17,7 @@ const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 const moment = require('moment')
 const HttpStatus = require('http-status-codes')
+const xss = require('xss')
 
 // Bus API Client
 let busApiClient
@@ -301,7 +302,8 @@ async function scan (modelName, scanParams) {
 function partialMatch (filter, value) {
   if (filter) {
     if (value) {
-      return RegExp(filter, 'i').test(value)
+      const filtered = xss(filter)
+      return value.includes(filtered)
     } else {
       return false
     }
