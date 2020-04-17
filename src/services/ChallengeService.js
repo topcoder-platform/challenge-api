@@ -181,7 +181,8 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (!_.isUndefined(mustNotQuery)) {
-    finalQuery.bool.must_not = { ...mustNotQuery }
+    // TODO: this is breaking the search functionality because of dirty data
+    // finalQuery.bool.must_not = { ...mustNotQuery }
   }
 
   const esQuery = {
