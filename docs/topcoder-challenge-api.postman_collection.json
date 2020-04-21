@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "ChallengeSettings",
+			"name": "challengeSettings",
 			"item": [
 				{
 					"name": "create challenge setting",
@@ -55,12 +55,12 @@
 											"raw": "{\n\t\"name\": \"setting-name-1\"\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeSettings",
+											"raw": "{{URL}}/challenge-settings",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeSettings"
+												"challenge-settings"
 											]
 										}
 									},
@@ -107,12 +107,12 @@
 											"raw": "{\n\t\"name\": \"setting-name-2\"\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeSettings",
+											"raw": "{{URL}}/challenge-settings",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeSettings"
+												"challenge-settings"
 											]
 										}
 									},
@@ -159,12 +159,12 @@
 											"raw": "{\n\t\"name\": \"setting-name-3\"\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeSettings",
+											"raw": "{{URL}}/challenge-settings",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeSettings"
+												"challenge-settings"
 											]
 										}
 									},
@@ -211,12 +211,12 @@
 											"raw": "{\n\t\"name\": \"setting-name-4\"\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeSettings",
+											"raw": "{{URL}}/challenge-settings",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeSettings"
+												"challenge-settings"
 											]
 										}
 									},
@@ -263,12 +263,12 @@
 											"raw": "{\n\t\"name\": \"setting-name-5\"\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeSettings",
+											"raw": "{{URL}}/challenge-settings",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeSettings"
+												"challenge-settings"
 											]
 										}
 									},
@@ -319,12 +319,12 @@
 									"raw": "{\n\t\"name\": \"create-by-copilot\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -371,12 +371,12 @@
 									"raw": "{\n\t\"name\": \"create-by-admin\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -422,12 +422,12 @@
 									"raw": "{\n\t\"invalid\": \"invalid\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -473,12 +473,12 @@
 									"raw": "{\n\t\"name\": \"create-by-invalid-token\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -524,12 +524,12 @@
 									"raw": "{\n\t\"name\": \"create-by-invalid\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -570,12 +570,12 @@
 									"raw": "{\n\t\"name\": \"create-by-admin\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -621,12 +621,12 @@
 									"raw": "{\n\t\"name\": \"create-by-invalid-token\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -672,12 +672,12 @@
 									"raw": "{\n\t\"name\": \"create-by-admin\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -723,12 +723,12 @@
 									"raw": "{\n\t\"name\": \"setting-NAME-1\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -775,12 +775,12 @@
 									"raw": "{\n\t\"name\": \"setting-name-by-m2m\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -826,12 +826,12 @@
 									"raw": "{\n\t\"name\": \"setting-name-by-m2m-failure\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -880,12 +880,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -941,12 +941,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings",
+									"raw": "{{URL}}/challenge-settings",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									]
 								}
 							},
@@ -988,12 +988,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?invalid=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?invalid=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1049,12 +1049,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1110,12 +1110,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1166,12 +1166,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1227,12 +1227,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1288,12 +1288,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1349,12 +1349,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings?name=-NAME-&page=2&perPage=2",
+									"raw": "{{URL}}/challenge-settings?name=-NAME-&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings"
+										"challenge-settings"
 									],
 									"query": [
 										{
@@ -1417,12 +1417,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -1465,12 +1465,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -1513,12 +1513,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/invalid-id",
+									"raw": "{{URL}}/challenge-settings/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"invalid-id"
 									]
 								}
@@ -1556,12 +1556,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -1604,12 +1604,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -1652,12 +1652,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -1700,12 +1700,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -1748,12 +1748,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/11111111-a41a-4b80-b6dd-90f3816ada99",
+									"raw": "{{URL}}/challenge-settings/11111111-a41a-4b80-b6dd-90f3816ada99",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"11111111-a41a-4b80-b6dd-90f3816ada99"
 									]
 								}
@@ -1796,12 +1796,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -1844,12 +1844,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -1903,12 +1903,12 @@
 									"raw": "{\n\t\"name\": \"update-name1\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -1955,12 +1955,12 @@
 									"raw": "{\n\t\"name\": \"update-NAME2\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -2007,12 +2007,12 @@
 									"raw": "{\n\t\"name\": \"update-name2\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -2059,12 +2059,12 @@
 									"raw": "{\n\t\"name\": \"update-NAME2\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/invalid-id",
+									"raw": "{{URL}}/challenge-settings/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"invalid-id"
 									]
 								}
@@ -2111,12 +2111,12 @@
 									"raw": "{\n\t\"name\": \"setting-NAME-failure\",\n\t\"invalid\": \"invalid\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -2158,12 +2158,12 @@
 									"raw": "{\n\t\"name\": \"update-name-failure\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -2210,12 +2210,12 @@
 									"raw": "{\n\t\"name\": \"update-name-failure\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -2262,12 +2262,12 @@
 									"raw": "{\n\t\"name\": \"update-name-failure\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -2314,12 +2314,12 @@
 									"raw": "{\n\t\"name\": \"update-name-failure\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGB_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGB_ID}}"
 									]
 								}
@@ -2366,12 +2366,12 @@
 									"raw": "{\n\t\"name\": \"update-NAME2\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/11111111-a41a-4b80-b6dd-90f3816ada99",
+									"raw": "{{URL}}/challenge-settings/11111111-a41a-4b80-b6dd-90f3816ada99",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"11111111-a41a-4b80-b6dd-90f3816ada99"
 									]
 								}
@@ -2418,12 +2418,12 @@
 									"raw": "{\n\t\"name\": \"setting-NAME-2\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -2470,12 +2470,12 @@
 									"raw": "{\n\t\"name\": \"update-name-by-m2m\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{TEST_SETTING_M2M_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{TEST_SETTING_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{TEST_SETTING_M2M_ID}}"
 									]
 								}
@@ -2522,12 +2522,12 @@
 									"raw": "{\n\t\"name\": \"update-name-by-m2m\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeSettings/{{TEST_SETTING_M2M_ID}}",
+									"raw": "{{URL}}/challenge-settings/{{TEST_SETTING_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeSettings",
+										"challenge-settings",
 										"{{TEST_SETTING_M2M_ID}}"
 									]
 								}
@@ -2591,12 +2591,12 @@
 											"raw": "{\n\t\"name\": \"type-name-1\",\n\t\"description\": \"descritpion1\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb1\",\n\t\"legacyId\": 111\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeTypes",
+											"raw": "{{URL}}/Challenge-types",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeTypes"
+												"Challenge-types"
 											]
 										}
 									},
@@ -2643,12 +2643,12 @@
 											"raw": "{\n\t\"name\": \"type-name-2\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb2\",\n\t\"legacyId\": 222\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeTypes",
+											"raw": "{{URL}}/Challenge-types",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeTypes"
+												"Challenge-types"
 											]
 										}
 									},
@@ -2695,12 +2695,12 @@
 											"raw": "{\n\t\"name\": \"type-name-3\",\n\t\"description\": \"descritpion3\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb3\",\n\t\"legacyId\": 333\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeTypes",
+											"raw": "{{URL}}/Challenge-types",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeTypes"
+												"Challenge-types"
 											]
 										}
 									},
@@ -2747,12 +2747,12 @@
 											"raw": "{\n\t\"name\": \"type-name-4\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb4\",\n\t\"legacyId\": 444\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeTypes",
+											"raw": "{{URL}}/Challenge-types",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeTypes"
+												"Challenge-types"
 											]
 										}
 									},
@@ -2799,12 +2799,12 @@
 											"raw": "{\n\t\"name\": \"type-name-5\",\n\t\"description\": \"descritpion5\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb5\",\n\t\"legacyId\": 555\n}"
 										},
 										"url": {
-											"raw": "{{URL}}/challengeTypes",
+											"raw": "{{URL}}/Challenge-types",
 											"host": [
 												"{{URL}}"
 											],
 											"path": [
-												"challengeTypes"
+												"Challenge-types"
 											]
 										}
 									},
@@ -2855,12 +2855,12 @@
 									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb123\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -2907,12 +2907,12 @@
 									"raw": "{\n\t\"name\": \"create-by-admin\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb456\",\n\t\"legacyId\": 456\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -2959,12 +2959,12 @@
 									"raw": "{\n\t\"name\": \"create-without-optional-properties\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"cwoop\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3010,12 +3010,12 @@
 									"raw": "{\n\t\"description\": \"failure\",\n\t\"isActive\": true,\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3061,12 +3061,12 @@
 									"raw": "{\n\t\"description\": \"failure\",\n\t\"name\": \"create-for-400\",\n\t\"abbreviation\": \"cf4\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3112,12 +3112,12 @@
 									"raw": "{\n\t\"description\": \"failure\",\n\t\"name\": \"create-for-400\",\n\t\"isActive\": false,\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3158,12 +3158,12 @@
 									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3209,12 +3209,12 @@
 									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3260,12 +3260,12 @@
 									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3311,12 +3311,12 @@
 									"raw": "{\n\t\"name\": \"create-by-copilot\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3362,12 +3362,12 @@
 									"raw": "{\n\t\"name\": \"type-NAME-1\",\n\t\"description\": \"test-value\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abb121212\",\n\t\"legacyId\": 123121212\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3414,12 +3414,12 @@
 									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb565656\",\n\t\"legacyId\": 123565656\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3465,12 +3465,12 @@
 									"raw": "{\n\t\"name\": \"create-by-m2m\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes",
+									"raw": "{{URL}}/Challenge-types",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									]
 								}
 							},
@@ -3514,12 +3514,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes?name=-name-&description=cri&isActive=true&abbreviation=abb&legacyId=123",
+									"raw": "{{URL}}/Challenge-types?name=-name-&description=cri&isActive=true&abbreviation=abb&legacyId=123",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									],
 									"query": [
 										{
@@ -3578,12 +3578,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes?isActive=true&page=2&perPage=2",
+									"raw": "{{URL}}/Challenge-types?isActive=true&page=2&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									],
 									"query": [
 										{
@@ -3634,12 +3634,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes?invalid=test",
+									"raw": "{{URL}}/Challenge-types?invalid=test",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									],
 									"query": [
 										{
@@ -3682,12 +3682,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes?isActive=test",
+									"raw": "{{URL}}/Challenge-types?isActive=test",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									],
 									"query": [
 										{
@@ -3730,12 +3730,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes?legacyId=-5678",
+									"raw": "{{URL}}/Challenge-types?legacyId=-5678",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes"
+										"Challenge-types"
 									],
 									"query": [
 										{
@@ -3785,12 +3785,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -3828,12 +3828,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -3871,12 +3871,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes/invalid-id",
+									"raw": "{{URL}}/Challenge-types/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"invalid-id"
 									]
 								}
@@ -3914,12 +3914,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -3973,12 +3973,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\",\n\t\"legacyId\": 123787811\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4025,12 +4025,12 @@
 									"raw": "{\n\t\"description\": \"add-description\",\n\t\"isActive\": true,\n\t\"abbreviation\": \"abbxxxyyzz11\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -4077,12 +4077,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/invalid-id",
+									"raw": "{{URL}}/Challenge-types/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"invalid-id"
 									]
 								}
@@ -4129,12 +4129,12 @@
 									"raw": "{\n\t\"name\": 1234,\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4181,12 +4181,12 @@
 									"raw": "{\n\t\"name\": \"1234\",\n\t\"description\": 1234\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4233,12 +4233,12 @@
 									"raw": "{\n\t\"name\": \"1234\",\n\t\"isActive\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4285,12 +4285,12 @@
 									"raw": "{\n\t\"abbreviation\": 1234\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4337,12 +4337,12 @@
 									"raw": "{\n\t\"legacyId\": -1234\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4384,12 +4384,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4436,12 +4436,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4488,12 +4488,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4540,12 +4540,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4592,12 +4592,12 @@
 									"raw": "{\n\t\"name\": \"update-name\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -4644,12 +4644,12 @@
 									"raw": "{\n\t\"name\": \"TYPE-name-1\",\n\t\"description\": \"update-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4696,12 +4696,12 @@
 									"raw": "{\n\t\"abbreviation\": \"abbxxxyyzz11\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4748,12 +4748,12 @@
 									"raw": "{\n\t\"legacyId\": 222\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4800,12 +4800,12 @@
 									"raw": "{\n\t\"name\": \"patch-by-m2m\",\n\t\"description\": \"patch-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TEST_TYPE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TEST_TYPE_M2M_ID}}"
 									]
 								}
@@ -4852,12 +4852,12 @@
 									"raw": "{\n\t\"name\": \"patch-by-m2m\",\n\t\"description\": \"patch-description\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TEST_TYPE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TEST_TYPE_M2M_ID}}"
 									]
 								}
@@ -4911,12 +4911,12 @@
 									"raw": "{\n\t\"name\": \"update-name-1789\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb789\",\n\t\"legacyId\": 789\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -4963,12 +4963,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb56756\",\n\t\"legacyId\": 12356756\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5015,12 +5015,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/invalid-id",
+									"raw": "{{URL}}/Challenge-types/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"invalid-id"
 									]
 								}
@@ -5067,12 +5067,12 @@
 									"raw": "{\n\t\"name\": \"test-name\",\n\t\"description\": 12345,\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": \"abc\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5119,12 +5119,12 @@
 									"raw": "{\n\t\"name\": 123,\n\t\"description\": \"12345\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": \"abc\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5171,12 +5171,12 @@
 									"raw": "{\n\t\"name\": \"test-name\",\n\t\"description\": \"12345\",\n\t\"isActive\": 123,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": \"abc\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5223,12 +5223,12 @@
 									"raw": "{\n\t\"name\": \"test-name\",\n\t\"description\": \"12345\",\n\t\"isActive\": false,\n\t\"abbreviation\": 123445,\n\t\"legacyId\": \"abc\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5275,12 +5275,12 @@
 									"raw": "{\n\t\"name\": \"test-name\",\n\t\"description\": \"12345\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"123445\",\n\t\"legacyId\": \"abc\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5327,12 +5327,12 @@
 									"raw": "{\n\t\"description\": \"update-description2\",\n\t\"isActive\": false\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5379,12 +5379,12 @@
 									"raw": "{\n\t\"name\": \"update\",\n\t\"abbreviation\": \"123\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5431,12 +5431,12 @@
 									"raw": "{\n\t\"name\": \"update\",\n\t\"isActive\": false\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5478,12 +5478,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5530,12 +5530,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5582,12 +5582,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5634,12 +5634,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5686,12 +5686,12 @@
 									"raw": "{\n\t\"name\": \"update-name-2\",\n\t\"description\": \"update-description2\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb\",\n\t\"legacyId\": 123\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -5738,12 +5738,12 @@
 									"raw": "{\n\t\"name\": \"TYPE-name-2\",\n\t\"description\": \"description\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abbaaabb34342\",\n\t\"legacyId\": 12322338899\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5790,12 +5790,12 @@
 									"raw": "{\n\t\"name\": \"TYPE-name-2-aaaa-bb\",\n\t\"description\": \"description\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abbaxxabb34342\",\n\t\"legacyId\": 789\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5842,12 +5842,12 @@
 									"raw": "{\n\t\"name\": \"TYPE-name-2-aaaa-bb\",\n\t\"description\": \"description\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb1\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TYPEB_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TYPEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TYPEB_ID}}"
 									]
 								}
@@ -5894,12 +5894,12 @@
 									"raw": "{\n\t\"name\": \"update-by-m2m-aabbcc\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb29293939\",\n\t\"legacyId\": 12329293939\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TEST_TYPE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TEST_TYPE_M2M_ID}}"
 									]
 								}
@@ -5946,12 +5946,12 @@
 									"raw": "{\n\t\"name\": \"update-by-m2m-aabbcc\",\n\t\"isActive\": false,\n\t\"abbreviation\": \"abb29293939\",\n\t\"legacyId\": 12329293939\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTypes/{{TEST_TYPE_M2M_ID}}",
+									"raw": "{{URL}}/Challenge-types/{{TEST_TYPE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTypes",
+										"Challenge-types",
 										"{{TEST_TYPE_M2M_ID}}"
 									]
 								}
@@ -6012,12 +6012,12 @@
 									"raw": "{\n\t\"name\": \"phase-1\",\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6064,12 +6064,12 @@
 									"raw": "{\n\t\"name\": \"phase-2\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6116,12 +6116,12 @@
 									"raw": "{\n\t\"name\": \"phase-3\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6168,12 +6168,12 @@
 									"raw": "{\n\t\"name\": \"phase-4\",\n\t\"isOpen\": false,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6220,12 +6220,12 @@
 									"raw": "{\n\t\"name\": \"4444\",\n\t\"description\": 1111,\n\t\"isOpen\": false,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6272,12 +6272,12 @@
 									"raw": "{\n\t\"name\": 4444,\n\t\"isOpen\": false,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6324,12 +6324,12 @@
 									"raw": "{\n\t\"name\": \"4444\",\n\t\"isOpen\": 10000,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6376,12 +6376,12 @@
 									"raw": "{\n\t\"name\": \"4444\",\n\t\"isOpen\": true,\n\t\"duration\": \"invalid\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6427,12 +6427,12 @@
 									"raw": "{\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6478,12 +6478,12 @@
 									"raw": "{\n\t\"name\": \"phase-5\",\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6529,12 +6529,12 @@
 									"raw": "{\n\t\"name\": \"phase-5\",\n\t\"isOpen\": true\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6575,12 +6575,12 @@
 									"raw": "{\n\t\"name\": \"phase-1\",\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6626,12 +6626,12 @@
 									"raw": "{\n\t\"name\": \"phase-1\",\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6677,12 +6677,12 @@
 									"raw": "{\n\t\"name\": \"phase-1\",\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6728,12 +6728,12 @@
 									"raw": "{\n\t\"name\": \"phase-1\",\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6779,12 +6779,12 @@
 									"raw": "{\n\t\"name\": \"PHASE-1\",\n\t\"description\": \"has-description\",\n\t\"isOpen\": true,\n\t\"duration\": 100000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6831,12 +6831,12 @@
 									"raw": "{\n\t\"name\": \"phase-by-m2m\",\n\t\"description\": \"m2m-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6882,12 +6882,12 @@
 									"raw": "{\n\t\"name\": \"phase-by-m2m\",\n\t\"description\": \"m2m-description\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -6936,12 +6936,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases?name=ph",
+									"raw": "{{URL}}/challenge-phases?name=ph",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									],
 									"query": [
 										{
@@ -6989,12 +6989,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases?name=ph&page=1&perPage=2",
+									"raw": "{{URL}}/challenge-phases?name=ph&page=1&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									],
 									"query": [
 										{
@@ -7050,12 +7050,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -7092,12 +7092,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases",
+									"raw": "{{URL}}/challenge-phases",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									]
 								}
 							},
@@ -7139,12 +7139,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases?name=ph",
+									"raw": "{{URL}}/challenge-phases?name=ph",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									],
 									"query": [
 										{
@@ -7192,12 +7192,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases?invalid=test",
+									"raw": "{{URL}}/challenge-phases?invalid=test",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases"
+										"challenge-phases"
 									],
 									"query": [
 										{
@@ -7252,12 +7252,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -7300,12 +7300,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7348,12 +7348,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/invalid-id",
+									"raw": "{{URL}}/challenge-phases/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"invalid-id"
 									]
 								}
@@ -7391,12 +7391,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7439,12 +7439,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7487,12 +7487,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7535,12 +7535,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7583,12 +7583,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TYPEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -7631,12 +7631,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -7679,12 +7679,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -7738,12 +7738,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -7790,12 +7790,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-2\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7842,12 +7842,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/invalid-id",
+									"raw": "{{URL}}/challenge-phases/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"invalid-id"
 									]
 								}
@@ -7894,12 +7894,12 @@
 									"raw": "{\n\t\"name\": 199,\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7946,12 +7946,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"description\": 5000,\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -7998,12 +7998,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": 1,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -8050,12 +8050,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": \"1day\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -8102,12 +8102,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8149,12 +8149,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8201,12 +8201,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8253,12 +8253,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8305,12 +8305,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -8357,12 +8357,12 @@
 									"raw": "{\n\t\"name\": \"update-PHASE-2\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8409,12 +8409,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-by-m2m\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -8461,12 +8461,12 @@
 									"raw": "{\n\t\"name\": \"update-phase-by-m2m\",\n\t\"isOpen\": true,\n\t\"duration\": 50000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -8520,12 +8520,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8572,12 +8572,12 @@
 									"raw": "{\n\t\"name\": \"new-PHASE-2\",\n\t\"description\": \"add-description-in-put\",\n\t\"isOpen\": true,\n\t\"duration\": 10000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -8624,12 +8624,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/invalid-id",
+									"raw": "{{URL}}/challenge-phases/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"invalid-id"
 									]
 								}
@@ -8676,12 +8676,12 @@
 									"raw": "{\n\t\"name\": 12345,\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8728,12 +8728,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8775,12 +8775,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8827,12 +8827,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8879,12 +8879,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-1\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -8931,12 +8931,12 @@
 									"raw": "{\n\t\"name\": \"phAse-3\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -8983,12 +8983,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-by-m2m\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -9035,12 +9035,12 @@
 									"raw": "{\n\t\"name\": \"new-phase-by-m2m\",\n\t\"isOpen\": true,\n\t\"duration\": 20000\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -9094,12 +9094,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEC_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEC_ID}}"
 									]
 								}
@@ -9146,12 +9146,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/invalid-id",
+									"raw": "{{URL}}/challenge-phases/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"invalid-id"
 									]
 								}
@@ -9193,12 +9193,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -9245,12 +9245,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -9297,12 +9297,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -9349,12 +9349,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{PHASEB_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{PHASEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{PHASEB_ID}}"
 									]
 								}
@@ -9401,12 +9401,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -9453,12 +9453,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -9505,12 +9505,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengePhases/{{TEST_PHASE_M2M_ID}}",
+									"raw": "{{URL}}/challenge-phases/{{TEST_PHASE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengePhases",
+										"challenge-phases",
 										"{{TEST_PHASE_M2M_ID}}"
 									]
 								}
@@ -9571,12 +9571,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      },\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9623,12 +9623,12 @@
 									"raw": "{\n\t\"name\": \"template-2\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9675,12 +9675,12 @@
 									"raw": "{\n\t\"name\": \"template-3\",\n    \"description\": \"desc-3\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      },\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9726,12 +9726,12 @@
 									"raw": "{\n\t\"name\": \"template-4\",\n    \"description\": \"desc-4\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASED_ID}}\",\n        \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9777,12 +9777,12 @@
 									"raw": "{\n\t\"name\": 1234,\n    \"description\": \"desc-4\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9828,12 +9828,12 @@
 									"raw": "{\n\t\"name\": \"template-4\",\n    \"description\": 1234,\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASED_ID}}\",\n        \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9879,12 +9879,12 @@
 									"raw": "{\n\t\"name\": \"template-4\",\n    \"isActive\": \"active\",\n    \"phases\": [\n      {\n        \"id\": \"{{PHASED_ID}}\",\n        \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9930,12 +9930,12 @@
 									"raw": "{\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"id\": \"{{PHASED_ID}}\",\n        \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -9981,12 +9981,12 @@
 									"raw": "{\n\t\"name\": \"template-4\",\n    \"phases\": [\n      {\n        \"id\": \"{{PHASED_ID}}\",\n        \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10032,12 +10032,12 @@
 									"raw": "{\n\t\"name\": \"template-4\",\n    \"isActive\": true\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10078,12 +10078,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10129,12 +10129,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10180,12 +10180,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10231,12 +10231,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10282,12 +10282,12 @@
 									"raw": "{\n\t\"name\": \"tempLATE-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10334,12 +10334,12 @@
 									"raw": "{\n\t\"name\": \"template-by-m2m\",\n    \"description\": \"desc-by-m2m\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      },\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10385,12 +10385,12 @@
 									"raw": "{\n\t\"name\": \"template-by-m2m\",\n    \"description\": \"desc-by-m2m\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates",
+									"raw": "{{URL}}/timeline-templates",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									]
 								}
 							},
@@ -10439,12 +10439,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates?name=1",
+									"raw": "{{URL}}/timeline-templates?name=1",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									],
 									"query": [
 										{
@@ -10492,12 +10492,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates?page=1&perPage=2",
+									"raw": "{{URL}}/timeline-templates?page=1&perPage=2",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									],
 									"query": [
 										{
@@ -10549,12 +10549,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates?name=LA",
+									"raw": "{{URL}}/timeline-templates?name=LA",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									],
 									"query": [
 										{
@@ -10602,12 +10602,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates?invalid=test",
+									"raw": "{{URL}}/timeline-templates?invalid=test",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates"
+										"timeline-templates"
 									],
 									"query": [
 										{
@@ -10662,12 +10662,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -10710,12 +10710,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEB_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEB_ID}}"
 									]
 								}
@@ -10758,12 +10758,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/invalid-id",
+									"raw": "{{URL}}/timeline-templates/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"invalid-id"
 									]
 								}
@@ -10806,12 +10806,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -10854,12 +10854,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -10897,12 +10897,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -10945,12 +10945,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -10993,12 +10993,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -11041,12 +11041,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -11089,12 +11089,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -11148,12 +11148,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11200,12 +11200,12 @@
 									"raw": "{\n\t\"name\": \"template-2\",\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      },\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEB_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEB_ID}}"
 									]
 								}
@@ -11252,12 +11252,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\",\n    \"phases\": []\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11304,12 +11304,12 @@
 									"raw": "{\n\t\"name\": 1234\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11356,12 +11356,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": 111111\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11408,12 +11408,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"isActive\": 111111\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11460,12 +11460,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11507,12 +11507,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11559,12 +11559,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11611,12 +11611,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11663,12 +11663,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -11715,12 +11715,12 @@
 									"raw": "{\n\t\"name\": \"template-2\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11767,12 +11767,12 @@
 									"raw": "{\n\t\"name\": \"new-template-m2m\",\n    \"description\": \"new-desc-m2m\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -11819,12 +11819,12 @@
 									"raw": "{\n\t\"name\": \"new-template-1\",\n    \"description\": \"new-desc-1\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11878,12 +11878,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      },\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -11930,12 +11930,12 @@
 									"raw": "{\n\t\"name\": \"template-2\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEB_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEB_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEB_ID}}"
 									]
 								}
@@ -11982,12 +11982,12 @@
 									"raw": "{\n\t\"name\": \"template-3\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"id\": \"{{SETTINGA_ID}}\",\n        \"name\": \"new-PHASE-2\",\n        \"description\": \"add-description-in-put\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n    \t\"isActive\": true,\n\t    \"duration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12034,12 +12034,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/invalid-id",
+									"raw": "{{URL}}/timeline-templates/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"invalid-id"
 									]
 								}
@@ -12086,12 +12086,12 @@
 									"raw": "{\n\t\"name\": 1221,\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12138,12 +12138,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": 11121,\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12190,12 +12190,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": 123,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12242,12 +12242,12 @@
 									"raw": "{\n\t\"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12294,12 +12294,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12346,12 +12346,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12398,12 +12398,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -12445,12 +12445,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -12497,12 +12497,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -12549,12 +12549,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -12601,12 +12601,12 @@
 									"raw": "{\n\t\"name\": \"template-1\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -12653,12 +12653,12 @@
 									"raw": "{\n\t\"name\": \"TEMPlate-2\",\n    \"description\": \"desc-1\",\n    \"isActive\": true,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEA_ID}}"
 									]
 								}
@@ -12705,12 +12705,12 @@
 									"raw": "{\n\t\"name\": \"update-template-by-m2m\",\n    \"description\": \"update-desc-by-m2m\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      },\n      {\n        \"phaseId\": \"{{PHASEB_ID}}\",\n\t    \"predecessor\": \"{{PHASEA_ID}}\",\n\t    \"defaultDuration\": 10000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -12757,12 +12757,12 @@
 									"raw": "{\n\t\"name\": \"update-template-by-m2m\",\n    \"description\": \"update-desc-by-m2m\",\n    \"isActive\": false,\n    \"phases\": [\n      {\n        \"phaseId\": \"{{PHASEA_ID}}\",\n        \"defaultDuration\": 20000\n      }\n    ]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -12816,12 +12816,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12868,12 +12868,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/invalid-id",
+									"raw": "{{URL}}/timeline-templates/invalid-id",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"invalid-id"
 									]
 								}
@@ -12915,12 +12915,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -12967,12 +12967,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -13019,12 +13019,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -13071,12 +13071,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEMPLATEC_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEMPLATEC_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEMPLATEC_ID}}"
 									]
 								}
@@ -13123,12 +13123,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{SETTINGA_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{SETTINGA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{SETTINGA_ID}}"
 									]
 								}
@@ -13175,12 +13175,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -13227,12 +13227,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/timelineTemplates/{{TEST_TEMPLATE_M2M_ID}}",
+									"raw": "{{URL}}/timeline-templates/{{TEST_TEMPLATE_M2M_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"timelineTemplates",
+										"timeline-templates",
 										"{{TEST_TEMPLATE_M2M_ID}}"
 									]
 								}
@@ -13247,7 +13247,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "ChallengeTypeTimelineTemplates",
+			"name": "ChallengeTypetimeline-templates",
 			"item": [
 				{
 					"name": "create challenge type timeline template",
@@ -13293,12 +13293,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13344,12 +13344,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13395,12 +13395,12 @@
 									"raw": "{\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13446,12 +13446,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\"\n}"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13497,12 +13497,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"invalid\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13548,12 +13548,12 @@
 									"raw": "{\n\t\"typeId\": \"invalid\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13599,12 +13599,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"a69033a4-4f18-4765-addc-f48cf61176d9\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13650,12 +13650,12 @@
 									"raw": "{\n\t\"typeId\": \"a69033a4-4f18-4765-addc-f48cf61176d9\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13701,12 +13701,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13747,12 +13747,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13798,12 +13798,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13849,12 +13849,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEB_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13900,12 +13900,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEB_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -13951,12 +13951,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEB_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									]
 								}
 							},
@@ -14027,12 +14027,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines?typeId={{TYPEA_ID}}&timelineTemplateId={{TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines?typeId={{TYPEA_ID}}&timelineTemplateId={{TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									],
 									"query": [
 										{
@@ -14084,12 +14084,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines",
+									"raw": "{{URL}}/challenge-timelines",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									],
 									"query": [
 										{
@@ -14143,12 +14143,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines?other={{TYPEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines?other={{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									],
 									"query": [
 										{
@@ -14201,12 +14201,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines?typeId=123",
+									"raw": "{{URL}}/challenge-timelines?typeId=123",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									],
 									"query": [
 										{
@@ -14254,12 +14254,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines?timelineTemplateId=12321",
+									"raw": "{{URL}}/challenge-timelines?timelineTemplateId=12321",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines"
+										"challenge-timelines"
 									],
 									"query": [
 										{
@@ -14336,12 +14336,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14384,12 +14384,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14432,12 +14432,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14480,12 +14480,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14528,12 +14528,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14576,12 +14576,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14619,12 +14619,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14667,12 +14667,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{PHASEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{PHASEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{PHASEA_ID}}"
 									]
 								}
@@ -14715,12 +14715,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/invalid",
+									"raw": "{{URL}}/challenge-timelines/invalid",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"invalid"
 									]
 								}
@@ -14796,12 +14796,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14848,12 +14848,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14895,12 +14895,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14947,12 +14947,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -14999,12 +14999,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15051,12 +15051,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15103,12 +15103,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\",\n    \"other\": 123\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15155,12 +15155,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15207,12 +15207,12 @@
 									"raw": "{\n\t\"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15259,12 +15259,12 @@
 									"raw": "{\n\t\"typeId\": [\"abc\"],\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15311,12 +15311,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": [\"abc\"]\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15363,12 +15363,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"a69033a4-4f18-4765-addc-f48cf61176d9\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15415,12 +15415,12 @@
 									"raw": "{\n    \"typeId\": \"a69033a4-4f18-4765-addc-f48cf61176d9\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15467,12 +15467,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15519,12 +15519,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15571,12 +15571,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEA_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEB_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -15623,12 +15623,12 @@
 									"raw": "{\n\t\"typeId\": \"{{TYPEB_ID}}\",\n    \"timelineTemplateId\": \"{{TEMPLATEA_ID}}\"\n}\n"
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15704,12 +15704,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15751,12 +15751,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15803,12 +15803,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15855,12 +15855,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15907,12 +15907,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -15959,12 +15959,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPE_TEMPLATEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPE_TEMPLATEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPE_TEMPLATEA_ID}}"
 									]
 								}
@@ -16011,12 +16011,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/invalid",
+									"raw": "{{URL}}/challenge-timelines/invalid",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"invalid"
 									]
 								}
@@ -16063,12 +16063,12 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{URL}}/challengeTimelines/{{TYPEA_ID}}",
+									"raw": "{{URL}}/challenge-timelines/{{TYPEA_ID}}",
 									"host": [
 										"{{URL}}"
 									],
 									"path": [
-										"challengeTimelines",
+										"challenge-timelines",
 										"{{TYPEA_ID}}"
 									]
 								}
@@ -16222,7 +16222,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"phaseId\": \"{{PHASEA_ID}}\",\n            \"duration\": 1000000\n        },\n        {\n            \"phaseId\": \"{{PHASEB_ID}}\",\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"],\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"phaseId\": \"{{PHASEA_ID}}\",\n            \"duration\": 1000000\n        },\n        {\n            \"phaseId\": \"{{PHASEB_ID}}\",\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"],\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -16885,7 +16885,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TYPEA_ID}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"phaseId\": \"{{PHASEA_ID}}\",\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"phaseId\": \"{{PHASEB_ID}}\",\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\",\n\t\"status\": \"Draft\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID1}}\",\n\t\"track\": \"test-track\",\n\t\"name\": \"test-create\",\n\t\"description\": \"test-description\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TYPEA_ID}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n\t\t{\n        \t\"phaseId\": \"{{PHASEA_ID}}\",\n        \t\"duration\": 1000000\n        },\n        {\n        \t\"phaseId\": \"{{PHASEB_ID}}\",\n\t    \t\"duration\": 2000000\n        }\n\t],\n\t\"prizeSets\": [\n\t\t{\n\t\t\t\"type\": \"Challenge prizes\",\n\t\t\t\"description\": \"desc\",\n\t\t\t\"prizes\": [\n\t\t        {\n\t\t          \"description\": \"desc-first\",\n\t\t          \"type\": \"first place\",\n\t\t          \"value\": 500\n\t\t        },\n\t\t        {\n\t\t          \"description\": \"desc-second\",\n\t\t          \"type\": \"second place\",\n\t\t          \"value\": 250\n\t\t        }\n\t\t    ]\n\t\t}\n\t],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 123,\n\t\"forumId\": 456,\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\",\n\t\"status\": \"Draft\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -17391,7 +17391,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"phaseId\": \"{{PHASEA_ID}}\",\n            \"duration\": 1000000\n        },\n        {\n            \"phaseId\": \"{{PHASEB_ID}}\",\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 10000,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"],\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"phaseId\": \"{{PHASEA_ID}}\",\n            \"duration\": 1000000\n        },\n        {\n            \"phaseId\": \"{{PHASEB_ID}}\",\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 10000,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"],\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -17442,7 +17442,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"phaseId\": \"{{PHASEA_ID}}\",\n            \"duration\": 1000000\n        },\n        {\n            \"phaseId\": \"{{PHASEB_ID}}\",\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 200,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"],\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
+									"raw": "{\n\t\"typeId\": \"{{TEST_TYPE_ID2}}\",\n\t\"track\": \"test-track-1\",\n\t\"name\": \"test-create-copilot\",\n\t\"description\": \"test-description\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value3\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID4}}\",\n\t\t\t\"value\": \"value4\"\n\t\t}\n\t],\n\t\"timelineTemplateId\": \"{{TEMPLATEA_ID}}\",\n\t\"phases\": [\n        {\n            \"phaseId\": \"{{PHASEA_ID}}\",\n            \"duration\": 1000000\n        },\n        {\n            \"phaseId\": \"{{PHASEB_ID}}\",\n            \"duration\": 2000000\n        }\n    ],\n    \"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"description\": \"desc\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 500\n                },\n                {\n                    \"description\": \"desc-second\",\n                    \"type\": \"second place\",\n                    \"value\": 250\n                }\n            ]\n        }\n    ],\n\t\"reviewType\": \"review type\",\n\t\"tags\": [\"tag1\", \"tag2\"],\n\t\"projectId\": 200,\n\t\"forumId\": 456,\n\t\"status\": \"Draft\",\n\t\"groups\": [\"group1\", \"group2\"],\n\t\"startDate\": \"2019-06-22T16:28:39.882Z\"\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges",
@@ -20056,7 +20056,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID3}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20420,7 +20420,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20576,7 +20576,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20623,7 +20623,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20675,7 +20675,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20727,7 +20727,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t]\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20831,7 +20831,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"],\n\t\"projectId\": 1000\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"],\n\t\"projectId\": 1000\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -20883,7 +20883,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challengeSettings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"],\n\t\"projectId\": 200\n}"
+									"raw": "{\n\t\"name\": \"update-new-name-1\",\n\t\"challenge-settings\": [\n\t\t{\n\t\t\t\"type\": \"{{TEST_SETTING_ID5}}\",\n\t\t\t\"value\": \"value5\"\n\t\t}\n\t],\n\t\"prizeSets\": [\n        {\n            \"type\": \"Challenge prizes\",\n            \"prizes\": [\n                {\n                    \"description\": \"desc-first\",\n                    \"type\": \"first place\",\n                    \"value\": 100\n                }\n            ]\n        }\n    ],\n\t\"status\": \"Completed\",\n\t\"attachmentIds\": [\"{{ATTACHMENT_ID2}}\"],\n\t\"groups\": [\"group1\", \"group2\", \"group3\", \"group4\"],\n\t\"projectId\": 200\n}"
 								},
 								"url": {
 									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
@@ -22812,12 +22812,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -22893,12 +22893,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID2}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z&createdBy=ghostar",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID2}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z&createdBy=ghostar",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -22963,12 +22963,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -23032,12 +23032,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -23096,12 +23096,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -23165,12 +23165,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&fieldName=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -23234,12 +23234,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&invalid=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&invalid=n&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2019-03-22T00:00:00Z&createdBy=tonyj",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -23303,12 +23303,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{
@@ -23384,12 +23384,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{URL}}/challengeAuditLogs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
+							"raw": "{{URL}}/challenge-audit-logs?challengeId={{CHALLENGE_ID1}}&createdDateStart=2019-02-22T00:00:00Z&createdDateEnd=2022-03-22T00:00:00Z",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"challengeAuditLogs"
+								"challenge-audit-logs"
 							],
 							"query": [
 								{

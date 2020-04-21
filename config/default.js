@@ -3,6 +3,7 @@
  */
 
 module.exports = {
+  READONLY: process.env.READONLY || false,
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
   PORT: process.env.PORT || 3000,
   API_VERSION: process.env.API_VERSION || 'v5',

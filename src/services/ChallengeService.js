@@ -13,6 +13,7 @@ const constants = require('../../app-constants')
 const models = require('../models')
 const HttpStatus = require('http-status-codes')
 const moment = require('moment')
+const phaseService = require('./PhaseService')
 
 const esClient = helper.getESClient()
 
@@ -61,6 +62,23 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
 }
 
 /**
+ * Ensure the user can access the groups being updated to
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} data the challenge data to be updated
+ * @param {String} challenge the original challenge data
+ */
+
+async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge) {
+  const userGroups = await helper.getUserGroups(currentUser.userId)
+  const userGroupsNames = _.map(userGroups, group => group.name)
+  const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
+  const filtered = updatedGroups.filter(g => !userGroupsNames.includes(g))
+  if (filtered.length > 0) {
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
+  }
+}
+
+/**
  * Search challenges
  * @param {Object} currentUser the user who perform operation
  * @param {Object} criteria the search criteria
@@ -82,7 +100,7 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
-  if (criteria.group) {
+  if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
   if (criteria.gitRepoURL) {
@@ -121,10 +139,16 @@ async function searchChallenges (currentUser, criteria) {
 
   const mustQuery = []
 
+  let mustNotQuery
+
   const accessQuery = []
 
   if (!_.isUndefined(currentUser) && currentUser.handle) {
     accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
+  }
+
+  if (_.isUndefined(currentUser)) {
+    mustNotQuery = { exists: { field: 'groups' } }
   }
 
   if (criteria.memberId) {
@@ -154,9 +178,10 @@ async function searchChallenges (currentUser, criteria) {
     size: criteria.perPage,
     from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
     body: {
-      query: mustQuery.length > 0 ? {
+      query: mustQuery.length > 0 || !_.isUndefined(mustNotQuery) ? {
         bool: {
-          must: mustQuery
+          must: mustQuery,
+          must_not: mustNotQuery
         }
       } : {
         match_all: {}
@@ -207,6 +232,9 @@ async function searchChallenges (currentUser, criteria) {
   _.each(result, element => {
     element.type = typeMap.get(element.typeId) || 'Code'
     delete element.typeId
+  })
+  _.each(result, async element => {
+    await getPhasesAndPopulate(element)
   })
 
   return { total, page: criteria.page, perPage: criteria.perPage, result: await populateSettings(result) }
@@ -482,6 +510,20 @@ async function populateSettings (data) {
 }
 
 /**
+ * Populate phase data from phase API.
+ * @param {Object} the challenge entity
+ */
+async function getPhasesAndPopulate (data) {
+  _.each(data.phases, async p => {
+    const phase = await phaseService.getPhase(p.phaseId)
+    p.name = phase.name
+    if (phase.description) {
+      p.description = phase.description
+    }
+  })
+}
+
+/**
  * Get challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} id the challenge id
@@ -528,6 +570,8 @@ async function getChallenge (currentUser, id) {
   } else {
     _.unset(challenge, 'privateDescription')
   }
+
+  getPhasesAndPopulate(challenge)
 
   return populateSettings(challenge)
 }
@@ -667,6 +711,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   console.log('Before checking group access')
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
   console.log('After checking group access')
+
+  // check groups access to be updated group values
+  if (data.groups) {
+    await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
+  }
 
   console.log('before fetching attachments')
   let newAttachments
@@ -952,6 +1001,14 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   delete data.attachmentIds
   delete data.termsIds
+  if (data.phases) {
+    _.each(data.phases, p => {
+      delete p.name
+      if (p.description) {
+        delete p.description
+      }
+    })
+  }
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments

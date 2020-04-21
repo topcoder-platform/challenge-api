@@ -56,7 +56,7 @@ module.exports = {
       scopes: [CHALLENGES.UPDATE, CHALLENGES.ALL]
     }
   },
-  '/challengeTypes': {
+  '/challenge-types': {
     get: {
       controller: 'ChallengeTypeController',
       method: 'searchChallengeTypes'
@@ -69,7 +69,7 @@ module.exports = {
       scopes: [CHALLENGE_TYPES.CREATE, CHALLENGE_TYPES.ALL]
     }
   },
-  '/challengeTypes/:challengeTypeId': {
+  '/challenge-types/:challengeTypeId': {
     get: {
       controller: 'ChallengeTypeController',
       method: 'getChallengeType'
@@ -89,7 +89,7 @@ module.exports = {
       scopes: [CHALLENGE_TYPES.UPDATE, CHALLENGE_TYPES.ALL]
     }
   },
-  '/challengeTimelines': {
+  '/challenge-timelines': {
     get: {
       controller: 'ChallengeTypeTimelineTemplateController',
       method: 'searchChallengeTypeTimelineTemplates'
@@ -105,7 +105,7 @@ module.exports = {
       scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.CREATE, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
     }
   },
-  '/challengeTimelines/:challengeTypeTimelineTemplateId': {
+  '/challenge-timelines/:challengeTypeTimelineTemplateId': {
     get: {
       controller: 'ChallengeTypeTimelineTemplateController',
       method: 'getChallengeTypeTimelineTemplate'
@@ -128,7 +128,7 @@ module.exports = {
       scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.DELETE, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
     }
   },
-  '/challengeSettings': {
+  '/challenge-settings': {
     get: {
       controller: 'ChallengeSettingController',
       method: 'searchChallengeSettings'
@@ -145,7 +145,7 @@ module.exports = {
       // scopes: [CHALLENGE_SETTINGS.CREATE, CHALLENGE_SETTINGS.ALL]
     }
   },
-  '/challengeSettings/:challengeSettingId': {
+  '/challenge-settings/:challengeSettingId': {
     get: {
       controller: 'ChallengeSettingController',
       method: 'getChallengeSetting',
@@ -161,7 +161,7 @@ module.exports = {
       scopes: [CHALLENGE_SETTINGS.UPDATE, CHALLENGE_SETTINGS.ALL]
     }
   },
-  '/challengeAuditLogs': {
+  '/challenge-audit-logs': {
     get: {
       controller: 'AuditLogController',
       method: 'searchAuditLogs',
@@ -170,7 +170,7 @@ module.exports = {
       scopes: [CHALLENGE_AUDIT_LOGS.READ]
     }
   },
-  '/challengePhases': {
+  '/challenge-phases': {
     get: {
       controller: 'ChallengePhaseController',
       method: 'searchPhases',
@@ -184,7 +184,7 @@ module.exports = {
       scopes: [CHALLENGE_PHASES.CREATE, CHALLENGE_PHASES.ALL]
     }
   },
-  '/challengePhases/:challengePhaseId': {
+  '/challenge-phases/:challengePhaseId': {
     get: {
       controller: 'ChallengePhaseController',
       method: 'getPhase',
@@ -214,7 +214,7 @@ module.exports = {
       scopes: [CHALLENGE_PHASES.DELETE, CHALLENGE_PHASES.ALL]
     }
   },
-  '/timelineTemplates': {
+  '/timeline-templates': {
     get: {
       controller: 'TimelineTemplateController',
       method: 'searchTimelineTemplates',
@@ -228,7 +228,7 @@ module.exports = {
       scopes: [TIMELINE_TEMPLATES.CREATE, TIMELINE_TEMPLATES.ALL]
     }
   },
-  '/timelineTemplates/:timelineTemplateId': {
+  '/timeline-templates/:timelineTemplateId': {
     get: {
       controller: 'TimelineTemplateController',
       method: 'getTimelineTemplate',

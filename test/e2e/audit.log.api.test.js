@@ -14,7 +14,7 @@ const testHelper = require('../testHelper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challengeAuditLogs`
+const basePath = `/${config.API_VERSION}/challenge-audit-logs`
 
 describe('audit log API E2E tests', () => {
   // generated data
