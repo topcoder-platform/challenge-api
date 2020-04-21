@@ -397,7 +397,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeTypes:
+  /challenge-types:
     get:
       tags:
         - ChallengeTypes
@@ -513,7 +513,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challengeTypes/:challengeTypeId':
+  '/challenge-types/:challengeTypeId':
     get:
       tags:
         - ChallengeTypes
@@ -650,7 +650,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeSettings:
+  /challenge-settings:
     get:
       tags:
         - ChallengeSettings
@@ -758,7 +758,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challengeSettings/:challengeSettingId':
+  '/challenge-settings/:challengeSettingId':
     get:
       tags:
         - ChallengeSettings
@@ -853,7 +853,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengePhases:
+  /challenge-phases:
     get:
       tags:
         - ChallengePhases
@@ -961,7 +961,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengePhases/:challengePhaseId:
+  /challenge-phases/:challengePhaseId:
     get:
       tags:
         - ChallengePhases
@@ -1152,7 +1152,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /timelineTemplates:
+  /timeline-templates:
     get:
       tags:
         - TimelineTemplates
@@ -1260,7 +1260,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /timelineTemplates/:timelineTemplateId:
+  /timeline-templates/:timelineTemplateId:
     get:
       tags:
         - TimelineTemplates
@@ -1451,7 +1451,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeTimelines:
+  /challenge-timelines:
     get:
       tags:
         - ChallengeTypeTimelineTemplates
@@ -1540,7 +1540,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeTimelines/:challengeTypeTimelineTemplateId:
+  /challenge-timelines/:challengeTypeTimelineTemplateId:
     get:
       tags:
         - ChallengeTypeTimelineTemplates
@@ -1677,7 +1677,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeAuditLogs:
+  /challenge-auditLogs:
     get:
       tags:
         - AuditLog

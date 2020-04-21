@@ -13,7 +13,7 @@ const helper = require('../../src/common/helper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challengeTimelines`
+const basePath = `/${config.API_VERSION}/challenge-timelines`
 
 describe('challenge type timeline template API E2E tests', () => {
   // created entity id
