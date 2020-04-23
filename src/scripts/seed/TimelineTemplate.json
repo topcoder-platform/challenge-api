@@ -4,20 +4,59 @@
     "name": "Standard Code",
     "description": "Standard Code challenge timeline",
     "isActive": true,
-    "phases": [{
-      "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-      "defaultDuration": 12345
-    }]
+    "phases": [
+      {
+        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+        "defaultDuration": 24
+      },
+      {
+        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+        "defaultDuration": 48
+      },
+      {
+        "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+        "defaultDuration": 24
+      },
+      {
+        "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+        "defaultDuration": 12
+      },
+      {
+        "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+        "defaultDuration": 12
+      }
+    ]
   },
   {
     "id": "592b0e63-5503-4d21-bb79-54202ff03135",
     "name": "Code with final fixes",
-    "description": "Code challenge with final fixe phase",
+    "description": "Code challenge with final fix phase",
     "isActive": true,
     "phases": [{
-      "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-      "defaultDuration": 111
-    }]
+      "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+      "defaultDuration": 24
+    },
+    {
+      "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+      "defaultDuration": 48
+    },
+    {
+      "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+      "defaultDuration": 24
+    },
+    {
+      "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+      "defaultDuration": 12
+    },
+    {
+      "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+      "defaultDuration": 12
+    },
+    {
+      "phaseId": "3e2afca6-9542-4763-a135-96b33f12c082",
+      "defaultDuration": 12
+    }
+  ]
   },
   {
     "id": "acf94fff-8e26-4617-b96c-61a46561623a",
@@ -25,8 +64,17 @@
     "description": "Idea/report generation",
     "isActive": true,
     "phases": [{
-      "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-      "defaultDuration": 222
-    }]
+        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+        "defaultDuration": 24
+      },
+      {
+        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+        "defaultDuration": 48
+      },
+      {
+        "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+        "defaultDuration": 24
+      }
+    ]
   }
 ]
