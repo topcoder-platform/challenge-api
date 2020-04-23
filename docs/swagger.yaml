@@ -650,10 +650,10 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challenge-settings:
+  /challenge-metadata:
     get:
       tags:
-        - ChallengeSettings
+        - ChallengeMetadata
       description: |
         Retrieve challenge settings in the system.
       security:
@@ -674,7 +674,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/ChallengeSettings'
+              $ref: '#/definitions/ChallengeMetadata'
           headers:
             X-Next-Page:
               type: integer
@@ -717,7 +717,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
     post:
       tags:
-        - ChallengeSettings
+        - ChallengeChallengeMetadataSettings
       description: |
         Create a new challenge setting in the system.
       security:
@@ -729,12 +729,12 @@ paths:
           name: body
           required: true
           schema:
-            $ref: '#/definitions/ChallengeSettingsData'
+            $ref: '#/definitions/ChallengeMetadataData'
       responses:
         '201':
           description: Created - The request was successful and the resource is returned.
           schema:
-            $ref: '#/definitions/ChallengeSettings'
+            $ref: '#/definitions/ChallengeMetadata'
         '400':
           description: Bad request.  Request parameters were invalid.
           schema:
@@ -758,17 +758,17 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenge-settings/:challengeSettingId':
+  '/challenge-metadata/:challengeMetadataId':
     get:
       tags:
-        - ChallengeSettings
+        - ChallengeMetadata
       description: Retrieve the Challenge settings with provided challenge settings id.
       security:
         - bearer: []
       produces:
         - application/json
       parameters:
-        - name: challengeSettingId
+        - name: challengeMetadataId
           in: path
           required: true
           type: string
@@ -778,7 +778,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/ChallengeSettings'
+            $ref: '#/definitions/ChallengeMetadata'
         '400':
           description: Bad request.  Request parameters were invalid.
           schema:
@@ -803,29 +803,29 @@ paths:
             $ref: '#/definitions/ErrorModel'
     put:
       tags:
-        - ChallengeSettings
+        - ChallengeMetadata
       description: Update the challenge settings with the specified id.
       security:
         - bearer: []
       produces:
         - application/json
       parameters:
-        - name: challengeSettingId
+        - name: challengeMetadataId
           in: path
           required: true
           type: string
           format: UUID
-          description: The id of challengeSettings to update
+          description: The id of ChallengeMetadata to update
         - in: body
           name: body
           required: true
           schema:
-            $ref: '#/definitions/ChallengeSettingsData'
+            $ref: '#/definitions/ChallengeMetadataData'
       responses:
         '200':
           description: Updated - The request was successful and the resource is returned.
           schema:
-            $ref: '#/definitions/ChallengeSettings'
+            $ref: '#/definitions/ChallengeMetadata'
         '400':
           description: Bad request.  Request parameters were invalid.
           schema:
@@ -1915,7 +1915,7 @@ definitions:
       - $ref: '#/definitions/ChallengeTypeData'
     required:
       - id
-  ChallengeSettings:
+  ChallengeMetadata:
     type: object
     allOf:
       - type: object
@@ -1924,7 +1924,7 @@ definitions:
             type: string
             description: The challenge settings id.
             format: UUID
-      - $ref: '#/definitions/ChallengeSettingsData'
+      - $ref: '#/definitions/ChallengeMetadataData'
     required:
       - id
   Phase:
@@ -1982,7 +1982,7 @@ definitions:
       privateDescription:
         type: string
         description: returned only if the user is registered on the challenge.
-      challengeSettings:
+      ChallengeMetadata:
         type: array
         items:
           properties:
@@ -2068,22 +2068,8 @@ definitions:
       terms:
         type: array
         items:
-          properties:
-            id:
-              type: integer
-              description: The terms of use id
-            agreeabilityType:
-              type: string
-              description: the terms of use agreeability type
-            title:
-              type: string
-              description: the terms of use title
-            url:
-              type: string
-              description: the terms of use url
-            templateId:
-              type: string
-              description: the template id of the terms of use (only valid when the terms agreeability type is 'Docusignable')
+          type: string
+          description: The terms of use id
       numOfSubmissions:
         type: integer
         description: number of submissions
@@ -2154,7 +2140,7 @@ definitions:
       - name
       - isActive
       - abbreviation
-  ChallengeSettingsData:
+  ChallengeMetadataData:
     type: object
     properties:
       name:
@@ -2273,17 +2259,17 @@ definitions:
         type: string
       privateDescription:
         type: string
-      termsIds:
+      terms:
         type : array
         description: The ids of the terms of use to add for the challenge
         items:
          type: string
          format: UUID
-      challengeSettings:
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
               format: UUID
@@ -2391,7 +2377,7 @@ definitions:
         type: string
       privateDescription:
         type: string
-      challengeSettings:
+      metadata:
         type: array
         items:
           properties:
@@ -2478,22 +2464,9 @@ definitions:
       terms:
         type: array
         items:
-          properties:
-            id:
-              type: integer
-              description: The terms of use id
-            agreeabilityType:
-              type: string
-              description: the terms of use agreeability type
-            title:
-              type: string
-              description: the terms of use title
-            url:
-              type: string
-              description: the terms of use url
-            templateId:
-              type: string
-              description: the template id of the terms of use (only valid when the terms agreeability type is 'Docusignable')
+          type: string
+          description: The terms of use id
+          format: UUID
       numOfSubmissions:
         type: integer
         description: number of submissions

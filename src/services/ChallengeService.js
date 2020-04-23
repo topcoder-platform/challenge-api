@@ -89,7 +89,7 @@ async function searchChallenges (currentUser, criteria) {
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
-    'currentPhaseId', 'currentPhaseName']), (value, key) => {
+    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -97,6 +97,15 @@ async function searchChallenges (currentUser, criteria) {
     }
   })
 
+  if (criteria.forumId) {
+    boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
+  }
+  if (criteria.track) {
+    boolQuery.push({ match_phrase: { 'legacy.track': criteria.track } })
+  }
+  if (criteria.reviewType) {
+    boolQuery.push({ match_phrase: { 'legacy.reviewType': criteria.reviewType } })
+  }
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
@@ -237,7 +246,7 @@ async function searchChallenges (currentUser, criteria) {
     await getPhasesAndPopulate(element)
   })
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result: await populateSettings(result) }
+  return { total, page: criteria.page, perPage: criteria.perPage, result: await populateMetadata(result) }
 }
 
 searchChallenges.schema = {
@@ -291,15 +300,15 @@ async function validateChallengeData (challenge) {
       }
     }
   }
-  if (challenge.challengeSettings) {
-    const list = await helper.scan('ChallengeSetting')
+  if (challenge.metadata) {
+    const list = await helper.scan('ChallengeMetadata')
     const map = new Map()
     _.each(list, e => {
       map.set(e.id, e.name)
     })
-    const invalidSettings = _.filter(challenge.challengeSettings, s => !map.has(s.type))
+    const invalidSettings = _.filter(challenge.metadata, s => !map.has(s.type))
     if (invalidSettings.length > 0) {
-      throw new errors.BadRequestError(`The following settings are invalid: ${helper.toString(invalidSettings)}`)
+      throw new errors.BadRequestError(`The following metadata are invalid: ${helper.toString(invalidSettings)}`)
     }
   }
   if (challenge.timelineTemplateId) {
@@ -407,7 +416,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   await helper.validatePhases(challenge.phases)
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
-  helper.ensureNoDuplicateOrNullElements(challenge.termsIds, 'termsIds')
+  helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
 
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
@@ -417,8 +426,7 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // populate challenge terms
   const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
-  challenge.terms = await helper.getChallengeTerms(_.union(projectTerms, challenge.termsIds))
-  delete challenge.termsIds
+  challenge.terms = await helper.getChallengeTerms(_.union(projectTerms, challenge.terms))
 
   challenge.endDate = helper.calculateChallengeEndDate(challenge)
   const ret = await helper.create('Challenge', _.assign({
@@ -446,11 +454,15 @@ createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object().keys({
     typeId: Joi.id(),
-    track: Joi.string().required(),
+    legacy: Joi.object().keys({
+      track: Joi.string().required(),
+      reviewType: Joi.string().required(),
+      forumId: Joi.number().integer().positive()
+    }).required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
     privateDescription: Joi.string(),
-    challengeSettings: Joi.array().items(Joi.object().keys({
+    metadata: Joi.array().items(Joi.object().keys({
       type: Joi.id(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
@@ -468,16 +480,14 @@ createChallenge.schema = {
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1).required(),
-    reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
-    forumId: Joi.number().integer().positive(),
     startDate: Joi.date().required(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri()),
-    termsIds: Joi.array().items(Joi.id()).default([])
+    terms: Joi.array().items(Joi.id()).default([])
   }).required(),
   userToken: Joi.any()
 }
@@ -487,23 +497,25 @@ createChallenge.schema = {
  * @param {Object|Array} the challenge entities
  * @param {Object|Array} the modified challenge entities
  */
-async function populateSettings (data) {
-  const list = await helper.scan('ChallengeSetting')
+async function populateMetadata (data) {
+  const list = await helper.scan('ChallengeMetadata')
   const map = new Map()
   _.each(list, e => {
     map.set(e.id, e.name)
   })
   if (_.isArray(data)) {
     _.each(data, element => {
-      if (element.challengeSettings) {
-        _.each(element.challengeSettings, s => {
-          s.type = map.get(s.type)
+      if (element.metadata) {
+        _.each(element.metadata, s => {
+          s.name = map.get(s.type)
+          delete s.type
         })
       }
     })
-  } else if (data.challengeSettings) {
-    _.each(data.challengeSettings, s => {
-      s.type = map.get(s.type)
+  } else if (data.metadata) {
+    _.each(data.metadata, s => {
+      s.name = map.get(s.type)
+      delete s.type
     })
   }
   return data
@@ -573,7 +585,7 @@ async function getChallenge (currentUser, id) {
 
   getPhasesAndPopulate(challenge)
 
-  return populateSettings(challenge)
+  return populateMetadata(challenge)
 }
 
 getChallenge.schema = {
@@ -730,18 +742,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   // Validate the challenge terms
   let newTermsOfUse
-  if (!_.isUndefined(data.termsIds)) {
-    helper.ensureNoDuplicateOrNullElements(data.termsIds, 'termsIds')
+  if (!_.isUndefined(data.terms)) {
+    helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
 
     // Get the project default terms
     const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId)
 
     // Make sure that the default project terms were not removed
-    const removedTerms = _.difference(defaultTerms, data.termsIds)
+    const removedTerms = _.difference(defaultTerms, data.terms)
     if (removedTerms.length !== 0) {
       throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
     }
-    newTermsOfUse = await helper.getChallengeTerms(_.union(data.termsIds, defaultTerms))
+    newTermsOfUse = await helper.getChallengeTerms(_.union(data.terms, defaultTerms))
   }
 
   // find out attachment ids to delete
@@ -787,7 +799,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const auditLogs = []
   _.each(data, (value, key) => {
     let op
-    if (key === 'challengeSettings') {
+    if (key === 'metadata') {
       if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
         _.differenceWith(challenge[key], value, _.isEqual).length !== 0) {
         op = '$PUT'
@@ -844,7 +856,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       }
       if (key === 'attachmentIds') {
         updateDetails[op].attachments = newAttachments
-      } else if (key === 'termsIds') {
+      } else if (key === 'terms') {
         updateDetails[op].terms = newTermsOfUse
       } else {
         updateDetails[op][key] = value
@@ -855,7 +867,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         if (key === 'attachmentIds') {
           oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : 'NULL'
           newValue = JSON.stringify(newAttachments)
-        } else if (key === 'termsIds') {
+        } else if (key === 'terms') {
           oldValue = challenge.terms ? JSON.stringify(challenge.terms) : 'NULL'
           newValue = JSON.stringify(newTermsOfUse)
         } else {
@@ -865,7 +877,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         auditLogs.push({
           id: uuid(),
           challengeId,
-          fieldName: key === 'termsIds' ? 'terms' : key,
+          fieldName: key,
           oldValue,
           newValue,
           created: new Date(),
@@ -876,21 +888,21 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     }
   })
 
-  if (isFull && _.isUndefined(data.challengeSettings) && challenge.challengeSettings) {
-    updateDetails['$DELETE'] = { challengeSettings: null }
+  if (isFull && _.isUndefined(data.metadata) && challenge.metadata) {
+    updateDetails['$DELETE'] = { metadata: null }
     auditLogs.push({
       id: uuid(),
       challengeId,
-      fieldName: 'challengeSettings',
-      oldValue: JSON.stringify(challenge.challengeSettings),
+      fieldName: 'metadata',
+      oldValue: JSON.stringify(challenge.metadata),
       newValue: 'NULL',
       created: new Date(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
-    delete challenge.challengeSettings
+    delete challenge.metadata
     // send null to Elasticsearch to clear the field
-    data.challengeSettings = null
+    data.metadata = null
   }
   if (isFull && _.isUndefined(data.attachmentIds) && challenge.attachments) {
     if (!updateDetails['$DELETE']) {
@@ -1000,7 +1012,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   console.log('after creating audit log')
 
   delete data.attachmentIds
-  delete data.termsIds
+  delete data.terms
   if (data.phases) {
     _.each(data.phases, p => {
       delete p.name
@@ -1050,12 +1062,16 @@ fullyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   data: Joi.object().keys({
+    legacy: Joi.object().keys({
+      track: Joi.string().required(),
+      reviewType: Joi.string().required(),
+      forumId: Joi.number().integer().positive()
+    }).required(),
     typeId: Joi.id(),
-    track: Joi.string().required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
     privateDescription: Joi.string(),
-    challengeSettings: Joi.array().items(Joi.object().keys({
+    metadata: Joi.array().items(Joi.object().keys({
       type: Joi.id(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
@@ -1073,11 +1089,9 @@ fullyUpdateChallenge.schema = {
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1).required(),
-    reviewType: Joi.string().required(),
     tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
-    forumId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
@@ -1088,7 +1102,7 @@ fullyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    termsIds: Joi.array().items(Joi.id().optional()).optional().allow([])
+    terms: Joi.array().items(Joi.id().optional()).optional().allow([])
   }).required(),
   userToken: Joi.any()
 }
@@ -1109,12 +1123,16 @@ partiallyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   data: Joi.object().keys({
+    legacy: Joi.object().keys({
+      track: Joi.string().required(),
+      reviewType: Joi.string().required(),
+      forumId: Joi.number().integer().positive()
+    }),
     typeId: Joi.optionalId(),
-    track: Joi.string(),
     name: Joi.string(),
     description: Joi.string(),
     privateDescription: Joi.string(),
-    challengeSettings: Joi.array().items(Joi.object().keys({
+    metadata: Joi.array().items(Joi.object().keys({
       type: Joi.string().required(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
@@ -1133,10 +1151,8 @@ partiallyUpdateChallenge.schema = {
         value: Joi.number().positive().required()
       })).min(1).required()
     })).min(1),
-    reviewType: Joi.string(),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
-    forumId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachmentIds: Joi.array().items(Joi.optionalId()),
@@ -1147,7 +1163,7 @@ partiallyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    termsIds: Joi.array().items(Joi.id().optional()).optional().allow([])
+    terms: Joi.array().items(Joi.id().optional()).optional().allow([])
   }).required(),
   userToken: Joi.any()
 }

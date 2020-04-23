@@ -75,11 +75,11 @@ module.exports = {
       DELETE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_DELETE || 'delete:challenge_type_timeline_templates',
       ALL: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_ALL || 'all:challenge_type_timeline_templates'
     },
-    CHALLENGE_SETTINGS: {
-      READ: process.env.SCOPE_CHALLENGE_SETTINGS_READ || 'read:challenge_settings',
-      CREATE: process.env.SCOPE_CHALLENGE_SETTINGS_CREATE || 'create:challenge_settings',
-      UPDATE: process.env.SCOPE_CHALLENGE_SETTINGS_UPDATE || 'update:challenge_settings',
-      ALL: process.env.SCOPE_CHALLENGE_SETTINGS_ALL || 'all:challenge_settings'
+    CHALLENGE_METADATA: {
+      READ: process.env.SCOPE_CHALLENGE_METADATA_READ || 'read:challenge_metadata',
+      CREATE: process.env.SCOPE_CHALLENGE_METADATA_CREATE || 'create:challenge_metadata',
+      UPDATE: process.env.SCOPE_CHALLENGE_METADATA_UPDATE || 'update:challenge_metadata',
+      ALL: process.env.SCOPE_CHALLENGE_METADATA_ALL || 'all:challenge_metadata'
     },
     CHALLENGE_AUDIT_LOGS: {
       READ: process.env.SCOPE_CHALLENGE_AUDIT_LOGS_READ || 'read:challenge_audit_logs'

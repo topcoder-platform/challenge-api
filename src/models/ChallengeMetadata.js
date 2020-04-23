@@ -1,5 +1,5 @@
 /**
- * This defines ChallengeSetting model.
+ * This defines ChallengeMetadata model.
  */
 
 const dynamoose = require('dynamoose')

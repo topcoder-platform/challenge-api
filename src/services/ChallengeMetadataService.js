@@ -14,8 +14,8 @@ const constants = require('../../app-constants')
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchChallengeSettings (criteria) {
-  const list = await helper.scan('ChallengeSetting')
+async function searchChallengeMetadata (criteria) {
+  const list = await helper.scan('ChallengeMetadata')
   const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name))
   const total = records.length
   const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
@@ -23,7 +23,7 @@ async function searchChallengeSettings (criteria) {
   return { total, page: criteria.page, perPage: criteria.perPage, result }
 }
 
-searchChallengeSettings.schema = {
+searchChallengeMetadata.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage(),
@@ -36,16 +36,16 @@ searchChallengeSettings.schema = {
  * @param {Object} setting the challenge setting to created
  * @returns {Object} the created challenge setting
  */
-async function createChallengeSetting (setting) {
-  await helper.validateDuplicate('ChallengeSetting', 'name', setting.name)
-  const ret = await helper.create('ChallengeSetting', _.assign({ id: uuid() }, setting))
+async function createChallengeMetadata (setting) {
+  await helper.validateDuplicate('ChallengeMetadata', 'name', setting.name)
+  const ret = await helper.create('ChallengeMetadata', _.assign({ id: uuid() }, setting))
 
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeSettingCreated, ret)
+  await helper.postBusEvent(constants.Topics.ChallengeMetadataCreated, ret)
   return ret
 }
 
-createChallengeSetting.schema = {
+createChallengeMetadata.schema = {
   setting: Joi.object().keys({
     name: Joi.string().required()
   }).required()
@@ -56,12 +56,12 @@ createChallengeSetting.schema = {
  * @param {String} id the challenge setting id
  * @returns {Object} the challenge setting with given id
  */
-async function getChallengeSetting (id) {
-  const ret = await helper.getById('ChallengeSetting', id)
+async function getChallengeMetadata (id) {
+  const ret = await helper.getById('ChallengeMetadata', id)
   return ret
 }
 
-getChallengeSetting.schema = {
+getChallengeMetadata.schema = {
   id: Joi.id()
 }
 
@@ -71,18 +71,18 @@ getChallengeSetting.schema = {
  * @param {Object} data the challenge setting data to be updated
  * @returns {Object} the updated challenge setting
  */
-async function updateChallengeSetting (id, data) {
-  const setting = await helper.getById('ChallengeSetting', id)
+async function updateChallengeMetadata (id, data) {
+  const setting = await helper.getById('ChallengeMetadata', id)
   if (setting.name.toLowerCase() !== data.name.toLowerCase()) {
-    await helper.validateDuplicate('ChallengeSetting', 'name', data.name)
+    await helper.validateDuplicate('ChallengeMetadata', 'name', data.name)
   }
   const ret = await helper.update(setting, data)
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeSettingUpdated, ret)
+  await helper.postBusEvent(constants.Topics.ChallengeMetadataUpdated, ret)
   return ret
 }
 
-updateChallengeSetting.schema = {
+updateChallengeMetadata.schema = {
   id: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string().required()
@@ -90,10 +90,10 @@ updateChallengeSetting.schema = {
 }
 
 module.exports = {
-  searchChallengeSettings,
-  createChallengeSetting,
-  getChallengeSetting,
-  updateChallengeSetting
+  searchChallengeMetadata,
+  createChallengeMetadata,
+  getChallengeMetadata,
+  updateChallengeMetadata
 }
 
 logger.buildService(module.exports)

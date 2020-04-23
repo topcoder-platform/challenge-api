@@ -607,12 +607,7 @@ async function getChallengeTerms (termsIds) {
     // Get the terms details from the API
     try {
       const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
-      terms.push(_.assign({
-        id: res.data.id,
-        agreeabilityType: res.data.agreeabilityType,
-        title: res.data.title,
-        url: res.data.url
-      }, _.isNil(res.data.docusignTemplateId) ? null : { templateId: res.data.docusignTemplateId }))
+      terms.push(res.data.id)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
         throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)

@@ -16,7 +16,7 @@ const initDB = async () => {
   for (const challenge of challenges) {
     await challenge.delete()
   }
-  const settings = await helper.scan('ChallengeSetting')
+  const settings = await helper.scan('ChallengeMetadata')
   for (const setting of settings) {
     await setting.delete()
   }
