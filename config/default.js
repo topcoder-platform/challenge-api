@@ -75,12 +75,6 @@ module.exports = {
       DELETE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_DELETE || 'delete:challenge_type_timeline_templates',
       ALL: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_ALL || 'all:challenge_type_timeline_templates'
     },
-    CHALLENGE_METADATA: {
-      READ: process.env.SCOPE_CHALLENGE_METADATA_READ || 'read:challenge_metadata',
-      CREATE: process.env.SCOPE_CHALLENGE_METADATA_CREATE || 'create:challenge_metadata',
-      UPDATE: process.env.SCOPE_CHALLENGE_METADATA_UPDATE || 'update:challenge_metadata',
-      ALL: process.env.SCOPE_CHALLENGE_METADATA_ALL || 'all:challenge_metadata'
-    },
     CHALLENGE_AUDIT_LOGS: {
       READ: process.env.SCOPE_CHALLENGE_AUDIT_LOGS_READ || 'read:challenge_audit_logs'
     },
@@ -104,6 +98,8 @@ module.exports = {
       ALL: process.env.SCOPE_CHALLENGE_ATTACHMENTS_ALL || 'all:challenge_attachments'
     }
   },
+
+  DEFAULT_CONFIDENTIALITY_TYPE: process.env.DEFAULT_CONFIDENTIALITY_TYPE || 'public',
 
   M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'TopcoderService'
 }

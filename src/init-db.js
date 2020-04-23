@@ -16,10 +16,6 @@ const initDB = async () => {
   for (const challenge of challenges) {
     await challenge.delete()
   }
-  const settings = await helper.scan('ChallengeMetadata')
-  for (const setting of settings) {
-    await setting.delete()
-  }
   const typeTimelineTemplates = await helper.scan('ChallengeTypeTimelineTemplate')
   for (const typeTT of typeTimelineTemplates) {
     await typeTT.delete()

@@ -7,7 +7,6 @@ const { SCOPES: {
   CHALLENGES,
   CHALLENGE_TYPES,
   CHALLENGE_TYPE_TIMELINE_TEMPLATES,
-  CHALLENGE_METADATA,
   CHALLENGE_AUDIT_LOGS,
   CHALLENGE_PHASES,
   TIMELINE_TEMPLATES,
@@ -126,39 +125,6 @@ module.exports = {
       auth: 'jwt',
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       scopes: [CHALLENGE_TYPE_TIMELINE_TEMPLATES.DELETE, CHALLENGE_TYPE_TIMELINE_TEMPLATES.ALL]
-    }
-  },
-  '/challenge-metadata': {
-    get: {
-      controller: 'ChallengeMetadataController',
-      method: 'searchChallengeMetadata'
-      // TODO: We may not need auth here. Temporarily disabling auth
-      // auth: 'jwt',
-      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      // scopes: [CHALLENGE_METADATA.READ, CHALLENGE_METADATA.ALL]
-    },
-    post: {
-      controller: 'ChallengeMetadataController',
-      method: 'createChallengeMetadata'
-      // auth: 'jwt',
-      // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      // scopes: [CHALLENGE_METADATA.CREATE, CHALLENGE_METADATA.ALL]
-    }
-  },
-  '/challenge-settings/:challengeMetadataId': {
-    get: {
-      controller: 'ChallengeMetadataController',
-      method: 'getChallengeMetadata',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_METADATA.READ, CHALLENGE_METADATA.ALL]
-    },
-    put: {
-      controller: 'ChallengeMetadataController',
-      method: 'updateChallengeMetadata',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CHALLENGE_METADATA.UPDATE, CHALLENGE_METADATA.ALL]
     }
   },
   '/challenge-audit-logs': {

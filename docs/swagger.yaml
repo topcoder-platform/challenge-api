@@ -650,209 +650,6 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challenge-metadata:
-    get:
-      tags:
-        - ChallengeMetadata
-      description: |
-        Retrieve challenge settings in the system.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - $ref: '#/parameters/page'
-        - $ref: '#/parameters/perPage'
-        - name: name
-          in: query
-          description: Filter by name, case-insensitive, partial matches are allowed.
-          required: false
-          type: string
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/ChallengeMetadata'
-          headers:
-            X-Next-Page:
-              type: integer
-              description: The index of the next page
-            X-Page:
-              type: integer
-              description: The index of the current page (starting at 1)
-            X-Per-Page:
-              type: integer
-              description: The number of items to list per page
-            X-Prev-Page:
-              type: integer
-              description: The index of the previous page
-            X-Total:
-              type: integer
-              description: The total number of items
-            X-Total-Pages:
-              type: integer
-              description: The total number of pages
-            Link:
-              type: string
-              description: Pagination link header.
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            access the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    post:
-      tags:
-        - ChallengeChallengeMetadataSettings
-      description: |
-        Create a new challenge setting in the system.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/ChallengeMetadataData'
-      responses:
-        '201':
-          description: Created - The request was successful and the resource is returned.
-          schema:
-            $ref: '#/definitions/ChallengeMetadata'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            create the challenge settings
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '409':
-          description: >
-            Conflict. Other challenge setting has already used the same name.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/challenge-metadata/:challengeMetadataId':
-    get:
-      tags:
-        - ChallengeMetadata
-      description: Retrieve the Challenge settings with provided challenge settings id.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - name: challengeMetadataId
-          in: path
-          required: true
-          type: string
-          format: UUID
-          description: The id of challenge settings to retrieve
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/ChallengeMetadata'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            access the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '404':
-          description: Challenge setting not found
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    put:
-      tags:
-        - ChallengeMetadata
-      description: Update the challenge settings with the specified id.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - name: challengeMetadataId
-          in: path
-          required: true
-          type: string
-          format: UUID
-          description: The id of ChallengeMetadata to update
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/ChallengeMetadataData'
-      responses:
-        '200':
-          description: Updated - The request was successful and the resource is returned.
-          schema:
-            $ref: '#/definitions/ChallengeMetadata'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            update the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '404':
-          description: Challenge setting not found
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '409':
-          description: >
-            Conflict. Other challenge setting has already used the same name.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
   /challenge-phases:
     get:
       tags:
@@ -1915,18 +1712,6 @@ definitions:
       - $ref: '#/definitions/ChallengeTypeData'
     required:
       - id
-  ChallengeMetadata:
-    type: object
-    allOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            description: The challenge settings id.
-            format: UUID
-      - $ref: '#/definitions/ChallengeMetadataData'
-    required:
-      - id
   Phase:
     type: object
     allOf:
@@ -1982,11 +1767,11 @@ definitions:
       privateDescription:
         type: string
         description: returned only if the user is registered on the challenge.
-      ChallengeMetadata:
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
               example: 'challenge setting name'
@@ -2140,13 +1925,6 @@ definitions:
       - name
       - isActive
       - abbreviation
-  ChallengeMetadataData:
-    type: object
-    properties:
-      name:
-        type: string
-    required:
-      - name
   PhaseData:
     type: object
     properties:
@@ -2381,7 +2159,7 @@ definitions:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
               format: UUID

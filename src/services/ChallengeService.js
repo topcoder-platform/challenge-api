@@ -89,7 +89,7 @@ async function searchChallenges (currentUser, criteria) {
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
-    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType']), (value, key) => {
+    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -105,6 +105,12 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.reviewType) {
     boolQuery.push({ match_phrase: { 'legacy.reviewType': criteria.reviewType } })
+  }
+  if (criteria.confidentialityType) {
+    boolQuery.push({ match_phrase: { 'legacy.confidentialityType': criteria.confidentialityType } })
+  }
+  if (criteria.directProjectId) {
+    boolQuery.push({ match_phrase: { 'legacy.directProjectId': criteria.directProjectId } })
   }
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
@@ -246,7 +252,7 @@ async function searchChallenges (currentUser, criteria) {
     await getPhasesAndPopulate(element)
   })
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result: await populateMetadata(result) }
+  return { total, page: criteria.page, perPage: criteria.perPage, result }
 }
 
 searchChallenges.schema = {
@@ -255,6 +261,8 @@ searchChallenges.schema = {
     page: Joi.page(),
     perPage: Joi.perPage(),
     id: Joi.optionalId(),
+    confidentialityType: Joi.string(),
+    directProjectId: Joi.number(),
     typeId: Joi.optionalId(),
     track: Joi.string(),
     name: Joi.string(),
@@ -298,17 +306,6 @@ async function validateChallengeData (challenge) {
       } else {
         throw e
       }
-    }
-  }
-  if (challenge.metadata) {
-    const list = await helper.scan('ChallengeMetadata')
-    const map = new Map()
-    _.each(list, e => {
-      map.set(e.id, e.name)
-    })
-    const invalidSettings = _.filter(challenge.metadata, s => !map.has(s.type))
-    if (invalidSettings.length > 0) {
-      throw new errors.BadRequestError(`The following metadata are invalid: ${helper.toString(invalidSettings)}`)
     }
   }
   if (challenge.timelineTemplateId) {
@@ -457,13 +454,14 @@ createChallenge.schema = {
     legacy: Joi.object().keys({
       track: Joi.string().required(),
       reviewType: Joi.string().required(),
+      confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer().positive()
     }).required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      type: Joi.id(),
+      name: Joi.id(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
     timelineTemplateId: Joi.id(),
@@ -490,35 +488,6 @@ createChallenge.schema = {
     terms: Joi.array().items(Joi.id()).default([])
   }).required(),
   userToken: Joi.any()
-}
-
-/**
- * Populate challenge settings data.
- * @param {Object|Array} the challenge entities
- * @param {Object|Array} the modified challenge entities
- */
-async function populateMetadata (data) {
-  const list = await helper.scan('ChallengeMetadata')
-  const map = new Map()
-  _.each(list, e => {
-    map.set(e.id, e.name)
-  })
-  if (_.isArray(data)) {
-    _.each(data, element => {
-      if (element.metadata) {
-        _.each(element.metadata, s => {
-          s.name = map.get(s.type)
-          delete s.type
-        })
-      }
-    })
-  } else if (data.metadata) {
-    _.each(data.metadata, s => {
-      s.name = map.get(s.type)
-      delete s.type
-    })
-  }
-  return data
 }
 
 /**
@@ -585,7 +554,7 @@ async function getChallenge (currentUser, id) {
 
   getPhasesAndPopulate(challenge)
 
-  return populateMetadata(challenge)
+  return challenge
 }
 
 getChallenge.schema = {
@@ -1065,6 +1034,8 @@ fullyUpdateChallenge.schema = {
     legacy: Joi.object().keys({
       track: Joi.string().required(),
       reviewType: Joi.string().required(),
+      confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+      directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive()
     }).required(),
     typeId: Joi.id(),
@@ -1072,7 +1043,7 @@ fullyUpdateChallenge.schema = {
     description: Joi.string().required(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      type: Joi.id(),
+      name: Joi.id(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
     timelineTemplateId: Joi.id(),
@@ -1126,6 +1097,8 @@ partiallyUpdateChallenge.schema = {
     legacy: Joi.object().keys({
       track: Joi.string().required(),
       reviewType: Joi.string().required(),
+      confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+      directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive()
     }),
     typeId: Joi.optionalId(),
@@ -1133,7 +1106,7 @@ partiallyUpdateChallenge.schema = {
     description: Joi.string(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      type: Joi.string().required(),
+      name: Joi.string().required(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
     timelineTemplateId: Joi.optionalId(),

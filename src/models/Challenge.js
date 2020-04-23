@@ -63,7 +63,7 @@ const schema = new Schema({
   },
   projectId: {
     type: Number,
-    required: true
+    required: false
   },
   startDate: {
     type: Date,
@@ -112,7 +112,10 @@ const schema = new Schema({
     required: false
   }
 },
-{ throughput: 'ON_DEMAND' }
+{
+  throughput: 'ON_DEMAND',
+  useDocumentTypes: true
+}
 )
 
 module.exports = schema
