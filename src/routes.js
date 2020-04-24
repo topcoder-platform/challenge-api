@@ -7,6 +7,7 @@ const { SCOPES: {
   READ,
   CREATE,
   UPDATE,
+  DELETE,
   ALL
 } } = require('config')
 
@@ -121,7 +122,7 @@ module.exports = {
       method: 'deleteChallengeTypeTimelineTemplate',
       auth: 'jwt',
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [DELETE, .LL]
+      scopes: [DELETE, ALL]
     }
   },
   '/challenge-audit-logs': {

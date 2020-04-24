@@ -60,6 +60,7 @@ module.exports = {
     READ: process.env.SCOPE_CHALLENGES_READ || 'read:challenges',
     CREATE: process.env.SCOPE_CHALLENGES_CREATE || 'create:challenges',
     UPDATE: process.env.SCOPE_CHALLENGES_UPDATE || 'update:challenges',
+    DELETE: process.env.SCOPE_CHALLENGES_DELETE || 'delete:challenges',
     ALL: process.env.SCOPE_CHALLENGES_ALL || 'all:challenges'
   },
 
