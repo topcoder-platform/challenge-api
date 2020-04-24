@@ -15,14 +15,17 @@
       },
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "defaultDuration": 24
       },
       {
         "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+        "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "defaultDuration": 12
       },
       {
         "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+        "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
         "defaultDuration": 12
       }
     ]
