@@ -57,46 +57,10 @@ module.exports = {
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
 
   SCOPES: {
-    CHALLENGES: {
-      READ: process.env.SCOPE_CHALLENGES_READ || 'read:challenges',
-      CREATE: process.env.SCOPE_CHALLENGES_CREATE || 'create:challenges',
-      UPDATE: process.env.SCOPE_CHALLENGES_UPDATE || 'update:challenges',
-      ALL: process.env.SCOPE_CHALLENGES_ALL || 'all:challenges'
-    },
-    CHALLENGE_TYPES: {
-      CREATE: process.env.SCOPE_CHALLENGE_TYPES_CREATE || 'create:challenge_types',
-      UPDATE: process.env.SCOPE_CHALLENGE_TYPES_UPDATE || 'update:challenge_types',
-      ALL: process.env.SCOPE_CHALLENGE_TYPES_ALL || 'all:challenge_types'
-    },
-    CHALLENGE_TYPE_TIMELINE_TEMPLATES: {
-      READ: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_READ || 'read:challenge_type_timeline_templates',
-      CREATE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_CREATE || 'create:challenge_type_timeline_templates',
-      UPDATE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_UPDATE || 'update:challenge_type_timeline_templates',
-      DELETE: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_DELETE || 'delete:challenge_type_timeline_templates',
-      ALL: process.env.SCOPE_CHALLENGE_TYPE_TIMELINE_TEMPLATES_ALL || 'all:challenge_type_timeline_templates'
-    },
-    CHALLENGE_AUDIT_LOGS: {
-      READ: process.env.SCOPE_CHALLENGE_AUDIT_LOGS_READ || 'read:challenge_audit_logs'
-    },
-    CHALLENGE_PHASES: {
-      READ: process.env.SCOPE_CHALLENGE_PHASES_READ || 'read:challenge_phases',
-      CREATE: process.env.SCOPE_CHALLENGE_PHASES_CREATE || 'create:challenge_phases',
-      DELETE: process.env.SCOPE_CHALLENGE_PHASES_DELETE || 'delete:challenge_phases',
-      UPDATE: process.env.SCOPE_CHALLENGE_PHASES_UPDATE || 'update:challenge_phases',
-      ALL: process.env.SCOPE_CHALLENGE_PHASES_ALL || 'all:challenge_phases'
-    },
-    TIMELINE_TEMPLATES: {
-      READ: process.env.SCOPE_TIMELINE_TEMPLATES_READ || 'read:timeline_templates',
-      CREATE: process.env.SCOPE_TIMELINE_TEMPLATES_CREATE || 'create:timeline_templates',
-      DELETE: process.env.SCOPE_TIMELINE_TEMPLATES_DELETE || 'delete:timeline_templates',
-      UPDATE: process.env.SCOPE_TIMELINE_TEMPLATES_UPDATE || 'update:timeline_templates',
-      ALL: process.env.SCOPE_TIMELINE_TEMPLATES_ALL || 'all:timeline_templates'
-    },
-    CHALLENGE_ATTACHMENTS: {
-      READ: process.env.SCOPE_CHALLENGE_ATTACHMENTS_READ || 'read:challenge_attachments',
-      CREATE: process.env.SCOPE_CHALLENGE_ATTACHMENTS_CREATE || 'create:challenge_attachments',
-      ALL: process.env.SCOPE_CHALLENGE_ATTACHMENTS_ALL || 'all:challenge_attachments'
-    }
+    READ: process.env.SCOPE_CHALLENGES_READ || 'read:challenges',
+    CREATE: process.env.SCOPE_CHALLENGES_CREATE || 'create:challenges',
+    UPDATE: process.env.SCOPE_CHALLENGES_UPDATE || 'update:challenges',
+    ALL: process.env.SCOPE_CHALLENGES_ALL || 'all:challenges'
   },
 
   DEFAULT_CONFIDENTIALITY_TYPE: process.env.DEFAULT_CONFIDENTIALITY_TYPE || 'public',
