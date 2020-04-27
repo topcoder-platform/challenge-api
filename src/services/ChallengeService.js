@@ -26,15 +26,11 @@ const esClient = helper.getESClient()
 async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
-  console.log('currentUser', currentUser)
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
-  console.log('needToCheckForGroupAccess', needToCheckForGroupAccess)
   for (const challenge of challenges) {
     challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
-    console.log('challenge.groups', challenge.groups)
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
-      console.log('Has access')
     } else if (currentUser) {
       // get user groups if not yet
       if (_.isNil(userGroups)) {
@@ -455,7 +451,8 @@ createChallenge.schema = {
       track: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
-      forumId: Joi.number().integer().positive()
+      forumId: Joi.number().integer().positive(),
+      informixModified: Joi.string()
     }).required(),
     name: Joi.string().required(),
     description: Joi.string().required(),
@@ -685,25 +682,19 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
   helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
-  console.log('Before fetching challenge')
   const challenge = await helper.getById('Challenge', challengeId)
-  console.log('After fetching challenge')
   // check groups authorization
-  console.log('Before checking group access')
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
-  console.log('After checking group access')
 
   // check groups access to be updated group values
   if (data.groups) {
     await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
   }
 
-  console.log('before fetching attachments')
   let newAttachments
   if (isFull || !_.isUndefined(data.attachmentIds)) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
-  console.log('after fetching attachments')
 
   if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase()) {
     throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
@@ -735,33 +726,26 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     })
   }
 
-  console.log('before validateChallengeData(data)')
   await validateChallengeData(data)
   if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Canceled) && data.status && data.status !== challenge.status) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
-  console.log('after validateChallengeData(data)')
 
   if (data.winners && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
   }
 
-  console.log('before validatePhases(data.phases)')
   if (data.phases) {
     await helper.validatePhases(data.phases)
     // populate phases
     await populatePhases(data.phases, data.startDate || challenge.startDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
-  console.log('after validatePhases(data.phases)')
 
-  console.log('before validateWinners(data.winners)')
   if (data.winners && data.winners.length) {
     await validateWinners(data.winners)
   }
-  console.log('after validateWinners(data.winners)')
 
-  console.log('before constructing the query')
   data.updated = new Date()
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
@@ -968,17 +952,12 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     // send null to Elasticsearch to clear the field
     data.winners = null
   }
-  console.log('after constructing the query')
 
-  console.log('before update')
   await models.Challenge.update({ id: challengeId }, updateDetails)
-  console.log('after update')
-  console.log('before creating audit log')
 
   if (auditLogs.length > 0) {
     await models.AuditLog.batchPut(auditLogs)
   }
-  console.log('after creating audit log')
 
   delete data.attachmentIds
   delete data.terms
@@ -1036,7 +1015,8 @@ fullyUpdateChallenge.schema = {
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
-      forumId: Joi.number().integer().positive()
+      forumId: Joi.number().integer().positive(),
+      informixModified: Joi.string()
     }).required(),
     typeId: Joi.id(),
     name: Joi.string().required(),
@@ -1099,7 +1079,8 @@ partiallyUpdateChallenge.schema = {
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
-      forumId: Joi.number().integer().positive()
+      forumId: Joi.number().integer().positive(),
+      informixModified: Joi.string()
     }),
     typeId: Joi.optionalId(),
     name: Joi.string(),

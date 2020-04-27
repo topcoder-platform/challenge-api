@@ -53,7 +53,6 @@ module.exports = (app) => {
               next()
             }
           } else {
-            console.log(req.authUser)
             req.authUser.userId = String(req.authUser.userId)
             // User roles authorization
             if (req.authUser.roles) {
