@@ -12,7 +12,7 @@ const app = require('../../app')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challengePhases`
+const basePath = `/${config.API_VERSION}/challenge-phases`
 
 describe('phase API E2E tests', () => {
   // created entity ids

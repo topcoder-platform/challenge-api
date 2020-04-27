@@ -17,6 +17,7 @@ const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 const moment = require('moment')
 const HttpStatus = require('http-status-codes')
+const xss = require('xss')
 
 // Bus API Client
 let busApiClient
@@ -301,7 +302,8 @@ async function scan (modelName, scanParams) {
 function partialMatch (filter, value) {
   if (filter) {
     if (value) {
-      return RegExp(filter, 'i').test(value)
+      const filtered = xss(filter)
+      return value.includes(filtered)
     } else {
       return false
     }
@@ -605,12 +607,7 @@ async function getChallengeTerms (termsIds) {
     // Get the terms details from the API
     try {
       const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
-      terms.push(_.assign({
-        id: res.data.id,
-        agreeabilityType: res.data.agreeabilityType,
-        title: res.data.title,
-        url: res.data.url
-      }, _.isNil(res.data.docusignTemplateId) ? null : { templateId: res.data.docusignTemplateId }))
+      terms.push(res.data.id)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
         throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)

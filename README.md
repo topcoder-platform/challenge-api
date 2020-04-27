@@ -34,6 +34,7 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 Configuration for the application is at `config/default.js`.
 The following parameters can be set in config files or in env variables:
 
+- READONLY: sets the API in read-only mode. POST/PUT/PATCH/DELETE operations will return 403 Forbidden
 - LOG_LEVEL: the log level, default is 'debug'
 - PORT: the server port, default is 3000
 - AUTH_SECRET: The authorization secret used during token verification.
@@ -75,7 +76,7 @@ You can find sample `.env` files inside the `/docs` directory.
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
 4. Initialize/Clear database in default environment: `npm run init-db`
-5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `ChallengeSetting`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
+5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
 6. Create Elasticsearch index: `npm run init-db`, or to re-create index: `npm run init-db force`
 7. Synchronize ES data and DynamoDB data: `npm run sync-es`
 

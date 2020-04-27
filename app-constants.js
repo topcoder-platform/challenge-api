@@ -30,8 +30,6 @@ const Topics = {
   ChallengeUpdated: 'challenge.notification.update',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
-  ChallengeSettingCreated: 'test.new.bus.events', // 'challenge.action.setting.created',
-  ChallengeSettingUpdated: 'test.new.bus.events', // 'challenge.action.setting.updated',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
   ChallengePhaseUpdated: 'test.new.bus.events', // 'challenge.action.phase.updated',
   ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',

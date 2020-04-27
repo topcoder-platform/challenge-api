@@ -54,6 +54,7 @@
     "topcoder-bus-api-wrapper": "topcoder-platform/tc-bus-api-wrapper.git",
     "uuid": "^3.3.2",
     "winston": "^3.1.0",
+    "xss": "^1.0.6",
     "yamljs": "^0.3.0"
   },
   "standard": {
