@@ -81,7 +81,6 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
  * @returns {Object} the search result
  */
 async function searchChallenges (currentUser, criteria) {
-  await validateSortQueryFields(criteria)
   // construct ES query
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
@@ -288,23 +287,9 @@ searchChallenges.schema = {
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
     memberId: Joi.number().integer().positive(),
-    sortBy: Joi.string()
+    sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
+    sortOrder: Joi.string().valid(['asc', 'desc'])
   })
-}
-
-
-async function validateSortQueryFields (criteria) {
-  let allowedFields = ['updatedBy', 'updated', 'createdBy', 'created', 'endDate', 'startDate', 'projectId', 'name', 'typeId']
-  if (criteria.sortBy) {
-    if (!allowedFields.includes(criteria.sortBy)) {
-      throw new errors.BadRequestError(`Not allowed to sort challenges by the field: ${criteria.sortBy}.`)
-    }
-  }
-  if (criteria.sortOrder) {
-    if (criteria.sortOrder !== 'asc' && criteria.sortOrder !== 'desc') {
-      throw new errors.BadRequestError(`Sort order should be valid`)
-    }
-  }
 }
 
 /**
