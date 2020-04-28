@@ -991,10 +991,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await attachment.delete()
   }
 
-  const result = isFull ? challenge : _.assignIn({ id: challengeId, legacyId: challenge.legacyId }, data)
-
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, result)
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
   return challenge
 }
 
