@@ -10,7 +10,6 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 - [Swagger](https://api.topcoder.com/v5/challenges/docs/)
 
 ## Intended use
-
 - Production API
 
 ## Related repos
