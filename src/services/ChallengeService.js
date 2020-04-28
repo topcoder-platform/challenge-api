@@ -81,11 +81,12 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
  * @returns {Object} the search result
  */
 async function searchChallenges (currentUser, criteria) {
+  await validateSortQueryFields(criteria)
   // construct ES query
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
-    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy']), (value, key) => {
+    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -148,6 +149,7 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ range: { endDate: { lte: criteria.endDateEnd } } })
   }
   const sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
+  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'asc'
 
   const mustQuery = []
 
@@ -198,7 +200,7 @@ async function searchChallenges (currentUser, criteria) {
       } : {
         match_all: {}
       },
-      sort: [{ [sortByProp]: { 'order': 'asc', 'missing': '_last', 'unmapped_type': 'String' } }]
+      sort: [{ [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
 
@@ -288,6 +290,21 @@ searchChallenges.schema = {
     memberId: Joi.number().integer().positive(),
     sortBy: Joi.string()
   })
+}
+
+
+async function validateSortQueryFields (criteria) {
+  let allowedFields = ['updatedBy', 'updated', 'createdBy', 'created', 'endDate', 'startDate', 'projectId', 'name', 'typeId']
+  if (criteria.sortBy) {
+    if (!allowedFields.includes(criteria.sortBy)) {
+      throw new errors.BadRequestError(`Not allowed to sort challenges by the field: ${criteria.sortBy}.`)
+    }
+  }
+  if (criteria.sortOrder) {
+    if (criteria.sortOrder !== 'asc' && criteria.sortOrder !== 'desc') {
+      throw new errors.BadRequestError(`Sort order should be valid`)
+    }
+  }
 }
 
 /**
