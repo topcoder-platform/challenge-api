@@ -85,7 +85,7 @@ async function searchChallenges (currentUser, criteria) {
   const boolQuery = []
   _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
-    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId']), (value, key) => {
+    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -147,6 +147,8 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.endDateEnd) {
     boolQuery.push({ range: { endDate: { lte: criteria.endDateEnd } } })
   }
+  const sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
+  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'asc'
 
   const mustQuery = []
 
@@ -197,7 +199,7 @@ async function searchChallenges (currentUser, criteria) {
       } : {
         match_all: {}
       },
-      sort: [{ 'created': { 'order': 'asc', 'missing': '_last', 'unmapped_type': 'String' } }]
+      sort: [{ [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
 
@@ -284,7 +286,9 @@ searchChallenges.schema = {
     updatedDateEnd: Joi.date(),
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
-    memberId: Joi.number().integer().positive()
+    memberId: Joi.number().integer().positive(),
+    sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
+    sortOrder: Joi.string().valid(['asc', 'desc'])
   })
 }
 
