@@ -20,6 +20,18 @@ const challengeStatuses = {
   Completed: 'Completed'
 }
 
+const validChallengeParams = {
+  UpdatedBy: 'updatedBy',
+  Updated: 'updated',
+  CreatedBy: 'createdBy',
+  Created: 'created',
+  EndDate: 'endDate',
+  StartDate: 'startDate',
+  ProjectId: 'projectId',
+  Name: 'name',
+  TypeId: 'typeId'
+}
+
 const EVENT_ORIGINATOR = 'topcoder-challenges-api'
 
 const EVENT_MIME_TYPE = 'application/json'
@@ -45,6 +57,7 @@ module.exports = {
   UserRoles,
   prizeSetTypes,
   challengeStatuses,
+  validChallengeParams,
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
   Topics

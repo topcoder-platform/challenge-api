@@ -195,6 +195,16 @@ paths:
           description: Filter by member, only return challenges this member can access to
           required: false
           type: string
+        - name: sortBy
+          in: query
+          description: Sort the results by the field.
+          required: false
+          type: string
+        - name: sortOrder
+          in: query
+          description: Order the results by the asc/desc.
+          required: false
+          type: string
       responses:
         '200':
           description: OK
