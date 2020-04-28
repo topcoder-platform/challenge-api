@@ -14,6 +14,7 @@ const prizeSetTypes = {
 }
 
 const challengeStatuses = {
+  New: 'New',
   Draft: 'Draft',
   Canceled: 'Canceled',
   Active: 'Active',
