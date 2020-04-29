@@ -1002,6 +1002,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
+    console.log('will populate phases')
     await getPhasesAndPopulate(challenge)
   }
 
