@@ -1001,6 +1001,10 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await attachment.delete()
   }
 
+  if (challenge.phases && challenge.phases.length > 0) {
+    getPhasesAndPopulate(challenge)
+  }
+
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
   return challenge
