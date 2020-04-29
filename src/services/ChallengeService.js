@@ -562,7 +562,7 @@ async function getChallenge (currentUser, id) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    getPhasesAndPopulate(challenge)
+    await getPhasesAndPopulate(challenge)
   }
 
   return challenge
@@ -1002,7 +1002,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    getPhasesAndPopulate(challenge)
+    await getPhasesAndPopulate(challenge)
   }
 
   // post bus event
