@@ -967,7 +967,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.winners = null
   }
 
-  logger.debug('Challenge.update', { id: challengeId }, updateDetails)
+  logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
   if (auditLogs.length > 0) {
