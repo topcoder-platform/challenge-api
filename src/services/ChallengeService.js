@@ -697,6 +697,15 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+
+  // FIXME: Tech Dept
+  if (_.get(challenge, 'legacy.track') && _.get(data, 'legacy.track') && _.get(challenge, 'legacy.track') !== _.get(data, 'legacy.track')) {
+    throw new errors.ForbiddenError('Cannot change legacy.track')
+  }
+  if (_.get(challenge, 'typeId') && _.get(data, 'typeId') && _.get(challenge, 'typeId') !== _.get(data, 'typeId')) {
+    throw new errors.ForbiddenError('Cannot change typeId')
+  }
+
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
@@ -1003,7 +1012,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    console.log('will populate phases')
     await getPhasesAndPopulate(challenge)
   }
 
