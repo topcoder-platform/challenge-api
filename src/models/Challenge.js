@@ -18,7 +18,7 @@ const schema = new Schema({
   },
   typeId: {
     type: String,
-    required: true
+    required: false
   },
   legacy: {
     type: Object,
@@ -30,7 +30,7 @@ const schema = new Schema({
   },
   description: {
     type: String,
-    required: true
+    required: false
   },
   privateDescription: {
     type: String,
@@ -42,11 +42,11 @@ const schema = new Schema({
   },
   timelineTemplateId: {
     type: String,
-    required: true
+    required: false
   },
   phases: {
     type: Array,
-    required: true
+    required: false
   },
   terms: {
     type: Array,
@@ -54,12 +54,12 @@ const schema = new Schema({
   },
   prizeSets: {
     type: [Object],
-    required: true
+    required: false
   },
   // tag names
   tags: {
     type: Array,
-    required: true
+    required: false
   },
   projectId: {
     type: Number,
@@ -67,11 +67,11 @@ const schema = new Schema({
   },
   startDate: {
     type: Date,
-    required: true
+    required: false
   },
   endDate: {
     type: Date,
-    required: true
+    required: false
   },
   status: {
     type: String,

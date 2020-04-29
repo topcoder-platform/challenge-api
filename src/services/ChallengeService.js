@@ -410,7 +410,9 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
 async function createChallenge (currentUser, challenge, userToken) {
   await helper.ensureProjectExist(challenge.projectId, userToken)
   await validateChallengeData(challenge)
-  await helper.validatePhases(challenge.phases)
+  if (challenge.phases && challenge.phases.length > 0) {
+    await helper.validatePhases(challenge.phases)
+  }
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
   helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
@@ -419,13 +421,17 @@ async function createChallenge (currentUser, challenge, userToken) {
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
-  await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
+  if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
+    await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
+  }
 
   // populate challenge terms
   const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
   challenge.terms = await helper.getChallengeTerms(_.union(projectTerms, challenge.terms))
 
-  challenge.endDate = helper.calculateChallengeEndDate(challenge)
+  if (challenge.phases && challenge.phases.length > 0) {
+    challenge.endDate = helper.calculateChallengeEndDate(challenge)
+  }
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
     created: new Date(),
@@ -450,26 +456,26 @@ async function createChallenge (currentUser, challenge, userToken) {
 createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object().keys({
-    typeId: Joi.id(),
+    typeId: Joi.optionalId(),
     legacy: Joi.object().keys({
       track: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer().positive(),
       informixModified: Joi.string()
-    }).required(),
+    }),
     name: Joi.string().required(),
-    description: Joi.string().required(),
+    description: Joi.string(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.id(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
-    timelineTemplateId: Joi.id(),
+    timelineTemplateId: Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
-    })).min(1).required(),
+    })),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
@@ -478,11 +484,11 @@ createChallenge.schema = {
         type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
-    })).min(1).required(),
-    tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
+    })),
+    tags: Joi.array().items(Joi.string().required()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
-    startDate: Joi.date().required(),
+    startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri()),
@@ -531,13 +537,15 @@ async function getChallenge (currentUser, id) {
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
   // FIXME: Temporarily hard coded as the migrad
   // populate type property based on the typeId
-  try {
-    const type = await helper.getById('ChallengeType', challenge.typeId)
-    challenge.type = type.name
-  } catch (e) {
-    challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10'
-    const type = await helper.getById('ChallengeType', challenge.typeId)
-    challenge.type = type.name
+  if (challenge.typeId) {
+    try {
+      const type = await helper.getById('ChallengeType', challenge.typeId)
+      challenge.type = type.name
+    } catch (e) {
+      challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10'
+      const type = await helper.getById('ChallengeType', challenge.typeId)
+      challenge.type = type.name
+    }
   }
   // delete challenge.typeId
 
@@ -553,7 +561,9 @@ async function getChallenge (currentUser, id) {
     _.unset(challenge, 'privateDescription')
   }
 
-  getPhasesAndPopulate(challenge)
+  if (challenge.phases && challenge.phases.length > 0) {
+    getPhasesAndPopulate(challenge)
+  }
 
   return challenge
 }
@@ -569,7 +579,7 @@ getChallenge.schema = {
  * @param {Array} otherPhases the second phases array
  * @returns {Boolean} true if different, false otherwise
  */
-function isDifferentPhases (phases, otherPhases) {
+function isDifferentPhases (phases = [], otherPhases) {
   if (phases.length !== otherPhases.length) {
     return true
   } else {
@@ -619,7 +629,7 @@ function isSamePrizeArray (prizes, otherPrizes) {
  * @param {Array} otherPrizeSets the second PrizeSet Array
  * @returns {Boolean} true if different, false otherwise
  */
-function isDifferentPrizeSets (prizeSets, otherPrizeSets) {
+function isDifferentPrizeSets (prizeSets = [], otherPrizeSets) {
   const length = otherPrizeSets.length
   if (prizeSets.length === otherPrizeSets.length) {
     let used = Array(length).fill(false)
@@ -1019,20 +1029,20 @@ fullyUpdateChallenge.schema = {
       directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive(),
       informixModified: Joi.string()
-    }).required(),
-    typeId: Joi.id(),
+    }),
+    typeId: Joi.optionalId(),
     name: Joi.string().required(),
-    description: Joi.string().required(),
+    description: Joi.string(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.id(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
-    timelineTemplateId: Joi.id(),
+    timelineTemplateId: Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
-    })).min(1).required(),
+    })),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
@@ -1041,8 +1051,8 @@ fullyUpdateChallenge.schema = {
         type: Joi.string().required(),
         value: Joi.number().positive().required()
       })).min(1).required()
-    })).min(1).required(),
-    tags: Joi.array().items(Joi.string().required()).min(1).required(), // tag names
+    })),
+    tags: Joi.array().items(Joi.string().required()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),

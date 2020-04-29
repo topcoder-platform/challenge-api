@@ -546,7 +546,7 @@ function calculateChallengeEndDate (challenge, data) {
   if (!phase || (!data.startDate && !challenge.startDate)) {
     return data.startDate || challenge.startDate
   }
-  const phases = challenge.phases.reduce((obj, elem) => {
+  const phases = (challenge.phases || []).reduce((obj, elem) => {
     obj[elem.id] = elem
     return obj
   }, {})
