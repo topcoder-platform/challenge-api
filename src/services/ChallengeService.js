@@ -976,6 +976,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.winners = null
   }
 
+  logger.debug('Challenge.update', { id: challengeId }, updateDetails)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
   if (auditLogs.length > 0) {
@@ -1015,6 +1016,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   // post bus event
+  logger.debug('Post Bus Event', constants.Topics.ChallengeUpdated, challenge)
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
   return challenge
 }
