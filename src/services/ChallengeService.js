@@ -1016,7 +1016,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   // post bus event
-  logger.debug('Post Bus Event', constants.Topics.ChallengeUpdated, challenge)
+  logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
   return challenge
 }
