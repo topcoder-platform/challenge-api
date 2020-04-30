@@ -707,6 +707,10 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     throw new errors.ForbiddenError('Cannot change typeId')
   }
 
+  if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
+    _.extend(challenge.legacy, data.legacy)
+  }
+
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
@@ -1039,8 +1043,7 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      track: Joi.string().required(),
-      reviewType: Joi.string().required(),
+      reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive(),
@@ -1103,8 +1106,7 @@ partiallyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      track: Joi.string().required(),
-      reviewType: Joi.string().required(),
+      reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive(),
