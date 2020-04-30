@@ -156,9 +156,10 @@ async function searchChallenges (currentUser, criteria) {
 
   const accessQuery = []
 
-  if (!_.isUndefined(currentUser) && currentUser.handle) {
-    accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
-  }
+  // FIXME: This is wrong!
+  // if (!_.isUndefined(currentUser) && currentUser.handle) {
+  //   accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
+  // }
 
   if (_.isUndefined(currentUser)) {
     mustNotQuery = { exists: { field: 'groups' } }
