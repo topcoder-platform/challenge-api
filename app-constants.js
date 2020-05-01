@@ -14,10 +14,23 @@ const prizeSetTypes = {
 }
 
 const challengeStatuses = {
+  New: 'New',
   Draft: 'Draft',
   Canceled: 'Canceled',
   Active: 'Active',
   Completed: 'Completed'
+}
+
+const validChallengeParams = {
+  UpdatedBy: 'updatedBy',
+  Updated: 'updated',
+  CreatedBy: 'createdBy',
+  Created: 'created',
+  EndDate: 'endDate',
+  StartDate: 'startDate',
+  ProjectId: 'projectId',
+  Name: 'name',
+  TypeId: 'typeId'
 }
 
 const EVENT_ORIGINATOR = 'topcoder-challenges-api'
@@ -30,8 +43,6 @@ const Topics = {
   ChallengeUpdated: 'challenge.notification.update',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
-  ChallengeSettingCreated: 'test.new.bus.events', // 'challenge.action.setting.created',
-  ChallengeSettingUpdated: 'test.new.bus.events', // 'challenge.action.setting.updated',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
   ChallengePhaseUpdated: 'test.new.bus.events', // 'challenge.action.phase.updated',
   ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',
@@ -47,6 +58,7 @@ module.exports = {
   UserRoles,
   prizeSetTypes,
   challengeStatuses,
+  validChallengeParams,
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
   Topics

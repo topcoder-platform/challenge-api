@@ -303,7 +303,7 @@ function partialMatch (filter, value) {
   if (filter) {
     if (value) {
       const filtered = xss(filter)
-      return value.includes(filtered)
+      return _.toLowerCase(value).includes(_.toLowerCase(filtered))
     } else {
       return false
     }
@@ -546,7 +546,7 @@ function calculateChallengeEndDate (challenge, data) {
   if (!phase || (!data.startDate && !challenge.startDate)) {
     return data.startDate || challenge.startDate
   }
-  const phases = challenge.phases.reduce((obj, elem) => {
+  const phases = (challenge.phases || []).reduce((obj, elem) => {
     obj[elem.id] = elem
     return obj
   }, {})
@@ -607,12 +607,7 @@ async function getChallengeTerms (termsIds) {
     // Get the terms details from the API
     try {
       const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
-      terms.push(_.assign({
-        id: res.data.id,
-        agreeabilityType: res.data.agreeabilityType,
-        title: res.data.title,
-        url: res.data.url
-      }, _.isNil(res.data.docusignTemplateId) ? null : { templateId: res.data.docusignTemplateId }))
+      terms.push(res.data.id)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
         throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)

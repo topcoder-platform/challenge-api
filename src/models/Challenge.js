@@ -18,11 +18,11 @@ const schema = new Schema({
   },
   typeId: {
     type: String,
-    required: true
+    required: false
   },
-  track: {
-    type: String,
-    required: true
+  legacy: {
+    type: Object,
+    required: false
   },
   name: {
     type: String,
@@ -30,56 +30,48 @@ const schema = new Schema({
   },
   description: {
     type: String,
-    required: true
+    required: false
   },
   privateDescription: {
     type: String,
     required: false
   },
-  challengeSettings: {
+  metadata: {
     type: [Object],
     required: false
   },
   timelineTemplateId: {
     type: String,
-    required: true
+    required: false
   },
   phases: {
     type: Array,
-    required: true
+    required: false
   },
   terms: {
-    type: [Object],
+    type: Array,
     required: false
   },
   prizeSets: {
     type: [Object],
-    required: true
-  },
-  reviewType: {
-    type: String,
-    required: true
+    required: false
   },
   // tag names
   tags: {
     type: Array,
-    required: true
+    required: false
   },
   projectId: {
-    type: Number,
-    required: true
-  },
-  forumId: {
     type: Number,
     required: false
   },
   startDate: {
     type: Date,
-    required: true
+    required: false
   },
   endDate: {
     type: Date,
-    required: true
+    required: false
   },
   status: {
     type: String,
@@ -120,7 +112,10 @@ const schema = new Schema({
     required: false
   }
 },
-{ throughput: 'ON_DEMAND' }
+{
+  throughput: 'ON_DEMAND',
+  useDocumentTypes: true
+}
 )
 
 module.exports = schema

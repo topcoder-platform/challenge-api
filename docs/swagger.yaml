@@ -116,7 +116,7 @@ paths:
           description: Filter by status, case-insensitive, partial matches are allowed.
           required: false
           type: string
-          enum: ['Draft', 'Canceled', 'Active', 'Completed']
+          enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
         - name: currentPhaseId
           in: query
           description: Filter by id of the current phase
@@ -193,6 +193,16 @@ paths:
         - name: memberId
           in: query
           description: Filter by member, only return challenges this member can access to
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          description: Sort the results by the field.
+          required: false
+          type: string
+        - name: sortOrder
+          in: query
+          description: Order the results by the asc/desc.
           required: false
           type: string
       responses:
@@ -644,209 +654,6 @@ paths:
         '409':
           description: >
             Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  /challenge-settings:
-    get:
-      tags:
-        - ChallengeSettings
-      description: |
-        Retrieve challenge settings in the system.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - $ref: '#/parameters/page'
-        - $ref: '#/parameters/perPage'
-        - name: name
-          in: query
-          description: Filter by name, case-insensitive, partial matches are allowed.
-          required: false
-          type: string
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/ChallengeSettings'
-          headers:
-            X-Next-Page:
-              type: integer
-              description: The index of the next page
-            X-Page:
-              type: integer
-              description: The index of the current page (starting at 1)
-            X-Per-Page:
-              type: integer
-              description: The number of items to list per page
-            X-Prev-Page:
-              type: integer
-              description: The index of the previous page
-            X-Total:
-              type: integer
-              description: The total number of items
-            X-Total-Pages:
-              type: integer
-              description: The total number of pages
-            Link:
-              type: string
-              description: Pagination link header.
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            access the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    post:
-      tags:
-        - ChallengeSettings
-      description: |
-        Create a new challenge setting in the system.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/ChallengeSettingsData'
-      responses:
-        '201':
-          description: Created - The request was successful and the resource is returned.
-          schema:
-            $ref: '#/definitions/ChallengeSettings'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            create the challenge settings
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '409':
-          description: >
-            Conflict. Other challenge setting has already used the same name.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/challenge-settings/:challengeSettingId':
-    get:
-      tags:
-        - ChallengeSettings
-      description: Retrieve the Challenge settings with provided challenge settings id.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - name: challengeSettingId
-          in: path
-          required: true
-          type: string
-          format: UUID
-          description: The id of challenge settings to retrieve
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/ChallengeSettings'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            access the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '404':
-          description: Challenge setting not found
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    put:
-      tags:
-        - ChallengeSettings
-      description: Update the challenge settings with the specified id.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - name: challengeSettingId
-          in: path
-          required: true
-          type: string
-          format: UUID
-          description: The id of challengeSettings to update
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/ChallengeSettingsData'
-      responses:
-        '200':
-          description: Updated - The request was successful and the resource is returned.
-          schema:
-            $ref: '#/definitions/ChallengeSettings'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            update the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '404':
-          description: Challenge setting not found
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '409':
-          description: >
-            Conflict. Other challenge setting has already used the same name.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -1915,18 +1722,6 @@ definitions:
       - $ref: '#/definitions/ChallengeTypeData'
     required:
       - id
-  ChallengeSettings:
-    type: object
-    allOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            description: The challenge settings id.
-            format: UUID
-      - $ref: '#/definitions/ChallengeSettingsData'
-    required:
-      - id
   Phase:
     type: object
     allOf:
@@ -1982,11 +1777,11 @@ definitions:
       privateDescription:
         type: string
         description: returned only if the user is registered on the challenge.
-      challengeSettings:
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
               example: 'challenge setting name'
@@ -2038,7 +1833,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
       attachments:
         type: array
         items:
@@ -2068,22 +1863,8 @@ definitions:
       terms:
         type: array
         items:
-          properties:
-            id:
-              type: integer
-              description: The terms of use id
-            agreeabilityType:
-              type: string
-              description: the terms of use agreeability type
-            title:
-              type: string
-              description: the terms of use title
-            url:
-              type: string
-              description: the terms of use url
-            templateId:
-              type: string
-              description: the template id of the terms of use (only valid when the terms agreeability type is 'Docusignable')
+          type: string
+          description: The terms of use id
       numOfSubmissions:
         type: integer
         description: number of submissions
@@ -2154,13 +1935,6 @@ definitions:
       - name
       - isActive
       - abbreviation
-  ChallengeSettingsData:
-    type: object
-    properties:
-      name:
-        type: string
-    required:
-      - name
   PhaseData:
     type: object
     properties:
@@ -2273,17 +2047,17 @@ definitions:
         type: string
       privateDescription:
         type: string
-      termsIds:
+      terms:
         type : array
         description: The ids of the terms of use to add for the challenge
         items:
          type: string
          format: UUID
-      challengeSettings:
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
               format: UUID
@@ -2336,7 +2110,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
       attachmentIds:
         type: array
         items:
@@ -2391,11 +2165,11 @@ definitions:
         type: string
       privateDescription:
         type: string
-      challengeSettings:
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
               format: UUID
@@ -2448,7 +2222,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
       attachments:
         type: array
         items:
@@ -2478,22 +2252,9 @@ definitions:
       terms:
         type: array
         items:
-          properties:
-            id:
-              type: integer
-              description: The terms of use id
-            agreeabilityType:
-              type: string
-              description: the terms of use agreeability type
-            title:
-              type: string
-              description: the terms of use title
-            url:
-              type: string
-              description: the terms of use url
-            templateId:
-              type: string
-              description: the template id of the terms of use (only valid when the terms agreeability type is 'Docusignable')
+          type: string
+          description: The terms of use id
+          format: UUID
       numOfSubmissions:
         type: integer
         description: number of submissions

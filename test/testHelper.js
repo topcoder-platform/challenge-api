@@ -80,7 +80,7 @@ async function createData () {
     track: 'track',
     name: `a B c challenge${new Date().getTime()}`,
     description: 'desc',
-    challengeSettings: [{ type: challengeSetting.id, value: 'value' }],
+    metadata: [{ name: challengeSetting.id, value: 'value' }],
     timelineTemplateId: timelineTemplate.id,
     phases: [phase],
     prizeSets: [{

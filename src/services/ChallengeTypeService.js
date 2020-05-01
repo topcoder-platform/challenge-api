@@ -31,7 +31,7 @@ async function searchChallengeTypes (criteria) {
 searchChallengeTypes.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
-    perPage: Joi.perPage(),
+    perPage: Joi.number().integer().min(1).max(100).default(100),
     name: Joi.string(),
     description: Joi.string(),
     isActive: Joi.boolean(),
