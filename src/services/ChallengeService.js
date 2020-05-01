@@ -483,7 +483,7 @@ createChallenge.schema = {
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
         type: Joi.string().required(),
-        value: Joi.number().positive().required()
+        value: Joi.number().min(0).required()
       })).min(1).required()
     })),
     tags: Joi.array().items(Joi.string().required()), // tag names
@@ -855,6 +855,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
           newValue = JSON.stringify(value)
         }
+        logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
         auditLogs.push({
           id: uuid(),
           challengeId,
@@ -1069,7 +1070,7 @@ fullyUpdateChallenge.schema = {
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
         type: Joi.string().required(),
-        value: Joi.number().positive().required()
+        value: Joi.number().min(0).required()
       })).min(1).required()
     })),
     tags: Joi.array().items(Joi.string().required()), // tag names
@@ -1134,7 +1135,7 @@ partiallyUpdateChallenge.schema = {
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
         type: Joi.string().required(),
-        value: Joi.number().positive().required()
+        value: Joi.number().min(0).required()
       })).min(1).required()
     })).min(1),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
