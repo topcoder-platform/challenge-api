@@ -266,7 +266,7 @@ searchChallenges.schema = {
     track: Joi.string(),
     name: Joi.string(),
     description: Joi.string(),
-    timelineTemplateId: Joi.optionalId(),
+    timelineTemplateId: Joi.string(), // Joi.optionalId(),
     reviewType: Joi.string(),
     tag: Joi.string(),
     projectId: Joi.number().integer().positive(),
@@ -469,10 +469,10 @@ createChallenge.schema = {
     description: Joi.string(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      name: Joi.id(),
+      name: Joi.string().required(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
-    timelineTemplateId: Joi.optionalId(),
+    timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
@@ -699,7 +699,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   const challenge = await helper.getById('Challenge', challengeId)
 
-  // FIXME: Tech Dept
+  // FIXME: Tech Debt
   if (_.get(challenge, 'legacy.track') && _.get(data, 'legacy.track') && _.get(challenge, 'legacy.track') !== _.get(data, 'legacy.track')) {
     throw new errors.ForbiddenError('Cannot change legacy.track')
   }
@@ -1043,6 +1043,7 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
+      track: Joi.string(),
       reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
@@ -1054,10 +1055,10 @@ fullyUpdateChallenge.schema = {
     description: Joi.string(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      name: Joi.id(),
+      name: Joi.string(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
-    timelineTemplateId: Joi.optionalId(),
+    timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
@@ -1106,6 +1107,7 @@ partiallyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
+      track: Joi.string(),
       reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
@@ -1120,7 +1122,7 @@ partiallyUpdateChallenge.schema = {
       name: Joi.string().required(),
       value: Joi.string().required()
     })).unique((a, b) => a.type === b.type),
-    timelineTemplateId: Joi.optionalId(),
+    timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
