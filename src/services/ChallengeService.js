@@ -733,6 +733,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // Validate the challenge terms
   let newTermsOfUse
   if (!_.isUndefined(data.terms)) {
+    console.log('Will update challenge terms')
     helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
 
     // Get the project default terms
@@ -823,7 +824,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length) {
         op = '$PUT'
       }
-    } else if (key === 'termsIds') {
+    } else if (key === 'terms') {
       const oldIds = _.map(challenge.terms || [], (t) => t.id)
       if (oldIds.length !== value.length ||
         _.intersection(oldIds, value).length !== value.length) {
