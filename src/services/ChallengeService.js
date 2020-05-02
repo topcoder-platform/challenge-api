@@ -436,7 +436,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
     created: new Date(),
-    createdBy: currentUser.handle || currentUser.sub
+    createdBy: currentUser.handle || currentUser.sub,
+    updated: new Date(),
+    updatedBy: currentUser.handle || currentUser.sub
   }, challenge))
   ret.numOfSubmissions = 0
   ret.numOfRegistrants = 0
