@@ -29,5 +29,17 @@
         "defaultDuration": 12
       }
     ]
+  },
+  {
+    "id": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+    "name": "Task",
+    "description": "Task Timeline",
+    "isActive": true,
+    "phases": [
+      {
+        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+        "defaultDuration": 24
+      }
+    ]
   }
 ]

@@ -8,5 +8,15 @@
         "id": "8c23bafa-a8ea-44c5-9bc5-f5a151df3b6d",
         "typeId": "0b2ac310-eaf0-40e3-b66b-37e5e9e09365",
         "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c"
-    }
+    },
+    {
+        "id": "0c75c44e-9218-475f-bfa1-1b1f3f0f6d1e",
+        "typeId": "e885273d-aeda-42c0-917d-bfbf979afbba",
+        "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6"
+    },
+    {
+        "id": "c8ff3935-e3be-4cc7-a221-476a4ac956ca",
+        "typeId": "e885273d-aeda-42c0-917d-bfbf979afbba",
+        "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6"
+    }    
 ]

@@ -222,5 +222,12 @@
     "isActive": true,
     "abbreviation": "AUTOMATED_TESTING",
     "legacyId": 41
+  },
+  {
+    "id": "e885273d-aeda-42c0-917d-bfbf979afbba",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK"
   }
 ]
