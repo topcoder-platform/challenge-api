@@ -733,7 +733,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // Validate the challenge terms
   let newTermsOfUse
   if (!_.isUndefined(data.terms)) {
-    console.log('Will update challenge terms')
     helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
 
     // Get the project default terms

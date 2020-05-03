@@ -303,7 +303,7 @@ function partialMatch (filter, value) {
   if (filter) {
     if (value) {
       const filtered = xss(filter)
-      return _.toLowerCase(value).includes(_.toLowerCase(filtered))
+      return _.toLower(value).includes(_.toLower(filtered))
     } else {
       return false
     }
