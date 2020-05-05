@@ -19,3 +19,8 @@ services:
       MINIO_ACCESS_KEY: "FAKE_ACCESS_KEY"
       MINIO_SECRET_KEY: "FAKE_SECRET_ACCESS_KEY"
     command: "server /data"
+  mock-api:
+    image: mock-api:latest
+    build:
+      context: ../
+      dockerfile: mock-api/Dockerfile
