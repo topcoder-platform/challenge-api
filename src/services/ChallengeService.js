@@ -1026,6 +1026,21 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
+
+  if (challenge.phases && challenge.phases.length > 0) {
+    challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
+    challenge.endDate = helper.calculateChallengeEndDate(challenge)
+  }
+  // Update ES
+  await esClient.create({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: challengeId,
+    body: {
+      doc: challenge
+    }
+  })
   return challenge
 }
 
