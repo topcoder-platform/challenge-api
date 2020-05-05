@@ -1032,7 +1032,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
   // Update ES
-  await esClient.create({
+  await esClient.update({
     index: config.get('ES.ES_INDEX'),
     type: config.get('ES.ES_TYPE'),
     refresh: config.get('ES.ES_REFRESH'),
