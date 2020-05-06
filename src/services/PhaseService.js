@@ -26,7 +26,7 @@ async function searchPhases (criteria) {
 searchPhases.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
-    perPage: Joi.perPage(),
+    perPage: Joi.perPage().default(100),
     name: Joi.string()
   })
 }
