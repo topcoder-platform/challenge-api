@@ -765,10 +765,15 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
   }
 
-  if (data.phases) {
-    await helper.validatePhases(data.phases)
+  if (data.phases || data.startDate) {
+    const newPhases = data.phases || challenge.phases
+    const newStartDate = data.startDate || challenge.startDate
+
+    await helper.validatePhases(newPhases)
     // populate phases
-    await populatePhases(data.phases, data.startDate || challenge.startDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    data.phases = newPhases
+    data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
 
