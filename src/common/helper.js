@@ -513,17 +513,10 @@ function getESClient () {
  * @param {String} userToken the user token
  */
 async function ensureProjectExist (projectId, userToken) {
-  let token
-  if (!userToken) {
-    token = await getM2MToken()
-  }
+  let token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   try {
-    if (userToken) {
-      await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } })
-    } else {
-      await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
-    }
+    await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
