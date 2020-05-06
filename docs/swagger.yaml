@@ -59,7 +59,7 @@ paths:
           required: false
           type: string
           format: UUID
-        - name: confidentsialityType
+        - name: confidentialityType
           in: query
           description: Filter by confidentialityType
           type: string
@@ -77,6 +77,10 @@ paths:
         - name: track
           in: query
           description: Filter by track, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+        - name: gitRepoURL
+          description: Filter by git repository URL, case-insensitive, partial matches are allowed.
           required: false
           type: string
         - name: name
@@ -2000,7 +2004,18 @@ definitions:
       phases:
         type: array
         items:
-          $ref: '#/definitions/Phase'
+          properties:
+            phaseId:
+              type: string
+              format: UUID
+            predecessor:
+              type: string
+              format: UUID
+            defaultDuration:
+              type: number
+          required:
+            - phaseId
+            - defaultDuration
     required:
       - name
       - isActive
@@ -2057,20 +2072,28 @@ definitions:
         type: string
         format: UUID
         example: 'challenge type id'
-      track:
-        type: string
+      legacy:
+        type: object
+        properties:
+          track:
+            type: string
+          reviewType:
+            type: string
+          confidentialityType:
+            type: string
+          forumId:
+            type: number
+          informixModified:
+            type: string
+        required:
+          - track
+          - reviewType
       name:
         type: string
       description:
         type: string
       privateDescription:
         type: string
-      terms:
-        type : array
-        description: The ids of the terms of use to add for the challenge
-        items:
-         type: string
-         format: UUID
       metadata:
         type: array
         items:
@@ -2083,13 +2106,20 @@ definitions:
             value:
               type: string
               description: The sample metadata value
+          required:
+            - name
+            - value
       timelineTemplateId:
         type: string
         format: UUID
       phases:
         type: array
         items:
-          $ref: '#/definitions/Phase'
+          properties:
+            phaseId:
+              type: UUID
+            duration:
+              type: number
       prizeSets:
         type: array
         items:
@@ -2108,9 +2138,12 @@ definitions:
                     type: string
                   value:
                     type: number
-      reviewType:
-        type: string
-        description: the review type
+                required:
+                  - type
+                  - value
+          required:
+            - type
+            - prizes
       tags:
         type: array
         items:
@@ -2118,9 +2151,8 @@ definitions:
       projectId:
         type: integer
         description: the project id
-      forumId:
-        type: integer
-        description: the forum id
+      legacyId:
+        type: number
       startDate:
         type: string
         format: date-time
@@ -2129,40 +2161,24 @@ definitions:
         type: string
         description: the status
         enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
-      attachmentIds:
-        type: array
-        items:
-          type: string
       groups:
         type: array
         items:
           type: string
-      winners:
+      gitRepoURLs:
         type: array
         items:
-          properties:
-            userId:
-              type: integer
-              description: The user id
-            handle:
-              type: string
-              description: the user handle
-            placement:
-              type: integer
-              description: the winner placement
-              example: 1
+          type: string
+      terms:
+        type : array
+        description: The ids of the terms of use to add for the challenge
+        items:
+         type: string
+         format: UUID
     required:
-      - typeId
-      - track
       - name
-      - description
-      - timelineTemplateId
-      - phases
-      - prizeSets
-      - reviewType
       - tags
       - projectId
-      - forumId
       - status
   ChallengeResponseBodyForCreateOrUpdate:
     type: object
