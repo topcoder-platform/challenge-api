@@ -399,6 +399,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
       throw new Error(`Invalid phase predecessor: ${phases[i].predecessor}`)
     }
   }
+  phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
 }
 
 /**
