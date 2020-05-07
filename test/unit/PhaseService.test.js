@@ -174,7 +174,7 @@ describe('phase service unit tests', () => {
       const result = await service.searchPhases({ name: 'xyzxyz123' })
       should.equal(result.total, 0)
       should.equal(result.page, 1)
-      should.equal(result.perPage, 20)
+      should.equal(result.perPage, 100)
       should.equal(result.result.length, 0)
     })
 

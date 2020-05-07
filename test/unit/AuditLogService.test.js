@@ -30,8 +30,8 @@ describe('audit log service unit tests', () => {
     it('search audit logs successfully 1', async () => {
       // update challenge so that there are some audit logs
       await ChallengeService.partiallyUpdateChallenge({ isMachine: true, sub: 'sub' }, data.challenge.id, {
-        track: 'track-abc',
-        description: 'desc-abc'
+        description: 'desc-abc',
+        privateDescription: 'private Desc.'
       })
 
       const res = await service.searchAuditLogs({
@@ -46,10 +46,9 @@ describe('audit log service unit tests', () => {
       should.equal(res.page, 1)
       should.equal(res.perPage, 10)
       should.equal(res.result.length, 2)
-      let log = _.find(res.result, (item) => item.fieldName === 'track')
+      let log = _.find(res.result, (item) => item.fieldName === 'privateDescription')
       should.exist(log)
-      should.equal(log.oldValue, '"track"')
-      should.equal(log.newValue, '"track-abc"')
+      should.equal(log.newValue, '"private Desc."')
       should.equal(log.challengeId, data.challenge.id)
       should.equal(log.createdBy, 'sub')
       should.exist(log.created)
