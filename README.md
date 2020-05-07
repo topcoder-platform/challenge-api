@@ -88,7 +88,7 @@ You can find sample `.env` files inside the `/docs` directory.
 Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
 
 ### Local services setup
-In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB and S3 compatible server.
+In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB, S3 compatible server and Mock API.
 
 ### Create Tables
 1. Make sure DynamoDB are running as per instructions above.
@@ -98,7 +98,7 @@ In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB 
 ### Mock API
 The provided mock API provides mock endpoint to fetch challenge resources and groups so you don't have to deploy the related services locally.
 You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
-Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mock-api listening on port 4000
+Mock API starts after running `docker-compose up` and expose port 4000.
 
 - Install dependencies `npm install`
 - Run lint `npm run lint`
@@ -109,7 +109,6 @@ Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mo
 - Clear and init db `npm run init-db`
 - Start app `npm start`
 - App is running at `http://localhost:3000`
-- Start mock-api, go to `mock-api` folder, run `npm i` and `npm start`, mock api is running at `http://localhost:4000`
 
 ## Production deployment
 
