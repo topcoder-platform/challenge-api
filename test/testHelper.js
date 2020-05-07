@@ -41,10 +41,6 @@ async function createData () {
     abbreviation: 'abbr',
     legacyId: 123
   })
-  challengeSetting = await helper.create('ChallengeSetting', {
-    id: uuid(),
-    name: `setting-${new Date().getTime()}`
-  })
   phase = await helper.create('Phase', {
     id: uuid(),
     name: `phase-${new Date().getTime()}`,
@@ -73,14 +69,13 @@ async function createData () {
       defaultDuration: 20000
     }]
   })
-
+  const nm = `a B c challenge${new Date().getTime()}`;
   const challengeData = {
     id: uuid(),
     typeId: challengeType.id,
-    track: 'track',
-    name: `a B c challenge${new Date().getTime()}`,
+    name: nm,
     description: 'desc',
-    metadata: [{ name: challengeSetting.id, value: 'value' }],
+    metadata: [{ name: nm, value: 'value' }],
     timelineTemplateId: timelineTemplate.id,
     phases: [phase],
     prizeSets: [{
@@ -92,12 +87,9 @@ async function createData () {
         value: 800
       }]
     }],
-    reviewType: 'review type',
     tags: ['tag1'],
     projectId: 111,
     legacyId: 222,
-    forumId: 333,
-    termsIds: [21343, 20723],
     startDate: new Date(),
     status: constants.challengeStatuses.Active,
     groups: ['group1'],
@@ -106,7 +98,6 @@ async function createData () {
     createdBy: 'admin'
   }
 
-  challengeData.endDate = moment(challengeData.startDate).add(phase.duration, 'seconds')
   challenge = await helper.create('Challenge', challengeData)
   completedChallenge = await helper.create('Challenge', _.assign(challengeData, { id: uuid(), status: constants.challengeStatuses.Completed }))
 
@@ -144,6 +135,8 @@ const defaultProjectTerms = [
     url: 'http://www.topcoder.com/i/terms/Subcontractor+Services+Agreement+2009-09-02.pdf'
   }]
 
+  const mockTerms = ['0fcb41d1-ec7c-44bb-8f3b-f017a61cd708', 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb'];
+
 const additionalTerm = {
   id: 20645,
   agreeabilityType: 'Electronically-agreeable',
@@ -176,7 +169,6 @@ async function clearData () {
   await timelineTemplate.delete()
   await phase.delete()
   await phase2.delete()
-  await challengeSetting.delete()
   await challengeType.delete()
 }
 
@@ -186,14 +178,14 @@ async function clearData () {
 function getData () {
   return {
     challengeType: challengeType.originalItem(),
-    challengeSetting: challengeSetting.originalItem(),
     phase: phase.originalItem(),
     phase2: phase2.originalItem(),
     timelineTemplate: timelineTemplate.originalItem(),
     challenge: challenge.originalItem(),
     completedChallenge: completedChallenge.originalItem(),
     defaultProjectTerms,
-    additionalTerm
+    additionalTerm,
+    mockTerms
   }
 }
 
