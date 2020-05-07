@@ -69,9 +69,6 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
   const userGroupsNames = _.map(userGroups, group => group.name)
   const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
   const filtered = updatedGroups.filter(g => !userGroupsNames.includes(g))
-  console.log('userGroupsNames: ', userGroupsNames)
-  console.log('updatedGroups: ', updatedGroups)
-  console.log('filtered: ', filtered)
   if (filtered.length > 0) {
     throw new errors.ForbiddenError(`You don't have access to this group!`)
   }
