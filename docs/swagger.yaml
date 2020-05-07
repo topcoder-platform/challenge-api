@@ -59,6 +59,15 @@ paths:
           required: false
           type: string
           format: UUID
+        - name: confidentialityType
+          in: query
+          description: Filter by confidentialityType
+          type: string
+          enum: ['public', 'private']
+        - name: directProjectId
+          in: query
+          description: Filter by directProjectId
+          type: integer
         - name: typeId
           in: query
           description: Filter by type id, exact match
@@ -68,6 +77,10 @@ paths:
         - name: track
           in: query
           description: Filter by track, case-insensitive, partial matches are allowed.
+          required: false
+          type: string
+        - name: gitRepoURL
+          description: Filter by git repository URL, case-insensitive, partial matches are allowed.
           required: false
           type: string
         - name: name
@@ -116,12 +129,46 @@ paths:
           description: Filter by status, case-insensitive, partial matches are allowed.
           required: false
           type: string
-          enum: ['Draft', 'Canceled', 'Active', 'Completed']
+          enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
+        - name: currentPhaseId
+          in: query
+          description: Filter by id of the current phase
+          required: false
+          type: string
+        - name: currentPhaseName
+          in: query
+          description: Filter by name of the current phase
+          required: false
+          type: string
         - name: group
           in: query
           description: Filter by group name, case-insensitive, partial matches are allowed.
           required: false
           type: string
+        - name: startDateStart
+          in: query
+          description: Filter by start date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: startDateEnd
+          in: query
+          description: Filter by start date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: endDateStart
+          in: query
+          description: Filter by end date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: endDateEnd
+          in: query
+          description: Filter by end date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
         - name: createdDateStart
           in: query
           description: Filter by created date (lower bound of date range)
@@ -159,6 +206,16 @@ paths:
         - name: memberId
           in: query
           description: Filter by member, only return challenges this member can access to
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          description: Sort the results by the field.
+          required: false
+          type: string
+        - name: sortOrder
+          in: query
+          description: Order the results by the asc/desc.
           required: false
           type: string
       responses:
@@ -363,7 +420,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeTypes:
+  /challenge-types:
     get:
       tags:
         - ChallengeTypes
@@ -389,6 +446,16 @@ paths:
           description: Filter by isActive flag.
           required: false
           type: boolean
+        - name: abbreviation
+          in: query
+          description: Filter by abbreviation.  Partial matches are allowed.
+          required: false
+          type: string
+        - name: legacyId
+          in: query
+          description: Filter by legacy id.
+          required: false
+          type: integer
       responses:
         '200':
           description: OK
@@ -462,14 +529,14 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challengeTypes/:challengeTypeId':
+  '/challenge-types/:challengeTypeId':
     get:
       tags:
         - ChallengeTypes
@@ -545,7 +612,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
@@ -599,217 +666,14 @@ paths:
             $ref: '#/definitions/ErrorModel'
         '409':
           description: >
-            Conflict. Other challenge type has already used the same name.
+            Conflict. Other challenge type has already used the same name, abbreviation or legacyId.
           schema:
             $ref: '#/definitions/ErrorModel'
         '500':
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeSettings:
-    get:
-      tags:
-        - ChallengeSettings
-      description: |
-        Retrieve challenge settings in the system.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - $ref: '#/parameters/page'
-        - $ref: '#/parameters/perPage'
-        - name: name
-          in: query
-          description: Filter by name, case-insensitive, partial matches are allowed.
-          required: false
-          type: string
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/ChallengeSettings'
-          headers:
-            X-Next-Page:
-              type: integer
-              description: The index of the next page
-            X-Page:
-              type: integer
-              description: The index of the current page (starting at 1)
-            X-Per-Page:
-              type: integer
-              description: The number of items to list per page
-            X-Prev-Page:
-              type: integer
-              description: The index of the previous page
-            X-Total:
-              type: integer
-              description: The total number of items
-            X-Total-Pages:
-              type: integer
-              description: The total number of pages
-            Link:
-              type: string
-              description: Pagination link header.
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            access the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    post:
-      tags:
-        - ChallengeSettings
-      description: |
-        Create a new challenge setting in the system.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/ChallengeSettingsData'
-      responses:
-        '201':
-          description: Created - The request was successful and the resource is returned.
-          schema:
-            $ref: '#/definitions/ChallengeSettings'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            create the challenge settings
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '409':
-          description: >
-            Conflict. Other challenge setting has already used the same name.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/challengeSettings/:challengeSettingId':
-    get:
-      tags:
-        - ChallengeSettings
-      description: Retrieve the Challenge settings with provided challenge settings id.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - name: challengeSettingId
-          in: path
-          required: true
-          type: string
-          format: UUID
-          description: The id of challenge settings to retrieve
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/ChallengeSettings'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            access the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '404':
-          description: Challenge setting not found
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    put:
-      tags:
-        - ChallengeSettings
-      description: Update the challenge settings with the specified id.
-      security:
-        - bearer: []
-      produces:
-        - application/json
-      parameters:
-        - name: challengeSettingId
-          in: path
-          required: true
-          type: string
-          format: UUID
-          description: The id of challengeSettings to update
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/ChallengeSettingsData'
-      responses:
-        '200':
-          description: Updated - The request was successful and the resource is returned.
-          schema:
-            $ref: '#/definitions/ChallengeSettings'
-        '400':
-          description: Bad request.  Request parameters were invalid.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '401':
-          description: Unauthorized. Fail to authenticate the requester.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '403':
-          description: >
-            Forbidden.  The requester does not have the correct permission to
-            update the challenge setting
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '404':
-          description: Challenge setting not found
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '409':
-          description: >
-            Conflict. Other challenge setting has already used the same name.
-          schema:
-            $ref: '#/definitions/ErrorModel'
-        '500':
-          description: Server error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  /challengePhases:
+  /challenge-phases:
     get:
       tags:
         - ChallengePhases
@@ -917,7 +781,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengePhases/:challengePhaseId:
+  /challenge-phases/:challengePhaseId:
     get:
       tags:
         - ChallengePhases
@@ -1108,7 +972,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /timelineTemplates:
+  /timeline-templates:
     get:
       tags:
         - TimelineTemplates
@@ -1216,7 +1080,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /timelineTemplates/:timelineTemplateId:
+  /timeline-templates/:timelineTemplateId:
     get:
       tags:
         - TimelineTemplates
@@ -1407,7 +1271,233 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /challengeAuditLogs:
+  /challenge-timelines:
+    get:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: |
+        Retrieve challenge type timeline templates in the system.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: typeId
+          in: query
+          description: Filter by challenge type id
+          required: false
+          type: string
+        - name: timelineTemplateId
+          in: query
+          description: Filter by timeline template id
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the timeline templates
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: |
+        Create a new challenge type timeline template in the system. Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplateData'
+      responses:
+        '201':
+          description: Created - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            create the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other timeline template has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /challenge-timelines/:challengeTypeTimelineTemplateId:
+    get:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: Retrieve the challenge type timeline template with provided id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeTimelineTemplateId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge type timeline template to retrieve
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Entity not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: Update the challenge type timeline template with the specified id. Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeTimelineTemplateId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge type timeline template to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplateData'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Entity not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '409':
+          description: >
+            Conflict. Other timeline template has already used the same name.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    delete:
+      tags:
+        - ChallengeTypeTimelineTemplates
+      description: Delete the challenge type timeline template with provided id. Only admins can access this endpoint.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeTimelineTemplateId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge type timeline template to be deleted
+      responses:
+        '200':
+          description: Deleted - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/ChallengeTypeTimelineTemplate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            delete the timeline template
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Entity not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /challenge-auditLogs:
     get:
       tags:
         - AuditLog
@@ -1645,18 +1735,6 @@ definitions:
       - $ref: '#/definitions/ChallengeTypeData'
     required:
       - id
-  ChallengeSettings:
-    type: object
-    allOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            description: The challenge settings id.
-            format: UUID
-      - $ref: '#/definitions/ChallengeSettingsData'
-    required:
-      - id
   Phase:
     type: object
     allOf:
@@ -1681,31 +1759,66 @@ definitions:
       - $ref: '#/definitions/TimelineTemplateData'
     required:
       - id
+  ChallengeTypeTimelineTemplate:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The challenge type timeline template id.
+            format: UUID
+      - $ref: '#/definitions/ChallengeTypeTimelineTemplateData'
+    required:
+      - id
+      - typeId
+      - timelineTemplateId
   ChallengeData:
     type: object
     properties:
       legacyId:
         type: number
+      legacy:
+        type: object
+        properties:
+          track:
+            type: string
+          reviewType:
+            type: string
+            description: the review type
+          forumId:
+            type: integer
+            description: the forum id
+          directProjectId:
+            type: integer
+          confidentialityType:
+            type: string
+            enum: ['public', 'private']
+          informixModified:
+            type: string
+            format: date-time
+            description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
       type:
         type: string
         example: 'challenge type name'
-      track:
-        type: string
       name:
         type: string
       description:
         type: string
-      challengeSettings:
+      privateDescription:
+        type: string
+        description: returned only if the user is registered on the challenge.
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
               description: The challenge setting type
-              example: 'challenge setting name'
+              example: 'sample metadata name'
             value:
               type: string
-              description: The challenge setting value
+              description: The sample metadata value
       timelineTemplateId:
         type: string
         format: UUID
@@ -1731,9 +1844,6 @@ definitions:
                     type: string
                   value:
                     type: number
-      reviewType:
-        type: string
-        description: the review type
       tags:
         type: array
         items:
@@ -1741,9 +1851,6 @@ definitions:
       projectId:
         type: integer
         description: the project id
-      forumId:
-        type: integer
-        description: the forum id
       startDate:
         type: string
         format: date-time
@@ -1751,7 +1858,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
       attachments:
         type: array
         items:
@@ -1764,6 +1871,31 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
+      terms:
+        type: array
+        items:
+          type: string
+          description: The terms of use id
+      numOfSubmissions:
+        type: integer
+        description: number of submissions
+      numOfRegistrants:
+        type: integer
+        description: number of registrants
       created:
         type: string
         format: date-time
@@ -1780,7 +1912,6 @@ definitions:
         example: 'topcoder user'
     required:
       - type
-      - track
       - name
       - description
       - timelineTemplateId
@@ -1790,8 +1921,6 @@ definitions:
       - createdBy
       - reviewType
       - tags
-      - projectId
-      - forumId
       - status
   Attachment:
     type: object
@@ -1820,34 +1949,49 @@ definitions:
         type: string
       isActive:
         type: boolean
+      abbreviation:
+        type: string
+      legacyId:
+        type: integer
     required:
       - name
       - isActive
-  ChallengeSettingsData:
-    type: object
-    properties:
-      name:
-        type: string
-    required:
-      - name
+      - abbreviation
   PhaseData:
     type: object
     properties:
+      phaseId:
+        type: string
+        format: UUID
+      predecessor:
+        type: string
+        format: UUID
       name:
         type: string
       description:
         type: string
-      predecessor:
-        type: string
-        format: UUID
-      isActive:
+      isOpen:
         type: boolean
       duration:
         type: number
-    required:
-      - name
-      - isActive
-      - duration
+      defaultDuration:
+        type: number
+      scheduledStartDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      scheduledEndDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      actualStartDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+      actualEndDate:
+        type: string
+        format: date-time
+        description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
   TimelineTemplateData:
     type: object
     properties:
@@ -1860,11 +2004,34 @@ definitions:
       phases:
         type: array
         items:
-          $ref: '#/definitions/Phase'
+          properties:
+            phaseId:
+              type: string
+              format: UUID
+            predecessor:
+              type: string
+              format: UUID
+            defaultDuration:
+              type: number
+          required:
+            - phaseId
+            - defaultDuration
     required:
       - name
       - isActive
       - phases
+  ChallengeTypeTimelineTemplateData:
+    type: object
+    properties:
+      typeId:
+        type: string
+        format: UUID
+      timelineTemplateId:
+        type: string
+        format: UUID
+    required:
+      - typeId
+      - timelineTemplateId
   AuditLogEntry:
     type: object
     properties:
@@ -1886,6 +2053,10 @@ definitions:
       createdBy:
         type: string
         example: 'topcoder user'
+      memberId:
+        type: string
+        description: 'The member ID'
+        example: '12345678'
     required:
       - id
       - challengeId
@@ -1901,31 +2072,54 @@ definitions:
         type: string
         format: UUID
         example: 'challenge type id'
-      track:
-        type: string
+      legacy:
+        type: object
+        properties:
+          track:
+            type: string
+          reviewType:
+            type: string
+          confidentialityType:
+            type: string
+          forumId:
+            type: number
+          informixModified:
+            type: string
+        required:
+          - track
+          - reviewType
       name:
         type: string
       description:
         type: string
-      challengeSettings:
+      privateDescription:
+        type: string
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
-              description: The challenge setting type
+              description: The sample metadata type
               format: UUID
-              example: 'challenge setting id'
+              example: 'sample metadata id'
             value:
               type: string
-              description: The challenge setting value
+              description: The sample metadata value
+          required:
+            - name
+            - value
       timelineTemplateId:
         type: string
         format: UUID
       phases:
         type: array
         items:
-          $ref: '#/definitions/Phase'
+          properties:
+            phaseId:
+              type: UUID
+            duration:
+              type: number
       prizeSets:
         type: array
         items:
@@ -1944,9 +2138,12 @@ definitions:
                     type: string
                   value:
                     type: number
-      reviewType:
-        type: string
-        description: the review type
+                required:
+                  - type
+                  - value
+          required:
+            - type
+            - prizes
       tags:
         type: array
         items:
@@ -1954,9 +2151,8 @@ definitions:
       projectId:
         type: integer
         description: the project id
-      forumId:
-        type: integer
-        description: the forum id
+      legacyId:
+        type: number
       startDate:
         type: string
         format: date-time
@@ -1964,27 +2160,25 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['Draft', 'Canceled', 'Active', 'Completed']
-      attachmentIds:
-        type: array
-        items:
-          type: string
+        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
       groups:
         type: array
         items:
           type: string
+      gitRepoURLs:
+        type: array
+        items:
+          type: string
+      terms:
+        type : array
+        description: The ids of the terms of use to add for the challenge
+        items:
+         type: string
+         format: UUID
     required:
-      - typeId
-      - track
       - name
-      - description
-      - timelineTemplateId
-      - phases
-      - prizeSets
-      - reviewType
       - tags
       - projectId
-      - forumId
       - status
   ChallengeResponseBodyForCreateOrUpdate:
     type: object
@@ -2003,18 +2197,20 @@ definitions:
         type: string
       description:
         type: string
-      challengeSettings:
+      privateDescription:
+        type: string
+      metadata:
         type: array
         items:
           properties:
-            type:
+            name:
               type: string
-              description: The challenge setting type
+              description: The sample metadata type
               format: UUID
-              example: 'challenge setting id'
+              example: 'challenge metadata id'
             value:
               type: string
-              description: The challenge setting value
+              description: The challenge metadata value
       timelineTemplateId:
         type: string
         format: UUID
@@ -2060,7 +2256,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
       attachments:
         type: array
         items:
@@ -2073,6 +2269,32 @@ definitions:
         type: array
         items:
           type: string
+      winners:
+        type: array
+        items:
+          properties:
+            userId:
+              type: integer
+              description: The user id
+            handle:
+              type: string
+              description: the user handle
+            placement:
+              type: integer
+              description: the winner placement
+              example: 1
+      terms:
+        type: array
+        items:
+          type: string
+          description: The terms of use id
+          format: UUID
+      numOfSubmissions:
+        type: integer
+        description: number of submissions
+      numOfRegistrants:
+        type: integer
+        description: number of registrants
       created:
         type: string
         format: date-time

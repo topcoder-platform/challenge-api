@@ -56,7 +56,7 @@ module.exports = (app) => {
             req.authUser.userId = String(req.authUser.userId)
             // User roles authorization
             if (req.authUser.roles) {
-              if (def.access && !helper.checkIfExists(def.access, req.authUser.roles)) {
+              if (def.access && !helper.checkIfExists(_.map(def.access, a => a.toLowerCase()), _.map(req.authUser.roles, r => r.toLowerCase()))) {
                 next(new errors.ForbiddenError('You are not allowed to perform this action!'))
               } else {
                 // user token is used in create/update challenge to ensure user can create/update challenge under specific project
@@ -94,7 +94,7 @@ module.exports = (app) => {
       }
 
       actions.push(method)
-      app[verb](path, helper.autoWrapExpress(actions))
+      app[verb](`/${config.API_VERSION}${path}`, helper.autoWrapExpress(actions))
     })
   })
 

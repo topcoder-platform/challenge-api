@@ -1,20 +1,233 @@
 [
   {
-    "id": "45415132-79fa-4d13-a9ac-71f50020dc10",
-    "name": "Code",
-    "description": "Code",
-    "isActive": true
+    "id": "19c0f147-4690-45cf-83f3-a613f219dc22",
+    "name": "Copilot Posting",
+    "description": "Copilot Posting",
+    "isActive": true,
+    "abbreviation": "COPILOT_POSTING",
+    "legacyId": 29
   },
   {
-    "id": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-    "name": "F2F",
-    "description": "First 2 Finish",
-    "isActive": true
+    "id": "c6a8ddd6-d463-4ba5-a977-4938b3bac172",
+    "name": "Web Design",
+    "description": "Web Design",
+    "isActive": true,
+    "abbreviation": "WEB_DESIGNS",
+    "legacyId": 17
+  },
+  {
+    "id": "338aee66-a8fb-42bf-bfaa-d5ed113f912c",
+    "name": "Logo Design",
+    "description": "Logo Design",
+    "isActive": true,
+    "abbreviation": "LOGO_DESIGN",
+    "legacyId": 20
+  },
+  {
+    "id": "6e1e77d0-b248-4025-bfef-958219222a79",
+    "name": "Banners/Icons",
+    "description": "Banners/Icons",
+    "isActive": true,
+    "abbreviation": "BANNERS_OR_ICONS",
+    "legacyId": 16
+  },
+  {
+    "id": "aea77c1c-1b38-4942-bdb2-937180532dcb",
+    "name": "Application Front-End Design",
+    "description": "Application Front-End Design",
+    "isActive": true,
+    "abbreviation": "APPLICATION_FRONT_END_DESIGN",
+    "legacyId": 32
+  },
+  {
+    "id": "2b2e8ced-b240-4bfb-8e50-5dd97c78d368",
+    "name": "Widget or Mobile Screen Design",
+    "description": "Widget or Mobile Screen Design",
+    "isActive": true,
+    "abbreviation": "WIDGET_OR_MOBILE_SCREEN_DESIGN",
+    "legacyId": 30
+  },
+  {
+    "id": "1964571b-07ce-487b-9544-158bff322ea7",
+    "name": "Front-End Flash",
+    "description": "Front-End Flash",
+    "isActive": true,
+    "abbreviation": "FRONT_END_FLASH",
+    "legacyId": 31
+  },
+  {
+    "id": "1a1d3d18-3ce3-4f8d-96b3-fe0f234674fe",
+    "name": "Print/Presentation",
+    "description": "Print/Presentation",
+    "isActive": true,
+    "abbreviation": "PRINT_OR_PRESENTATION",
+    "legacyId": 21
+  },
+  {
+    "id": "b723e67c-e4b4-4d15-b586-1383cb6b31dc",
+    "name": "Wireframes",
+    "description": "Wireframes",
+    "isActive": true,
+    "abbreviation": "WIREFRAMES",
+    "legacyId": 18
+  },
+  {
+    "id": "294af178-5a81-487c-8fbb-2f5044056624",
+    "name": "Idea Generation",
+    "description": "Idea Generation",
+    "isActive": true,
+    "abbreviation": "IDEA_GENERATION",
+    "legacyId": 22
+  },
+  {
+    "id": "bb082fb0-744f-47dd-9969-ba5fcf6172e3",
+    "name": "Studio Other",
+    "description": "Studio Other",
+    "isActive": true,
+    "abbreviation": "STUDIO_OTHER",
+    "legacyId": 34
+  },
+  {
+    "id": "35571804-a4a3-4b29-a147-bc7e44407114",
+    "name": "Conceptualization",
+    "description": "Conceptualization",
+    "isActive": true,
+    "abbreviation": "CONCEPTUALIZATION",
+    "legacyId": 23
+  },
+  {
+    "id": "d4765ff2-fc5b-41dd-a6a2-650b7bc97748",
+    "name": "Specification",
+    "description": "Specification",
+    "isActive": true,
+    "abbreviation": "SPECIFICATION",
+    "legacyId": 6
+  },
+  {
+    "id": "cd5b9b14-80e0-409a-b15b-3c3e18ac516d",
+    "name": "Architecture",
+    "description": "Architecture",
+    "isActive": true,
+    "abbreviation": "ARCHITECTURE",
+    "legacyId": 7
+  },
+  {
+    "id": "c21336d5-4831-4cce-93a3-ca45bef61562",
+    "name": "Design",
+    "description": "Design",
+    "isActive": true,
+    "abbreviation": "DESIGN",
+    "legacyId": 1
+  },
+  {
+    "id": "0b2ac310-eaf0-40e3-b66b-37e5e9e09365",
+    "name": "Development",
+    "description": "Development",
+    "isActive": true,
+    "abbreviation": "DEVELOPMENT",
+    "legacyId": 2
+  },
+  {
+    "id": "0c7bbd97-156f-47c4-9174-c8336ddd8351",
+    "name": "RIA Build Competition",
+    "description": "RIA Build Competition",
+    "isActive": true,
+    "abbreviation": "RIA_BUILD_COMPETITION",
+    "legacyId": 24
+  },
+  {
+    "id": "3534d757-a25b-40cd-a8fd-e2ce5835415c",
+    "name": "UI Prototype Competition",
+    "description": "UI Prototype Competition",
+    "isActive": true,
+    "abbreviation": "UI_PROTOTYPE_COMPETITION",
+    "legacyId": 19
+  },
+  {
+    "id": "d79bb088-8166-4476-be4c-6e17186cb3b4",
+    "name": "Assembly Competition",
+    "description": "Assembly Competition",
+    "isActive": true,
+    "abbreviation": "ASSEMBLY_COMPETITION",
+    "legacyId": 14
+  },
+  {
+    "id": "19148de0-19a5-4f79-a3ba-a8c35528ff4c",
+    "name": "Test Suites",
+    "description": "Test Suites",
+    "isActive": true,
+    "abbreviation": "TEST_SUITES",
+    "legacyId": 13
+  },
+  {
+    "id": "230d3e9a-d673-414f-b764-4e6693f053da",
+    "name": "Test Scenarios",
+    "description": "Test Scenarios",
+    "isActive": true,
+    "abbreviation": "TEST_SCENARIOS",
+    "legacyId": 26
+  },
+  {
+    "id": "76c0aea3-dc2b-4e40-9986-5ba3a2ffbfa1",
+    "name": "Content Creation",
+    "description": "Content Creation",
+    "isActive": true,
+    "abbreviation": "CONTENT_CREATION",
+    "legacyId": 35
+  },
+  {
+    "id": "c2579605-e294-4967-b3db-875ef85240cd",
+    "name": "Marathon Match",
+    "description": "Marathon Match",
+    "isActive": true,
+    "abbreviation": "DEVELOP_MARATHON_MATCH",
+    "legacyId": 37
   },
   {
     "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
     "name": "Bug Hunt",
     "description": "Bug Hunt",
-    "isActive": true
+    "isActive": true,
+    "abbreviation": "BUG_HUNT",
+    "legacyId": 9
+  },
+  {
+    "id": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+    "name": "First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "abbreviation": "FIRST_2_FINISH",
+    "legacyId": 38
+  },
+  {
+    "id": "45415132-79fa-4d13-a9ac-71f50020dc10",
+    "name": "Code",
+    "description": "Code",
+    "isActive": true,
+    "abbreviation": "CODE",
+    "legacyId": 39
+  },
+  {
+    "id": "bf8c8915-9e0f-440d-a945-58eafc439ee8",
+    "name": "Design First2Finish",
+    "description": "Design First2Finish",
+    "isActive": true,
+    "abbreviation": "DESIGN_FIRST_2_FINISH",
+    "legacyId": 40
+  },
+  {
+    "id": "c0c9d714-60e2-4fbb-872e-6f8c229954af",
+    "name": "Automated Testing",
+    "description": "Automated Testing",
+    "isActive": true,
+    "abbreviation": "AUTOMATED_TESTING",
+    "legacyId": 41
+  },
+  {
+    "id": "e885273d-aeda-42c0-917d-bfbf979afbba",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK"
   }
 ]

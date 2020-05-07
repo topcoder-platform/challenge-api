@@ -15,6 +15,9 @@ const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_
 const axios = require('axios')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
+const moment = require('moment')
+const HttpStatus = require('http-status-codes')
+const xss = require('xss')
 
 // Bus API Client
 let busApiClient
@@ -27,8 +30,8 @@ validateESRefreshMethod(config.ES.ES_REFRESH)
 
 AWS.config.update({
   s3: config.AMAZON.S3_API_VERSION,
-  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
-  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  // accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  // secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
   region: config.AMAZON.AWS_REGION
 })
 const s3 = new AWS.S3()
@@ -226,7 +229,7 @@ async function getByIds (modelName, ids) {
 async function validateDuplicate (modelName, name, value) {
   const list = await scan(modelName)
   for (let i = 0; i < list.length; i++) {
-    if (list[i][name].toLowerCase() === value.toLowerCase()) {
+    if (list[i][name] && String(list[i][name]).toLowerCase() === String(value).toLowerCase()) {
       throw new errors.ConflictError(`${modelName} with ${name}: ${value} already exist`)
     }
   }
@@ -299,7 +302,8 @@ async function scan (modelName, scanParams) {
 function partialMatch (filter, value) {
   if (filter) {
     if (value) {
-      return RegExp(filter, 'i').test(value)
+      const filtered = xss(filter)
+      return _.toLower(value).includes(_.toLower(filtered))
     } else {
       return false
     }
@@ -313,14 +317,17 @@ function partialMatch (filter, value) {
  * @param {Array} phases the phases data.
  */
 async function validatePhases (phases) {
+  if (!phases || phases.length === 0) {
+    return
+  }
   const records = await scan('Phase')
   const map = new Map()
   _.each(records, r => {
     map.set(r.id, r)
   })
-  const invalidPhases = _.filter(phases, p => !map.has(p.id) || !p.isActive)
+  const invalidPhases = _.filter(phases, p => !map.has(p.phaseId))
   if (invalidPhases.length > 0) {
-    throw new errors.BadRequestError(`The following phases are invalid or inactive: ${toString(invalidPhases)}`)
+    throw new errors.BadRequestError(`The following phases are invalid: ${toString(invalidPhases)}`)
   }
 }
 
@@ -407,7 +414,7 @@ async function getUserGroups (userId) {
         membershipType: 'user'
       }
     })
-    const groups = result.data.result || []
+    const groups = result.data || []
     if (groups.length === 0) {
       break
     }
@@ -501,31 +508,47 @@ function getESClient () {
 }
 
 /**
-<<<<<<< HEAD
  * Ensure project exist
  * @param {String} projectId the project id
  * @param {String} userToken the user token
  */
 async function ensureProjectExist (projectId, userToken) {
-  let token
-  if (!userToken) {
-    token = await getM2MToken()
-  }
+  let token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   try {
-    if (userToken) {
-      await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } })
-    } else {
-      await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
-    }
+    await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   } catch (err) {
-    if (_.get(err.response.status) === 404) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
     } else {
       // re-throw other error
       throw err
     }
   }
+}
+
+/**
+ * Calculates challenge end date based on its phases
+ * @param {any} challenge
+ */
+function calculateChallengeEndDate (challenge, data) {
+  if (!data) {
+    data = challenge
+  }
+  let phase = data.phases.slice(-1)[0]
+  if (!phase || (!data.startDate && !challenge.startDate)) {
+    return data.startDate || challenge.startDate
+  }
+  const phases = (challenge.phases || []).reduce((obj, elem) => {
+    obj[elem.id] = elem
+    return obj
+  }, {})
+  let result = moment(data.startDate || challenge.startDate)
+  while (phase) {
+    result.add(phase.duration || 0, 'seconds')
+    phase = phase.predecessor && phases[phase.predecessor]
+  }
+  return result.toDate()
 }
 
 /**
@@ -549,6 +572,46 @@ async function listChallengesByMember (memberId) {
 async function validateESRefreshMethod (method) {
   Joi.attempt(method, Joi.string().label('ES_REFRESH').valid(['true', 'false', 'wait_for']))
   return method
+}
+
+/**
+ * This functions gets the default terms of use for a given project id
+ *
+ * @param {Number} projectId The id of the project for which to get the default terms of use
+ * @returns {Promise<Array<Number>>} An array containing the ids of the default project terms of use
+ */
+async function getProjectDefaultTerms (projectId) {
+  const token = await getM2MToken()
+  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
+  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+  return res.data.terms
+}
+
+/**
+ * This function gets the challenge terms array with the terms data
+ * The terms data is retrieved from the terms API using the specified terms ids
+ *
+ * @param {Array<Number>} termsIds The array of terms ids to retrieve from terms API
+ */
+async function getChallengeTerms (termsIds) {
+  const terms = []
+  const token = await getM2MToken()
+  for (let id of termsIds) {
+    // Get the terms details from the API
+    try {
+      const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
+      terms.push(res.data.id)
+    } catch (e) {
+      if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
+        throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)
+      } else {
+        // re-throw other error
+        throw e
+      }
+    }
+  }
+
+  return terms
 }
 
 module.exports = {
@@ -575,6 +638,9 @@ module.exports = {
   postBusEvent,
   getESClient,
   ensureProjectExist,
+  calculateChallengeEndDate,
   listChallengesByMember,
-  validateESRefreshMethod
+  validateESRefreshMethod,
+  getProjectDefaultTerms,
+  getChallengeTerms
 }

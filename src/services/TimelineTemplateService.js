@@ -52,12 +52,9 @@ createTimelineTemplate.schema = {
     description: Joi.string(),
     isActive: Joi.boolean().required(),
     phases: Joi.array().items(Joi.object().keys({
-      id: Joi.id(),
-      name: Joi.string().required(),
-      description: Joi.string(),
+      phaseId: Joi.id(),
       predecessor: Joi.optionalId(),
-      isActive: Joi.boolean().required(),
-      duration: Joi.number().positive().required()
+      defaultDuration: Joi.number().positive().required()
     })).min(1).required()
   }).required()
 }
@@ -122,12 +119,9 @@ fullyUpdateTimelineTemplate.schema = {
     description: Joi.string(),
     isActive: Joi.boolean().required(),
     phases: Joi.array().items(Joi.object().keys({
-      id: Joi.id(),
-      name: Joi.string().required(),
-      description: Joi.string(),
+      phaseId: Joi.id(),
       predecessor: Joi.optionalId(),
-      isActive: Joi.boolean().required(),
-      duration: Joi.number().positive().required()
+      defaultDuration: Joi.number().positive().required()
     })).min(1).required()
   }).required()
 }
@@ -149,12 +143,9 @@ partiallyUpdateTimelineTemplate.schema = {
     description: Joi.string(),
     isActive: Joi.boolean(),
     phases: Joi.array().items(Joi.object().keys({
-      id: Joi.id(),
-      name: Joi.string().required(),
-      description: Joi.string(),
+      phaseId: Joi.id(),
       predecessor: Joi.optionalId(),
-      isActive: Joi.boolean().required(),
-      duration: Joi.number().positive().required()
+      defaultDuration: Joi.number().positive().required()
     })).min(1)
   }).required()
 }

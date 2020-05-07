@@ -18,7 +18,9 @@ async function searchChallengeTypes (criteria) {
   const list = await helper.scan('ChallengeType')
   const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name) &&
     helper.partialMatch(criteria.description, e.description) &&
-    (_.isUndefined(criteria.isActive) || e.isActive === criteria.isActive)
+    (_.isUndefined(criteria.isActive) || e.isActive === criteria.isActive) &&
+    helper.partialMatch(criteria.abbreviation, e.abbreviation) &&
+    (_.isUndefined(criteria.legacyId) || e.legacyId === criteria.legacyId)
   )
   const total = records.length
   const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
@@ -29,10 +31,12 @@ async function searchChallengeTypes (criteria) {
 searchChallengeTypes.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
-    perPage: Joi.perPage(),
+    perPage: Joi.number().integer().min(1).max(100).default(100),
     name: Joi.string(),
     description: Joi.string(),
-    isActive: Joi.boolean()
+    isActive: Joi.boolean(),
+    abbreviation: Joi.string(),
+    legacyId: Joi.number().integer().positive()
   })
 }
 
@@ -43,6 +47,10 @@ searchChallengeTypes.schema = {
  */
 async function createChallengeType (type) {
   await helper.validateDuplicate('ChallengeType', 'name', type.name)
+  await helper.validateDuplicate('ChallengeType', 'abbreviation', type.abbreviation)
+  if (type.legacyId) {
+    await helper.validateDuplicate('ChallengeType', 'legacyId', type.legacyId)
+  }
   const ret = await helper.create('ChallengeType', _.assign({ id: uuid() }, type))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret)
@@ -53,7 +61,9 @@ createChallengeType.schema = {
   type: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
-    isActive: Joi.boolean().required()
+    isActive: Joi.boolean().required(),
+    abbreviation: Joi.string().required(),
+    legacyId: Joi.number().integer().positive()
   }).required()
 }
 
@@ -82,8 +92,17 @@ async function fullyUpdateChallengeType (id, data) {
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
   }
+  if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
+    await helper.validateDuplicate('ChallengeType', 'abbreviation', data.abbreviation)
+  }
+  if (data.legacyId && type.legacyId !== data.legacyId) {
+    await helper.validateDuplicate('ChallengeType', 'legacyId', data.legacyId)
+  }
   if (_.isUndefined(data.description)) {
     type.description = undefined
+  }
+  if (_.isUndefined(data.legacyId)) {
+    type.legacyId = undefined
   }
   const ret = await helper.update(type, data)
   // post bus event
@@ -96,7 +115,9 @@ fullyUpdateChallengeType.schema = {
   data: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
-    isActive: Joi.boolean().required()
+    isActive: Joi.boolean().required(),
+    abbreviation: Joi.string().required(),
+    legacyId: Joi.number().integer().positive()
   }).required()
 }
 
@@ -111,6 +132,12 @@ async function partiallyUpdateChallengeType (id, data) {
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
   }
+  if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
+    await helper.validateDuplicate('ChallengeType', 'abbreviation', data.abbreviation)
+  }
+  if (data.legacyId && type.legacyId !== data.legacyId) {
+    await helper.validateDuplicate('ChallengeType', 'legacyId', data.legacyId)
+  }
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data))
@@ -122,7 +149,9 @@ partiallyUpdateChallengeType.schema = {
   data: Joi.object().keys({
     name: Joi.string(),
     description: Joi.string(),
-    isActive: Joi.boolean()
+    isActive: Joi.boolean(),
+    abbreviation: Joi.string(),
+    legacyId: Joi.number().integer().positive()
   }).required()
 }
 

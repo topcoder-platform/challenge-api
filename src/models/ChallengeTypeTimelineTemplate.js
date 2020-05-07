@@ -1,5 +1,5 @@
 /**
- * This defines ChallengeSetting model.
+ * This defines ChallengeType-TimelineTemplate mapping model.
  */
 
 const dynamoose = require('dynamoose')
@@ -12,7 +12,11 @@ const schema = new Schema({
     hashKey: true,
     required: true
   },
-  name: {
+  typeId: {
+    type: String,
+    required: true
+  },
+  timelineTemplateId: {
     type: String,
     required: true
   }

@@ -18,11 +18,11 @@ const schema = new Schema({
   },
   typeId: {
     type: String,
-    required: true
+    required: false
   },
-  track: {
-    type: String,
-    required: true
+  legacy: {
+    type: Object,
+    required: false
   },
   name: {
     type: String,
@@ -30,44 +30,48 @@ const schema = new Schema({
   },
   description: {
     type: String,
-    required: true
+    required: false
   },
-  challengeSettings: {
+  privateDescription: {
+    type: String,
+    required: false
+  },
+  metadata: {
     type: [Object],
     required: false
   },
   timelineTemplateId: {
     type: String,
-    required: true
+    required: false
   },
   phases: {
     type: Array,
-    required: true
+    required: false
+  },
+  terms: {
+    type: Array,
+    required: false
   },
   prizeSets: {
     type: [Object],
-    required: true
-  },
-  reviewType: {
-    type: String,
-    required: true
+    required: false
   },
   // tag names
   tags: {
     type: Array,
-    required: true
+    required: false
   },
   projectId: {
-    type: Number,
-    required: true
-  },
-  forumId: {
     type: Number,
     required: false
   },
   startDate: {
     type: Date,
-    required: true
+    required: false
+  },
+  endDate: {
+    type: Date,
+    required: false
   },
   status: {
     type: String,
@@ -83,6 +87,11 @@ const schema = new Schema({
     required: false
   },
   gitRepoURLs: {
+    type: Array,
+    required: false
+  },
+  // winners
+  winners: {
     type: Array,
     required: false
   },
@@ -104,7 +113,9 @@ const schema = new Schema({
   }
 },
 {
-  throughput: { read: 4, write: 2 }
-})
+  throughput: 'ON_DEMAND',
+  useDocumentTypes: true
+}
+)
 
 module.exports = schema

@@ -12,7 +12,7 @@ const app = require('../../app')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = '/challengePhases'
+const basePath = `/${config.API_VERSION}/challenge-phases`
 
 describe('phase API E2E tests', () => {
   // created entity ids
@@ -31,14 +31,14 @@ describe('phase API E2E tests', () => {
         .send({
           name,
           description: 'desc',
-          isActive: true,
+          isOpen: true,
           duration: 123
         })
       should.equal(response.status, 201)
       const result = response.body
       should.equal(result.name, name)
       should.equal(result.description, 'desc')
-      should.equal(result.isActive, true)
+      should.equal(result.isOpen, true)
       should.equal(result.duration, 123)
       should.exist(result.id)
       id = result.id
@@ -51,16 +51,14 @@ describe('phase API E2E tests', () => {
         .send({
           name: name2,
           description: 'desc2',
-          predecessor: id,
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 201)
       const result = response.body
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, false)
+      should.equal(result.isOpen, false)
       should.equal(result.duration, 456)
       should.exist(result.id)
       id2 = result.id
@@ -72,7 +70,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'ueueue7878',
           description: 'desc',
-          isActive: true,
+          isOpen: true,
           duration: 123
         })
       should.equal(response.status, 401)
@@ -86,7 +84,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'ueueue7878',
           description: 'desc',
-          isActive: true,
+          isOpen: true,
           duration: 123
         })
       should.equal(response.status, 401)
@@ -100,7 +98,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'ueueue7878',
           description: 'desc',
-          isActive: true,
+          isOpen: true,
           duration: 123
         })
       should.equal(response.status, 401)
@@ -114,26 +112,11 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'ueueue7878',
           description: 'desc',
-          isActive: true,
+          isOpen: true,
           duration: 123
         })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'Failed to authenticate token.')
-    })
-
-    it('create phase - predecessor not found', async () => {
-      const response = await chai.request(app)
-        .post(basePath)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
-        .send({
-          name: 'igj58687',
-          description: 'desc2',
-          predecessor: notFoundId,
-          isActive: false,
-          duration: 456
-        })
-      should.equal(response.status, 404)
-      should.equal(response.body.message, `Phase with id: ${notFoundId} doesn't exist`)
     })
 
     it('create phase - name already used', async () => {
@@ -143,7 +126,7 @@ describe('phase API E2E tests', () => {
         .send({
           name,
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 409)
@@ -157,7 +140,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'flskjdf',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 403)
@@ -170,7 +153,7 @@ describe('phase API E2E tests', () => {
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
         .send({
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
@@ -184,7 +167,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: ['xx'],
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
@@ -198,26 +181,11 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'fijgijfgfg',
           description: null,
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"description" must be a string')
-    })
-
-    it('create phase - invalid predecessor', async () => {
-      const response = await chai.request(app)
-        .post(basePath)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
-        .send({
-          name: 'fjsioijdf',
-          description: 'desc',
-          predecessor: 'abc',
-          isActive: false,
-          duration: 456
-        })
-      should.equal(response.status, 400)
-      should.equal(response.body.message, '"predecessor" must be a valid GUID')
     })
 
     it('create phase - unexpected field', async () => {
@@ -227,7 +195,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'flskjdf',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456,
           other: 'def'
         })
@@ -246,8 +214,7 @@ describe('phase API E2E tests', () => {
       should.equal(result.id, id2)
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, false)
+      should.equal(result.isOpen, false)
       should.equal(result.duration, 456)
     })
 
@@ -294,8 +261,7 @@ describe('phase API E2E tests', () => {
       should.equal(result[0].id, id2)
       should.equal(result[0].name, name2)
       should.equal(result[0].description, 'desc2')
-      should.equal(result[0].predecessor, id)
-      should.equal(result[0].isActive, false)
+      should.equal(result[0].isOpen, false)
       should.equal(result[0].duration, 456)
     })
 
@@ -348,8 +314,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: `${name2}-updated`,
           description: 'desc222',
-          predecessor: id,
-          isActive: true,
+          isOpen: true,
           duration: 789
         })
       should.equal(response.status, 200)
@@ -357,8 +322,7 @@ describe('phase API E2E tests', () => {
       should.equal(result.id, id2)
       should.equal(result.name, `${name2}-updated`)
       should.equal(result.description, 'desc222')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, true)
+      should.equal(result.isOpen, true)
       should.equal(result.duration, 789)
     })
 
@@ -369,7 +333,7 @@ describe('phase API E2E tests', () => {
         .send({
           name,
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 409)
@@ -383,7 +347,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'xlkjfeug',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 403)
@@ -397,7 +361,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'fjgjgjg',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 404)
@@ -411,7 +375,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: 'fjgjgjg',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
@@ -425,7 +389,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: null,
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
@@ -439,7 +403,7 @@ describe('phase API E2E tests', () => {
         .send({
           name: { invalid: 123 },
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
@@ -453,25 +417,25 @@ describe('phase API E2E tests', () => {
         .send({
           name: '',
           description: 'desc',
-          isActive: false,
+          isOpen: false,
           duration: 456
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" is not allowed to be empty')
     })
 
-    it('fully update phase - invalid isActive', async () => {
+    it('fully update phase - invalid isOpen', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send({
           name: 'slkdjfhhghg',
           description: 'desc',
-          isActive: [],
+          isOpen: [],
           duration: 456
         })
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"isActive" must be a boolean')
+      should.equal(response.body.message, '"isOpen" must be a boolean')
     })
   })
 
@@ -490,8 +454,7 @@ describe('phase API E2E tests', () => {
       should.equal(result.id, id2)
       should.equal(result.name, `${name2}-33`)
       should.equal(result.description, 'desc33')
-      should.equal(result.predecessor, id)
-      should.equal(result.isActive, true)
+      should.equal(result.isOpen, true)
       should.equal(result.duration, 111)
     })
 
@@ -575,14 +538,6 @@ describe('phase API E2E tests', () => {
         .set('Authorization', `Bearer ${config.USER_TOKEN}`)
       should.equal(response.status, 403)
       should.equal(response.body.message, 'You are not allowed to perform this action!')
-    })
-
-    it('remove phase - there is dependent phase', async () => {
-      const response = await chai.request(app)
-        .delete(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Can't delete phase ${id} because it is preceding phase of other phases.`)
     })
 
     it('remove phase successfully 1', async () => {

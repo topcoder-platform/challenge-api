@@ -14,7 +14,7 @@ const testHelper = require('../testHelper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = '/challengeAuditLogs'
+const basePath = `/${config.API_VERSION}/challenge-audit-logs`
 
 describe('audit log API E2E tests', () => {
   // generated data
@@ -34,7 +34,7 @@ describe('audit log API E2E tests', () => {
     it('search audit logs successfully 1', async () => {
       // update challenge so that there are some audit logs
       const updateChallengeResponse = await chai.request(app)
-        .patch(`/challenges/${data.challenge.id}`)
+        .patch(`/${config.API_VERSION}/challenges/${data.challenge.id}`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
         .send({
           track: 'track-abc',

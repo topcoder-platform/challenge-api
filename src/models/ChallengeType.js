@@ -23,6 +23,14 @@ const schema = new Schema({
   isActive: {
     type: Boolean,
     required: true
+  },
+  abbreviation: {
+    type: String,
+    required: true
+  },
+  legacyId: {
+    type: Number,
+    required: false
   }
 },
 {
