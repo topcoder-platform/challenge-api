@@ -414,7 +414,7 @@ async function getUserGroups (userId) {
         membershipType: 'user'
       }
     })
-    const groups = result.data.result || []
+    const groups = result.data || []
     if (groups.length === 0) {
       break
     }
