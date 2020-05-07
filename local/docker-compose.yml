@@ -24,3 +24,5 @@ services:
     build:
       context: ../
       dockerfile: mock-api/Dockerfile
+    ports:
+      - "4000:4000"
