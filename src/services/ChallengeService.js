@@ -477,7 +477,7 @@ createChallenge.schema = {
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type),
+    })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
@@ -1082,9 +1082,9 @@ fullyUpdateChallenge.schema = {
     description: Joi.string(),
     privateDescription: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      name: Joi.string(),
+      name: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type),
+    })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
@@ -1148,7 +1148,7 @@ partiallyUpdateChallenge.schema = {
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type),
+    })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
