@@ -245,7 +245,6 @@ async function searchChallenges (currentUser, criteria) {
   })
   _.each(result, element => {
     element.type = typeMap.get(element.typeId) || 'Code'
-    delete element.typeId
   })
   _.each(result, async element => {
     await getPhasesAndPopulate(element)
