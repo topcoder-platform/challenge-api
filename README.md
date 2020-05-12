@@ -100,6 +100,14 @@ The provided mock API provides mock endpoint to fetch challenge resources and gr
 You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
 Mock API starts after running `docker-compose up` and expose port 4000.
 
+### Notes
+There are two parts need to be updated for local development
+- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116 
+`throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
+- https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
+Two aws config should be uncommented
+
+
 - Install dependencies `npm install`
 - Run lint `npm run lint`
 - Run lint fix `npm run lint:fix`
@@ -132,8 +140,7 @@ The following test parameters can be set in config file or in env variables:
 - S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
 
 ### Prepare
-- Start Local services.
-- Start Mock API.
+- Start Local services in docker.
 - Create DynamoDB tables.
 - Initialize ES index.
 - Various config parameters should be properly set.
