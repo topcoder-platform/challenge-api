@@ -136,7 +136,7 @@ describe('challenge service unit tests', () => {
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('create challenge successfully with completed status', async () => {
@@ -195,7 +195,7 @@ describe('challenge service unit tests', () => {
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('create challenge - type not found', async () => {
@@ -389,7 +389,7 @@ describe('challenge service unit tests', () => {
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('get challenge - not found', async () => {
@@ -431,7 +431,7 @@ describe('challenge service unit tests', () => {
         gitRepoURL: data.challenge.gitRepoURLs[0],
         createdDateStart: '1992-01-02',
         createdDateEnd: '2022-01-02',
-        createdBy: data.challenge.createdBy,
+        createdBy: data.challenge.createdBy
       })
       should.equal(res.total, 1)
       should.equal(res.page, 1)
@@ -576,7 +576,7 @@ describe('challenge service unit tests', () => {
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('search challenges - invalid name', async () => {
@@ -783,7 +783,7 @@ describe('challenge service unit tests', () => {
       should.exist(result.created)
       should.exist(result.updated)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('fully update challenge with winners successfully', async () => {
@@ -857,7 +857,7 @@ describe('challenge service unit tests', () => {
       should.exist(result.created)
       should.exist(result.updated)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('fully update challenge - not found', async () => {
@@ -1098,7 +1098,7 @@ describe('challenge service unit tests', () => {
       should.exist(result.created)
       should.exist(result.updated)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('partially update challenge successfully with winners', async () => {
@@ -1166,7 +1166,7 @@ describe('challenge service unit tests', () => {
       should.exist(result.created)
       should.exist(result.updated)
       should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, data.mockTerms), true)
+      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it(`partially update challenge - project not found`, async () => {
