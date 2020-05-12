@@ -4,14 +4,12 @@
 const _ = require('lodash')
 const uuid = require('uuid/v4')
 const config = require('config')
-const moment = require('moment')
 const helper = require('../src/common/helper')
 const constants = require('../app-constants')
 
 const esClient = helper.getESClient()
 
 let challengeType
-let challengeSetting
 let phase
 let phase2
 let timelineTemplate
@@ -69,7 +67,7 @@ async function createData () {
       defaultDuration: 20000
     }]
   })
-  const nm = `a B c challenge${new Date().getTime()}`;
+  const nm = `a B c challenge${new Date().getTime()}`
   const challengeData = {
     id: uuid(),
     typeId: challengeType.id,
@@ -89,6 +87,11 @@ async function createData () {
     }],
     tags: ['tag1'],
     projectId: 111,
+    legacy: {
+      track: 'track',
+      reviewType: 'Virus Scan',
+      forumId: 123456
+    },
     legacyId: 222,
     startDate: new Date(),
     status: constants.challengeStatuses.Active,
@@ -122,23 +125,26 @@ async function createData () {
 
 const defaultProjectTerms = [
   {
-    id: 21343,
-    agreeabilityType: 'DocuSignable',
+    id: '0fcb41d1-ec7c-44bb-8f3b-f017a61cd708',
     title: 'Competition Non-Disclosure Agreement',
     url: '',
-    templateId: '0c5b7081-1fff-4484-a20f-824c97a03b9b'
+    text: 'docusign NDA',
+    docusignTemplateId: '0c5b7081-1fff-4484-a20f-824c97a03b9b',
+    agreeabilityType: 'DocuSignable'
   },
   {
-    id: 20723,
-    agreeabilityType: 'Non-electronically-agreeable',
+    id: 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb',
     title: 'Subcontractor Services Agreement 2009-09-02',
-    url: 'http://www.topcoder.com/i/terms/Subcontractor+Services+Agreement+2009-09-02.pdf'
-  }]
+    url: 'http://www.topcoder.com/i/terms/Subcontractor+Services+Agreement+2009-09-02.pdf',
+    text: 'Subcontractor Services Agreement 2009-09-02. This agreement is unavailable in text format.  Please download the PDF to read its contents',
+    agreeabilityType: 'Non-electronically-agreeable'
+  }
+]
 
-  const mockTerms = ['0fcb41d1-ec7c-44bb-8f3b-f017a61cd708', 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb'];
+const mockTerms = ['8a0207fc-ac9b-47e7-af1b-81d1ccaf0afc', '453c7c5c-c872-4672-9e78-5162d70903d3']
 
 const additionalTerm = {
-  id: 20645,
+  id: '28841de8-2f42-486f-beac-21d46a832ab6',
   agreeabilityType: 'Electronically-agreeable',
   title: '2008 TCO Marathon Match Competition Official Rules',
   url: 'http://topcoder.com/mm-terms'

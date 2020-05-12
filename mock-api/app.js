@@ -95,25 +95,23 @@ app.get('/v5/groups', (req, res) => {
   // only member id '151743' has groups
   let result
   if (page > 1 || memberId !== '151743') {
-    result = { result: [] }
+    result = []
   } else {
-    result = {
-      result: [{
-        id: '33ba038e-48da-487b-96e8-8d3b99b6d181',
-        name: 'group1',
-        description: 'desc1',
-        privateGroup: false,
-        selfRegister: true,
-        domain: 'domain1'
-      }, {
-        id: '33ba038e-48da-487b-96e8-8d3b99b6d182',
-        name: 'group2',
-        description: 'desc2',
-        privateGroup: true,
-        selfRegister: false,
-        domain: 'domain2'
-      }]
-    }
+    result = [{
+      id: '33ba038e-48da-487b-96e8-8d3b99b6d181',
+      name: 'group1',
+      description: 'desc1',
+      privateGroup: false,
+      selfRegister: true,
+      domain: 'domain1'
+    }, {
+      id: '33ba038e-48da-487b-96e8-8d3b99b6d182',
+      name: 'group2',
+      description: 'desc2',
+      privateGroup: true,
+      selfRegister: false,
+      domain: 'domain2'
+    }]
   }
 
   winston.info(`Result: ${JSON.stringify(result, null, 4)}`)
