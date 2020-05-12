@@ -272,7 +272,7 @@ describe('phase API E2E tests', () => {
         .query({ name: 'xxjklsdjfihx' })
       should.equal(response.status, 200)
       should.equal(response.headers['x-page'], '1')
-      should.equal(response.headers['x-per-page'], '20')
+      should.equal(response.headers['x-per-page'], '100')
       should.equal(response.headers['x-total'], '0')
       should.equal(response.headers['x-total-pages'], '0')
       should.equal(response.body.length, 0)
@@ -559,7 +559,7 @@ describe('phase API E2E tests', () => {
     it('remove phase - not found', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 404)
       should.equal(response.body.message, `Phase with id: ${id} doesn't exist`)
     })
@@ -567,7 +567,7 @@ describe('phase API E2E tests', () => {
     it('remove phase - invalid id', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/invalid`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 400)
       should.equal(response.body.message, '"phaseId" must be a valid GUID')
     })

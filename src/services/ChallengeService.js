@@ -496,7 +496,7 @@ createChallenge.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri()),
-    terms: Joi.array().items(Joi.id()).default([])
+    terms: Joi.array().items(Joi.optionalId()).default([])
   }).required(),
   userToken: Joi.any()
 }
