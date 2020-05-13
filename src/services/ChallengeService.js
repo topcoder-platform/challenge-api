@@ -83,7 +83,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
+  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
     'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
@@ -93,6 +93,12 @@ async function searchChallenges (currentUser, criteria) {
     }
   })
 
+  if (criteria.name) {
+    boolQuery.push({ match_phrase: { name: `.*${criteria.name}.*` } })
+  }
+  if (criteria.description) {
+    boolQuery.push({ match_phrase: { description: `.*${criteria.name}.*` } })
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
