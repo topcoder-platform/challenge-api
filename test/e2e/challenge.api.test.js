@@ -475,7 +475,7 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
         .send(challengeData)
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"status" must be one of [New, Draft, Canceled, Active, Completed]')
+      should.equal(response.body.message, '"status" must be one of [New, Draft, Cancelled, Active, Completed]')
     })
 
     it('create challenge - unexpected field', async () => {
@@ -896,7 +896,7 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .query({ status: 'abc' })
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"status" must be one of [New, Draft, Canceled, Active, Completed]')
+      should.equal(response.body.message, '"status" must be one of [New, Draft, Cancelled, Active, Completed]')
     })
 
     it('search challenges - invalid createdDateStart', async () => {

@@ -129,7 +129,7 @@ paths:
           description: Filter by status, case-insensitive, partial matches are allowed.
           required: false
           type: string
-          enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
+          enum: ['New', 'Draft', 'Cancelled', 'Active', 'Completed']
         - name: currentPhaseId
           in: query
           description: Filter by id of the current phase
@@ -1858,7 +1858,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Cancelled', 'Active', 'Completed']
       attachments:
         type: array
         items:
@@ -2160,7 +2160,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Cancelled', 'Active', 'Completed']
       groups:
         type: array
         items:
@@ -2256,7 +2256,7 @@ definitions:
       status:
         type: string
         description: the status
-        enum: ['New', 'Draft', 'Canceled', 'Active', 'Completed']
+        enum: ['New', 'Draft', 'Cancelled', 'Active', 'Completed']
       attachments:
         type: array
         items:

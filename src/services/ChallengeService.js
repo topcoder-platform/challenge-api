@@ -763,7 +763,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   await validateChallengeData(data)
-  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Canceled) && data.status && data.status !== challenge.status) {
+  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Cancelled) && data.status && data.status !== challenge.status) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
 
