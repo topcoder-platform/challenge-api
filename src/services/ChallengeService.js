@@ -476,6 +476,7 @@ createChallenge.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
@@ -1083,6 +1084,7 @@ fullyUpdateChallenge.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
@@ -1147,6 +1149,7 @@ partiallyUpdateChallenge.schema = {
     name: Joi.string(),
     description: Joi.string(),
     privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
