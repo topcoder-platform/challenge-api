@@ -16,9 +16,17 @@ const prizeSetTypes = {
 const challengeStatuses = {
   New: 'New',
   Draft: 'Draft',
-  Canceled: 'Canceled',
+  Cancelled: 'Cancelled',
   Active: 'Active',
-  Completed: 'Completed'
+  Completed: 'Completed',
+  Deleted: 'Deleted',
+  CancelledFailedReview: 'Cancelled - Failed Review',
+  CancelledFailedScreening: 'Cancelled - Failed Screening',
+  CancelledZeroSubmissions: 'Cancelled - Zero Submissions',
+  CancelledWinnerUnresponsive: 'Cancelled - Winner Unresponsive',
+  CancelledClientRequest: 'Cancelled - Client Request',
+  CancelledRequirementsInfeasible: 'Cancelled - Requirements Infeasible',
+  CancelledZeroRegistrations: 'Cancelled - Zero Registrations'
 }
 
 const validChallengeParams = {

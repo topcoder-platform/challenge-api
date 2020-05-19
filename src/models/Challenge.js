@@ -36,6 +36,11 @@ const schema = new Schema({
     type: String,
     required: false
   },
+  descriptionFormat: {
+    type: String,
+    default: 'HTML',
+    required: true
+  },
   metadata: {
     type: [Object],
     required: false
@@ -113,7 +118,7 @@ const schema = new Schema({
   }
 },
 {
-  throughput: 'ON_DEMAND',
+  throughput: { read: 4, write: 2 },
   useDocumentTypes: true
 }
 )

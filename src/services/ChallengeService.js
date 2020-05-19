@@ -83,7 +83,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
+  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
     'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
@@ -93,6 +93,12 @@ async function searchChallenges (currentUser, criteria) {
     }
   })
 
+  if (criteria.name) {
+    boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
+  }
+  if (criteria.description) {
+    boolQuery.push({ match: { description: `.*${criteria.name}.*` } })
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -245,7 +251,6 @@ async function searchChallenges (currentUser, criteria) {
   })
   _.each(result, element => {
     element.type = typeMap.get(element.typeId) || 'Code'
-    delete element.typeId
   })
   _.each(result, async element => {
     await getPhasesAndPopulate(element)
@@ -399,6 +404,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
       throw new Error(`Invalid phase predecessor: ${phases[i].predecessor}`)
     }
   }
+  phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
 }
 
 /**
@@ -436,7 +442,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
     created: new Date(),
-    createdBy: currentUser.handle || currentUser.sub
+    createdBy: currentUser.handle || currentUser.sub,
+    updated: new Date(),
+    updatedBy: currentUser.handle || currentUser.sub
   }, challenge))
   ret.numOfSubmissions = 0
   ret.numOfRegistrants = 0
@@ -468,10 +476,11 @@ createChallenge.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type),
+    })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
@@ -483,7 +492,7 @@ createChallenge.schema = {
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
         type: Joi.string().required(),
-        value: Joi.number().positive().required()
+        value: Joi.number().min(0).required()
       })).min(1).required()
     })),
     tags: Joi.array().items(Joi.string().required()), // tag names
@@ -493,7 +502,7 @@ createChallenge.schema = {
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     groups: Joi.array().items(Joi.string()), // group names
     gitRepoURLs: Joi.array().items(Joi.string().uri()),
-    terms: Joi.array().items(Joi.id()).default([])
+    terms: Joi.array().items(Joi.optionalId()).default([])
   }).required(),
   userToken: Joi.any()
 }
@@ -755,7 +764,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   await validateChallengeData(data)
-  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Canceled) && data.status && data.status !== challenge.status) {
+  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Cancelled) && data.status && data.status !== challenge.status) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
 
@@ -763,10 +772,15 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
   }
 
-  if (data.phases) {
-    await helper.validatePhases(data.phases)
+  if (data.phases || data.startDate) {
+    const newPhases = data.phases || challenge.phases
+    const newStartDate = data.startDate || challenge.startDate
+
+    await helper.validatePhases(newPhases)
     // populate phases
-    await populatePhases(data.phases, data.startDate || challenge.startDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    data.phases = newPhases
+    data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
 
@@ -821,7 +835,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length) {
         op = '$PUT'
       }
-    } else if (key === 'termsIds') {
+    } else if (key === 'terms') {
       const oldIds = _.map(challenge.terms || [], (t) => t.id)
       if (oldIds.length !== value.length ||
         _.intersection(oldIds, value).length !== value.length) {
@@ -855,6 +869,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
           newValue = JSON.stringify(value)
         }
+        logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
         auditLogs.push({
           id: uuid(),
           challengeId,
@@ -1023,6 +1038,21 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
+
+  if (challenge.phases && challenge.phases.length > 0) {
+    challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
+    challenge.endDate = helper.calculateChallengeEndDate(challenge)
+  }
+  // Update ES
+  await esClient.update({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: challengeId,
+    body: {
+      doc: challenge
+    }
+  })
   return challenge
 }
 
@@ -1054,10 +1084,11 @@ fullyUpdateChallenge.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
-      name: Joi.string(),
+      name: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type),
+    })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
@@ -1069,7 +1100,7 @@ fullyUpdateChallenge.schema = {
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
         type: Joi.string().required(),
-        value: Joi.number().positive().required()
+        value: Joi.number().min(0).required()
       })).min(1).required()
     })),
     tags: Joi.array().items(Joi.string().required()), // tag names
@@ -1118,10 +1149,11 @@ partiallyUpdateChallenge.schema = {
     name: Joi.string(),
     description: Joi.string(),
     privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.string().required()
-    })).unique((a, b) => a.type === b.type),
+    })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
@@ -1134,7 +1166,7 @@ partiallyUpdateChallenge.schema = {
       prizes: Joi.array().items(Joi.object().keys({
         description: Joi.string(),
         type: Joi.string().required(),
-        value: Joi.number().positive().required()
+        value: Joi.number().min(0).required()
       })).min(1).required()
     })).min(1),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
