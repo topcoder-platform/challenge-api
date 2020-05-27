@@ -11,7 +11,7 @@ const helper = require('../common/helper')
  * @param {Object} res the response
  */
 async function searchChallenges (req, res) {
-  const result = await service.searchChallenges(req.authUser, req.query)
+  const result = await service.searchChallenges(req.authUser, { ...req.query, ...req.body })
   helper.setResHeaders(req, res, result)
   res.send(result.result)
 }
