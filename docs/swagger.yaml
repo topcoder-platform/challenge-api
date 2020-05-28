@@ -111,7 +111,7 @@ paths:
           type: string
         - name: projectId
           in: query
-          description: Filter by project id, exact match.
+          description: Filter by v5 project id, exact match.
           required: false
           type: integer
         - name: forumId
@@ -218,6 +218,11 @@ paths:
           description: Order the results by the asc/desc.
           required: false
           type: string
+        - in: body
+          name: body
+          required: false
+          schema: 
+            $ref: '#/definitions/SearchChallengeRequestBody'
       responses:
         '200':
           description: OK
@@ -2180,6 +2185,17 @@ definitions:
       - tags
       - projectId
       - status
+  SearchChallengeRequestBody:
+    type: object
+    properties:
+      groups:
+        description: Filter by group IDs
+        type: array
+        items:
+          type: string
+          format: UUID
+        minItems: 1
+        uniqueItems: true
   ChallengeResponseBodyForCreateOrUpdate:
     type: object
     properties:

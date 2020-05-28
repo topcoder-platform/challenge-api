@@ -37,7 +37,8 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
         userGroups = await helper.getUserGroups(currentUser.userId)
       }
       // check if there is matched group
-      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.name === group))) {
+      // logger.debug('Groups', challenge.groups, userGroups)
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
         res.push(challenge)
       }
     }
@@ -83,7 +84,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
+  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
     'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
@@ -119,6 +120,11 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
+  }
+  if (criteria.groups && !_.isUndefined(currentUser)) {
+    for (const group of criteria.groups) {
+      boolQuery.push({ match: { groups: group } })
+    }
   }
   if (criteria.gitRepoURL) {
     boolQuery.push({ match_phrase: { gitRepoURLs: criteria.gitRepoURL } })
@@ -294,7 +300,8 @@ searchChallenges.schema = {
     updatedBy: Joi.string(),
     memberId: Joi.number().integer().positive(),
     sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
-    sortOrder: Joi.string().valid(['asc', 'desc'])
+    sortOrder: Joi.string().valid(['asc', 'desc']),
+    groups: Joi.array().items(Joi.optionalId()).unique().min(1)
   })
 }
 
