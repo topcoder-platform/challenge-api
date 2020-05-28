@@ -37,7 +37,8 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
         userGroups = await helper.getUserGroups(currentUser.userId)
       }
       // check if there is matched group
-      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.name === group))) {
+      // logger.debug('Groups', challenge.groups, userGroups)
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
         res.push(challenge)
       }
     }
@@ -122,7 +123,7 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.groups && !_.isUndefined(currentUser)) {
     for (const group of criteria.groups) {
-      boolQuery.push({ match_phrase: { groups: group } })
+      boolQuery.push({ match: { groups: group } })
     }
   }
   if (criteria.gitRepoURL) {
