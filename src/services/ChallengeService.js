@@ -121,11 +121,6 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
-  if (criteria.groups && !_.isUndefined(currentUser)) {
-    for (const group of criteria.groups) {
-      boolQuery.push({ match: { groups: group } })
-    }
-  }
   if (criteria.gitRepoURL) {
     boolQuery.push({ match_phrase: { gitRepoURLs: criteria.gitRepoURL } })
   }
@@ -163,6 +158,22 @@ async function searchChallenges (currentUser, criteria) {
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'asc'
 
   const mustQuery = []
+
+  const shouldQuery = []
+
+  if (criteria.groups && !_.isUndefined(currentUser)) {
+    for (const group of criteria.groups) {
+      shouldQuery.push({ match: { groups: group } })
+    }
+  }
+
+  if (shouldQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        should: shouldQuery
+      }
+    })
+  }
 
   let mustNotQuery
 
