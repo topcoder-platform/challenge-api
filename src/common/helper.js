@@ -76,7 +76,7 @@ function autoWrapExpress (obj) {
  */
 function getPageLink (req, page) {
   const q = _.assignIn({}, req.query, { page })
-  return `${req.protocol}://${req.get('Host')}${req.baseUrl}${req.path}?${querystring.stringify(q)}`
+  return `${config.API_BASE_URL}/${req.path}?${querystring.stringify(q)}`
 }
 
 /**
