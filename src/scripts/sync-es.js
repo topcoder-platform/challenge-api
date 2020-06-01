@@ -15,8 +15,8 @@ async function migrateRecords () {
   const result = await helper.scan('Challenge')
   for (const challenge of result) {
     await esClient.update({
-      index: config.get('ES.ES_INDEX'),
-      type: config.get('ES.ES_TYPE'),
+      index: config.get('ES.CHALLENGE_ES_INDEX'),
+      type: config.get('ES.CHALLENGE_ES_TYPE'),
       id: challenge.id,
       body: { doc: challenge, doc_as_upsert: true }
     })

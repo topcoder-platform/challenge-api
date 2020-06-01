@@ -55,8 +55,16 @@ The following parameters can be set in config files or in env variables:
 - ES: config object for Elasticsearch
 - ES.HOST: Elasticsearch host
 - ES.API_VERSION: Elasticsearch API version
-- ES.ES_INDEX: Elasticsearch index name
-- ES.ES_TYPE: Elasticsearch index type
+- ES.CHALLENGE_ES_INDEX: Elasticsearch index name for the Challenge model
+- ES.CHALLENGE_ES_TYPE: Elasticsearch index type for the Challenge model
+- ES.CHALLENGE_TYPE_ES_INDEX: Elasticsearch index name for the ChallengeType model
+- ES.CHALLENGE_TYPE_ES_TYPE: Elasticsearch index type for the ChallengeType model
+- ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX: Elasticsearch index name for the ChallengeTypeTimelineTemplate model
+- ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_TYPE: Elasticsearch index type for the ChallengeTypeTimelineTemplate model
+- ES.PHASE_ES_INDEX: Elasticsearch index name for the Phase model
+- ES.PHASE_ES_TYPE: Elasticsearch index type for the Phase model
+- ES.TIMELINE_TEMPLATE_ES_INDEX: Elasticsearch index name for the TimelineTemplate model
+- ES.TIMELINE_TEMPLATE_ES_TYPE: Elasticsearch index type for the TimelineTemplate model
 - ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
 - RESOURCES_API_URL: TC resources API base URL
@@ -74,6 +82,7 @@ You can find sample `.env` files inside the `/docs` directory.
 1. Drop/delete tables: `npm run drop-tables`
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
+3. Seed/Insert data to ES: `npm run seed-es`
 4. Initialize/Clear database in default environment: `npm run init-db`
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
 6. Create Elasticsearch index: `npm run init-db`, or to re-create index: `npm run init-db force`

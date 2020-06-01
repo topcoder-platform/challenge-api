@@ -12,33 +12,47 @@ const helper = require('./common/helper')
 
 const client = helper.getESClient()
 
-const initES = async () => {
+const indexes = [
+  config.ES.CHALLENGE_ES_INDEX,
+  config.ES.CHALLENGE_TYPE_ES_INDEX,
+  config.ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX,
+  config.ES.TIMELINE_TEMPLATE_ES_INDEX,
+  config.ES.PHASE_ES_INDEX
+]
+
+const processIndex = async (index) => {
   if (process.argv.length === 3 && process.argv[2] === 'force') {
-    logger.info(`Delete index ${config.ES.ES_INDEX} if any.`)
+    logger.info(`Delete index ${index} if any.`)
     try {
-      await client.indices.delete({ index: config.ES.ES_INDEX })
+      await client.indices.delete({ index })
     } catch (err) {
       // ignore
     }
   }
 
-  const exists = await client.indices.exists({ index: config.ES.ES_INDEX })
+  const exists = await client.indices.exists({ index })
   if (exists) {
-    logger.info(`The index ${config.ES.ES_INDEX} exists.`)
+    logger.info(`The index ${index} exists.`)
   } else {
-    logger.info(`The index ${config.ES.ES_INDEX} will be created.`)
+    logger.info(`The index ${index} will be created.`)
 
     const body = { mappings: {} }
-    body.mappings[config.get('ES.ES_TYPE')] = {
+    body.mappings[index] = {
       properties: {
         id: { type: 'keyword' }
       }
     }
 
     await client.indices.create({
-      index: config.ES.ES_INDEX,
+      index,
       body
     })
+  }
+}
+
+const initES = async () => {
+  for (const index of indexes) {
+    await processIndex(index)
   }
 }
 

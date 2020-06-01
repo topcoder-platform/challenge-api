@@ -16,22 +16,6 @@ const initDB = async () => {
   for (const challenge of challenges) {
     await challenge.delete()
   }
-  const typeTimelineTemplates = await helper.scan('ChallengeTypeTimelineTemplate')
-  for (const typeTT of typeTimelineTemplates) {
-    await typeTT.delete()
-  }
-  const types = await helper.scan('ChallengeType')
-  for (const type of types) {
-    await type.delete()
-  }
-  const phases = await helper.scan('Phase')
-  for (const phase of phases) {
-    await phase.delete()
-  }
-  const timelineTemplates = await helper.scan('TimelineTemplate')
-  for (const timelineTemplate of timelineTemplates) {
-    await timelineTemplate.delete()
-  }
   const attachments = await helper.scan('Attachment')
   for (const attachment of attachments) {
     await attachment.delete()

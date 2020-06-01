@@ -320,7 +320,23 @@ async function validatePhases (phases) {
   if (!phases || phases.length === 0) {
     return
   }
-  const records = await scan('Phase')
+
+  const docs = await getESClient().search({
+    index: config.get('ES.TIMELINE_TEMPLATE_ES_INDEX'),
+    body: {
+      query: {
+        bool: {
+          must: {
+            bool: {
+              should: _.map(phases, phase => ({ match: { id: phase.phaseId } }))
+            }
+          }
+        }
+      }
+    }
+  })
+  const records = _.map(docs.hits.hits, item => item._source)
+
   const map = new Map()
   _.each(records, r => {
     map.set(r.id, r)

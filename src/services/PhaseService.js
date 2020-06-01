@@ -3,11 +3,15 @@
  */
 
 const _ = require('lodash')
+const config = require('config')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
+const errors = require('../common/errors')
 const constants = require('../../app-constants')
+
+const esClient = helper.getESClient()
 
 /**
  * Search phases
@@ -15,10 +19,53 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchPhases (criteria) {
-  const list = await helper.scan('Phase')
-  const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name))
-  const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  const mustQuery = []
+  const boolQuery = []
+
+  if (criteria.name) {
+    boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
+  }
+
+  if (boolQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        filter: boolQuery
+      }
+    })
+  }
+
+  const esQuery = {
+    index: config.get('ES.PHASE_ES_INDEX'),
+    size: criteria.perPage,
+    from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
+    body: {
+      query: mustQuery.length > 0 ? {
+        bool: {
+          must: mustQuery
+        }
+      } : {
+        match_all: {}
+      }
+    }
+  }
+
+  // Search with constructed query
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    // Catch error when the ES is fresh and has no data
+    docs = {
+      hits: {
+        total: 0,
+        hits: []
+      }
+    }
+  }
+
+  // Extract data from hits
+  const total = docs.hits.total
+  let result = _.map(docs.hits.hits, item => item._source)
 
   return { total, page: criteria.page, perPage: criteria.perPage, result }
 }
@@ -37,11 +84,22 @@ searchPhases.schema = {
  * @returns {Object} the created phase
  */
 async function createPhase (phase) {
-  await helper.validateDuplicate('Phase', 'name', phase.name)
-  const ret = await helper.create('Phase', _.assign({ id: uuid() }, phase))
+  const [duplicate] = searchPhases({ name: phase.name })
+  if (duplicate) {
+    errors.ConflictError(`Phase with name: ${phase.name} already exist`)
+  }
+  phase = _.assign({ id: uuid() }, phase)
+  await esClient.create({
+    index: config.get('ES.PHASE_ES_INDEX'),
+    type: config.get('ES.PHASE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: phase.id,
+    body: phase
+  })
+
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret)
-  return ret
+  await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, phase)
+  return phase
 }
 
 createPhase.schema = {
@@ -59,7 +117,11 @@ createPhase.schema = {
  * @returns {Object} the phase with given id
  */
 async function getPhase (phaseId) {
-  return helper.getById('Phase', phaseId)
+  return esClient.getSource({
+    index: config.get('ES.PHASE_ES_INDEX'),
+    type: config.get('ES.PHASE_ES_TYPE'),
+    id: phaseId
+  })
 }
 
 getPhase.schema = {
@@ -74,10 +136,13 @@ getPhase.schema = {
  * @returns {Object} the updated phase
  */
 async function update (phaseId, data, isFull) {
-  const phase = await helper.getById('Phase', phaseId)
+  const phase = await getPhase(phaseId)
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    await helper.validateDuplicate('Phase', 'name', data.name)
+    const [duplicate] = searchPhases({ name: phase.name })
+    if (duplicate) {
+      errors.ConflictError(`Phase with name: ${phase.name} already exist`)
+    }
   }
 
   if (isFull) {
@@ -85,11 +150,21 @@ async function update (phaseId, data, isFull) {
     phase.description = data.description
   }
 
-  const ret = await helper.update(phase, data)
+  _.extend(phase, data)
+
+  await esClient.update({
+    index: config.get('ES.PHASE_ES_INDEX'),
+    type: config.get('ES.PHASE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: phaseId,
+    body: {
+      doc: phase
+    }
+  })
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseUpdated,
-    isFull ? ret : _.assignIn({ id: phaseId }, data))
-  return ret
+    isFull ? phase : _.assignIn({ id: phaseId }, data))
+  return phase
 }
 
 /**
@@ -138,8 +213,12 @@ partiallyUpdatePhase.schema = {
  * @returns {Object} the deleted phase
  */
 async function deletePhase (phaseId) {
-  const ret = await helper.getById('Phase', phaseId)
-  await ret.delete()
+  const ret = await getPhase(phaseId)
+  await esClient.delete({
+    index: config.get('ES.PHASE_ES_INDEX'),
+    type: config.get('ES.PHASE_ES_TYPE'),
+    id: phaseId
+  })
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, ret)
   return ret

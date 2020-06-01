@@ -14,6 +14,8 @@ const models = require('../models')
 const HttpStatus = require('http-status-codes')
 const moment = require('moment')
 const phaseService = require('./PhaseService')
+const challengeTypeService = require('./ChallengeTypeService')
+const timelineTemplateService = require('./TimelineTemplateService')
 
 const esClient = helper.getESClient()
 
@@ -210,8 +212,8 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   const esQuery = {
-    index: config.get('ES.ES_INDEX'),
-    type: config.get('ES.ES_TYPE'),
+    index: config.get('ES.CHALLENGE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_ES_TYPE'),
     size: criteria.perPage,
     from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
     body: {
@@ -261,7 +263,7 @@ async function searchChallenges (currentUser, criteria) {
     result = _.each(result, val => _.unset(val, 'privateDescription'))
   }
 
-  const typeList = await helper.scan('ChallengeType')
+  const typeList = await challengeTypeService.searchChallengeTypes()
   const typeMap = new Map()
   _.each(typeList, e => {
     typeMap.set(e.id, e.name)
@@ -323,7 +325,7 @@ searchChallenges.schema = {
 async function validateChallengeData (challenge) {
   if (challenge.typeId) {
     try {
-      await helper.getById('ChallengeType', challenge.typeId)
+      await challengeTypeService.getChallengeType(challenge.typeId)
     } catch (e) {
       if (e.name === 'NotFoundError') {
         throw new errors.BadRequestError(`No challenge type found with id: ${challenge.typeId}.`)
@@ -333,7 +335,7 @@ async function validateChallengeData (challenge) {
     }
   }
   if (challenge.timelineTemplateId) {
-    const template = await helper.getById('TimelineTemplate', challenge.timelineTemplateId)
+    const template = await timelineTemplateService.getTimelineTemplate(challenge.timelineTemplateId)
     if (!template.isActive) {
       throw new errors.BadRequestError(`The timeline template with id: ${challenge.timelineTemplateId} is inactive`)
     }
@@ -350,8 +352,8 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   if (!phases || phases.length === 0) {
     return
   }
-  const template = await helper.getById('TimelineTemplate', timelineTemplateId)
-  const phaseDefinitions = await helper.scan('Phase')
+  const template = timelineTemplateService.getTimelineTemplate(timelineTemplateId)
+  const phaseDefinitions = await phaseService.searchPhases()
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
     phases[i].id = uuid()
@@ -471,8 +473,8 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // Create in ES
   await esClient.create({
-    index: config.get('ES.ES_INDEX'),
-    type: config.get('ES.ES_TYPE'),
+    index: config.get('ES.CHALLENGE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_ES_TYPE'),
     refresh: config.get('ES.ES_REFRESH'),
     id: ret.id,
     body: ret
@@ -550,8 +552,8 @@ async function getChallenge (currentUser, id) {
   let challenge
   try {
     challenge = await esClient.getSource({
-      index: config.get('ES.ES_INDEX'),
-      type: config.get('ES.ES_TYPE'),
+      index: config.get('ES.CHALLENGE_ES_INDEX'),
+      type: config.get('ES.CHALLENGE_ES_TYPE'),
       id
     })
   } catch (e) {
@@ -567,11 +569,11 @@ async function getChallenge (currentUser, id) {
   // populate type property based on the typeId
   if (challenge.typeId) {
     try {
-      const type = await helper.getById('ChallengeType', challenge.typeId)
+      const type = await challengeTypeService.getChallengeType(challenge.typeId)
       challenge.type = type.name
     } catch (e) {
       challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10'
-      const type = await helper.getById('ChallengeType', challenge.typeId)
+      const type = await challengeTypeService.getChallengeType(challenge.typeId)
       challenge.type = type.name
     }
   }
@@ -1063,8 +1065,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
   // Update ES
   await esClient.update({
-    index: config.get('ES.ES_INDEX'),
-    type: config.get('ES.ES_TYPE'),
+    index: config.get('ES.CHALLENGE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_ES_TYPE'),
     refresh: config.get('ES.ES_REFRESH'),
     id: challengeId,
     body: {

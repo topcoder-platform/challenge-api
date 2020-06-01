@@ -3,11 +3,15 @@
  */
 
 const _ = require('lodash')
+const config = require('config')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
+const errors = require('../common/errors')
 const constants = require('../../app-constants')
+
+const esClient = helper.getESClient()
 
 /**
  * Search timeline templates.
@@ -15,10 +19,53 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchTimelineTemplates (criteria) {
-  const list = await helper.scan('TimelineTemplate')
-  const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name))
-  const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  const mustQuery = []
+  const boolQuery = []
+
+  if (criteria.name) {
+    boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
+  }
+
+  if (boolQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        filter: boolQuery
+      }
+    })
+  }
+
+  const esQuery = {
+    index: config.get('ES.TIMELINE_TEMPLATE_ES_INDEX'),
+    size: criteria.perPage,
+    from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
+    body: {
+      query: mustQuery.length > 0 ? {
+        bool: {
+          must: mustQuery
+        }
+      } : {
+        match_all: {}
+      }
+    }
+  }
+
+  // Search with constructed query
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    // Catch error when the ES is fresh and has no data
+    docs = {
+      hits: {
+        total: 0,
+        hits: []
+      }
+    }
+  }
+
+  // Extract data from hits
+  const total = docs.hits.total
+  let result = _.map(docs.hits.hits, item => item._source)
 
   return { total, page: criteria.page, perPage: criteria.perPage, result }
 }
@@ -37,13 +84,25 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate (timelineTemplate) {
-  await helper.validateDuplicate('TimelineTemplate', 'name', timelineTemplate.name)
+  const [duplicate] = searchTimelineTemplates({ name: timelineTemplate.name })
+  if (duplicate) {
+    errors.ConflictError(`TimelineTemplate with name: ${timelineTemplate.name} already exist`)
+  }
+
   await helper.validatePhases(timelineTemplate.phases)
 
-  const ret = await helper.create('TimelineTemplate', _.assign({ id: uuid() }, timelineTemplate))
+  timelineTemplate = _.assign({ id: uuid() }, timelineTemplate)
+  await esClient.create({
+    index: config.get('ES.TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.TIMELINE_TEMPLATE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: timelineTemplate.id,
+    body: timelineTemplate
+  })
+
   // post bus event
-  await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, ret)
-  return ret
+  await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, timelineTemplate)
+  return timelineTemplate
 }
 
 createTimelineTemplate.schema = {
@@ -65,7 +124,11 @@ createTimelineTemplate.schema = {
  * @returns {Object} the timeline template with given id
  */
 async function getTimelineTemplate (timelineTemplateId) {
-  return helper.getById('TimelineTemplate', timelineTemplateId)
+  return esClient.getSource({
+    index: config.get('ES.TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.TIMELINE_TEMPLATE_ES_TYPE'),
+    id: timelineTemplateId
+  })
 }
 
 getTimelineTemplate.schema = {
@@ -80,10 +143,13 @@ getTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function update (timelineTemplateId, data, isFull) {
-  const timelineTemplate = await helper.getById('TimelineTemplate', timelineTemplateId)
+  const timelineTemplate = await getTimelineTemplate(timelineTemplateId)
 
   if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
-    await helper.validateDuplicate('TimelineTemplate', 'name', data.name)
+    const [duplicate] = searchTimelineTemplates({ name: timelineTemplate.name })
+    if (duplicate) {
+      errors.ConflictError(`TimelineTemplate with name: ${timelineTemplate.name} already exist`)
+    }
   }
 
   if (data.phases) {
@@ -93,13 +159,22 @@ async function update (timelineTemplateId, data, isFull) {
   if (isFull) {
     // description is optional field, can be undefined
     timelineTemplate.description = data.description
+
+    await esClient.update({
+      index: config.get('ES.TIMELINE_TEMPLATE_ES_INDEX'),
+      type: config.get('ES.TIMELINE_TEMPLATE_ES_TYPE'),
+      refresh: config.get('ES.ES_REFRESH'),
+      id: timelineTemplateId,
+      body: {
+        doc: timelineTemplate
+      }
+    })
   }
 
-  const ret = await helper.update(timelineTemplate, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateUpdated,
-    isFull ? ret : _.assignIn({ id: timelineTemplateId }, data))
-  return ret
+    isFull ? timelineTemplate : _.assignIn({ id: timelineTemplateId }, data))
+  return timelineTemplate
 }
 
 /**
@@ -156,8 +231,12 @@ partiallyUpdateTimelineTemplate.schema = {
  * @returns {Object} the deleted timeline template
  */
 async function deleteTimelineTemplate (timelineTemplateId) {
-  const ret = await helper.getById('TimelineTemplate', timelineTemplateId)
-  await ret.delete()
+  const ret = await getTimelineTemplate(timelineTemplateId)
+  await esClient.delete({
+    index: config.get('ES.TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.TIMELINE_TEMPLATE_ES_TYPE'),
+    id: timelineTemplateId
+  })
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, ret)
   return ret

@@ -3,11 +3,15 @@
  */
 
 const _ = require('lodash')
+const config = require('config')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
+const errors = require('../common/errors')
 const constants = require('../../app-constants')
+
+const esClient = helper.getESClient()
 
 /**
  * Search challenge types
@@ -15,15 +19,62 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchChallengeTypes (criteria) {
-  const list = await helper.scan('ChallengeType')
-  const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name) &&
-    helper.partialMatch(criteria.description, e.description) &&
-    (_.isUndefined(criteria.isActive) || e.isActive === criteria.isActive) &&
-    helper.partialMatch(criteria.abbreviation, e.abbreviation) &&
-    (_.isUndefined(criteria.legacyId) || e.legacyId === criteria.legacyId)
-  )
-  const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  const mustQuery = []
+  const boolQuery = []
+
+  if (criteria.name) {
+    boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
+  }
+  if (criteria.description) {
+    boolQuery.push({ match: { description: `.*${criteria.description}.*` } })
+  }
+  if (criteria.abbreviation) {
+    boolQuery.push({ match: { abbreviation: criteria.abbreviation } })
+  }
+  if (criteria.legacyId) {
+    boolQuery.push({ match: { legacyId: criteria.legacyId } })
+  }
+
+  if (boolQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        filter: boolQuery
+      }
+    })
+  }
+
+  const esQuery = {
+    index: config.get('ES.CHALLENGE_TYPE_ES_INDEX'),
+    size: criteria.perPage,
+    from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
+    body: {
+      query: mustQuery.length > 0 ? {
+        bool: {
+          must: mustQuery
+        }
+      } : {
+        match_all: {}
+      }
+    }
+  }
+
+  // Search with constructed query
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    // Catch error when the ES is fresh and has no data
+    docs = {
+      hits: {
+        total: 0,
+        hits: []
+      }
+    }
+  }
+
+  // Extract data from hits
+  const total = docs.hits.total
+  let result = _.map(docs.hits.hits, item => item._source)
 
   return { total, page: criteria.page, perPage: criteria.perPage, result }
 }
@@ -46,15 +97,21 @@ searchChallengeTypes.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeType (type) {
-  await helper.validateDuplicate('ChallengeType', 'name', type.name)
-  await helper.validateDuplicate('ChallengeType', 'abbreviation', type.abbreviation)
-  if (type.legacyId) {
-    await helper.validateDuplicate('ChallengeType', 'legacyId', type.legacyId)
+  const [duplicate] = await searchChallengeTypes(type)
+  if (duplicate) {
+    errors.ConflictError('ChallengeType already exist')
   }
-  const ret = await helper.create('ChallengeType', _.assign({ id: uuid() }, type))
+  type = _.assign({ id: uuid() }, type)
+  await esClient.create({
+    index: config.get('ES.CHALLENGE_TYPE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: type.id,
+    body: type
+  })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret)
-  return ret
+  await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, type)
+  return type
 }
 
 createChallengeType.schema = {
@@ -73,8 +130,11 @@ createChallengeType.schema = {
  * @returns {Object} the challenge type with given id
  */
 async function getChallengeType (id) {
-  const ret = await helper.getById('ChallengeType', id)
-  return ret
+  return esClient.getSource({
+    index: config.get('ES.CHALLENGE_TYPE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_ES_TYPE'),
+    id
+  })
 }
 
 getChallengeType.schema = {
@@ -88,15 +148,25 @@ getChallengeType.schema = {
  * @returns {Object} the updated challenge type
  */
 async function fullyUpdateChallengeType (id, data) {
-  const type = await helper.getById('ChallengeType', id)
+  const type = await getChallengeType(id)
+  let duplicateRecords
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
-    await helper.validateDuplicate('ChallengeType', 'name', data.name)
+    duplicateRecords = await searchChallengeTypes({ name: data.name })
+    if (duplicateRecords.length > 0) {
+      errors.ConflictError(`ChallengeType with name ${data.name} already exist`)
+    }
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    await helper.validateDuplicate('ChallengeType', 'abbreviation', data.abbreviation)
+    duplicateRecords = await searchChallengeTypes({ abbreviation: data.abbreviation })
+    if (duplicateRecords.length > 0) {
+      errors.ConflictError(`ChallengeType with abbreviation ${data.abbreviation} already exist`)
+    }
   }
   if (data.legacyId && type.legacyId !== data.legacyId) {
-    await helper.validateDuplicate('ChallengeType', 'legacyId', data.legacyId)
+    duplicateRecords = await searchChallengeTypes({ legacyId: data.legacyId })
+    if (duplicateRecords.length > 0) {
+      errors.ConflictError(`ChallengeType with legacyId ${data.legacyId} already exist`)
+    }
   }
   if (_.isUndefined(data.description)) {
     type.description = undefined
@@ -104,10 +174,20 @@ async function fullyUpdateChallengeType (id, data) {
   if (_.isUndefined(data.legacyId)) {
     type.legacyId = undefined
   }
-  const ret = await helper.update(type, data)
+  _.extend(type, data)
+
+  await esClient.update({
+    index: config.get('ES.CHALLENGE_TYPE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id,
+    body: {
+      doc: type
+    }
+  })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, ret)
-  return ret
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, type)
+  return type
 }
 
 fullyUpdateChallengeType.schema = {
@@ -128,20 +208,41 @@ fullyUpdateChallengeType.schema = {
  * @returns {Object} the updated challenge type
  */
 async function partiallyUpdateChallengeType (id, data) {
-  const type = await helper.getById('ChallengeType', id)
+  const type = await getChallengeType(id)
+  let duplicateRecords
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
-    await helper.validateDuplicate('ChallengeType', 'name', data.name)
+    duplicateRecords = await searchChallengeTypes({ name: data.name })
+    if (duplicateRecords.length > 0) {
+      errors.ConflictError(`ChallengeType with name ${data.name} already exist`)
+    }
   }
   if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    await helper.validateDuplicate('ChallengeType', 'abbreviation', data.abbreviation)
+    duplicateRecords = await searchChallengeTypes({ abbreviation: data.abbreviation })
+    if (duplicateRecords.length > 0) {
+      errors.ConflictError(`ChallengeType with abbreviation ${data.abbreviation} already exist`)
+    }
   }
   if (data.legacyId && type.legacyId !== data.legacyId) {
-    await helper.validateDuplicate('ChallengeType', 'legacyId', data.legacyId)
+    duplicateRecords = await searchChallengeTypes({ legacyId: data.legacyId })
+    if (duplicateRecords.length > 0) {
+      errors.ConflictError(`ChallengeType with legacyId ${data.legacyId} already exist`)
+    }
   }
-  const ret = await helper.update(type, data)
+
+  _.extend(type, data)
+
+  await esClient.update({
+    index: config.get('ES.CHALLENGE_TYPE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id,
+    body: {
+      doc: type
+    }
+  })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data))
-  return ret
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, type)
+  return type
 }
 
 partiallyUpdateChallengeType.schema = {

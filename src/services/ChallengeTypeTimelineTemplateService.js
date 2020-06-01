@@ -3,12 +3,17 @@
  */
 
 const _ = require('lodash')
+const config = require('config')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
+const challengeTypeService = require('./ChallengeTypeService')
+const timelineTemplateService = require('./TimelineTemplateService')
+
+const esClient = helper.getESClient()
 
 /**
  * Search challenge type timeline templates.
@@ -16,10 +21,55 @@ const constants = require('../../app-constants')
  * @returns {Array} the search result
  */
 async function searchChallengeTypeTimelineTemplates (criteria) {
-  const list = await helper.scan('ChallengeTypeTimelineTemplate')
-  const records = _.filter(list, e => (!criteria.typeId || criteria.typeId === e.typeId) &&
-    (!criteria.timelineTemplateId || criteria.timelineTemplateId === e.timelineTemplateId))
-  return records
+  const mustQuery = []
+  const boolQuery = []
+
+  if (criteria.typeId) {
+    boolQuery.push({ match: { typeId: criteria.typeId } })
+  }
+  if (criteria.timelineTemplateId) {
+    boolQuery.push({ match: { timelineTemplateId: criteria.timelineTemplateId } })
+  }
+
+  if (boolQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        filter: boolQuery
+      }
+    })
+  }
+
+  const esQuery = {
+    index: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX'),
+    body: {
+      query: mustQuery.length > 0 ? {
+        bool: {
+          must: mustQuery
+        }
+      } : {
+        match_all: {}
+      }
+    }
+  }
+
+  // Search with constructed query
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    // Catch error when the ES is fresh and has no data
+    docs = {
+      hits: {
+        total: 0,
+        hits: []
+      }
+    }
+  }
+
+  // Extract data from hits
+  let result = _.map(docs.hits.hits, item => item._source)
+
+  return result
 }
 
 searchChallengeTypeTimelineTemplates.schema = {
@@ -41,13 +91,28 @@ async function createChallengeTypeTimelineTemplate (data) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
-  await helper.getById('ChallengeType', data.typeId)
-  await helper.getById('TimelineTemplate', data.timelineTemplateId)
+  const type = await challengeTypeService.getChallengeType(data.typeId)
+  if (!type) {
+    throw new errors.NotFoundError(`ChallengeType with id: ${data.typeId} doesn't exist`)
+  }
+  const timelineTemplate = await timelineTemplateService.getTimelineTemplate(data.timelineTemplateId)
+  if (!timelineTemplate) {
+    throw new errors.NotFoundError(`TimelineTemplate with id: ${data.timelineTemplateId} doesn't exist`)
+  }
 
-  const ret = await helper.create('ChallengeTypeTimelineTemplate', _.assign({ id: uuid() }, data))
+  data = _.assign({ id: uuid() }, data)
+
+  await esClient.create({
+    index: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: data.id,
+    body: data
+  })
+
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTypeTimelineTemplateCreated, ret)
-  return ret
+  await helper.postBusEvent(constants.Topics.ChallengeTypeTimelineTemplateCreated, data)
+  return data
 }
 
 createChallengeTypeTimelineTemplate.schema = {
@@ -63,7 +128,11 @@ createChallengeTypeTimelineTemplate.schema = {
  * @returns {Object} the challenge type timeline template with given id
  */
 async function getChallengeTypeTimelineTemplate (challengeTypeTimelineTemplateId) {
-  return helper.getById('ChallengeTypeTimelineTemplate', challengeTypeTimelineTemplateId)
+  return esClient.getSource({
+    index: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_TYPE'),
+    id: challengeTypeTimelineTemplateId
+  })
 }
 
 getChallengeTypeTimelineTemplate.schema = {
@@ -77,7 +146,7 @@ getChallengeTypeTimelineTemplate.schema = {
  * @returns {Object} the updated challenge type timeline template
  */
 async function fullyUpdateChallengeTypeTimelineTemplate (challengeTypeTimelineTemplateId, data) {
-  const record = await helper.getById('ChallengeTypeTimelineTemplate', challengeTypeTimelineTemplateId)
+  const record = await getChallengeTypeTimelineTemplate(challengeTypeTimelineTemplateId)
 
   if (record.typeId === data.typeId && record.timelineTemplateId === data.timelineTemplateId) {
     // no change
@@ -90,13 +159,29 @@ async function fullyUpdateChallengeTypeTimelineTemplate (challengeTypeTimelineTe
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
-  await helper.getById('ChallengeType', data.typeId)
-  await helper.getById('TimelineTemplate', data.timelineTemplateId)
+  const type = await challengeTypeService.getChallengeType(data.typeId)
+  if (!type) {
+    throw new errors.NotFoundError(`ChallengeType with id: ${data.typeId} doesn't exist`)
+  }
+  const timelineTemplate = await timelineTemplateService.getTimelineTemplate(data.timelineTemplateId)
+  if (!timelineTemplate) {
+    throw new errors.NotFoundError(`TimelineTemplate with id: ${data.timelineTemplateId} doesn't exist`)
+  }
 
-  const ret = await helper.update(record, data)
+  _.extend(type, data)
+
+  await esClient.update({
+    index: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: challengeTypeTimelineTemplateId,
+    body: {
+      doc: data
+    }
+  })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTypeTimelineTemplateUpdated, ret)
-  return ret
+  await helper.postBusEvent(constants.Topics.ChallengeTypeTimelineTemplateUpdated, type)
+  return type
 }
 
 fullyUpdateChallengeTypeTimelineTemplate.schema = {
@@ -110,8 +195,12 @@ fullyUpdateChallengeTypeTimelineTemplate.schema = {
  * @returns {Object} the deleted challenge type timeline template
  */
 async function deleteChallengeTypeTimelineTemplate (challengeTypeTimelineTemplateId) {
-  const ret = await helper.getById('ChallengeTypeTimelineTemplate', challengeTypeTimelineTemplateId)
-  await ret.delete()
+  const ret = await getChallengeTypeTimelineTemplate(challengeTypeTimelineTemplateId)
+  await esClient.delete({
+    index: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_INDEX'),
+    type: config.get('ES.CHALLENGE_TYPE_TIMELINE_TEMPLATE_ES_TYPE'),
+    id: challengeTypeTimelineTemplateId
+  })
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeTimelineTemplateDeleted, ret)
   return ret

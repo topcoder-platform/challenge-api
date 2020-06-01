@@ -30,10 +30,6 @@ dynamoose.setDefaults({
 
 module.exports = {
   Challenge: dynamoose.model('Challenge', require('./Challenge')),
-  ChallengeType: dynamoose.model('ChallengeType', require('./ChallengeType')),
-  ChallengeTypeTimelineTemplate: dynamoose.model('ChallengeTypeTimelineTemplate', require('./ChallengeTypeTimelineTemplate')),
   AuditLog: dynamoose.model('AuditLog', require('./AuditLog')),
-  Phase: dynamoose.model('Phase', require('./Phase')),
-  TimelineTemplate: dynamoose.model('TimelineTemplate', require('./TimelineTemplate')),
   Attachment: dynamoose.model('Attachment', require('./Attachment'))
 }

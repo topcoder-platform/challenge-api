@@ -106,8 +106,8 @@ async function createData () {
 
   // create challenge in Elasticsearch
   await esClient.create({
-    index: config.ES.ES_INDEX,
-    type: config.ES.ES_TYPE,
+    index: config.ES.CHALLENGE_ES_INDEX,
+    type: config.ES.CHALLENGE_ES_TYPE,
     id: challenge.id,
     body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, challenge.originalItem()),
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
@@ -115,8 +115,8 @@ async function createData () {
 
   // create completedChallenge in Elasticsearch
   await esClient.create({
-    index: config.ES.ES_INDEX,
-    type: config.ES.ES_TYPE,
+    index: config.ES.CHALLENGE_ES_INDEX,
+    type: config.ES.CHALLENGE_ES_TYPE,
     id: completedChallenge.id,
     body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, completedChallenge.originalItem()),
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
@@ -156,16 +156,16 @@ const additionalTerm = {
 async function clearData () {
   // remove challenge in Elasticsearch
   await esClient.delete({
-    index: config.ES.ES_INDEX,
-    type: config.ES.ES_TYPE,
+    index: config.ES.CHALLENGE_ES_INDEX,
+    type: config.ES.CHALLENGE_ES_TYPE,
     id: challenge.id,
     refresh: 'true' // refresh ES so that it is effective for read operations instantly
   })
 
   // remove completedChallenge in Elasticsearch
   await esClient.delete({
-    index: config.ES.ES_INDEX,
-    type: config.ES.ES_TYPE,
+    index: config.ES.CHALLENGE_ES_INDEX,
+    type: config.ES.CHALLENGE_ES_TYPE,
     id: completedChallenge.id,
     refresh: 'true' // refresh ES so that it is effective for read operations instantly
   })
