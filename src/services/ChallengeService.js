@@ -121,11 +121,6 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
-  if (criteria.groups && !_.isUndefined(currentUser)) {
-    for (const group of criteria.groups) {
-      boolQuery.push({ match: { groups: group } })
-    }
-  }
   if (criteria.gitRepoURL) {
     boolQuery.push({ match_phrase: { gitRepoURLs: criteria.gitRepoURL } })
   }
@@ -163,6 +158,22 @@ async function searchChallenges (currentUser, criteria) {
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'asc'
 
   const mustQuery = []
+
+  const shouldQuery = []
+
+  if (criteria.groups && !_.isUndefined(currentUser)) {
+    for (const group of criteria.groups) {
+      shouldQuery.push({ match: { groups: group } })
+    }
+  }
+
+  if (shouldQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        should: shouldQuery
+      }
+    })
+  }
 
   let mustNotQuery
 
@@ -448,9 +459,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   }
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
-    created: new Date(),
+    created: moment().utc(),
     createdBy: currentUser.handle || currentUser.sub,
-    updated: new Date(),
+    updated: moment().utc(),
     updatedBy: currentUser.handle || currentUser.sub
   }, challenge))
   ret.numOfSubmissions = 0
@@ -537,6 +548,11 @@ async function getPhasesAndPopulate (data) {
 async function getChallenge (currentUser, id) {
   // get challenge from Elasticsearch
   let challenge
+  logger.warn(JSON.stringify({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    _id: id
+  }))
   try {
     challenge = await esClient.getSource({
       index: config.get('ES.ES_INDEX'),
@@ -795,7 +811,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await validateWinners(data.winners)
   }
 
-  data.updated = new Date()
+  data.updated = moment().utc()
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
   const auditLogs = []
@@ -883,7 +899,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
           fieldName: key,
           oldValue,
           newValue,
-          created: new Date(),
+          created: moment().utc(),
           createdBy: currentUser.handle || currentUser.sub,
           memberId: currentUser.userId || null
         })
@@ -899,7 +915,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       fieldName: 'metadata',
       oldValue: JSON.stringify(challenge.metadata),
       newValue: 'NULL',
-      created: new Date(),
+      created: moment().utc(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
@@ -918,7 +934,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       fieldName: 'attachments',
       oldValue: JSON.stringify(challenge.attachments),
       newValue: 'NULL',
-      created: new Date(),
+      created: moment().utc(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
@@ -937,7 +953,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       fieldName: 'groups',
       oldValue: JSON.stringify(challenge.groups),
       newValue: 'NULL',
-      created: new Date(),
+      created: moment().utc(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
@@ -956,7 +972,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       fieldName: 'gitRepoURLs',
       oldValue: JSON.stringify(challenge.gitRepoURLs),
       newValue: 'NULL',
-      created: new Date(),
+      created: moment().utc(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
@@ -975,7 +991,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       fieldName: 'legacyId',
       oldValue: JSON.stringify(challenge.legacyId),
       newValue: 'NULL',
-      created: new Date(),
+      created: moment().utc(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
@@ -994,7 +1010,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       fieldName: 'winners',
       oldValue: JSON.stringify(challenge.winners),
       newValue: 'NULL',
-      created: new Date(),
+      created: moment().utc(),
       createdBy: currentUser.handle || currentUser.sub,
       memberId: currentUser.userId || null
     })
