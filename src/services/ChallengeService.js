@@ -84,7 +84,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'gitRepoURL', 'createdDateStart', 'createdDateEnd',
+  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
     'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
@@ -120,9 +120,6 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
-  }
-  if (criteria.gitRepoURL) {
-    boolQuery.push({ match_phrase: { gitRepoURLs: criteria.gitRepoURL } })
   }
   if (criteria.currentPhaseId) {
     boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
@@ -296,7 +293,7 @@ searchChallenges.schema = {
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
-    gitRepoURL: Joi.string().uri(),
+    // gitRepoURL: Joi.string().uri(),
     startDateStart: Joi.date(),
     startDateEnd: Joi.date(),
     endDateStart: Joi.date(),
@@ -488,7 +485,10 @@ createChallenge.schema = {
       track: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
-      forumId: Joi.number().integer().positive(),
+      forumId: Joi.number().integer(),
+      directProjectId: Joi.number().integer(),
+      screeningScorecardId: Joi.number().integer(),
+      reviewScorecardId: Joi.number().integer(),
       informixModified: Joi.string()
     }),
     name: Joi.string().required(),
@@ -497,12 +497,17 @@ createChallenge.schema = {
     descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
-      value: Joi.string().required()
+      value: Joi.required()
     })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
+    })),
+    events: Joi.array().items(Joi.object().keys({
+      id: Joi.number().required(),
+      name: Joi.string(),
+      key: Joi.string()
     })),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -518,8 +523,8 @@ createChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-    groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    groups: Joi.array().items(Joi.id()),
+    // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     terms: Joi.array().items(Joi.optionalId()).default([])
   }).required(),
   userToken: Joi.any()
@@ -727,7 +732,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(data.attachmentIds, 'attachmentIds')
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
-  helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
+  // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
 
@@ -848,11 +853,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         _.intersection(challenge[key], value).length !== value.length) {
         op = '$PUT'
       }
-    } else if (key === 'gitRepoURLs') {
-      if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
-        _.intersection(challenge[key], value).length !== value.length) {
-        op = '$PUT'
-      }
+    // } else if (key === 'gitRepoURLs') {
+    //   if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
+    //     _.intersection(challenge[key], value).length !== value.length) {
+    //     op = '$PUT'
+    //   }
     } else if (key === 'winners') {
       if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
       _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length) {
@@ -961,25 +966,25 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     // send null to Elasticsearch to clear the field
     data.groups = null
   }
-  if (isFull && _.isUndefined(data.gitRepoURLs) && challenge.gitRepoURLs) {
-    if (!updateDetails['$DELETE']) {
-      updateDetails['$DELETE'] = {}
-    }
-    updateDetails['$DELETE'].gitRepoURLs = null
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: 'gitRepoURLs',
-      oldValue: JSON.stringify(challenge.gitRepoURLs),
-      newValue: 'NULL',
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null
-    })
-    delete challenge.gitRepoURLs
-    // send null to Elasticsearch to clear the field
-    data.gitRepoURLs = null
-  }
+  // if (isFull && _.isUndefined(data.gitRepoURLs) && challenge.gitRepoURLs) {
+  //   if (!updateDetails['$DELETE']) {
+  //     updateDetails['$DELETE'] = {}
+  //   }
+  //   updateDetails['$DELETE'].gitRepoURLs = null
+  //   auditLogs.push({
+  //     id: uuid(),
+  //     challengeId,
+  //     fieldName: 'gitRepoURLs',
+  //     oldValue: JSON.stringify(challenge.gitRepoURLs),
+  //     newValue: 'NULL',
+  //     created: moment().utc(),
+  //     createdBy: currentUser.handle || currentUser.sub,
+  //     memberId: currentUser.userId || null
+  //   })
+  //   delete challenge.gitRepoURLs
+  //   // send null to Elasticsearch to clear the field
+  //   data.gitRepoURLs = null
+  // }
   if (isFull && _.isUndefined(data.legacyId) && challenge.legacyId) {
     if (!updateDetails['$DELETE']) {
       updateDetails['$DELETE'] = {}
@@ -1096,11 +1101,13 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      track: Joi.string(),
-      reviewType: Joi.string(),
+      track: Joi.string().required(),
+      reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
-      directProjectId: Joi.number(),
-      forumId: Joi.number().integer().positive(),
+      forumId: Joi.number().integer(),
+      directProjectId: Joi.number().integer(),
+      screeningScorecardId: Joi.number().integer(),
+      reviewScorecardId: Joi.number().integer(),
       informixModified: Joi.string()
     }),
     typeId: Joi.optionalId(),
@@ -1110,7 +1117,7 @@ fullyUpdateChallenge.schema = {
     descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
-      value: Joi.string().required()
+      value: Joi.required()
     })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
@@ -1126,14 +1133,19 @@ fullyUpdateChallenge.schema = {
         value: Joi.number().min(0).required()
       })).min(1).required()
     })),
+    events: Joi.array().items(Joi.object().keys({
+      id: Joi.number().required(),
+      name: Joi.string(),
+      key: Joi.string()
+    })),
     tags: Joi.array().items(Joi.string().required()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachmentIds: Joi.array().items(Joi.optionalId()),
-    groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    groups: Joi.array().items(Joi.optionalId()),
+    // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     winners: Joi.array().items(Joi.object().keys({
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
@@ -1175,13 +1187,18 @@ partiallyUpdateChallenge.schema = {
     descriptionFormat: Joi.string(),
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
-      value: Joi.string().required()
+      value: Joi.required()
     })).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
     })).min(1),
+    events: Joi.array().items(Joi.object().keys({
+      id: Joi.number().required(),
+      name: Joi.string(),
+      key: Joi.string()
+    })),
     startDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1197,8 +1214,8 @@ partiallyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachmentIds: Joi.array().items(Joi.optionalId()),
-    groups: Joi.array().items(Joi.string()), // group names
-    gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    groups: Joi.array().items(Joi.id()), // group names
+    // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     winners: Joi.array().items(Joi.object().keys({
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
