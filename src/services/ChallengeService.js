@@ -437,8 +437,8 @@ async function createChallenge (currentUser, challenge, userToken) {
   }
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
-  helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
-  helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
+  // helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
+  // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
 
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
@@ -449,8 +449,11 @@ async function createChallenge (currentUser, challenge, userToken) {
   }
 
   // populate challenge terms
-  const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
-  challenge.terms = await helper.getChallengeTerms(_.union(projectTerms, challenge.terms))
+  // const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
+  // challenge.terms = await helper.validateChallengeTerms(_.union(projectTerms, challenge.terms))
+  // TODO - challenge terms returned from projects api don't have a role associated
+  // this will need to be updated to associate project terms with a roleId
+  challenge.terms = await helper.validateChallengeTerms(challenge.terms)
 
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
@@ -524,9 +527,12 @@ createChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-    groups: Joi.array().items(Joi.id()),
+    groups: Joi.array().items(Joi.optionalId()).unique(),
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
-    terms: Joi.array().items(Joi.optionalId()).default([])
+    terms: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      roleId: Joi.id()
+    }))
   }).required(),
   userToken: Joi.any()
 }
@@ -769,17 +775,22 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // Validate the challenge terms
   let newTermsOfUse
   if (!_.isUndefined(data.terms)) {
-    helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
+    // helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
 
     // Get the project default terms
     const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId)
 
+    if (defaultTerms) {
     // Make sure that the default project terms were not removed
-    const removedTerms = _.difference(defaultTerms, data.terms)
-    if (removedTerms.length !== 0) {
-      throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
+    // TODO - there are no default terms returned by v5
+    // the terms array is objects with a roleId now, so this _.difference won't work
+      // const removedTerms = _.difference(defaultTerms, data.terms)
+      // if (removedTerms.length !== 0) {
+      //   throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
+      // }
     }
-    newTermsOfUse = await helper.getChallengeTerms(_.union(data.terms, defaultTerms))
+    // newTermsOfUse = await helper.validateChallengeTerms(_.union(data.terms, defaultTerms))
+    newTermsOfUse = await helper.validateChallengeTerms(data.terms)
   }
 
   // find out attachment ids to delete
@@ -866,8 +877,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       }
     } else if (key === 'terms') {
       const oldIds = _.map(challenge.terms || [], (t) => t.id)
-      if (oldIds.length !== value.length ||
-        _.intersection(oldIds, value).length !== value.length) {
+      const newIds = _.map(value || [], (t) => t.id)
+      if (oldIds.length !== newIds.length ||
+        _.intersection(oldIds, newIds).length !== value.length) {
         op = '$PUT'
       }
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
@@ -1152,7 +1164,10 @@ fullyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     })).min(1),
-    terms: Joi.array().items(Joi.id().optional()).optional().allow([])
+    terms: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      roleId: Joi.id()
+    })).optional().allow([])
   }).required(),
   userToken: Joi.any()
 }
