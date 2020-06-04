@@ -86,7 +86,7 @@ async function searchChallenges (currentUser, criteria) {
   const boolQuery = []
   _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
-    'currentPhaseId', 'currentPhaseName', 'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
+    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -121,12 +121,12 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.group && !_.isUndefined(currentUser)) {
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
-  if (criteria.currentPhaseId) {
-    boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
-  }
-  if (criteria.currentPhaseName) {
-    boolQuery.push({ match_phrase: { 'currentPhase.name': criteria.currentPhaseName } })
-  }
+  // if (criteria.currentPhaseId) {
+  //   boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
+  // }
+  // if (criteria.currentPhaseName) {
+  //   boolQuery.push({ match_phrase: { 'currentPhase.name': criteria.currentPhaseName } })
+  // }
   if (criteria.createdDateStart) {
     boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } })
   }
@@ -224,7 +224,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.info('Query Object', esQuery)
+  logger.debug('Query Object', esQuery)
 
   // Search with constructed query
   let docs
@@ -298,8 +298,8 @@ searchChallenges.schema = {
     startDateEnd: Joi.date(),
     endDateStart: Joi.date(),
     endDateEnd: Joi.date(),
-    currentPhaseId: Joi.optionalId(),
-    currentPhaseName: Joi.string(),
+    // currentPhaseId: Joi.optionalId(),
+    // currentPhaseName: Joi.string(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
     updatedDateStart: Joi.date(),
@@ -438,6 +438,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
   helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
+  helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
 
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
