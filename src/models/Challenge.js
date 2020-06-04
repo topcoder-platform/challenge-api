@@ -53,6 +53,10 @@ const schema = new Schema({
     type: Array,
     required: false
   },
+  events: {
+    type: [Object],
+    required: false
+  },
   terms: {
     type: Array,
     required: false
@@ -88,10 +92,6 @@ const schema = new Schema({
   },
   // group names
   groups: {
-    type: Array,
-    required: false
-  },
-  gitRepoURLs: {
     type: Array,
     required: false
   },

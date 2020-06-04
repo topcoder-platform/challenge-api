@@ -79,10 +79,6 @@ paths:
           description: Filter by track, case-insensitive, partial matches are allowed.
           required: false
           type: string
-        - name: gitRepoURL
-          description: Filter by git repository URL, case-insensitive, partial matches are allowed.
-          required: false
-          type: string
         - name: name
           in: query
           description: Filter by name, case-insensitive, partial matches are allowed.
@@ -1752,6 +1748,17 @@ definitions:
       - $ref: '#/definitions/PhaseData'
     required:
       - id
+  Event:
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: number
+            description: Event Id
+      - $ref: '#/definitions/EventData'
+    required:
+      - id
   TimelineTemplate:
     type: object
     allOf:
@@ -1831,6 +1838,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Phase'
+      events:
+        type: array
+        items:
+          $ref: '#/definitions/Event'
       prizeSets:
         type: array
         items:
@@ -1869,10 +1880,6 @@ definitions:
         items:
           $ref: '#/definitions/Attachment'
       groups:
-        type: array
-        items:
-          type: string
-      gitRepoURLs:
         type: array
         items:
           type: string
@@ -1997,6 +2004,15 @@ definitions:
         type: string
         format: date-time
         description: 'ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ)'
+  EventData:
+    type: object
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      key:
+        type: string
   TimelineTemplateData:
     type: object
     properties:
@@ -2117,12 +2133,23 @@ definitions:
       timelineTemplateId:
         type: string
         format: UUID
+      events:
+        type: array
+        items:
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            key:
+              type: string
       phases:
         type: array
         items:
           properties:
             phaseId:
-              type: UUID
+              type: string
+              format: UUID
             duration:
               type: number
       prizeSets:
@@ -2167,10 +2194,6 @@ definitions:
         description: the status
         enum: ['New', 'Draft', 'Cancelled', 'Active', 'Completed']
       groups:
-        type: array
-        items:
-          type: string
-      gitRepoURLs:
         type: array
         items:
           type: string
@@ -2234,6 +2257,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Phase'
+      events:
+        type: array
+        items:
+          $ref: '#/definitions/Event'
       prizeSets:
         type: array
         items:
@@ -2278,10 +2305,6 @@ definitions:
         items:
           $ref: '#/definitions/Attachment'
       groups:
-        type: array
-        items:
-          type: string
-      gitRepoURLs:
         type: array
         items:
           type: string
