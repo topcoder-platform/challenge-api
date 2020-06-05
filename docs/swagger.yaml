@@ -199,11 +199,6 @@ paths:
           description: Filter by 'updatedBy' field, case-insensitive, partial matches are allowed.
           required: false
           type: string
-        - name: memberId
-          in: query
-          description: Filter by member, only return challenges this member can access to
-          required: false
-          type: string
         - name: sortBy
           in: query
           description: Sort the results by the field.
@@ -2211,6 +2206,14 @@ definitions:
   SearchChallengeRequestBody:
     type: object
     properties:
+      ids:
+        description: Array of challenge IDs
+        type: array
+        items:
+          type: string
+          format: UUID
+        minItems: 1
+        uniqueItems: true
       groups:
         description: Filter by group IDs
         type: array

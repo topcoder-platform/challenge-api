@@ -84,8 +84,8 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'createdDateStart', 'createdDateEnd',
-    'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd', 'memberId',
+  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'ids', 'createdDateStart', 'createdDateEnd',
+    'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
     'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
@@ -164,6 +164,12 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
+  if (criteria.ids) {
+    for (const id of criteria.ids) {
+      shouldQuery.push({ match: { _id: id } })
+    }
+  }
+
   if (shouldQuery.length > 0) {
     mustQuery.push({
       bool: {
@@ -185,10 +191,12 @@ async function searchChallenges (currentUser, criteria) {
     mustNotQuery = { exists: { field: 'groups' } }
   }
 
-  if (criteria.memberId) {
-    const ids = await helper.listChallengesByMember(criteria.memberId)
-    accessQuery.push({ terms: { _id: ids } })
-  }
+  // if (criteria.memberId) {
+  //   logger.error(`memberId ${criteria.memberId}`)
+  //   const ids = await helper.listChallengesByMember(criteria.memberId)
+  //   logger.error(`response ${JSON.stringify(ids)}`)
+  //   accessQuery.push({ terms: { _id: ids } })
+  // }
 
   if (accessQuery.length > 0) {
     mustQuery.push({
@@ -306,10 +314,11 @@ searchChallenges.schema = {
     updatedDateEnd: Joi.date(),
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
-    memberId: Joi.number().integer().positive(),
+    // memberId: Joi.number().integer().positive(),
     sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
     sortOrder: Joi.string().valid(['asc', 'desc']),
-    groups: Joi.array().items(Joi.optionalId()).unique().min(1)
+    groups: Joi.array().items(Joi.optionalId()).unique().min(1),
+    ids: Joi.array().items(Joi.optionalId()).unique().min(1)
   })
 }
 
