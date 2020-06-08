@@ -83,6 +83,9 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
  */
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
+
+  const page = criteria.page || 0
+  const perPage = criteria.perPage || 20
   const boolQuery = []
   _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
@@ -217,8 +220,8 @@ async function searchChallenges (currentUser, criteria) {
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
     type: config.get('ES.ES_TYPE'),
-    size: criteria.perPage,
-    from: (criteria.page - 1) * criteria.perPage, // Es Index starts from 0
+    size: perPage,
+    from: (page - 1) * perPage, // Es Index starts from 0
     body: {
       query: mustQuery.length > 0 || !_.isUndefined(mustNotQuery) ? {
         bool: {
@@ -240,6 +243,7 @@ async function searchChallenges (currentUser, criteria) {
     docs = await esClient.search(esQuery)
   } catch (e) {
     // Catch error when the ES is fresh and has no data
+    logger.info(`Query Error from ES ${JSON.stringify(e)}`)
     docs = {
       hits: {
         total: 0,
@@ -278,7 +282,7 @@ async function searchChallenges (currentUser, criteria) {
     await getPhasesAndPopulate(element)
   })
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result }
+  return { total, page, perPage, result }
 }
 
 searchChallenges.schema = {
