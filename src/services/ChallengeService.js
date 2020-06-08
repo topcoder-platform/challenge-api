@@ -191,12 +191,12 @@ async function searchChallenges (currentUser, criteria) {
     mustNotQuery = { exists: { field: 'groups' } }
   }
 
-  // if (criteria.memberId) {
-  //   logger.error(`memberId ${criteria.memberId}`)
-  //   const ids = await helper.listChallengesByMember(criteria.memberId)
-  //   logger.error(`response ${JSON.stringify(ids)}`)
-  //   accessQuery.push({ terms: { _id: ids } })
-  // }
+  if (criteria.memberId) {
+    // logger.error(`memberId ${criteria.memberId}`)
+    const ids = await helper.listChallengesByMember(criteria.memberId)
+    // logger.error(`response ${JSON.stringify(ids)}`)
+    accessQuery.push({ terms: { _id: ids } })
+  }
 
   if (accessQuery.length > 0) {
     mustQuery.push({
