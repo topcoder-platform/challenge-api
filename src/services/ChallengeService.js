@@ -314,7 +314,7 @@ searchChallenges.schema = {
     updatedDateEnd: Joi.date(),
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
-    // memberId: Joi.number().integer().positive(),
+    memberId: Joi.number().integer().positive(),
     sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
     sortOrder: Joi.string().valid(['asc', 'desc']),
     groups: Joi.array().items(Joi.optionalId()).unique().min(1),
