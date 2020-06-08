@@ -84,7 +84,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
 
-  const page = criteria.page || 0
+  const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
   _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
