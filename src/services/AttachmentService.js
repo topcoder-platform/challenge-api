@@ -127,4 +127,4 @@ module.exports = {
   downloadAttachment
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)

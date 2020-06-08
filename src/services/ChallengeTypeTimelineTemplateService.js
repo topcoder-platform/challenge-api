@@ -129,4 +129,4 @@ module.exports = {
   deleteChallengeTypeTimelineTemplate
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)
