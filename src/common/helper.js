@@ -588,6 +588,19 @@ async function getProjectDefaultTerms (projectId) {
 }
 
 /**
+ * This functions gets the default billing account for a given project id
+ *
+ * @param {Number} projectId The id of the project for which to get the default terms of use
+ * @returns {Promise<Number>} The billing account ID
+ */
+async function getProjectBillingAccount (projectId) {
+  const token = await getM2MToken()
+  const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
+  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+  return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+}
+
+/**
  * This function gets the challenge terms array with the terms data
  * The terms data is retrieved from the terms API using the specified terms ids
  *
@@ -642,5 +655,6 @@ module.exports = {
   listChallengesByMember,
   validateESRefreshMethod,
   getProjectDefaultTerms,
-  validateChallengeTerms
+  validateChallengeTerms,
+  getProjectBillingAccount
 }

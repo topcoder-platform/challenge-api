@@ -60,6 +60,7 @@ The following parameters can be set in config files or in env variables:
 - ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
 - RESOURCES_API_URL: TC resources API base URL
+- V3_PROJECTS_API_URL: TC direct projects API base URL
 - GROUPS_API_URL: TC groups API base URL
 - PROJECTS_API_URL: TC projects API base URL
 - TERMS_API_URL: TC Terms API Base URL

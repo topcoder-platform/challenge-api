@@ -443,6 +443,9 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * @returns {Object} the created challenge
  */
 async function createChallenge (currentUser, challenge, userToken) {
+  if (challenge.status === constants.challengeStatuses.Active) {
+    throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
+  }
   await helper.ensureProjectExist(challenge.projectId, userToken)
   await validateChallengeData(challenge)
   if (challenge.phases && challenge.phases.length > 0) {
@@ -755,6 +758,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  let billingAccountId
+  if (data.status) {
+    if (data.status === constants.challengeStatuses.Active && _.isUndefined(challenge.legacy.directProjectId)) {
+      throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
+    }
+    if (data.status === constants.challengeStatuses.Completed) {
+      if (challenge.status !== constants.challengeStatuses.Active) {
+        throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
+      }
+      billingAccountId = helper.getProjectBillingAccount(challenge.legacy.directProjectId)
+    }
+  }
 
   // FIXME: Tech Debt
   if (_.get(challenge, 'legacy.track') && _.get(data, 'legacy.track') && _.get(challenge, 'legacy.track') !== _.get(data, 'legacy.track')) {
@@ -1091,7 +1106,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
+  const busEventPayload = { ...challenge }
+  if (billingAccountId) {
+    busEventPayload.billingAccountId = billingAccountId
+  }
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
 
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
