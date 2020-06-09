@@ -3,14 +3,20 @@
  */
 
 const models = require('../models')
+const { includes } = require('lodash')
 const logger = require('../common/logger')
 
 logger.info('Requesting to create tables...')
 
 const promises = []
+const skipModels = ['DynamoDB']
 
 Object.keys(models).forEach(modelName => {
-  promises.push(models[modelName].$__.table.create())
+  if (!includes(skipModels, modelName)) {
+    promises.push(models[modelName].$__.table.create())
+  } else {
+    logger.info(`Skipping ${modelName}`)
+  }
 })
 
 Promise.all(promises)
