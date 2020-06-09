@@ -593,7 +593,7 @@ async function getProjectDefaultTerms (projectId) {
  *
  * @param {Array<Object>} terms The array of terms {id, roleId} to retrieve from terms API
  */
-async function validateChallengeTerms (terms) {
+async function validateChallengeTerms (terms = []) {
   const listOfTerms = []
   const token = await getM2MToken()
   for (let term of terms) {
