@@ -76,7 +76,7 @@ function autoWrapExpress (obj) {
  */
 function getPageLink (req, page) {
   const q = _.assignIn({}, req.query, { page })
-  return `${config.API_BASE_URL}/${req.path}?${querystring.stringify(q)}`
+  return `${config.API_BASE_URL}${req.path}?${querystring.stringify(q)}`
 }
 
 /**
@@ -584,26 +584,26 @@ async function getProjectDefaultTerms (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
   const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-  return res.data.terms
+  return res.data.terms || []
 }
 
 /**
  * This function gets the challenge terms array with the terms data
  * The terms data is retrieved from the terms API using the specified terms ids
  *
- * @param {Array<Number>} termsIds The array of terms ids to retrieve from terms API
+ * @param {Array<Object>} terms The array of terms {id, roleId} to retrieve from terms API
  */
-async function getChallengeTerms (termsIds) {
-  const terms = []
+async function validateChallengeTerms (terms) {
+  const listOfTerms = []
   const token = await getM2MToken()
-  for (let id of termsIds) {
+  for (let term of terms) {
     // Get the terms details from the API
     try {
-      const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
-      terms.push(res.data.id)
+      await axios.get(`${config.TERMS_API_URL}/${term.id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
+      listOfTerms.push(term)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
-        throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)
+        throw new errors.BadRequestError(`Terms of use identified by the id ${term.id} does not exist`)
       } else {
         // re-throw other error
         throw e
@@ -611,7 +611,7 @@ async function getChallengeTerms (termsIds) {
     }
   }
 
-  return terms
+  return listOfTerms
 }
 
 module.exports = {
@@ -642,5 +642,5 @@ module.exports = {
   listChallengesByMember,
   validateESRefreshMethod,
   getProjectDefaultTerms,
-  getChallengeTerms
+  validateChallengeTerms
 }

@@ -158,4 +158,4 @@ module.exports = {
   deletePhase
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)

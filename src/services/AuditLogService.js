@@ -42,4 +42,4 @@ module.exports = {
   searchAuditLogs
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)
