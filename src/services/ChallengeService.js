@@ -1142,7 +1142,6 @@ function sanitizeChallenge (challenge) {
       'informixModified'
     ])
   }
-  // metadata
   if (challenge.metadata) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
