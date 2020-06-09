@@ -1111,6 +1111,63 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 }
 
 /**
+ * Remove unwanted properties from the challenge object
+ * @param {Object} challenge the challenge object
+ */
+function sanitizeChallenge (challenge) {
+  const sanitized = _.pick(challenge, [
+    'typeId',
+    'name',
+    'description',
+    'privateDescription',
+    'descriptionFormat',
+    'timelineTemplateId',
+    'tags',
+    'projectId',
+    'legacyId',
+    'startDate',
+    'status',
+    'attachmentIds',
+    'groups'
+  ])
+  if (challenge.legacy) {
+    sanitized.legacy = _.pick(challenge.legacy, [
+      'track',
+      'reviewType',
+      'confidentialityType',
+      'forumId',
+      'directProjectId',
+      'screeningScorecardId',
+      'reviewScorecardId',
+      'informixModified'
+    ])
+  }
+  // metadata
+  if (challenge.metadata) {
+    sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
+  }
+  if (challenge.phases) {
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration']))
+  }
+  if (challenge.prizeSets) {
+    sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
+      ..._.pick(prizeSet, ['type', 'description']),
+      prizes: _.map(prizeSet.prizes, prize => _.pick(prize, ['description', 'type', 'value']))
+    }))
+  }
+  if (challenge.events) {
+    sanitized.events = _.map(challenge.events, event => _.pick(event, ['id', 'name', 'key']))
+  }
+  if (challenge.winners) {
+    sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
+  }
+  if (challenge.terms) {
+    sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
+  }
+  return sanitized
+}
+
+/**
  * Fully update challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -1119,7 +1176,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
  * @returns {Object} the updated challenge
  */
 async function fullyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, data, userToken, true)
+  return update(currentUser, challengeId, sanitizeChallenge(data), userToken, true)
 }
 
 fullyUpdateChallenge.schema = {
@@ -1194,7 +1251,7 @@ fullyUpdateChallenge.schema = {
  * @returns {Object} the updated challenge
  */
 async function partiallyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, data, userToken)
+  return update(currentUser, challengeId, sanitizeChallenge(data), userToken)
 }
 
 partiallyUpdateChallenge.schema = {
