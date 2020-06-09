@@ -7,27 +7,27 @@
     "phases": [
       {
         "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 120
+        "defaultDuration": 432000
       },
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
         "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 12
+        "defaultDuration": 43200
       },
       {
         "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
         "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
-        "defaultDuration": 16
+        "defaultDuration": 57600
       }
     ]
   },
@@ -40,42 +40,42 @@
     "phases": [
       {
         "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 96
+        "defaultDuration": 345600
       },
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 72
+        "defaultDuration": 259200
       },
       {
         "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
         "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 12
+        "defaultDuration": 43200
       },
       {
         "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
         "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
-        "defaultDuration": 16
+        "defaultDuration": 57600
       },
       {
         "phaseId": "3e2afca6-9542-4763-a135-96b33f12c082",
         "predecessor": "797a6af7-cd3f-4436-9fca-9679f773bee9",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       },
       {
         "phaseId": "f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59",
         "predecessor": "3e2afca6-9542-4763-a135-96b33f12c082",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       },
       {
         "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
         "predecessor": "f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       }
     ]
   },
@@ -88,17 +88,17 @@
     "phases": [
       {
         "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 336
+        "defaultDuration": 1209600
       },
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 336
+        "defaultDuration": 1209600
       },
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 168
+        "defaultDuration": 604800
       }
     ]
   },
@@ -111,63 +111,63 @@
     "phases": [
       {
         "phaseId": "fb21431c-119e-4bc7-b447-d0af3f2be6b4",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       },
       {
         "phaseId": "2752454b-0952-4a42-a4f0-f3fb88a9b065",
         "predecessor": "fb21431c-119e-4bc7-b447-d0af3f2be6b4",
-        "defaultDuration": 12
+        "defaultDuration": 43200
       },
       
       {
         "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
         "predecessor": "2752454b-0952-4a42-a4f0-f3fb88a9b065",
-        "defaultDuration": 96
+        "defaultDuration": 345600
       },
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 216
+        "defaultDuration": 777600
       },
       {
         "phaseId": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 84
+        "defaultDuration": 302400
       },
       {
         "phaseId": "ce1afb4c-74f9-496b-9e4b-087ae73ab032",
         "predecessor": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
-        "defaultDuration": 4
+        "defaultDuration": 14400
       },
       {
         "phaseId": "84b43897-2aab-44d6-a95a-42c433657eed",
         "predecessor": "ce1afb4c-74f9-496b-9e4b-087ae73ab032",
-        "defaultDuration": 84
+        "defaultDuration": 302400
       },
       {
         "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
         "predecessor": "84b43897-2aab-44d6-a95a-42c433657eed",
-        "defaultDuration": 12
+        "defaultDuration": 43200
       },
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "defaultDuration": 120
+        "defaultDuration": 432000
       },
       {
         "phaseId": "3e2afca6-9542-4763-a135-96b33f12c082",
         "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59",
         "predecessor": "3e2afca6-9542-4763-a135-96b33f12c082",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       },
       {
         "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
         "predecessor": "f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       }
     ]
   },
@@ -179,27 +179,27 @@
     "phases": [
       {
         "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 2
+        "defaultDuration": 7200
       },
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       },
       {
         "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
         "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 48
+        "defaultDuration": 172800
       }
     ]
   },
@@ -212,17 +212,17 @@
     "phases": [
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       },
       {
         "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       },
       {
         "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
         "predecessor": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
-        "defaultDuration": 24
+        "defaultDuration": 86400
       }
     ]
   }
