@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+// const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 

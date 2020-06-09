@@ -15,17 +15,40 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchChallengeTypes (criteria) {
-  const list = await helper.scan('ChallengeType')
-  const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name) &&
-    helper.partialMatch(criteria.description, e.description) &&
-    (_.isUndefined(criteria.isActive) || e.isActive === criteria.isActive) &&
-    helper.partialMatch(criteria.abbreviation, e.abbreviation) &&
-    (_.isUndefined(criteria.legacyId) || e.legacyId === criteria.legacyId)
-  )
-  const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  // TODO - move this to ES
+  let records = await helper.scan('ChallengeType')
+  const page = criteria.page || 1
+  const perPage = criteria.perPage || 50
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result }
+  if (criteria.name) {
+    logger.warn(`filter on name ${criteria.name}`)
+    records = _.filter(records, e => helper.partialMatch(criteria.name, e.name))
+  }
+  if (criteria.description) {
+    logger.warn(`filter on description ${criteria.description}`)
+    records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
+  }
+  if (criteria.abbreviation) {
+    logger.warn(`filter on abbreviation ${criteria.abbreviation}`)
+    records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
+  }
+  if (!_.isUndefined(criteria.isActive)) {
+    // logger.warn(`filter on isActive ${criteria.isActive} ${criteria.isActive === true}  ${criteria.isActive === 'true'}`)
+    records = _.filter(records, e => {
+      // logger.warn(`e.isActive ${e.isActive} ${e.isActive === true} ${e.isActive === 'true'}`)
+      return (e.isActive === (criteria.isActive === 'true'))
+    })
+  }
+  if (criteria.legacyId) {
+    logger.warn(`filter on legacyId ${criteria.legacyId}`)
+    records = _.filter(records, e => (e.legacyId === criteria.legacyId))
+  }
+  // const records = list
+  // logger.warn(JSON.stringify(list))
+  const total = records.length
+  const result = records.slice((page - 1) * perPage, page * perPage)
+
+  return { total, page, perPage, result }
 }
 
 searchChallengeTypes.schema = {
