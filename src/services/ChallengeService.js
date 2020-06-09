@@ -466,7 +466,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   // challenge.terms = await helper.validateChallengeTerms(_.union(projectTerms, challenge.terms))
   // TODO - challenge terms returned from projects api don't have a role associated
   // this will need to be updated to associate project terms with a roleId
-  challenge.terms = await helper.validateChallengeTerms(challenge.terms)
+  challenge.terms = await helper.validateChallengeTerms(challenge.terms || [])
 
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
