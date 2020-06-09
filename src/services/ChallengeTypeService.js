@@ -20,31 +20,12 @@ async function searchChallengeTypes (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
 
-  if (criteria.name) {
-    logger.warn(`filter on name ${criteria.name}`)
-    records = _.filter(records, e => helper.partialMatch(criteria.name, e.name))
-  }
-  if (criteria.description) {
-    logger.warn(`filter on description ${criteria.description}`)
-    records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
-  }
-  if (criteria.abbreviation) {
-    logger.warn(`filter on abbreviation ${criteria.abbreviation}`)
-    records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
-  }
-  if (!_.isUndefined(criteria.isActive)) {
-    // logger.warn(`filter on isActive ${criteria.isActive} ${criteria.isActive === true}  ${criteria.isActive === 'true'}`)
-    records = _.filter(records, e => {
-      // logger.warn(`e.isActive ${e.isActive} ${e.isActive === true} ${e.isActive === 'true'}`)
-      return (e.isActive === (criteria.isActive === 'true'))
-    })
-  }
-  if (criteria.legacyId) {
-    logger.warn(`filter on legacyId ${criteria.legacyId}`)
-    records = _.filter(records, e => (e.legacyId === criteria.legacyId))
-  }
-  // const records = list
-  // logger.warn(JSON.stringify(list))
+  if (criteria.name) records = _.filter(records, e => helper.partialMatch(criteria.name, e.name))
+  if (criteria.description) records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
+  if (criteria.abbreviation) records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
+  if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive === 'true')))
+  if (criteria.legacyId) records = _.filter(records, e => (e.legacyId === criteria.legacyId))
+
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
 

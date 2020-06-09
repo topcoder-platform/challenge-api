@@ -5,7 +5,7 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+// const logger = require('../common/logger')
 
 /**
  * Search audit logs
@@ -13,17 +13,20 @@ const logger = require('../common/logger')
  * @returns {Object} the search result
  */
 async function searchAuditLogs (criteria) {
-  const list = await helper.scan('AuditLog')
-  const records = _.filter(list, e => helper.partialMatch(criteria.fieldName, e.fieldName) &&
-    (_.isUndefined(criteria.createdDateStart) || criteria.createdDateStart.getTime() <= e.created.getTime()) &&
-    (_.isUndefined(criteria.createdDateEnd) || criteria.createdDateEnd.getTime() >= e.created.getTime()) &&
-    (_.isUndefined(criteria.challengeId) || criteria.challengeId === e.challengeId) &&
-    (_.isUndefined(criteria.createdBy) || criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase())
-  )
-  const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  const page = criteria.page || 1
+  const perPage = criteria.perPage || 50
+  let records = await helper.scan('AuditLog')
+  // TODO this needs to be in ES
+  if (criteria.fieldName) records = _.filter(records, e => helper.partialMatch(criteria.fieldName, e.fieldName))
+  if (criteria.createdDateStart) records = _.filter(records, e => criteria.createdDateStart.getTime() <= e.created.getTime())
+  if (criteria.createdDateEnd) records = _.filter(records, e => criteria.createdDateEnd.getTime() <= e.created.getTime())
+  if (criteria.challengeId) records = _.filter(records, e => criteria.challengeId === e.challengeId)
+  if (criteria.createdBy) records = _.filter(records, e => criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase())
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result }
+  const total = records.length
+  const result = records.slice((page - 1) * perPage, page * perPage)
+
+  return { total, page, perPage, result }
 }
 
 searchAuditLogs.schema = {
