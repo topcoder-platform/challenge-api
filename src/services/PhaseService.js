@@ -15,12 +15,14 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchPhases (criteria) {
+  const page = criteria.page || 1
+  const perPage = criteria.perPage || 50
   const list = await helper.scan('Phase')
   const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name))
   const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  const result = records.slice((page - 1) * perPage, page * perPage)
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result }
+  return { total, page, perPage, result }
 }
 
 searchPhases.schema = {
