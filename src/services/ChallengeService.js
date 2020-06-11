@@ -767,8 +767,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       if (challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
-      billingAccountId = helper.getProjectBillingAccount(challenge.legacy.directProjectId)
     }
+    billingAccountId = helper.getProjectBillingAccount(challenge.legacy.directProjectId)
   }
 
   // FIXME: Tech Debt
