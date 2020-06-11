@@ -760,15 +760,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const challenge = await helper.getById('Challenge', challengeId)
   let billingAccountId
   if (data.status) {
-    if (data.status === constants.challengeStatuses.Active && _.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
-      throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
+    if (data.status === constants.challengeStatuses.Active) {
+      if (_.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
+        throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
+      }
+      billingAccountId = helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
+      billingAccountId = helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
     }
-    billingAccountId = helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
   }
 
   // FIXME: Tech Debt
