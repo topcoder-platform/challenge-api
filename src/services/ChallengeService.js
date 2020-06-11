@@ -758,6 +758,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  // FIXME: Tech Dept
   let billingAccountId
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
