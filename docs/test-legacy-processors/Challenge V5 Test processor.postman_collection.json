@@ -80,7 +80,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n    \"name\": \"Thomas test challenge 11 June\",\n    \"projectId\": 16531,\n    \"status\": \"Draft\",\n    \"terms\": [],\n    \"description\": \"This is the description\",\n    \"legacy\": {\n        \"track\": \"DEVELOP\",\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-06-09T14:00:00.000Z\",\n    \"prizeSets\": [\n        {\n            \"type\": \"placement\",\n            \"description\": \"Challenge Prizes\",\n            \"prizes\": [\n                {\n                    \"value\": 500,\n                    \"type\": \"USD\"\n                },\n                {\n                    \"value\": 250,\n                    \"type\": \"USD\"\n                }\n            ]\n        }\n    ],\n    \"tags\": [\n        \"JavaScript\",\n        \"Apex\",\n        \"Visualforce\",\n        \"Force.com\",\n        \"Salesforce.com\"\n    ]\n}",
+					"raw": "{\n    \"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n    \"name\": \"Thomas test challenge 11 June\",\n    \"projectId\": 16531,\n    \"status\": \"Draft\",\n    \"terms\": [],\n    \"description\": \"This is the description\",\n    \"legacy\": {\n        \"track\": \"DEVELOP\",\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-06-12T14:00:00.000Z\",\n    \"prizeSets\": [\n        {\n            \"type\": \"placement\",\n            \"description\": \"Challenge Prizes\",\n            \"prizes\": [\n                {\n                    \"value\": 500,\n                    \"type\": \"USD\"\n                },\n                {\n                    \"value\": 250,\n                    \"type\": \"USD\"\n                }\n            ]\n        }\n    ],\n    \"tags\": [\n        \"JavaScript\",\n        \"Apex\",\n        \"Visualforce\",\n        \"Force.com\",\n        \"Salesforce.com\"\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -113,7 +113,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n    \"name\": \"Thomas test challenge 9 June\",\n    \"projectId\": 16531,\n    \"status\": \"New\",\n    \"terms\": [],\n    \"description\": \"This is the description\",\n    \"legacy\": {\n        \"track\": \"DEVELOP\",\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-06-09T14:00:00.000Z\",\n    \"prizeSets\": [\n        {\n            \"type\": \"placement\",\n            \"description\": \"Challenge Prizes\",\n            \"prizes\": [\n                {\n                    \"value\": 500,\n                    \"type\": \"USD\"\n                },\n                {\n                    \"value\": 250,\n                    \"type\": \"USD\"\n                }\n            ]\n        }\n    ],\n    \"tags\": [\n        \"JavaScript\",\n        \"Apex\",\n        \"Visualforce\",\n        \"Force.com\",\n        \"Salesforce.com\"\n    ]\n}",
+					"raw": "{\n    \"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n    \"name\": \"Thomas test challenge 9 June\",\n    \"projectId\": 16531,\n    \"status\": \"New\",\n    \"terms\": [],\n    \"description\": \"This is the description\",\n    \"legacy\": {\n        \"track\": \"DEVELOP\",\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-06-12T14:00:00.000Z\",\n    \"prizeSets\": [\n        {\n            \"type\": \"placement\",\n            \"description\": \"Challenge Prizes\",\n            \"prizes\": [\n                {\n                    \"value\": 500,\n                    \"type\": \"USD\"\n                },\n                {\n                    \"value\": 250,\n                    \"type\": \"USD\"\n                }\n            ]\n        }\n    ],\n    \"tags\": [\n        \"JavaScript\",\n        \"Apex\",\n        \"Visualforce\",\n        \"Force.com\",\n        \"Salesforce.com\"\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -223,6 +223,76 @@
 					]
 				},
 				"description": "If the `challenge.legacy.directProjectId` is not set, meaning the challenge wasn't yet created on the legacy system, this will fail. Otherwise, the processor will activate the challenge on the legacy system."
+			},
+			"response": []
+		},
+		{
+			"name": "Open submission/registration phases",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800,\n            \"isOpen\": true\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000,\n            \"isOpen\": true\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				},
+				"description": "The legacy processor should ingore the event if the `challenge.status` is `New`"
+			},
+			"response": []
+		},
+		{
+			"name": "Register member",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"challengeId\": \"{{CHALLENGE_ID}}\",\n  \"memberHandle\": \"TonyJ\",\n  \"roleId\": \"{{SUBMITTER_ROLE_ID}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://api.topcoder-dev.com/v5/resources",
+					"protocol": "http",
+					"host": [
+						"api",
+						"topcoder-dev",
+						"com"
+					],
+					"path": [
+						"v5",
+						"resources"
+					]
+				}
 			},
 			"response": []
 		},

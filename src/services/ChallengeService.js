@@ -371,7 +371,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
     const phaseDefinition = _.find(phaseDefinitions, (p) => p.id === phase.phaseId)
     phase.name = _.get(phaseDefinition, 'name')
-    phase.isOpen = false
+    phase.isOpen = _.get(phase, 'isOpen', false)
     if (templatePhase) {
       // use default duration if not provided
       if (!phase.duration) {
@@ -1175,7 +1175,7 @@ function sanitizeChallenge (challenge) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
   if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration']))
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen']))
   }
   if (challenge.prizeSets) {
     sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
@@ -1233,7 +1233,8 @@ fullyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().positive()
+      duration: Joi.number().positive(),
+      isOpen: Joi.boolean()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1306,7 +1307,8 @@ partiallyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().positive()
+      duration: Joi.number().positive(),
+      isOpen: Joi.boolean()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
