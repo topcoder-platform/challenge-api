@@ -716,9 +716,15 @@ function isDifferentPrizeSets (prizeSets = [], otherPrizeSets) {
 /**
  * Validate the winners array.
  * @param {Array} winners the Winner Array
+ * @param {String} winchallengeIdners the challenge ID
  */
-function validateWinners (winners) {
+async function validateWinners (winners, challengeId) {
+  const challengeResources = await helper.getChallengeResources(challengeId)
+  const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
   for (const winner of winners) {
+    if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(winner.userId))) {
+      throw new errors.BadRequestError(`Member with userId: ${winner.userId} is not registered on the challenge`)
+    }
     const diffWinners = _.differenceWith(winners, [winner], _.isEqual)
     if (diffWinners.length + 1 !== winners.length) {
       throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
@@ -857,7 +863,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (data.winners && data.winners.length) {
-    await validateWinners(data.winners)
+    await validateWinners(data.winners, challengeId)
   }
 
   data.updated = moment().utc()
