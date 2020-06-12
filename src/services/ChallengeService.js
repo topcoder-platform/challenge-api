@@ -1134,6 +1134,62 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 }
 
 /**
+ * Remove unwanted properties from the challenge object
+ * @param {Object} challenge the challenge object
+ */
+function sanitizeChallenge (challenge) {
+  const sanitized = _.pick(challenge, [
+    'typeId',
+    'name',
+    'description',
+    'privateDescription',
+    'descriptionFormat',
+    'timelineTemplateId',
+    'tags',
+    'projectId',
+    'legacyId',
+    'startDate',
+    'status',
+    'attachmentIds',
+    'groups'
+  ])
+  if (challenge.legacy) {
+    sanitized.legacy = _.pick(challenge.legacy, [
+      'track',
+      'reviewType',
+      'confidentialityType',
+      'forumId',
+      'directProjectId',
+      'screeningScorecardId',
+      'reviewScorecardId',
+      'informixModified'
+    ])
+  }
+  if (challenge.metadata) {
+    sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
+  }
+  if (challenge.phases) {
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration']))
+  }
+  if (challenge.prizeSets) {
+    sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
+      ..._.pick(prizeSet, ['type', 'description']),
+      prizes: _.map(prizeSet.prizes, prize => _.pick(prize, ['description', 'type', 'value']))
+    }))
+  }
+  if (challenge.events) {
+    sanitized.events = _.map(challenge.events, event => _.pick(event, ['id', 'name', 'key']))
+  }
+  if (challenge.winners) {
+    sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
+  }
+  if (challenge.terms) {
+    sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
+  }
+  return sanitized
+}
+
+/**
  * Fully update challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -1142,7 +1198,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
  * @returns {Object} the updated challenge
  */
 async function fullyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, data, userToken, true)
+  return update(currentUser, challengeId, sanitizeChallenge(data), userToken, true)
 }
 
 fullyUpdateChallenge.schema = {
@@ -1158,7 +1214,7 @@ fullyUpdateChallenge.schema = {
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
       informixModified: Joi.string()
-    }),
+    }).unknown(true),
     typeId: Joi.optionalId(),
     name: Joi.string().required(),
     description: Joi.string(),
@@ -1167,12 +1223,12 @@ fullyUpdateChallenge.schema = {
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.required()
-    })).unique((a, b) => a.name === b.name),
+    }).unknown(true)).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
-    })),
+    }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
@@ -1181,12 +1237,12 @@ fullyUpdateChallenge.schema = {
         type: Joi.string().required(),
         value: Joi.number().min(0).required()
       })).min(1).required()
-    })),
+    }).unknown(true)),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
       name: Joi.string(),
       key: Joi.string()
-    })),
+    }).unknown(true)),
     tags: Joi.array().items(Joi.string().required()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
@@ -1199,12 +1255,12 @@ fullyUpdateChallenge.schema = {
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
-    })).min(1),
+    }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.object().keys({
       id: Joi.id(),
       roleId: Joi.id()
-    })).optional().allow([])
-  }).required(),
+    }).unknown(true)).optional().allow([])
+  }).unknown(true).required(),
   userToken: Joi.any()
 }
 
@@ -1217,7 +1273,7 @@ fullyUpdateChallenge.schema = {
  * @returns {Object} the updated challenge
  */
 async function partiallyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, data, userToken)
+  return update(currentUser, challengeId, sanitizeChallenge(data), userToken)
 }
 
 partiallyUpdateChallenge.schema = {
@@ -1231,7 +1287,7 @@ partiallyUpdateChallenge.schema = {
       directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive(),
       informixModified: Joi.string()
-    }),
+    }).unknown(true),
     typeId: Joi.optionalId(),
     name: Joi.string(),
     description: Joi.string(),
@@ -1240,17 +1296,17 @@ partiallyUpdateChallenge.schema = {
     metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
       value: Joi.required()
-    })).unique((a, b) => a.name === b.name),
+    }).unknown(true)).unique((a, b) => a.name === b.name),
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().positive()
-    })).min(1),
+    }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
       name: Joi.string(),
       key: Joi.string()
-    })),
+    }).unknown(true)),
     startDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1260,7 +1316,7 @@ partiallyUpdateChallenge.schema = {
         type: Joi.string().required(),
         value: Joi.number().min(0).required()
       })).min(1).required()
-    })).min(1),
+    }).unknown(true)).min(1),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
@@ -1272,9 +1328,9 @@ partiallyUpdateChallenge.schema = {
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
-    })).min(1),
+    }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.id().optional()).optional().allow([])
-  }).required(),
+  }).unknown(true).required(),
   userToken: Joi.any()
 }
 
