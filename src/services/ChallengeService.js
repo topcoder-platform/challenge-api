@@ -371,7 +371,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
     const phaseDefinition = _.find(phaseDefinitions, (p) => p.id === phase.phaseId)
     phase.name = _.get(phaseDefinition, 'name')
-    phase.isOpen = false
+    phase.isOpen = _.get(phase, 'isOpen', false)
     if (templatePhase) {
       // use default duration if not provided
       if (!phase.duration) {
@@ -716,9 +716,15 @@ function isDifferentPrizeSets (prizeSets = [], otherPrizeSets) {
 /**
  * Validate the winners array.
  * @param {Array} winners the Winner Array
+ * @param {String} winchallengeIdners the challenge ID
  */
-function validateWinners (winners) {
+async function validateWinners (winners, challengeId) {
+  const challengeResources = await helper.getChallengeResources(challengeId)
+  const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
   for (const winner of winners) {
+    if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(winner.userId))) {
+      throw new errors.BadRequestError(`Member with userId: ${winner.userId} is not registered on the challenge`)
+    }
     const diffWinners = _.differenceWith(winners, [winner], _.isEqual)
     if (diffWinners.length + 1 !== winners.length) {
       throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
@@ -857,7 +863,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (data.winners && data.winners.length) {
-    await validateWinners(data.winners)
+    await validateWinners(data.winners, challengeId)
   }
 
   data.updated = moment().utc()
@@ -1169,7 +1175,7 @@ function sanitizeChallenge (challenge) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
   if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration']))
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen']))
   }
   if (challenge.prizeSets) {
     sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
@@ -1227,7 +1233,8 @@ fullyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().positive()
+      duration: Joi.number().positive(),
+      isOpen: Joi.boolean()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1300,7 +1307,8 @@ partiallyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().positive()
+      duration: Joi.number().positive(),
+      isOpen: Joi.boolean()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
