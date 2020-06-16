@@ -68,6 +68,11 @@ paths:
           in: query
           description: Filter by directProjectId
           type: integer
+        - name: type
+          in: query
+          description: Filter by type abbreviation, exact match
+          required: false
+          type: string
         - name: typeId
           in: query
           description: Filter by type id, exact match
