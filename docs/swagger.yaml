@@ -70,7 +70,7 @@ paths:
           type: integer
         - name: type
           in: query
-          description: Filter by type abbreviation, exact match
+          description: Filter by type abbreviation, exact match. If provided, the typeId will be ignored
           required: false
           type: string
         - name: typeId
