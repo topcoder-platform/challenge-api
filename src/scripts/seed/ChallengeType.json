@@ -229,5 +229,69 @@
     "description": "Private or TCX task",
     "isActive": true,
     "abbreviation": "TASK"
+  },
+  {
+    "id": "482bd567-1805-43c9-bc8e-1c35a1911f21",
+    "name": "RIA Component Competition",
+    "description": "RIA Component Competition",
+    "isActive": false,
+    "abbreviation": "RIA_COMPONENT_COMPETITION",
+    "legacyId": 25
+  },
+  {
+    "id": "8cc52d02-2dde-4f0d-b329-4c052cec084d",
+    "name": "Testing Competition",
+    "description": "Testing Competition",
+    "isActive": false,
+    "abbreviation": "TESTING_COMPETITION",
+    "legacyId": 5
+  },
+  {
+    "id": "94c70199-bf7a-4219-9a60-d5dd2ff48895",
+    "name": "Reporting",
+    "description": "Reporting",
+    "isActive": false,
+    "abbreviation": "REPORTING",
+    "legacyId": 36
+  },
+  {
+    "id": "ecaac74c-b165-4448-ab5c-dc770a99cdb8",
+    "name": "Process",
+    "description": "Process",
+    "isActive": false,
+    "abbreviation": "PROCESS",
+    "legacyId": 12
+  },
+  {
+    "id": "40fe2fc7-3cd7-432e-9a4c-04d8889947b9",
+    "name": "Legacy",
+    "description": "Legacy",
+    "isActive": false,
+    "abbreviation": "LEGACY",
+    "legacyId": 15
+  },
+  {
+    "id": "428d3337-e7c8-45b2-ad76-cbce783975d3",
+    "name": "Security",
+    "description": "Security",
+    "isActive": false,
+    "abbreviation": "Security",
+    "legacyId": 3
+  },
+  {
+    "id": "59954448-d1bf-4aef-83f4-2a5602f0f686",
+    "name": "Deployment",
+    "description": "Deployment",
+    "isActive": false,
+    "abbreviation": "DEPLOYMENT",
+    "legacyId": 10
+  },
+  {
+    "id": "1047be9d-4b9e-461d-b875-d03883b00502",
+    "name": "Component Production",
+    "description": "Component Production",
+    "isActive": false,
+    "abbreviation": "COMPONENT_PRODUCTION",
+    "legacyId": 8
   }
 ]
