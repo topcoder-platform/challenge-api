@@ -68,9 +68,14 @@ paths:
           in: query
           description: Filter by directProjectId
           type: integer
+        - name: type
+          in: query
+          description: Filter by type abbreviation, exact match. If provided, the typeId will be ignored
+          required: false
+          type: string
         - name: typeId
           in: query
-          description: Filter by type id, exact match
+          description: Filter by type id, exact match. If type is provided, typeId will be ignored
           required: false
           type: string
           format: UUID
