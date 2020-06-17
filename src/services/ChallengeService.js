@@ -586,11 +586,11 @@ async function getPhasesAndPopulate (data) {
 async function getChallenge (currentUser, id) {
   // get challenge from Elasticsearch
   let challenge
-  logger.warn(JSON.stringify({
-    index: config.get('ES.ES_INDEX'),
-    type: config.get('ES.ES_TYPE'),
-    _id: id
-  }))
+  // logger.warn(JSON.stringify({
+  //   index: config.get('ES.ES_INDEX'),
+  //   type: config.get('ES.ES_TYPE'),
+  //   _id: id
+  // }))
   try {
     challenge = await esClient.getSource({
       index: config.get('ES.ES_INDEX'),
