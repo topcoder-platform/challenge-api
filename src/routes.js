@@ -16,6 +16,7 @@ module.exports = {
     get: {
       controller: 'ChallengeController',
       method: 'searchChallenges',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.User],
       scopes: [READ, ALL]
     },
     post: {

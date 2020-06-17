@@ -3,7 +3,8 @@
  */
 const UserRoles = {
   Admin: 'Administrator',
-  Copilot: 'Copilot'
+  Copilot: 'Copilot',
+  User: 'Topcoder User'
 }
 
 const prizeSetTypes = {

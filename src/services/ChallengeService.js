@@ -14,6 +14,7 @@ const models = require('../models')
 const HttpStatus = require('http-status-codes')
 const moment = require('moment')
 const phaseService = require('./PhaseService')
+const challengeTypeService = require('./ChallengeTypeService')
 
 const esClient = helper.getESClient()
 
@@ -87,7 +88,15 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
-  _.forIn(_.omit(criteria, ['name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
+
+  if (criteria.type) {
+    const typeSearchRes = await challengeTypeService.searchChallengeTypes({ abbreviation: criteria.type })
+    if (typeSearchRes.total > 0) {
+      criteria.typeId = _.get(typeSearchRes, 'result[0].id')
+    }
+  }
+
+  _.forIn(_.omit(criteria, ['type', 'name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
     'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
     if (!_.isUndefined(value)) {
@@ -294,6 +303,7 @@ searchChallenges.schema = {
     confidentialityType: Joi.string(),
     directProjectId: Joi.number(),
     typeId: Joi.optionalId(),
+    type: Joi.string(),
     track: Joi.string(),
     name: Joi.string(),
     description: Joi.string(),
@@ -576,11 +586,11 @@ async function getPhasesAndPopulate (data) {
 async function getChallenge (currentUser, id) {
   // get challenge from Elasticsearch
   let challenge
-  logger.warn(JSON.stringify({
-    index: config.get('ES.ES_INDEX'),
-    type: config.get('ES.ES_TYPE'),
-    _id: id
-  }))
+  // logger.warn(JSON.stringify({
+  //   index: config.get('ES.ES_INDEX'),
+  //   type: config.get('ES.ES_TYPE'),
+  //   _id: id
+  // }))
   try {
     challenge = await esClient.getSource({
       index: config.get('ES.ES_INDEX'),
