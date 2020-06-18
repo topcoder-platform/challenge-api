@@ -77,7 +77,7 @@ You can find sample `.env` files inside the `/docs` directory.
 3. Seed/Insert data to tables: `npm run seed-tables`
 4. Initialize/Clear database in default environment: `npm run init-db`
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
-6. Create Elasticsearch index: `npm run init-db`, or to re-create index: `npm run init-db force`
+6. Create Elasticsearch index: `npm run init-es`, or to re-create index: `npm run init-es force`
 7. Synchronize ES data and DynamoDB data: `npm run sync-es`
 
 ### Notes
