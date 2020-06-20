@@ -167,7 +167,7 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ range: { endDate: { lte: criteria.endDateEnd } } })
   }
   const sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
-  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'asc'
+  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'desc'
 
   const mustQuery = []
 
