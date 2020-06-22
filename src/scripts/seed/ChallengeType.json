@@ -1,27 +1,11 @@
 [
   {
-    "id": "19c0f147-4690-45cf-83f3-a613f219dc22",
-    "name": "Copilot Posting",
-    "description": "Copilot Posting",
+    "id": "0b2ac310-eaf0-40e3-b66b-37e5e9e09365",
+    "name": "Development",
+    "description": "Development",
     "isActive": false,
-    "abbreviation": "COPILOT_POSTING",
-    "legacyId": 29
-  },
-  {
-    "id": "c6a8ddd6-d463-4ba5-a977-4938b3bac172",
-    "name": "Web Design",
-    "description": "Web Design",
-    "isActive": false,
-    "abbreviation": "WEB_DESIGNS",
-    "legacyId": 17
-  },
-  {
-    "id": "338aee66-a8fb-42bf-bfaa-d5ed113f912c",
-    "name": "Logo Design",
-    "description": "Logo Design",
-    "isActive": false,
-    "abbreviation": "LOGO_DESIGN",
-    "legacyId": 20
+    "abbreviation": "DEVELOPMENT",
+    "legacyId": 2
   },
   {
     "id": "6e1e77d0-b248-4025-bfef-958219222a79",
@@ -32,54 +16,6 @@
     "legacyId": 16
   },
   {
-    "id": "aea77c1c-1b38-4942-bdb2-937180532dcb",
-    "name": "Application Front-End Design",
-    "description": "Application Front-End Design",
-    "isActive": false,
-    "abbreviation": "APPLICATION_FRONT_END_DESIGN",
-    "legacyId": 32
-  },
-  {
-    "id": "2b2e8ced-b240-4bfb-8e50-5dd97c78d368",
-    "name": "Widget or Mobile Screen Design",
-    "description": "Widget or Mobile Screen Design",
-    "isActive": false,
-    "abbreviation": "WIDGET_OR_MOBILE_SCREEN_DESIGN",
-    "legacyId": 30
-  },
-  {
-    "id": "1964571b-07ce-487b-9544-158bff322ea7",
-    "name": "Front-End Flash",
-    "description": "Front-End Flash",
-    "isActive": false,
-    "abbreviation": "FRONT_END_FLASH",
-    "legacyId": 31
-  },
-  {
-    "id": "1a1d3d18-3ce3-4f8d-96b3-fe0f234674fe",
-    "name": "Print/Presentation",
-    "description": "Print/Presentation",
-    "isActive": false,
-    "abbreviation": "PRINT_OR_PRESENTATION",
-    "legacyId": 21
-  },
-  {
-    "id": "b723e67c-e4b4-4d15-b586-1383cb6b31dc",
-    "name": "Wireframes",
-    "description": "Wireframes",
-    "isActive": false,
-    "abbreviation": "WIREFRAMES",
-    "legacyId": 18
-  },
-  {
-    "id": "294af178-5a81-487c-8fbb-2f5044056624",
-    "name": "Idea Generation",
-    "description": "Idea Generation",
-    "isActive": false,
-    "abbreviation": "IDEA_GENERATION",
-    "legacyId": 22
-  },
-  {
     "id": "bb082fb0-744f-47dd-9969-ba5fcf6172e3",
     "name": "Studio Other",
     "description": "Studio Other",
@@ -88,44 +24,52 @@
     "legacyId": 34
   },
   {
-    "id": "35571804-a4a3-4b29-a147-bc7e44407114",
-    "name": "Conceptualization",
-    "description": "Conceptualization",
+    "id": "338aee66-a8fb-42bf-bfaa-d5ed113f912c",
+    "name": "Logo Design",
+    "description": "Logo Design",
     "isActive": false,
-    "abbreviation": "CONCEPTUALIZATION",
-    "legacyId": 23
+    "abbreviation": "LOGO_DESIGN",
+    "legacyId": 20
   },
   {
-    "id": "d4765ff2-fc5b-41dd-a6a2-650b7bc97748",
-    "name": "Specification",
-    "description": "Specification",
+    "id": "d79bb088-8166-4476-be4c-6e17186cb3b4",
+    "name": "Assembly Competition",
+    "description": "Assembly Competition",
     "isActive": false,
-    "abbreviation": "SPECIFICATION",
-    "legacyId": 6
+    "abbreviation": "ASSEMBLY_COMPETITION",
+    "legacyId": 14
   },
   {
-    "id": "cd5b9b14-80e0-409a-b15b-3c3e18ac516d",
-    "name": "Architecture",
-    "description": "Architecture",
+    "id": "230d3e9a-d673-414f-b764-4e6693f053da",
+    "name": "Test Scenarios",
+    "description": "Test Scenarios",
     "isActive": false,
-    "abbreviation": "ARCHITECTURE",
-    "legacyId": 7
+    "abbreviation": "TEST_SCENARIOS",
+    "legacyId": 26
   },
   {
-    "id": "c21336d5-4831-4cce-93a3-ca45bef61562",
-    "name": "Design",
-    "description": "Design",
-    "isActive": true,
-    "abbreviation": "DESIGN",
-    "legacyId": 1
+    "id": "482bd567-1805-43c9-bc8e-1c35a1911f21",
+    "name": "RIA Component Competition",
+    "description": "RIA Component Competition",
+    "isActive": false,
+    "abbreviation": "RIA_COMPONENT_COMPETITION",
+    "legacyId": 25
   },
   {
-    "id": "0b2ac310-eaf0-40e3-b66b-37e5e9e09365",
-    "name": "Development",
-    "description": "Development",
+    "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "name": "Bug Hunt",
+    "description": "Bug Hunt",
     "isActive": false,
-    "abbreviation": "DEVELOPMENT",
-    "legacyId": 2
+    "abbreviation": "BUG_HUNT",
+    "legacyId": 9
+  },
+  {
+    "id": "aea77c1c-1b38-4942-bdb2-937180532dcb",
+    "name": "Application Front-End Design",
+    "description": "Application Front-End Design",
+    "isActive": false,
+    "abbreviation": "APPLICATION_FRONT_END_DESIGN",
+    "legacyId": 32
   },
   {
     "id": "0c7bbd97-156f-47c4-9174-c8336ddd8351",
@@ -144,28 +88,12 @@
     "legacyId": 19
   },
   {
-    "id": "d79bb088-8166-4476-be4c-6e17186cb3b4",
-    "name": "Assembly Competition",
-    "description": "Assembly Competition",
+    "id": "94c70199-bf7a-4219-9a60-d5dd2ff48895",
+    "name": "Reporting",
+    "description": "Reporting",
     "isActive": false,
-    "abbreviation": "ASSEMBLY_COMPETITION",
-    "legacyId": 14
-  },
-  {
-    "id": "19148de0-19a5-4f79-a3ba-a8c35528ff4c",
-    "name": "Test Suites",
-    "description": "Test Suites",
-    "isActive": false,
-    "abbreviation": "TEST_SUITES",
-    "legacyId": 13
-  },
-  {
-    "id": "230d3e9a-d673-414f-b764-4e6693f053da",
-    "name": "Test Scenarios",
-    "description": "Test Scenarios",
-    "isActive": false,
-    "abbreviation": "TEST_SCENARIOS",
-    "legacyId": 26
+    "abbreviation": "REPORTING",
+    "legacyId": 36
   },
   {
     "id": "76c0aea3-dc2b-4e40-9986-5ba3a2ffbfa1",
@@ -176,91 +104,12 @@
     "legacyId": 35
   },
   {
-    "id": "c2579605-e294-4967-b3db-875ef85240cd",
-    "name": "Marathon Match",
-    "description": "Marathon Match",
-    "isActive": true,
-    "abbreviation": "DEVELOP_MARATHON_MATCH",
-    "legacyId": 37
-  },
-  {
-    "id": "a93544bc-c165-4af4-b55e-18f3593b457a",
-    "name": "Bug Hunt",
-    "description": "Bug Hunt",
-    "isActive": true,
-    "abbreviation": "BUG_HUNT",
-    "legacyId": 9
-  },
-  {
-    "id": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-    "name": "First2Finish",
-    "description": "First2Finish",
-    "isActive": true,
-    "abbreviation": "FIRST_2_FINISH",
-    "legacyId": 38
-  },
-  {
-    "id": "45415132-79fa-4d13-a9ac-71f50020dc10",
-    "name": "Code",
-    "description": "Code",
-    "isActive": true,
-    "abbreviation": "CODE",
-    "legacyId": 39
-  },
-  {
-    "id": "bf8c8915-9e0f-440d-a945-58eafc439ee8",
-    "name": "Design First2Finish",
-    "description": "Design First2Finish",
+    "id": "d4765ff2-fc5b-41dd-a6a2-650b7bc97748",
+    "name": "Specification",
+    "description": "Specification",
     "isActive": false,
-    "abbreviation": "DESIGN_FIRST_2_FINISH",
-    "legacyId": 40
-  },
-  {
-    "id": "c0c9d714-60e2-4fbb-872e-6f8c229954af",
-    "name": "Automated Testing",
-    "description": "Automated Testing",
-    "isActive": false,
-    "abbreviation": "AUTOMATED_TESTING",
-    "legacyId": 41
-  },
-  {
-    "id": "e885273d-aeda-42c0-917d-bfbf979afbba",
-    "name": "Task",
-    "description": "Private or TCX task",
-    "isActive": true,
-    "abbreviation": "TASK"
-  },
-  {
-    "id": "482bd567-1805-43c9-bc8e-1c35a1911f21",
-    "name": "RIA Component Competition",
-    "description": "RIA Component Competition",
-    "isActive": false,
-    "abbreviation": "RIA_COMPONENT_COMPETITION",
-    "legacyId": 25
-  },
-  {
-    "id": "8cc52d02-2dde-4f0d-b329-4c052cec084d",
-    "name": "Testing Competition",
-    "description": "Testing Competition",
-    "isActive": false,
-    "abbreviation": "TESTING_COMPETITION",
-    "legacyId": 5
-  },
-  {
-    "id": "94c70199-bf7a-4219-9a60-d5dd2ff48895",
-    "name": "Reporting",
-    "description": "Reporting",
-    "isActive": false,
-    "abbreviation": "REPORTING",
-    "legacyId": 36
-  },
-  {
-    "id": "ecaac74c-b165-4448-ab5c-dc770a99cdb8",
-    "name": "Process",
-    "description": "Process",
-    "isActive": false,
-    "abbreviation": "PROCESS",
-    "legacyId": 12
+    "abbreviation": "SPECIFICATION",
+    "legacyId": 6
   },
   {
     "id": "40fe2fc7-3cd7-432e-9a4c-04d8889947b9",
@@ -271,12 +120,123 @@
     "legacyId": 15
   },
   {
+    "id": "e885273d-aeda-42c0-917d-bfbf979afbba",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK"
+  },
+  {
     "id": "428d3337-e7c8-45b2-ad76-cbce783975d3",
     "name": "Security",
     "description": "Security",
     "isActive": false,
     "abbreviation": "Security",
     "legacyId": 3
+  },
+  {
+    "id": "c2579605-e294-4967-b3db-875ef85240cd",
+    "name": "Marathon Match",
+    "description": "Marathon Match",
+    "isActive": true,
+    "abbreviation": "DEVELOP_MARATHON_MATCH",
+    "legacyId": 37
+  },
+  {
+    "id": "1a1d3d18-3ce3-4f8d-96b3-fe0f234674fe",
+    "name": "Print/Presentation",
+    "description": "Print/Presentation",
+    "isActive": false,
+    "abbreviation": "PRINT_OR_PRESENTATION",
+    "legacyId": 21
+  },
+  {
+    "id": "c0c9d714-60e2-4fbb-872e-6f8c229954af",
+    "name": "Automated Testing",
+    "description": "Automated Testing",
+    "isActive": false,
+    "abbreviation": "AUTOMATED_TESTING",
+    "legacyId": 41
+  },
+  {
+    "id": "ecaac74c-b165-4448-ab5c-dc770a99cdb8",
+    "name": "Process",
+    "description": "Process",
+    "isActive": false,
+    "abbreviation": "PROCESS",
+    "legacyId": 12
+  },
+  {
+    "id": "19c0f147-4690-45cf-83f3-a613f219dc22",
+    "name": "Copilot Posting",
+    "description": "Copilot Posting",
+    "isActive": false,
+    "abbreviation": "COPILOT_POSTING",
+    "legacyId": 29
+  },
+  {
+    "id": "8cc52d02-2dde-4f0d-b329-4c052cec084d",
+    "name": "Testing Competition",
+    "description": "Testing Competition",
+    "isActive": false,
+    "abbreviation": "TESTING_COMPETITION",
+    "legacyId": 5
+  },
+  {
+    "id": "c6a8ddd6-d463-4ba5-a977-4938b3bac172",
+    "name": "Web Design",
+    "description": "Web Design",
+    "isActive": false,
+    "abbreviation": "WEB_DESIGNS",
+    "legacyId": 17
+  },
+  {
+    "id": "b723e67c-e4b4-4d15-b586-1383cb6b31dc",
+    "name": "Wireframes",
+    "description": "Wireframes",
+    "isActive": false,
+    "abbreviation": "WIREFRAMES",
+    "legacyId": 18
+  },
+  {
+    "isActive": true,
+    "abbreviation": "CHALLENGE",
+    "description": "Challenge",
+    "id": "94eee466-9255-4b60-88d8-4f59c1810dd0",
+    "legacyId": 39,
+    "name": "Challenge"
+  },
+  {
+    "id": "c21336d5-4831-4cce-93a3-ca45bef61562",
+    "name": "Design",
+    "description": "Design",
+    "isActive": false,
+    "abbreviation": "DESIGN",
+    "legacyId": 1
+  },
+  {
+    "id": "1964571b-07ce-487b-9544-158bff322ea7",
+    "name": "Front-End Flash",
+    "description": "Front-End Flash",
+    "isActive": false,
+    "abbreviation": "FRONT_END_FLASH",
+    "legacyId": 31
+  },
+  {
+    "id": "cd5b9b14-80e0-409a-b15b-3c3e18ac516d",
+    "name": "Architecture",
+    "description": "Architecture",
+    "isActive": false,
+    "abbreviation": "ARCHITECTURE",
+    "legacyId": 7
+  },
+  {
+    "id": "19148de0-19a5-4f79-a3ba-a8c35528ff4c",
+    "name": "Test Suites",
+    "description": "Test Suites",
+    "isActive": false,
+    "abbreviation": "TEST_SUITES",
+    "legacyId": 13
   },
   {
     "id": "59954448-d1bf-4aef-83f4-2a5602f0f686",
@@ -287,11 +247,59 @@
     "legacyId": 10
   },
   {
+    "id": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+    "name": "First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "abbreviation": "FIRST_2_FINISH",
+    "legacyId": 38
+  },
+  {
+    "id": "bf8c8915-9e0f-440d-a945-58eafc439ee8",
+    "name": "Design First2Finish",
+    "description": "Design First2Finish",
+    "isActive": false,
+    "abbreviation": "DESIGN_FIRST_2_FINISH",
+    "legacyId": 40
+  },
+  {
+    "id": "35571804-a4a3-4b29-a147-bc7e44407114",
+    "name": "Conceptualization",
+    "description": "Conceptualization",
+    "isActive": false,
+    "abbreviation": "CONCEPTUALIZATION",
+    "legacyId": 23
+  },
+  {
+    "id": "2b2e8ced-b240-4bfb-8e50-5dd97c78d368",
+    "name": "Widget or Mobile Screen Design",
+    "description": "Widget or Mobile Screen Design",
+    "isActive": false,
+    "abbreviation": "WIDGET_OR_MOBILE_SCREEN_DESIGN",
+    "legacyId": 30
+  },
+  {
     "id": "1047be9d-4b9e-461d-b875-d03883b00502",
     "name": "Component Production",
     "description": "Component Production",
     "isActive": false,
     "abbreviation": "COMPONENT_PRODUCTION",
     "legacyId": 8
+  },
+  {
+    "id": "294af178-5a81-487c-8fbb-2f5044056624",
+    "name": "Idea Generation",
+    "description": "Idea Generation",
+    "isActive": false,
+    "abbreviation": "IDEA_GENERATION",
+    "legacyId": 22
+  },
+  {
+    "id": "45415132-79fa-4d13-a9ac-71f50020dc10",
+    "name": "Code",
+    "description": "Code",
+    "isActive": false,
+    "abbreviation": "CODE",
+    "legacyId": 39
   }
 ]
