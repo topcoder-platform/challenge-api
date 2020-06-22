@@ -130,7 +130,10 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
-  if (criteria.group && !_.isUndefined(currentUser)) {
+  if (criteria.group) {
+    if (_.isUndefined(currentUser)) {
+      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
+    }
     boolQuery.push({ match_phrase: { groups: criteria.group } })
   }
   // if (criteria.currentPhaseId) {
@@ -164,13 +167,16 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ range: { endDate: { lte: criteria.endDateEnd } } })
   }
   const sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
-  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'asc'
+  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'desc'
 
   const mustQuery = []
 
   const shouldQuery = []
 
-  if (criteria.groups && !_.isUndefined(currentUser)) {
+  if (criteria.groups) {
+    if (_.isUndefined(currentUser)) {
+      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
+    }
     for (const group of criteria.groups) {
       shouldQuery.push({ match: { groups: group } })
     }
