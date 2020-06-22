@@ -1053,23 +1053,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   //   data.gitRepoURLs = null
   // }
   if (isFull && _.isUndefined(data.legacyId) && challenge.legacyId) {
-    if (!updateDetails['$DELETE']) {
-      updateDetails['$DELETE'] = {}
-    }
-    updateDetails['$DELETE'].legacyId = null
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: 'legacyId',
-      oldValue: JSON.stringify(challenge.legacyId),
-      newValue: 'NULL',
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null
-    })
-    delete challenge.legacyId
-    // send null to Elasticsearch to clear the field
-    data.legacyId = null
+    data.legacyId = challenge.legacyId
   }
   if (isFull && _.isUndefined(data.winners) && challenge.winners) {
     if (!updateDetails['$DELETE']) {
