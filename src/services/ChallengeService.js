@@ -98,7 +98,7 @@ async function searchChallenges (currentUser, criteria) {
 
   _.forIn(_.omit(criteria, ['type', 'name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
-    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder']), (value, key) => {
+    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -285,6 +285,15 @@ async function searchChallenges (currentUser, criteria) {
     result = _.each(result, val => _.unset(val, 'privateDescription'))
   }
 
+  if (criteria.isLightweight === 'true') {
+    result = _.each(result, val => {
+      // _.unset(val, 'terms')
+      _.unset(val, 'description')
+      _.unset(val, 'privateDescription')
+      return val
+    })
+  }
+
   const typeList = await helper.scan('ChallengeType')
   const typeMap = new Map()
   _.each(typeList, e => {
@@ -334,6 +343,7 @@ searchChallenges.schema = {
     updatedDateEnd: Joi.date(),
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
+    isLightweight: Joi.boolean().default(false),
     memberId: Joi.number().integer().positive(),
     sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
     sortOrder: Joi.string().valid(['asc', 'desc']),
