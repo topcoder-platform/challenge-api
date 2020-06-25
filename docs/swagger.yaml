@@ -214,6 +214,12 @@ paths:
           description: Order the results by the asc/desc.
           required: false
           type: string
+        - name: isLightweight
+          in: query
+          description: Turn off description and privateDescription for a smaller response payload
+          required: false
+          type: boolean
+          default: false
         - in: body
           name: body
           required: false
