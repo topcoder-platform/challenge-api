@@ -15,6 +15,7 @@ const HttpStatus = require('http-status-codes')
 const moment = require('moment')
 const phaseService = require('./PhaseService')
 const challengeTypeService = require('./ChallengeTypeService')
+const challengeTypeTimelineTemplateService = require('./ChallengeTypeTimelineTemplateService')
 
 const esClient = helper.getESClient()
 
@@ -486,6 +487,18 @@ async function createChallenge (currentUser, challenge, userToken) {
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
+  if (!challenge.timelineTemplateId) {
+    if (challenge.typeId && _.get(challenge, 'legacy.track')) {
+      const [challengeTypeTimelineTemplate] = await challengeTypeTimelineTemplateService.searchChallengeTypeTimelineTemplates({
+        typeId: challenge.typeId,
+        track: _.get(challenge, 'legacy.track')
+      })
+      if (!challengeTypeTimelineTemplate) {
+        throw new errors.BadRequestError(`The selected ChallengeType with id: ${challenge.typeId} does not have a default timeline template for the track ${_.get(challenge, 'legacy.track')}. Please provide a timelineTemplateId`)
+      }
+      challenge.timelineTemplateId = challengeTypeTimelineTemplate.timelineTemplateId
+    }
+  }
   if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
     await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
   }
@@ -874,6 +887,13 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   if (data.winners && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
+  }
+
+  // TODO: Fix this Tech Debt once legacy is turned off
+  const finalStatus = data.status || challenge.status
+  const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
+  if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
+    throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${data.status}`)
   }
 
   if (data.phases || data.startDate) {
