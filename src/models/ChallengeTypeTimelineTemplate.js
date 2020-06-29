@@ -16,6 +16,10 @@ const schema = new Schema({
     type: String,
     required: true
   },
+  track: {
+    type: String,
+    required: false
+  },
   timelineTemplateId: {
     type: String,
     required: true
