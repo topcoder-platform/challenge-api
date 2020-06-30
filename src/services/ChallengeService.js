@@ -893,7 +893,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const finalStatus = data.status || challenge.status
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
   if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
-    throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${data.status}`)
+    throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
   }
 
   if (data.phases || data.startDate) {
