@@ -29,8 +29,10 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
+  const subGroupsMap = {}
   for (const challenge of challenges) {
     challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
+    let expandedGroups = []
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
     } else if (currentUser) {
@@ -38,9 +40,23 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
       if (_.isNil(userGroups)) {
         userGroups = await helper.getUserGroups(currentUser.userId)
       }
+      // Expand challenge groups by subGroups
+      // results are being saved on a hashmap for efficiency
+      for (const group of challenge.groups) {
+        let subGroups
+        if (subGroupsMap[group]) {
+          subGroups = subGroupsMap[group]
+        } else {
+          subGroups = await helper.expandWithSubGroups(group)
+          subGroupsMap[group] = subGroups
+        }
+        expandedGroups = [
+          ..._.concat(expandedGroups, subGroups)
+        ]
+      }
       // check if there is matched group
       // logger.debug('Groups', challenge.groups, userGroups)
-      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
         res.push(challenge)
       }
     }
@@ -69,9 +85,9 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
 
 async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge) {
   const userGroups = await helper.getUserGroups(currentUser.userId)
-  const userGroupsNames = _.map(userGroups, group => group.name)
+  const userGroupsIds = _.map(userGroups, group => group.id)
   const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
-  const filtered = updatedGroups.filter(g => !userGroupsNames.includes(g))
+  const filtered = updatedGroups.filter(g => !userGroupsIds.includes(g))
   if (filtered.length > 0) {
     throw new errors.ForbiddenError(`You don't have access to this group!`)
   }
