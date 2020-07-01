@@ -403,12 +403,10 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   if (!phases || phases.length === 0) {
     return
   }
-  let template
-  try {
-    template = await helper.getById('TimelineTemplate', timelineTemplateId)
-  } catch (e) {
-    throw new errors.BadRequestError(`Timeline template with id: ${timelineTemplateId} cannot be found`)
+  if (_.isUndefined(timelineTemplateId)) {
+    throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
   }
+  const template = await helper.getById('TimelineTemplate', timelineTemplateId)
   const phaseDefinitions = await helper.scan('Phase')
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
