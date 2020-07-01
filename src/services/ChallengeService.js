@@ -403,7 +403,12 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   if (!phases || phases.length === 0) {
     return
   }
-  const template = await helper.getById('TimelineTemplate', timelineTemplateId)
+  let template
+  try {
+    template = await helper.getById('TimelineTemplate', timelineTemplateId)
+  } catch (e) {
+    throw new errors.BadRequestError(`Timeline template with id: ${timelineTemplateId} cannot be found`)
+  }
   const phaseDefinitions = await helper.scan('Phase')
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
@@ -513,6 +518,8 @@ async function createChallenge (currentUser, challenge, userToken) {
         throw new errors.BadRequestError(`The selected ChallengeType with id: ${challenge.typeId} does not have a default timeline template for the track ${_.get(challenge, 'legacy.track')}. Please provide a timelineTemplateId`)
       }
       challenge.timelineTemplateId = challengeTypeTimelineTemplate.timelineTemplateId
+    } else {
+      throw new errors.BadRequestError(`Both the typeId and the legacy.track are required to create a challenge`)
     }
   }
   if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
