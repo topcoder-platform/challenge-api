@@ -321,6 +321,9 @@ async function searchChallenges (currentUser, criteria) {
   })
   _.each(result, async element => {
     await getPhasesAndPopulate(element)
+    if (element.status !== constants.challengeStatuses.Completed) {
+      _.unset(element, 'winners')
+    }
   })
 
   return { total, page, perPage, result }
@@ -688,6 +691,10 @@ async function getChallenge (currentUser, id) {
     await getPhasesAndPopulate(challenge)
   }
 
+  if (challenge.status !== constants.challengeStatuses.Completed) {
+    _.unset(challenge, 'winners')
+  }
+
   return challenge
 }
 
@@ -908,7 +915,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
 
-  if (data.winners && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
+  if (data.winners && data.winners.length > 0 && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
   }
 
@@ -931,7 +938,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
 
-  if (data.winners && data.winners.length) {
+  if (data.winners && data.winners.length && data.winners.length > 0) {
     await validateWinners(data.winners, challengeId)
   }
 
