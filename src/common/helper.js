@@ -428,6 +428,23 @@ async function getUserGroups (userId) {
 }
 
 /**
+ * Get all subgroups for the given group ID
+ * @param {String} groupId the group ID
+ * @returns {Array<String>} an array with the groups ID and the IDs of all subGroups
+ */
+async function expandWithSubGroups (groupId) {
+  const token = await getM2MToken()
+  const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      includeSubGroups: true
+    }
+  })
+  const groups = result.data || {}
+  return [groupId, ..._.map(_.get(groups, 'subGroups', []), 'id')]
+}
+
+/**
  * Ensures there are no duplicate or null elements in given array.
  * @param {Array} arr the array to check
  * @param {String} name the array name
@@ -656,5 +673,6 @@ module.exports = {
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
-  getProjectBillingAccount
+  getProjectBillingAccount,
+  expandWithSubGroups
 }

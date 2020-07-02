@@ -2053,6 +2053,9 @@ definitions:
       typeId:
         type: string
         format: UUID
+      track:
+        type: string
+        format: UUID
       timelineTemplateId:
         type: string
         format: UUID
@@ -2266,6 +2269,7 @@ definitions:
               description: The challenge metadata value
       timelineTemplateId:
         type: string
+        description: Required if the selected typeId/track combination does not have a default timeline template ID
         format: UUID
       phases:
         type: array
@@ -2368,7 +2372,6 @@ definitions:
       - track
       - name
       - description
-      - timelineTemplateId
       - phases
       - prizeSets
       - created

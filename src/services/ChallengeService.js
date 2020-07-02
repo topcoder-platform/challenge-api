@@ -15,6 +15,7 @@ const HttpStatus = require('http-status-codes')
 const moment = require('moment')
 const phaseService = require('./PhaseService')
 const challengeTypeService = require('./ChallengeTypeService')
+const challengeTypeTimelineTemplateService = require('./ChallengeTypeTimelineTemplateService')
 
 const esClient = helper.getESClient()
 
@@ -28,8 +29,10 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   let userGroups
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
+  const subGroupsMap = {}
   for (const challenge of challenges) {
     challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
+    let expandedGroups = []
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
     } else if (currentUser) {
@@ -37,9 +40,23 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
       if (_.isNil(userGroups)) {
         userGroups = await helper.getUserGroups(currentUser.userId)
       }
+      // Expand challenge groups by subGroups
+      // results are being saved on a hashmap for efficiency
+      for (const group of challenge.groups) {
+        let subGroups
+        if (subGroupsMap[group]) {
+          subGroups = subGroupsMap[group]
+        } else {
+          subGroups = await helper.expandWithSubGroups(group)
+          subGroupsMap[group] = subGroups
+        }
+        expandedGroups = [
+          ..._.concat(expandedGroups, subGroups)
+        ]
+      }
       // check if there is matched group
       // logger.debug('Groups', challenge.groups, userGroups)
-      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
         res.push(challenge)
       }
     }
@@ -68,9 +85,9 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
 
 async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge) {
   const userGroups = await helper.getUserGroups(currentUser.userId)
-  const userGroupsNames = _.map(userGroups, group => group.name)
+  const userGroupsIds = _.map(userGroups, group => group.id)
   const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
-  const filtered = updatedGroups.filter(g => !userGroupsNames.includes(g))
+  const filtered = updatedGroups.filter(g => !userGroupsIds.includes(g))
   if (filtered.length > 0) {
     throw new errors.ForbiddenError(`You don't have access to this group!`)
   }
@@ -304,6 +321,9 @@ async function searchChallenges (currentUser, criteria) {
   })
   _.each(result, async element => {
     await getPhasesAndPopulate(element)
+    if (element.status !== constants.challengeStatuses.Completed) {
+      _.unset(element, 'winners')
+    }
   })
 
   return { total, page, perPage, result }
@@ -385,6 +405,9 @@ async function validateChallengeData (challenge) {
 async function populatePhases (phases, startDate, timelineTemplateId) {
   if (!phases || phases.length === 0) {
     return
+  }
+  if (_.isUndefined(timelineTemplateId)) {
+    throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
   }
   const template = await helper.getById('TimelineTemplate', timelineTemplateId)
   const phaseDefinitions = await helper.scan('Phase')
@@ -486,6 +509,20 @@ async function createChallenge (currentUser, challenge, userToken) {
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
+  if (!challenge.timelineTemplateId) {
+    if (challenge.typeId && _.get(challenge, 'legacy.track')) {
+      const [challengeTypeTimelineTemplate] = await challengeTypeTimelineTemplateService.searchChallengeTypeTimelineTemplates({
+        typeId: challenge.typeId,
+        track: _.get(challenge, 'legacy.track')
+      })
+      if (!challengeTypeTimelineTemplate) {
+        throw new errors.BadRequestError(`The selected ChallengeType with id: ${challenge.typeId} does not have a default timeline template for the track ${_.get(challenge, 'legacy.track')}. Please provide a timelineTemplateId`)
+      }
+      challenge.timelineTemplateId = challengeTypeTimelineTemplate.timelineTemplateId
+    } else {
+      throw new errors.BadRequestError(`Both the typeId and the legacy.track are required to create a challenge`)
+    }
+  }
   if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
     await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
   }
@@ -650,6 +687,10 @@ async function getChallenge (currentUser, id) {
 
   if (challenge.phases && challenge.phases.length > 0) {
     await getPhasesAndPopulate(challenge)
+  }
+
+  if (challenge.status !== constants.challengeStatuses.Completed) {
+    _.unset(challenge, 'winners')
   }
 
   return challenge
@@ -872,8 +913,15 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
 
-  if (data.winners && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
+  if (data.winners && data.winners.length > 0 && (challenge.status !== constants.challengeStatuses.Completed && data.status !== constants.challengeStatuses.Completed)) {
     throw new errors.BadRequestError(`Cannot set winners for challenge with non-completed ${challenge.status} status`)
+  }
+
+  // TODO: Fix this Tech Debt once legacy is turned off
+  const finalStatus = data.status || challenge.status
+  const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
+  if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
+    throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
   }
 
   if (data.phases || data.startDate) {
@@ -888,7 +936,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
 
-  if (data.winners && data.winners.length) {
+  if (data.winners && data.winners.length && data.winners.length > 0) {
     await validateWinners(data.winners, challengeId)
   }
 

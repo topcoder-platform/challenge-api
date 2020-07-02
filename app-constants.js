@@ -63,6 +63,13 @@ const Topics = {
   ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.type.timeline.template.deleted'
 }
 
+const challengeTracks = {
+  DEVELOP: 'DEVELOP',
+  DESIGN: 'DESIGN',
+  DATA_SCIENCE: 'DATA_SCIENCE',
+  QA: 'QA'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -70,5 +77,6 @@ module.exports = {
   validChallengeParams,
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
-  Topics
+  Topics,
+  challengeTracks
 }

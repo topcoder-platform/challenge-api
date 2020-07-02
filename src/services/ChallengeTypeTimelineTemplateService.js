@@ -18,13 +18,15 @@ const constants = require('../../app-constants')
 async function searchChallengeTypeTimelineTemplates (criteria) {
   const list = await helper.scan('ChallengeTypeTimelineTemplate')
   const records = _.filter(list, e => (!criteria.typeId || criteria.typeId === e.typeId) &&
-    (!criteria.timelineTemplateId || criteria.timelineTemplateId === e.timelineTemplateId))
+  (!criteria.timelineTemplateId || criteria.timelineTemplateId === e.timelineTemplateId) &&
+  (!criteria.track || criteria.track === e.track))
   return records
 }
 
 searchChallengeTypeTimelineTemplates.schema = {
   criteria: Joi.object().keys({
     typeId: Joi.optionalId(),
+    track: Joi.string().valid(_.values(constants.challengeTracks)),
     timelineTemplateId: Joi.optionalId()
   })
 }
@@ -53,6 +55,7 @@ async function createChallengeTypeTimelineTemplate (data) {
 createChallengeTypeTimelineTemplate.schema = {
   data: Joi.object().keys({
     typeId: Joi.id(),
+    track: Joi.string().valid(_.values(constants.challengeTracks)),
     timelineTemplateId: Joi.id()
   }).required()
 }
