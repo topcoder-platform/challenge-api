@@ -1971,6 +1971,8 @@ definitions:
         type: string
       legacyId:
         type: integer
+      track:
+        type: string
     required:
       - name
       - isActive
@@ -2051,9 +2053,6 @@ definitions:
     type: object
     properties:
       typeId:
-        type: string
-        format: UUID
-      track:
         type: string
         format: UUID
       timelineTemplateId:

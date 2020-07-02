@@ -31,6 +31,10 @@ const schema = new Schema({
   legacyId: {
     type: Number,
     required: false
+  },
+  track: {
+    type: String,
+    required: false
   }
 },
 {

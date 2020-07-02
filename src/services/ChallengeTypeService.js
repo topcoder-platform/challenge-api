@@ -22,6 +22,7 @@ async function searchChallengeTypes (criteria) {
 
   if (criteria.name) records = _.filter(records, e => helper.partialMatch(criteria.name, e.name))
   if (criteria.description) records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
+  if (criteria.track) records = _.filter(records, e => _.toLower(criteria.track) === _.toLower(e.track))
   if (criteria.abbreviation) records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
   if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive === 'true')))
   if (criteria.legacyId) records = _.filter(records, e => (e.legacyId === criteria.legacyId))
@@ -40,7 +41,8 @@ searchChallengeTypes.schema = {
     description: Joi.string(),
     isActive: Joi.boolean(),
     abbreviation: Joi.string(),
-    legacyId: Joi.number().integer().positive()
+    legacyId: Joi.number().integer().positive(),
+    track: Joi.string().valid(_.values(constants.challengeTracks))
   })
 }
 
@@ -67,7 +69,8 @@ createChallengeType.schema = {
     description: Joi.string(),
     isActive: Joi.boolean().required(),
     abbreviation: Joi.string().required(),
-    legacyId: Joi.number().integer().positive()
+    legacyId: Joi.number().integer().positive(),
+    track: Joi.string().valid(_.values(constants.challengeTracks))
   }).required()
 }
 
@@ -108,6 +111,9 @@ async function fullyUpdateChallengeType (id, data) {
   if (_.isUndefined(data.legacyId)) {
     type.legacyId = undefined
   }
+  if (_.isUndefined(data.track)) {
+    type.track = undefined
+  }
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, ret)
@@ -121,7 +127,8 @@ fullyUpdateChallengeType.schema = {
     description: Joi.string(),
     isActive: Joi.boolean().required(),
     abbreviation: Joi.string().required(),
-    legacyId: Joi.number().integer().positive()
+    legacyId: Joi.number().integer().positive(),
+    track: Joi.string().valid(_.values(constants.challengeTracks))
   }).required()
 }
 
@@ -155,7 +162,8 @@ partiallyUpdateChallengeType.schema = {
     description: Joi.string(),
     isActive: Joi.boolean(),
     abbreviation: Joi.string(),
-    legacyId: Joi.number().integer().positive()
+    legacyId: Joi.number().integer().positive(),
+    track: Joi.string().valid(_.values(constants.challengeTracks))
   }).required()
 }
 

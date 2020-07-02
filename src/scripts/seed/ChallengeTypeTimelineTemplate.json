@@ -33,31 +33,5 @@
         "id": "0644c23b-e0a2-4899-a422-892493c17709",
         "typeId": "e885273d-aeda-42c0-917d-bfbf979afbba",
         "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6"
-    },
-
-
-    {
-        "id": "faa23edc-7dc0-44d1-b26e-c58f880c9533",
-        "typeId": "94eee466-9255-4b60-88d8-4f59c1810dd0",
-        "track": "DEVELOP",
-        "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c"
-    },
-    {
-        "id": "c1ed1c93-ace9-41d5-b15c-543ae96fd06e",
-        "typeId": "94eee466-9255-4b60-88d8-4f59c1810dd0",
-        "track": "DESIGN",
-        "timelineTemplateId": "d4201ca4-8437-4d63-9957-3f7708184b07"
-    },
-    {
-        "id": "baac06f6-728b-4089-9933-750da9303d22",
-        "typeId": "94eee466-9255-4b60-88d8-4f59c1810dd0",
-        "track": "DATA_SCIENCE",
-        "timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b"
-    },
-    {
-        "id": "1b73aa22-21b9-4a6c-bd3c-b433f206910d",
-        "typeId": "94eee466-9255-4b60-88d8-4f59c1810dd0",
-        "track": "QA",
-        "timelineTemplateId": "f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963"
     }
 ]
