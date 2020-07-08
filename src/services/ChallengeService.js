@@ -115,6 +115,8 @@ async function searchChallenges (currentUser, criteria) {
 
   _.forIn(_.omit(criteria, ['type', 'name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
+    'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
+    'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd',
     'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
@@ -156,14 +158,38 @@ async function searchChallenges (currentUser, criteria) {
   // if (criteria.currentPhaseId) {
   //   boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
   // }
-  // if (criteria.currentPhaseName) {
-  //   boolQuery.push({ match_phrase: { 'currentPhase.name': criteria.currentPhaseName } })
-  // }
+  if (criteria.currentPhaseName) {
+    boolQuery.push({ match_phrase: { 'currentPhaseNames': criteria.currentPhaseName } })
+  }
   if (criteria.createdDateStart) {
     boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } })
   }
   if (criteria.createdDateEnd) {
     boolQuery.push({ range: { created: { lte: criteria.createdDateEnd } } })
+  }
+  if (criteria.registrationStartDateStart) {
+    boolQuery.push({ range: { registrationStartDate: { gte: criteria.registrationStartDateStart } } })
+  }
+  if (criteria.registrationStartDateEnd) {
+    boolQuery.push({ range: { registrationStartDate: { lte: criteria.registrationStartDateEnd } } })
+  }
+  if (criteria.registrationEndDateStart) {
+    boolQuery.push({ range: { registrationEndDate: { gte: criteria.registrationEndDateStart } } })
+  }
+  if (criteria.registrationEndDateEnd) {
+    boolQuery.push({ range: { registrationEndDate: { lte: criteria.registrationEndDateEnd } } })
+  }
+  if (criteria.submissionStartDateStart) {
+    boolQuery.push({ range: { submissionStartDate: { gte: criteria.submissionStartDateStart } } })
+  }
+  if (criteria.submissionStartDateEnd) {
+    boolQuery.push({ range: { submissionStartDate: { lte: criteria.submissionStartDateEnd } } })
+  }
+  if (criteria.submissionEndDateStart) {
+    boolQuery.push({ range: { submissionEndDate: { gte: criteria.submissionEndDateStart } } })
+  }
+  if (criteria.submissionEndDateEnd) {
+    boolQuery.push({ range: { submissionEndDate: { lte: criteria.submissionEndDateEnd } } })
   }
   if (criteria.updatedDateStart) {
     boolQuery.push({ range: { updated: { gte: criteria.updatedDateStart } } })
@@ -189,6 +215,16 @@ async function searchChallenges (currentUser, criteria) {
   const mustQuery = []
 
   const shouldQuery = []
+
+  if (criteria.includeAllTags) {
+    for (const tag of criteria.tags) {
+      boolQuery.push({ match_phrase: { tags: tag } })
+    }
+  } else {
+    for (const tag of criteria.tags) {
+      shouldQuery.push({ match: { tags: tag } })
+    }
+  }
 
   if (criteria.groups) {
     if (_.isUndefined(currentUser)) {
@@ -345,6 +381,8 @@ searchChallenges.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     reviewType: Joi.string(),
     tag: Joi.string(),
+    tags: Joi.array().items(Joi.string()),
+    includeAllTags: Joi.boolean().default(true),
     projectId: Joi.number().integer().positive(),
     forumId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
@@ -356,11 +394,19 @@ searchChallenges.schema = {
     endDateStart: Joi.date(),
     endDateEnd: Joi.date(),
     // currentPhaseId: Joi.optionalId(),
-    // currentPhaseName: Joi.string(),
+    currentPhaseName: Joi.string(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
     updatedDateStart: Joi.date(),
     updatedDateEnd: Joi.date(),
+    registrationStartDateStart: Joi.date(),
+    registrationStartDateEnd: Joi.date(),
+    registrationEndDateStart: Joi.date(),
+    registrationEndDateEnd: Joi.date(),
+    submissionStartDateStart: Joi.date(),
+    submissionStartDateEnd: Joi.date(),
+    submissionEndDateStart: Joi.date(),
+    submissionEndDateEnd: Joi.date(),
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
     isLightweight: Joi.boolean().default(false),
@@ -546,6 +592,19 @@ async function createChallenge (currentUser, challenge, userToken) {
   }, challenge))
   ret.numOfSubmissions = 0
   ret.numOfRegistrants = 0
+  if (ret.phases && ret.phases.length > 0) {
+    const registrationPhase = _.find(ret.phases, p => p.name === 'Registration')
+    const submissionPhase = _.find(ret.phases, p => p.name === 'Submission')
+    ret.currentPhaseNames = _.map(_.filter(ret.phases, p => p.isOpen === true), 'name')
+    if (registrationPhase) {
+      ret.registrationStartDate = registrationPhase.actualStartDate || registrationPhase.scheduledStartDate
+      ret.registrationEndDate = registrationPhase.actualEndDate || registrationPhase.scheduledEndDate
+    }
+    if (submissionPhase) {
+      ret.submissionStartDate = submissionPhase.actualStartDate || submissionPhase.scheduledStartDate
+      ret.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate
+    }
+  }
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
 
