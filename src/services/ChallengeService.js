@@ -216,13 +216,16 @@ async function searchChallenges (currentUser, criteria) {
 
   const shouldQuery = []
 
-  if (criteria.tags && criteria.includeAllTags) {
-    for (const tag of criteria.tags) {
-      boolQuery.push({ match_phrase: { tags: tag } })
-    }
-  } else {
-    for (const tag of criteria.tags) {
-      shouldQuery.push({ match: { tags: tag } })
+  logger.debug(`Tags: ${criteria.tags}`)
+  if (criteria.tags) {
+    if (criteria.includeAllTags) {
+      for (const tag of criteria.tags) {
+        boolQuery.push({ match_phrase: { tags: tag } })
+      }
+    } else {
+      for (const tag of criteria.tags) {
+        shouldQuery.push({ match: { tags: tag } })
+      }
     }
   }
 
