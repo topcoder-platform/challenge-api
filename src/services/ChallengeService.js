@@ -216,7 +216,7 @@ async function searchChallenges (currentUser, criteria) {
 
   const shouldQuery = []
 
-  if (criteria.includeAllTags) {
+  if (criteria.tags && criteria.includeAllTags) {
     for (const tag of criteria.tags) {
       boolQuery.push({ match_phrase: { tags: tag } })
     }
