@@ -3,7 +3,7 @@
  */
 
 module.exports = {
-  READONLY: process.env.READONLY || false,
+  READONLY: process.env.READONLY === 'true' || false,
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
   PORT: process.env.PORT || 3000,
   // used to properly set the header response to api calls for services behind a load balancer

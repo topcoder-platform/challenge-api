@@ -23,7 +23,7 @@ const app = express()
 
 // Disable POST, PUT, PATCH, DELETE operations if READONLY is set to true
 app.use((req, res, next) => {
-  if (config.READONLY && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+  if (config.READONLY === true && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
     throw new ForbiddenError('Action is temporarely not allowed!')
   }
   next()
