@@ -110,6 +110,13 @@ paths:
           description: Filter by tag name, case-insensitive, partial matches are allowed.
           required: false
           type: string
+        - name: tags
+          in: query
+          description: Filter by multiple tag names, case-insensitive, partial matches are allowed.
+          required: false
+          type: array
+          items:
+            type: string
         - name: projectId
           in: query
           description: Filter by v5 project id, exact match.
@@ -149,6 +156,54 @@ paths:
         - name: startDateStart
           in: query
           description: Filter by start date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: registrationStartDateStart
+          in: query
+          description: Filter by registration start date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: registrationStartDateEnd
+          in: query
+          description: Filter by registration start date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: registrationEndDateStart
+          in: query
+          description: Filter by registration end date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: registrationEndDateEnd
+          in: query
+          description: Filter by registration end date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: submissionStartDateStart
+          in: query
+          description: Filter by submission start date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: submissionStartDateEnd
+          in: query
+          description: Filter by submission start date (upper bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: submissionEndDateStart
+          in: query
+          description: Filter by submission end date (lower bound of date range)
+          required: false
+          type: string
+          format: date-time
+        - name: submissionEndDateEnd
+          in: query
+          description: Filter by submission end date (upper bound of date range)
           required: false
           type: string
           format: date-time
@@ -1971,6 +2026,8 @@ definitions:
         type: string
       legacyId:
         type: integer
+      track:
+        type: string
     required:
       - name
       - isActive
@@ -2051,9 +2108,6 @@ definitions:
     type: object
     properties:
       typeId:
-        type: string
-        format: UUID
-      track:
         type: string
         format: UUID
       timelineTemplateId:
