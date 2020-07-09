@@ -559,17 +559,16 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // populate phases
   if (!challenge.timelineTemplateId) {
-    if (challenge.typeId && _.get(challenge, 'legacy.track')) {
+    if (challenge.typeId) {
       const [challengeTypeTimelineTemplate] = await challengeTypeTimelineTemplateService.searchChallengeTypeTimelineTemplates({
-        typeId: challenge.typeId,
-        track: _.get(challenge, 'legacy.track')
+        typeId: challenge.typeId
       })
       if (!challengeTypeTimelineTemplate) {
-        throw new errors.BadRequestError(`The selected ChallengeType with id: ${challenge.typeId} does not have a default timeline template for the track ${_.get(challenge, 'legacy.track')}. Please provide a timelineTemplateId`)
+        throw new errors.BadRequestError(`The selected ChallengeType with id: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`)
       }
       challenge.timelineTemplateId = challengeTypeTimelineTemplate.timelineTemplateId
     } else {
-      throw new errors.BadRequestError(`Both the typeId and the legacy.track are required to create a challenge`)
+      throw new errors.BadRequestError(`The typeId is required to create a challenge`)
     }
   }
   if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {

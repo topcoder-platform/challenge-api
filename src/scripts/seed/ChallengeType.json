@@ -120,13 +120,6 @@
     "legacyId": 15
   },
   {
-    "id": "e885273d-aeda-42c0-917d-bfbf979afbba",
-    "name": "Task",
-    "description": "Private or TCX task",
-    "isActive": true,
-    "abbreviation": "TASK"
-  },
-  {
     "id": "428d3337-e7c8-45b2-ad76-cbce783975d3",
     "name": "Security",
     "description": "Security",
@@ -199,14 +192,6 @@
     "legacyId": 18
   },
   {
-    "isActive": true,
-    "abbreviation": "CHALLENGE",
-    "description": "Challenge",
-    "id": "94eee466-9255-4b60-88d8-4f59c1810dd0",
-    "legacyId": 39,
-    "name": "Challenge"
-  },
-  {
     "id": "c21336d5-4831-4cce-93a3-ca45bef61562",
     "name": "Design",
     "description": "Design",
@@ -245,14 +230,6 @@
     "isActive": false,
     "abbreviation": "DEPLOYMENT",
     "legacyId": 10
-  },
-  {
-    "id": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-    "name": "First2Finish",
-    "description": "First2Finish",
-    "isActive": true,
-    "abbreviation": "FIRST_2_FINISH",
-    "legacyId": 38
   },
   {
     "id": "bf8c8915-9e0f-440d-a945-58eafc439ee8",
@@ -301,5 +278,109 @@
     "isActive": false,
     "abbreviation": "CODE",
     "legacyId": 39
+  },
+  {
+    "isActive": true,
+    "abbreviation": "CHALLENGE",
+    "description": "Challenge",
+    "id": "94eee466-9255-4b60-88d8-4f59c1810dd0",
+    "legacyId": 39,
+    "name": "Challenge",
+    "track": "DEVELOP"
+  },
+  {
+    "isActive": true,
+    "abbreviation": "CHALLENGE",
+    "description": "Challenge",
+    "id": "82ca20c0-d7b1-4b61-a7c6-bd99cbbb639f",
+    "legacyId": 32,
+    "name": "Challenge",
+    "track": "DESIGN"
+  },
+  {
+    "isActive": true,
+    "abbreviation": "CHALLENGE",
+    "description": "Challenge",
+    "id": "20a39060-43e6-4d46-91e5-a472f4391b9d",
+    "legacyId": 37,
+    "name": "Challenge",
+    "track": "DATA_SCIENCE"
+  },
+  {
+    "isActive": true,
+    "abbreviation": "CHALLENGE",
+    "description": "Challenge",
+    "id": "12af2929-846c-4dfb-980a-898b275ae015",
+    "legacyId": 9,
+    "name": "Challenge",
+    "track": "QA"
+  },
+  {
+    "id": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+    "name": "First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "abbreviation": "FIRST_2_FINISH",
+    "legacyId": 38,
+    "track": "DEVELOP"
+  },
+  {
+    "id": "7f42c9eb-f481-4dd0-8f64-9fc7f5a1ce15",
+    "name": "First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "abbreviation": "FIRST_2_FINISH",
+    "legacyId": 40,
+    "track": "DESIGN"
+  },
+  {
+    "id": "14165f5d-4011-41b5-9702-0f5dcca00b16",
+    "name": "First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "abbreviation": "FIRST_2_FINISH",
+    "legacyId": 38,
+    "track": "DATA_SCIENCE"
+  },
+  {
+    "id": "1b15ff0a-3197-4ce7-8cb8-0fb9505b0b9c",
+    "name": "First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "abbreviation": "FIRST_2_FINISH",
+    "legacyId": 38,
+    "track": "QA"
+  },
+  {
+    "id": "e885273d-aeda-42c0-917d-bfbf979afbba",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK",
+    "track": "DEVELOP"
+  },
+  {
+    "id": "149a2013-92b9-4ca9-b35d-c337d47a2490",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK",
+    "track": "DESIGN"
+  },
+  {
+    "id": "b3b60e22-e302-4db8-bef8-4eaff965565f",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK",
+    "track": "DATA_SCIENCE"
+  },
+  {
+    "id": "a91e69fd-6240-4227-8484-66b8defc4ca9",
+    "name": "Task",
+    "description": "Private or TCX task",
+    "isActive": true,
+    "abbreviation": "TASK",
+    "track": "QA"
   }
 ]
