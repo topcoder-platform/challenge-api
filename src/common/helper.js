@@ -575,7 +575,7 @@ function calculateChallengeEndDate (challenge, data) {
  */
 async function listChallengesByMember (memberId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges`
+  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges?perPage=10000`
   const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
 }
