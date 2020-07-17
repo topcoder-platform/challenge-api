@@ -413,7 +413,7 @@ searchChallenges.schema = {
     createdBy: Joi.string(),
     updatedBy: Joi.string(),
     isLightweight: Joi.boolean().default(false),
-    memberId: Joi.number().integer().positive(),
+    memberId: Joi.string().positive(),
     sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
     sortOrder: Joi.string().valid(['asc', 'desc']),
     groups: Joi.array().items(Joi.optionalId()).unique().min(1),
