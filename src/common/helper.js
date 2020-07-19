@@ -629,7 +629,7 @@ async function validateChallengeTerms (terms = []) {
   for (let term of terms) {
     // Get the terms details from the API
     try {
-      await axios.get(`${config.TERMS_API_URL}/${term.id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.get(`${config.TERMS_API_URL}/${term.id}`, { headers: { Authorization: `Bearer ${token}` } })
       listOfTerms.push(term)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
