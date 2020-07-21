@@ -277,7 +277,7 @@ async function searchChallenges (currentUser, criteria) {
         shouldQuery.push({ match_phrase: { groups: g } })
       })
       // include public challenges
-      shouldQuery.push({ must_not: { exists: { field: 'groups' } } })
+      shouldQuery.push({ bool: { must_not: { exists: { field: 'groups' } } } })
     }
   } else {
     _.each(groupsToFilter, (g) => {
