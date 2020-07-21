@@ -228,6 +228,8 @@ async function searchChallenges (currentUser, criteria) {
   let groupsToFilter = []
   let accessibleGroups = []
 
+  logger.debug(`currentUser: ${currentUser}`)
+
   if (currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
     accessibleGroups = await helper.getCompleteUserGroupTreeIds(currentUser.userId)
   }
@@ -254,7 +256,7 @@ async function searchChallenges (currentUser, criteria) {
         ...(criteria.groups ? criteria.groups : [])
       ]
       if (criteria.group) {
-        groupsToFilter.push()
+        groupsToFilter.push(criteria.group)
       }
     }
     groupsToFilter = _.uniq(groupsToFilter)
