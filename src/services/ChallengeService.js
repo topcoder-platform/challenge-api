@@ -242,11 +242,13 @@ async function searchChallenges (currentUser, criteria) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
       }
-      _.each(criteria.groups, (g) => {
-        if (accessibleGroups.includes(g)) {
-          groupsToFilter.push(g)
-        }
-      })
+      if (criteria.groups && criteria.groups.length > 0) {
+        _.each(criteria.groups, (g) => {
+          if (accessibleGroups.includes(g)) {
+            groupsToFilter.push(g)
+          }
+        })
+      }
     } else {
       groupsToFilter = [
         criteria.group,
@@ -261,6 +263,9 @@ async function searchChallenges (currentUser, criteria) {
       return { total: 0, page, perPage, result: [] }
     }
   }
+
+  logger.debug(`groupsToFilter: ${groupsToFilter}`)
+  logger.debug(`accessibleGroups: ${accessibleGroups}`)
 
   if (groupsToFilter.length === 0) {
     // Return public challenges + challenges from groups that the user has access to
