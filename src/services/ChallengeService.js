@@ -149,12 +149,6 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
-  if (criteria.group) {
-    if (_.isUndefined(currentUser)) {
-      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
-    }
-    boolQuery.push({ match_phrase: { groups: criteria.group } })
-  }
   // if (criteria.currentPhaseId) {
   //   boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
   // }
@@ -229,11 +223,62 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  if (criteria.groups) {
+  let mustNotQuery
+
+  let groupsToFilter = []
+  let accessibleGroups = []
+
+  if (currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    accessibleGroups = await helper.getCompleteUserGroupTreeIds(currentUser.userId)
+  }
+
+  // Filter all groups from the criteria to make sure the user can access those
+  if (!_.isUndefined(criteria.group) || !_.isUndefined(criteria.groups)) {
+    // check group access
     if (_.isUndefined(currentUser)) {
       throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
     }
-    for (const group of criteria.groups) {
+    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      if (accessibleGroups.includes(criteria.group)) {
+        groupsToFilter.push(criteria.group)
+      }
+      _.each(criteria.groups, (g) => {
+        if (accessibleGroups.includes(g)) {
+          groupsToFilter.push(g)
+        }
+      })
+    } else {
+      groupsToFilter = [
+        criteria.group,
+        ...criteria.groups
+      ]
+    }
+    groupsToFilter = _.uniq(groupsToFilter)
+
+    if (groupsToFilter.length === 0) {
+      // User can't access any of the groups from the filters
+      // We return an empty array as the result
+      return { total: 0, page, perPage, result: [] }
+    }
+  }
+
+  if (groupsToFilter.length === 0) {
+    // Return public challenges + challenges from groups that the user has access to
+    if (_.isUndefined(currentUser)) {
+      // If the user is not authenticated, only query challenges that don't have a group
+      if (_.isUndefined(currentUser)) {
+        mustNotQuery = { exists: { field: 'groups' } }
+      }
+    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
+      for (const group of accessibleGroups) {
+        shouldQuery.push({ match: { groups: group } })
+      }
+      // include public challenges
+      shouldQuery.push({ must_not: { exists: { field: 'groups' } } })
+    }
+  } else {
+    for (const group of groupsToFilter) {
       shouldQuery.push({ match: { groups: group } })
     }
   }
@@ -252,18 +297,12 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  let mustNotQuery
-
   const accessQuery = []
 
   // FIXME: This is wrong!
   // if (!_.isUndefined(currentUser) && currentUser.handle) {
   //   accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
   // }
-
-  if (_.isUndefined(currentUser)) {
-    mustNotQuery = { exists: { field: 'groups' } }
-  }
 
   if (criteria.memberId) {
     // logger.error(`memberId ${criteria.memberId}`)
@@ -288,25 +327,38 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  let finalQuery = {
+    bool: {}
+  }
+
+  if (mustQuery.length > 0) {
+    finalQuery.bool.must = mustQuery
+  }
+  if (!_.isUndefined(mustNotQuery)) {
+    finalQuery.bool.must_not = mustNotQuery
+    if (!finalQuery.bool.must) {
+      finalQuery.bool.must = mustQuery
+    }
+  }
+  // if none of the above were set, match all
+  if (!finalQuery.bool.must) {
+    finalQuery = {
+      match_all: {}
+    }
+  }
+
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
     type: config.get('ES.ES_TYPE'),
     size: perPage,
     from: (page - 1) * perPage, // Es Index starts from 0
     body: {
-      query: mustQuery.length > 0 || !_.isUndefined(mustNotQuery) ? {
-        bool: {
-          must: mustQuery,
-          must_not: mustNotQuery
-        }
-      } : {
-        match_all: {}
-      },
+      query: finalQuery,
       sort: [{ [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
 
-  // logger.debug('Query Object', esQuery)
+  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
 
   // Search with constructed query
   let docs
@@ -325,7 +377,6 @@ async function searchChallenges (currentUser, criteria) {
   // Extract data from hits
   const total = docs.hits.total
   let result = _.map(docs.hits.hits, item => item._source)
-  result = await filterChallengesByGroupsAccess(currentUser, result)
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {

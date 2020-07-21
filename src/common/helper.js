@@ -428,6 +428,24 @@ async function getUserGroups (userId) {
 }
 
 /**
+ * Get all user groups including all parent groups for each child group
+ * @param {String} userId the user id
+ * @returns {Promise<Array>} the user groups
+ */
+async function getCompleteUserGroupTreeIds (userId) {
+  const childGroups = await getUserGroups(userId)
+  const childGroupIds = _.map(childGroups, 'id')
+  let result = []
+  for (const id of childGroupIds) {
+    if (!result.includes(id)) {
+      const expanded = await expandWithParentGroups(id)
+      result = _.concat(result, expanded)
+    }
+  }
+  return _.uniq(result)
+}
+
+/**
  * Get all subgroups for the given group ID
  * @param {String} groupId the group ID
  * @returns {Array<String>} an array with the groups ID and the IDs of all subGroups
@@ -442,6 +460,33 @@ async function expandWithSubGroups (groupId) {
   })
   const groups = result.data || {}
   return [groupId, ..._.map(_.get(groups, 'subGroups', []), 'id')]
+}
+
+/**
+ * Get the "up the chain" group tree for the given group ID
+ * @param {String} groupId the group ID
+ * @returns {Array<String>} an array with the group ID and the IDs of all parent groups up the chain
+ */
+async function expandWithParentGroups (groupId) {
+  const token = await getM2MToken()
+  const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      includeParentGroup: true,
+      oneLevel: false
+    }
+  })
+
+  const ids = []
+  const extractIds = (group) => {
+    ids.push(group.id)
+    _.each(_.get(group, 'parentGroups', []), (parent) => {
+      extractIds(parent)
+    })
+  }
+
+  extractIds(result.data || {})
+  return ids
 }
 
 /**
@@ -674,5 +719,7 @@ module.exports = {
   getProjectDefaultTerms,
   validateChallengeTerms,
   getProjectBillingAccount,
-  expandWithSubGroups
+  expandWithSubGroups,
+  getCompleteUserGroupTreeIds,
+  expandWithParentGroups
 }
