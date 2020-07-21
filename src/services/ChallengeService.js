@@ -216,7 +216,7 @@ async function searchChallenges (currentUser, criteria) {
 
   const shouldQuery = []
 
-  logger.debug(`Tags: ${criteria.tags}`)
+  // logger.debug(`Tags: ${criteria.tags}`)
   if (criteria.tags) {
     if (criteria.includeAllTags) {
       for (const tag of criteria.tags) {
@@ -306,7 +306,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.debug('Query Object', esQuery)
+  // logger.debug('Query Object', esQuery)
 
   // Search with constructed query
   let docs
