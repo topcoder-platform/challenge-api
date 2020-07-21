@@ -271,21 +271,21 @@ async function searchChallenges (currentUser, criteria) {
     // Return public challenges + challenges from groups that the user has access to
     if (_.isUndefined(currentUser)) {
       // If the user is not authenticated, only query challenges that don't have a group
-      if (_.isUndefined(currentUser)) {
-        mustNotQuery = { exists: { field: 'groups' } }
-      }
+      mustNotQuery = { exists: { field: 'groups' } }
     } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
-      for (const group of accessibleGroups) {
-        shouldQuery.push({ match: { groups: group } })
-      }
+      _.each(accessibleGroups, (g) => {
+        logger.debug(`adding accessibleGroups: ${g} to the query`)
+        shouldQuery.push({ match: { groups: g } })
+      })
       // include public challenges
       shouldQuery.push({ must_not: { exists: { field: 'groups' } } })
     }
   } else {
-    for (const group of groupsToFilter) {
-      shouldQuery.push({ match: { groups: group } })
-    }
+    _.each(groupsToFilter, (g) => {
+      logger.debug(`adding groupToFilter: ${g} to the query`)
+      shouldQuery.push({ match: { groups: g } })
+    })
   }
 
   if (criteria.ids) {
