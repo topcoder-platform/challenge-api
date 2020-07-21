@@ -228,8 +228,6 @@ async function searchChallenges (currentUser, criteria) {
   let groupsToFilter = []
   let accessibleGroups = []
 
-  logger.debug(`currentUser: ${currentUser}`)
-
   if (currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
     accessibleGroups = await helper.getCompleteUserGroupTreeIds(currentUser.userId)
   }
@@ -268,9 +266,6 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.debug(`groupsToFilter: ${groupsToFilter}`)
-  logger.debug(`accessibleGroups: ${accessibleGroups}`)
-
   if (groupsToFilter.length === 0) {
     // Return public challenges + challenges from groups that the user has access to
     if (_.isUndefined(currentUser)) {
@@ -279,16 +274,14 @@ async function searchChallenges (currentUser, criteria) {
     } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
       _.each(accessibleGroups, (g) => {
-        logger.debug(`adding accessibleGroups: ${g} to the query`)
-        shouldQuery.push({ match: { groups: g } })
+        shouldQuery.push({ match_phrase: { groups: g } })
       })
       // include public challenges
       shouldQuery.push({ must_not: { exists: { field: 'groups' } } })
     }
   } else {
     _.each(groupsToFilter, (g) => {
-      logger.debug(`adding groupToFilter: ${g} to the query`)
-      shouldQuery.push({ match: { groups: g } })
+      shouldQuery.push({ match_phrase: { groups: g } })
     })
   }
 
