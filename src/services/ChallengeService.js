@@ -252,7 +252,7 @@ async function searchChallenges (currentUser, criteria) {
     } else {
       groupsToFilter = [
         criteria.group,
-        ...criteria.groups
+        ...(criteria.groups ? criteria.groups : [])
       ]
     }
     groupsToFilter = _.uniq(groupsToFilter)
