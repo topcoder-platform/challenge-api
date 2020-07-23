@@ -698,7 +698,8 @@ createChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      informixModified: Joi.string()
+      informixModified: Joi.string(),
+      isTask: Joi.boolean()
     }),
     name: Joi.string().required(),
     description: Joi.string(),
@@ -1352,7 +1353,8 @@ function sanitizeChallenge (challenge) {
       'directProjectId',
       'screeningScorecardId',
       'reviewScorecardId',
-      'informixModified'
+      'informixModified',
+      'isTask'
     ])
   }
   if (challenge.metadata) {
@@ -1403,7 +1405,8 @@ fullyUpdateChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      informixModified: Joi.string()
+      informixModified: Joi.string(),
+      isTask: Joi.boolean()
     }).unknown(true),
     typeId: Joi.optionalId(),
     name: Joi.string().required(),
@@ -1477,7 +1480,8 @@ partiallyUpdateChallenge.schema = {
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive(),
-      informixModified: Joi.string()
+      informixModified: Joi.string(),
+      isTask: Joi.boolean()
     }).unknown(true),
     typeId: Joi.optionalId(),
     name: Joi.string(),
