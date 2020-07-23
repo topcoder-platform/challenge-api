@@ -223,7 +223,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  let mustNotQuery
+  const mustNotQuery = []
 
   let groupsToFilter = []
   let accessibleGroups = []
@@ -270,7 +270,7 @@ async function searchChallenges (currentUser, criteria) {
     // Return public challenges + challenges from groups that the user has access to
     if (_.isUndefined(currentUser)) {
       // If the user is not authenticated, only query challenges that don't have a group
-      mustNotQuery = { exists: { field: 'groups' } }
+      mustNotQuery.push({ exists: { field: 'groups' } })
     } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
       _.each(accessibleGroups, (g) => {
@@ -287,7 +287,13 @@ async function searchChallenges (currentUser, criteria) {
 
   if (criteria.ids) {
     for (const id of criteria.ids) {
-      shouldQuery.push({ match: { _id: id } })
+      shouldQuery.push({ match_phrase: { _id: id } })
+    }
+  }
+
+  if (_.isUndefined(criteria.type) && _.isUndefined(criteria.typeId)) {
+    for (const id of config.DEFAULT_EXCLUDED_CHALLENGE_TYPES) {
+      mustNotQuery.push({ match_phrase: { _id: id } })
     }
   }
 
@@ -336,8 +342,14 @@ async function searchChallenges (currentUser, criteria) {
   if (mustQuery.length > 0) {
     finalQuery.bool.must = mustQuery
   }
-  if (!_.isUndefined(mustNotQuery)) {
-    finalQuery.bool.must_not = mustNotQuery
+  if (mustNotQuery.length > 0) {
+    finalQuery.bool.must_not = [
+      {
+        bool: {
+          filter: mustNotQuery
+        }
+      }
+    ]
     if (!finalQuery.bool.must) {
       finalQuery.bool.must = mustQuery
     }
