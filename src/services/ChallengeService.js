@@ -346,7 +346,7 @@ async function searchChallenges (currentUser, criteria) {
     finalQuery.bool.must_not = [
       {
         bool: {
-          filter: mustNotQuery
+          must: mustNotQuery
         }
       }
     ]
