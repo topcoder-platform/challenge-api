@@ -293,7 +293,7 @@ async function searchChallenges (currentUser, criteria) {
 
   if (_.isUndefined(criteria.type) && _.isUndefined(criteria.typeId)) {
     for (const id of config.DEFAULT_EXCLUDED_CHALLENGE_TYPES) {
-      mustNotQuery.push({ term: { typeId: id } })
+      mustNotQuery.push({ match_phrase: { typeId: id } })
     }
   }
 
@@ -343,13 +343,7 @@ async function searchChallenges (currentUser, criteria) {
     finalQuery.bool.must = mustQuery
   }
   if (mustNotQuery.length > 0) {
-    finalQuery.bool.must_not = [
-      {
-        bool: {
-          must: mustNotQuery
-        }
-      }
-    ]
+    finalQuery.bool.must_not = mustNotQuery
     if (!finalQuery.bool.must) {
       finalQuery.bool.must = mustQuery
     }
