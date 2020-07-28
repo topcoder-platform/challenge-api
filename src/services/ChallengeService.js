@@ -291,7 +291,8 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  if (_.isUndefined(criteria.type) && _.isUndefined(criteria.typeId)) {
+  // FIXME: Tech Debt
+  if (_.isUndefined(criteria.type) && _.isUndefined(criteria.typeId) && _.isUndefined(criteria.legacyId)) {
     for (const id of config.DEFAULT_EXCLUDED_CHALLENGE_TYPES) {
       mustNotQuery.push({ match_phrase: { typeId: id } })
     }
