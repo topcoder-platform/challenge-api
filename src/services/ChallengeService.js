@@ -291,8 +291,31 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
+  /*
+  Long and drawn out filter to hide tasks from challenge list unless:
+  1. You're not specifically searching for them (What if you include a task type in your filter, do you see assigned ones?)
+  2. You're not searching for a legacyId
+  3. You're not getting a member's challenges
+  4. You're not an M2M or Admin
+  5. The member ID is not the current requesting user JWT
+  */
   // FIXME: Tech Debt
+  let excludeTasks = false
+  // If you're not looking for a particular type or a specific challenge, exclude tasks
   if (_.isUndefined(criteria.type) && _.isUndefined(criteria.typeId) && _.isUndefined(criteria.legacyId)) {
+    excludeTasks = true
+  }
+  if (!_.isUndefined(criteria.memberId)) {
+    // If a memberId is provided by a non-admin/M2M, exclude tasks
+    if (!helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)) {
+      excludeTasks = true
+    }
+    // If the authenticated member is not looking for his own challenges, exclude tasks
+    if (criteria.memberId !== _.get(currentUser, 'userId')) {
+      excludeTasks = true
+    }
+  }
+  if (excludeTasks) {
     for (const id of config.DEFAULT_EXCLUDED_CHALLENGE_TYPES) {
       mustNotQuery.push({ match_phrase: { typeId: id } })
     }
@@ -788,7 +811,7 @@ async function getChallenge (currentUser, id) {
       const type = await helper.getById('ChallengeType', challenge.typeId)
       challenge.type = type.name
     } catch (e) {
-      challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10'
+      challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10' // TODO Fix HardCode
       const type = await helper.getById('ChallengeType', challenge.typeId)
       challenge.type = type.name
     }
