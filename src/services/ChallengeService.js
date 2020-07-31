@@ -1374,6 +1374,7 @@ function sanitizeChallenge (challenge) {
     'legacyId',
     'startDate',
     'status',
+    'task',
     'attachmentIds',
     'groups'
   ])
