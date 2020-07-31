@@ -730,6 +730,11 @@ createChallenge.schema = {
       reviewScorecardId: Joi.number().integer(),
       isTask: Joi.boolean()
     }),
+    task: Joi.object().keys({
+      isTask: Joi.boolean().default(false),
+      isAssigned: Joi.boolean().default(false),
+      memberId: Joi.string().allow(null)
+    }),
     name: Joi.string().required(),
     description: Joi.string(),
     privateDescription: Joi.string(),
@@ -1442,6 +1447,11 @@ fullyUpdateChallenge.schema = {
       reviewScorecardId: Joi.number().integer(),
       isTask: Joi.boolean()
     }).unknown(true),
+    task: Joi.object().keys({
+      isTask: Joi.boolean().default(false),
+      isAssigned: Joi.boolean().default(false),
+      memberId: Joi.string().allow(null)
+    }),
     trackId: Joi.optionalId(),
     typeId: Joi.optionalId(),
     name: Joi.string().required(),
@@ -1518,6 +1528,11 @@ partiallyUpdateChallenge.schema = {
       forumId: Joi.number().integer().positive(),
       isTask: Joi.boolean()
     }).unknown(true),
+    task: Joi.object().keys({
+      isTask: Joi.boolean().default(false),
+      isAssigned: Joi.boolean().default(false),
+      memberId: Joi.string().allow(null)
+    }),
     trackId: Joi.optionalId(),
     typeId: Joi.optionalId(),
     name: Joi.string(),
