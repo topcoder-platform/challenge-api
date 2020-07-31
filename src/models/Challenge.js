@@ -18,7 +18,11 @@ const schema = new Schema({
   },
   typeId: {
     type: String,
-    required: false
+    required: true
+  },
+  trackId: {
+    type: String,
+    required: true
   },
   legacy: {
     type: Object,
@@ -42,6 +46,10 @@ const schema = new Schema({
     required: true
   },
   metadata: {
+    type: [Object],
+    required: false
+  },
+  task: {
     type: [Object],
     required: false
   },

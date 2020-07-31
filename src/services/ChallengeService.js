@@ -13,9 +13,10 @@ const constants = require('../../app-constants')
 const models = require('../models')
 const HttpStatus = require('http-status-codes')
 const moment = require('moment')
-const phaseService = require('./PhaseService')
-const challengeTypeService = require('./ChallengeTypeService')
-const challengeTypeTimelineTemplateService = require('./ChallengeTypeTimelineTemplateService')
+const PhaseService = require('./PhaseService')
+const ChallengeTypeService = require('./ChallengeTypeService')
+const ChallengeTrackService = require('./ChallengeTrackService')
+const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateService')
 
 const esClient = helper.getESClient()
 
@@ -107,9 +108,15 @@ async function searchChallenges (currentUser, criteria) {
   const boolQuery = []
 
   if (criteria.type) {
-    const typeSearchRes = await challengeTypeService.searchChallengeTypes({ abbreviation: criteria.type })
+    const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: criteria.type })
     if (typeSearchRes.total > 0) {
       criteria.typeId = _.get(typeSearchRes, 'result[0].id')
+    }
+  }
+  if (criteria.track) {
+    const trackSearchRes = await ChallengeTrackService.searchChallengeTracks({ abbreviation: criteria.track })
+    if (trackSearchRes.total > 0) {
+      criteria.trackId = _.get(trackSearchRes, 'result[0].id')
     }
   }
 
@@ -134,9 +141,6 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
-  if (criteria.track) {
-    boolQuery.push({ match_phrase: { 'legacy.track': criteria.track } })
-  }
   if (criteria.reviewType) {
     boolQuery.push({ match_phrase: { 'legacy.reviewType': criteria.reviewType } })
   }
@@ -149,9 +153,6 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.tag) {
     boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
-  // if (criteria.currentPhaseId) {
-  //   boolQuery.push({ match_phrase: { 'currentPhase.id': criteria.currentPhaseId } })
-  // }
   if (criteria.currentPhaseName) {
     boolQuery.push({ match_phrase: { 'currentPhaseNames': criteria.currentPhaseName } })
   }
@@ -460,6 +461,7 @@ searchChallenges.schema = {
     confidentialityType: Joi.string(),
     directProjectId: Joi.number(),
     typeId: Joi.optionalId(),
+    trackId: Joi.optionalId(),
     type: Joi.string(),
     track: Joi.string(),
     name: Joi.string(),
@@ -474,12 +476,10 @@ searchChallenges.schema = {
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
-    // gitRepoURL: Joi.string().uri(),
     startDateStart: Joi.date(),
     startDateEnd: Joi.date(),
     endDateStart: Joi.date(),
     endDateEnd: Joi.date(),
-    // currentPhaseId: Joi.optionalId(),
     currentPhaseName: Joi.string(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
@@ -515,6 +515,17 @@ async function validateChallengeData (challenge) {
     } catch (e) {
       if (e.name === 'NotFoundError') {
         throw new errors.BadRequestError(`No challenge type found with id: ${challenge.typeId}.`)
+      } else {
+        throw e
+      }
+    }
+  }
+  if (challenge.trackId) {
+    try {
+      await helper.getById('ChallengeTrack', challenge.trackId)
+    } catch (e) {
+      if (e.name === 'NotFoundError') {
+        throw new errors.BadRequestError(`No challenge track found with id: ${challenge.trackId}.`)
       } else {
         throw e
       }
@@ -642,16 +653,17 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // populate phases
   if (!challenge.timelineTemplateId) {
-    if (challenge.typeId) {
-      const [challengeTypeTimelineTemplate] = await challengeTypeTimelineTemplateService.searchChallengeTypeTimelineTemplates({
-        typeId: challenge.typeId
+    if (challenge.typeId && challenge.trackId) {
+      const [challengeTimelineTemplate] = await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
+        typeId: challenge.typeId,
+        trackId: challenge.trackId
       })
-      if (!challengeTypeTimelineTemplate) {
-        throw new errors.BadRequestError(`The selected ChallengeType with id: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`)
+      if (!challengeTimelineTemplate) {
+        throw new errors.BadRequestError(`The selected trackId ${challenge.trackId} and typeId: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`)
       }
-      challenge.timelineTemplateId = challengeTypeTimelineTemplate.timelineTemplateId
+      challenge.timelineTemplateId = challengeTimelineTemplate.timelineTemplateId
     } else {
-      throw new errors.BadRequestError(`The typeId is required to create a challenge`)
+      throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`)
     }
   }
   if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
@@ -708,8 +720,8 @@ createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object().keys({
     typeId: Joi.optionalId(),
+    trackId: Joi.optionalId(),
     legacy: Joi.object().keys({
-      track: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
@@ -767,7 +779,7 @@ createChallenge.schema = {
  */
 async function getPhasesAndPopulate (data) {
   _.each(data.phases, async p => {
-    const phase = await phaseService.getPhase(p.phaseId)
+    const phase = await PhaseService.getPhase(p.phaseId)
     p.name = phase.name
     if (phase.description) {
       p.description = phase.description
@@ -804,18 +816,18 @@ async function getChallenge (currentUser, id) {
   }
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge)
-  // FIXME: Temporarily hard coded as the migrad
-  // populate type property based on the typeId
-  if (challenge.typeId) {
-    try {
-      const type = await helper.getById('ChallengeType', challenge.typeId)
-      challenge.type = type.name
-    } catch (e) {
-      challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10' // TODO Fix HardCode
-      const type = await helper.getById('ChallengeType', challenge.typeId)
-      challenge.type = type.name
-    }
-  }
+  // // FIXME: Temporarily hard coded as the migrad
+  // // populate type property based on the typeId
+  // if (challenge.typeId) {
+  //   try {
+  //     const type = await helper.getById('ChallengeType', challenge.typeId)
+  //     challenge.type = type.name
+  //   } catch (e) {
+  //     challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10' // TODO Fix HardCode
+  //     const type = await helper.getById('ChallengeType', challenge.typeId)
+  //     challenge.type = type.name
+  //   }
+  // }
   // delete challenge.typeId
 
   // Remove privateDescription for unregistered users
@@ -976,7 +988,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
-  // FIXME: Tech Dept
+  // FIXME: Tech Debt
   let billingAccountId
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
@@ -996,6 +1008,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // FIXME: Tech Debt
   if (_.get(challenge, 'legacy.track') && _.get(data, 'legacy.track') && _.get(challenge, 'legacy.track') !== _.get(data, 'legacy.track')) {
     throw new errors.ForbiddenError('Cannot change legacy.track')
+  }
+  if (_.get(challenge, 'trackId') && _.get(data, 'trackId') && _.get(challenge, 'trackId') !== _.get(data, 'trackId')) {
+    throw new errors.ForbiddenError('Cannot change trackId')
   }
   if (_.get(challenge, 'typeId') && _.get(data, 'typeId') && _.get(challenge, 'typeId') !== _.get(data, 'typeId')) {
     throw new errors.ForbiddenError('Cannot change typeId')
@@ -1348,6 +1363,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
  */
 function sanitizeChallenge (challenge) {
   const sanitized = _.pick(challenge, [
+    'trackId',
     'typeId',
     'name',
     'description',
@@ -1365,13 +1381,13 @@ function sanitizeChallenge (challenge) {
   if (challenge.legacy) {
     sanitized.legacy = _.pick(challenge.legacy, [
       'track',
+      'subTrack',
       'reviewType',
       'confidentialityType',
       'forumId',
       'directProjectId',
       'screeningScorecardId',
       'reviewScorecardId',
-      'informixModified',
       'isTask'
     ])
   }
@@ -1417,6 +1433,7 @@ fullyUpdateChallenge.schema = {
   data: Joi.object().keys({
     legacy: Joi.object().keys({
       track: Joi.string().required(),
+      subTrack: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
@@ -1426,6 +1443,7 @@ fullyUpdateChallenge.schema = {
       informixModified: Joi.string(),
       isTask: Joi.boolean()
     }).unknown(true),
+    trackId: Joi.optionalId(),
     typeId: Joi.optionalId(),
     name: Joi.string().required(),
     description: Joi.string(),
@@ -1494,6 +1512,7 @@ partiallyUpdateChallenge.schema = {
   data: Joi.object().keys({
     legacy: Joi.object().keys({
       track: Joi.string(),
+      subTrack: Joi.string(),
       reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
@@ -1501,6 +1520,7 @@ partiallyUpdateChallenge.schema = {
       informixModified: Joi.string(),
       isTask: Joi.boolean()
     }).unknown(true),
+    trackId: Joi.optionalId(),
     typeId: Joi.optionalId(),
     name: Joi.string(),
     description: Joi.string(),

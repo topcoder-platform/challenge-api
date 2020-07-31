@@ -1,8 +1,8 @@
 [
   {
     "id": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
-    "name": "Standard Development",
-    "description": "Standard Code challenge timeline",
+    "name": "Default Challenge",
+    "description": "Standard Default Challenge Timeline",
     "isActive": true,
     "phases": [
       {
@@ -105,7 +105,7 @@
 
   {
     "id": "d4201ca4-8437-4d63-9957-3f7708184b07",
-    "name": "Standard Design",
+    "name": "Design with Checkpoints",
     "description": "Standard Design challenge timeline",
     "isActive": true,
     "phases": [
@@ -203,10 +203,35 @@
       }
     ]
   },
-
+  {
+    "id": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+    "name": "Default First2Finish",
+    "description": "First2Finish",
+    "isActive": true,
+    "phases": [
+      {
+        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+        "defaultDuration": 2592000
+      },
+      {
+        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+        "defaultDuration": 2592000
+      },
+      {
+        "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+        "defaultDuration": 86400
+      },
+      {
+        "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+        "predecessor": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+        "defaultDuration": 86400
+      }
+    ]
+  },
   {
     "id": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
-    "name": "Task",
+    "name": "Default Task",
     "description": "Task Timeline",
     "isActive": true,
     "phases": [

@@ -1,5 +1,5 @@
 /**
- * This defines ChallengeType model.
+ * This defines ChallengeTrack model.
  */
 
 const dynamoose = require('dynamoose')
