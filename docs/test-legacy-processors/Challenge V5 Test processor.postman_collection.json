@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "4ce83573-7d66-4f37-a968-52c1f4bfdc5d",
 		"name": "Challenge V5 Test processor",
-		"description": "Test API to see if processors are working.\n\n- [ ] Create a challenge using v5 API, make sure it goes back into v4 correctly\n- [ ] Review the legacy processor to make sure the updated properties correctly update v5 data. The following properties must be updated when a challenge gets created on legacy by the processor:\n  - [ ] `legacy.directProjectId`\n  - [ ] `legacy.forumId`\n  - [ ] `legacy.informixModified`\n  - [ ] `legacyId`",
+		"description": "Test API to see if processors are working.\n\n- [ ] Create a challenge using v5 API, make sure it goes back into v4 correctly\n- [ ] Review the legacy processor to make sure the updated properties correctly update v5 data. The following properties must be updated when a challenge gets created on legacy by the processor:\n  - [ ] `legacy.directProjectId`\n  - [ ] `legacy.forumId`\n  - [ ] `legacyId`",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [

@@ -728,7 +728,6 @@ createChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      informixModified: Joi.string(),
       isTask: Joi.boolean()
     }),
     name: Joi.string().required(),
@@ -1440,7 +1439,6 @@ fullyUpdateChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      informixModified: Joi.string(),
       isTask: Joi.boolean()
     }).unknown(true),
     trackId: Joi.optionalId(),
@@ -1517,7 +1515,6 @@ partiallyUpdateChallenge.schema = {
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer().positive(),
-      informixModified: Joi.string(),
       isTask: Joi.boolean()
     }).unknown(true),
     trackId: Joi.optionalId(),

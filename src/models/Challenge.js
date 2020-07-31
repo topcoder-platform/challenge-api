@@ -50,7 +50,7 @@ const schema = new Schema({
     required: false
   },
   task: {
-    type: [Object],
+    type: Object,
     required: false
   },
   timelineTemplateId: {
