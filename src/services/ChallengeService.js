@@ -509,9 +509,11 @@ searchChallenges.schema = {
  * @param {Object} challenge the challenge data
  */
 async function validateChallengeData (challenge) {
+  let type
+  let track
   if (challenge.typeId) {
     try {
-      await helper.getById('ChallengeType', challenge.typeId)
+      type = await helper.getById('ChallengeType', challenge.typeId)
     } catch (e) {
       if (e.name === 'NotFoundError') {
         throw new errors.BadRequestError(`No challenge type found with id: ${challenge.typeId}.`)
@@ -522,7 +524,7 @@ async function validateChallengeData (challenge) {
   }
   if (challenge.trackId) {
     try {
-      await helper.getById('ChallengeTrack', challenge.trackId)
+      track = await helper.getById('ChallengeTrack', challenge.trackId)
     } catch (e) {
       if (e.name === 'NotFoundError') {
         throw new errors.BadRequestError(`No challenge track found with id: ${challenge.trackId}.`)
@@ -537,6 +539,7 @@ async function validateChallengeData (challenge) {
       throw new errors.BadRequestError(`The timeline template with id: ${challenge.timelineTemplateId} is inactive`)
     }
   }
+  return { type, track }
 }
 
 /**
@@ -639,7 +642,7 @@ async function createChallenge (currentUser, challenge, userToken) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
   await helper.ensureProjectExist(challenge.projectId, userToken)
-  await validateChallengeData(challenge)
+  const { track, type } = await validateChallengeData(challenge)
   if (challenge.phases && challenge.phases.length > 0) {
     await helper.validatePhases(challenge.phases)
   }
@@ -702,6 +705,14 @@ async function createChallenge (currentUser, challenge, userToken) {
       ret.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate
     }
   }
+
+  if (track) {
+    ret.track = track.name
+  }
+  if (type) {
+    ret.type = type.name
+  }
+
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
 
@@ -719,8 +730,8 @@ async function createChallenge (currentUser, challenge, userToken) {
 createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object().keys({
-    typeId: Joi.optionalId(),
-    trackId: Joi.optionalId(),
+    typeId: Joi.id(),
+    trackId: Joi.id(),
     legacy: Joi.object().keys({
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
@@ -1334,6 +1345,16 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   if (challenge.phases && challenge.phases.length > 0) {
     await getPhasesAndPopulate(challenge)
+  }
+
+  // Populate challenge.track and challenge.type based on the track/type IDs
+  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
+
+  if (track) {
+    challenge.track = track.name
+  }
+  if (type) {
+    challenge.type = type.name
   }
 
   // post bus event
