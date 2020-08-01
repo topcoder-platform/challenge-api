@@ -115,9 +115,11 @@ function setResHeaders (req, res, result) {
  * @param {Object} authUser the user
  */
 function hasAdminRole (authUser) {
-  for (let i = 0; i < authUser.roles.length; i++) {
-    if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
-      return true
+  if (authUser && authUser.roles) {
+    for (let i = 0; i < authUser.roles.length; i++) {
+      if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
+        return true
+      }
     }
   }
   return false
