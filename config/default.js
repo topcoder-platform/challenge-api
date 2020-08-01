@@ -69,12 +69,5 @@ module.exports = {
 
   DEFAULT_CONFIDENTIALITY_TYPE: process.env.DEFAULT_CONFIDENTIALITY_TYPE || 'public',
 
-  M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'TopcoderService',
-
-  DEFAULT_EXCLUDED_CHALLENGE_TYPES: process.env.DEFAULT_EXCLUDED_CHALLENGE_TYPES ? process.env.DEFAULT_EXCLUDED_CHALLENGE_TYPES.split(',') : [
-    'b3b60e22-e302-4db8-bef8-4eaff965565f',
-    'e885273d-aeda-42c0-917d-bfbf979afbba',
-    '149a2013-92b9-4ca9-b35d-c337d47a2490',
-    'a91e69fd-6240-4227-8484-66b8defc4ca9'
-  ]
+  M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'TopcoderService'
 }
