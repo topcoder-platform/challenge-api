@@ -22,6 +22,7 @@
   },
   "author": "TCSCODER",
   "license": "none",
+  "repository": "https://github.com/topcoder-platform/challenge-api",
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
