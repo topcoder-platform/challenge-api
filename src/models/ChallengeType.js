@@ -24,6 +24,10 @@ const schema = new Schema({
     type: Boolean,
     required: true
   },
+  isTask: {
+    type: Boolean,
+    default: false
+  },
   abbreviation: {
     type: String,
     required: true

@@ -4,6 +4,7 @@
     "name": "Challenge",
     "description": "A Multi-person Competition with Reviews and Winners",
     "isActive": true,
+    "isTask": false,
     "abbreviation": "CH"
   },
   {
@@ -11,6 +12,7 @@
     "name": "First2Finish",
     "description": "A challenge where the first submission that satisfies the spec wins",
     "isActive": true,
+    "isTask": false,
     "abbreviation": "F2F"
   },
   {
@@ -18,6 +20,7 @@
     "name": "Task",
     "description": "A piece of work assigned to one person",
     "isActive": true,
+    "isTask": true,
     "abbreviation": "T"
   }
 ]

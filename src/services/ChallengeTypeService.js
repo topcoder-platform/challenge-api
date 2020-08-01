@@ -23,6 +23,7 @@ async function searchChallengeTypes (criteria) {
   if (criteria.description) records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
   if (criteria.abbreviation) records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
   if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive === 'true')))
+  if (!_.isUndefined(criteria.isTask)) records = _.filter(records, e => (e.isTask === (criteria.isTask === 'true')))
 
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
@@ -37,6 +38,7 @@ searchChallengeTypes.schema = {
     name: Joi.string(),
     description: Joi.string(),
     isActive: Joi.boolean(),
+    isTask: Joi.boolean().default(false),
     abbreviation: Joi.string()
   })
 }
@@ -60,6 +62,7 @@ createChallengeType.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     isActive: Joi.boolean().required(),
+    isTask: Joi.boolean().default(false),
     abbreviation: Joi.string().required()
   }).required()
 }
@@ -107,6 +110,7 @@ fullyUpdateChallengeType.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     isActive: Joi.boolean().required(),
+    isTask: Joi.boolean().default(false),
     abbreviation: Joi.string().required()
   }).required()
 }
@@ -137,6 +141,7 @@ partiallyUpdateChallengeType.schema = {
     name: Joi.string(),
     description: Joi.string(),
     isActive: Joi.boolean(),
+    isTask: Joi.boolean().default(false),
     abbreviation: Joi.string()
   }).required()
 }
