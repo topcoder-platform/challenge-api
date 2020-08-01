@@ -124,7 +124,7 @@ async function searchChallenges (currentUser, criteria) {
     'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
     'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
     'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd',
-    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight']), (value, key) => {
+    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight', 'isTask', 'taskIsAssigned', 'taskMemberId']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
@@ -316,10 +316,51 @@ async function searchChallenges (currentUser, criteria) {
       excludeTasks = true
     }
   }
-  if (excludeTasks) {
-    for (const id of config.DEFAULT_EXCLUDED_CHALLENGE_TYPES) {
-      mustNotQuery.push({ match_phrase: { typeId: id } })
+  // Exclude tasks for unauthenticated users
+  if (_.isUndefined(currentUser)) {
+    excludeTasks = true
+  }
+
+  /**
+   * For non-authenticated users:
+   * - Only unassigned tasks will be returned
+   * For authenticated users (non-admin):
+   * - Only unassigned tasks and tasks assigned to the logged in user will be returned
+   * For admins/m2m:
+   * - All tasks will be returned
+   */
+  if (currentUser && (helper.hasAdminRole(currentUser) || _.get(currentUser, 'isMachine', false))) {
+    // For admins/m2m, allow filtering based on task properties
+    if (criteria.isTask) {
+      boolQuery.push({ match_phrase: { 'task.isTask': criteria.isTask } })
     }
+    if (criteria.taskIsAssigned) {
+      boolQuery.push({ match_phrase: { 'task.isAssigned': criteria.taskIsAssigned } })
+    }
+    if (criteria.taskMemberId) {
+      boolQuery.push({ match_phrase: { 'task.memberId': criteria.taskMemberId } })
+    }
+  } else if (excludeTasks) {
+    mustQuery.push({
+      bool: {
+        should: [
+          { match_phrase: { 'task.isTask': false } },
+          {
+            bool: {
+              must: [
+                { match_phrase: { 'task.isTask': true } },
+                { match_phrase: { 'task.isAssigned': false } }
+              ]
+            }
+          },
+          ...(
+            currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)
+              ? [{ match_phrase: { 'task.memberId': currentUser.userId } }]
+              : []
+          )
+        ]
+      }
+    })
   }
 
   if (shouldQuery.length > 0) {
@@ -500,7 +541,10 @@ searchChallenges.schema = {
     sortBy: Joi.string().valid(_.values(constants.validChallengeParams)),
     sortOrder: Joi.string().valid(['asc', 'desc']),
     groups: Joi.array().items(Joi.optionalId()).unique().min(1),
-    ids: Joi.array().items(Joi.optionalId()).unique().min(1)
+    ids: Joi.array().items(Joi.optionalId()).unique().min(1),
+    isTask: Joi.boolean(),
+    taskIsAssigned: Joi.boolean(),
+    taskMemberId: Joi.string()
   })
 }
 

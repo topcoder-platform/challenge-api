@@ -309,6 +309,32 @@ paths:
           required: false
           type: boolean
           default: false
+        - name: isTask
+          in: query
+          description: >-
+            Filter based on the task.isTask property.
+            Only available for admins/m2m.
+            Will be ignored for regular users or not authenticated users
+          required: false
+          type: boolean
+          default: false
+        - name: taskIsAssigned
+          in: query
+          description: >-
+            Filter based on the task.isAssigned property.
+            Only available for admins/m2m.
+            Will be ignored for regular users or not authenticated users
+          required: false
+          type: boolean
+          default: false
+        - name: taskMemberId
+          in: query
+          description: >-
+            Filter based on the task.memberId property.
+            Only available for admins/m2m.
+            Will be ignored for regular users or not authenticated users
+          required: false
+          type: string
         - in: body
           name: body
           required: false
