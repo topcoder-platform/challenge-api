@@ -66,7 +66,7 @@
 									"",
 									"pm.test(\"Verify the challenge was created on V4\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.result.content.id).to.eql(pm.environment.get(\"V4_CHALLENGE_ID\"));",
+									"    pm.expect(jsonData.result.content.challengeId).to.eql(pm.environment.get(\"V4_CHALLENGE_ID\"));",
 									"});"
 								],
 								"type": "text/javascript"
