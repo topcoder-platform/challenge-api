@@ -110,6 +110,9 @@ async function searchChallenges (currentUser, criteria) {
   const perPage = criteria.perPage || 20
   const boolQuery = []
 
+  const includedTrackIds = []
+  const includedTypeIds = []
+
   if (criteria.type) {
     const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: criteria.type })
     if (typeSearchRes.total > 0) {
@@ -123,8 +126,32 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  _.forIn(_.omit(criteria, ['type', 'name', 'description', 'page', 'perPage', 'tag', 'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd',
-    'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
+  if (criteria.types) {
+    for (const t of criteria.types) {
+      const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t })
+      if (typeSearchRes.total > 0) {
+        includedTypeIds.push(_.get(typeSearchRes, 'result[0].id'))
+      }
+    }
+  }
+  if (criteria.tracks) {
+    for (const t of criteria.types) {
+      const trackSearchRes = await ChallengeTrackService.searchChallengeTracks({ abbreviation: t })
+      if (trackSearchRes.total > 0) {
+        includedTrackIds.push(_.get(trackSearchRes, 'result[0].id'))
+      }
+    }
+  }
+
+  if (criteria.typeId) {
+    includedTypeIds.push(criteria.typeId)
+  }
+  if (criteria.trackId) {
+    includedTrackIds.push(criteria.trackId)
+  }
+
+  _.forIn(_.omit(criteria, ['types', 'tracks', 'typeIds', 'trackIds', 'type', 'name', 'trackId', 'typeId', 'description', 'page', 'perPage', 'tag',
+    'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd', 'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
     'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
     'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd',
     'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight', 'isTask', 'taskIsAssigned', 'taskMemberId']), (value, key) => {
@@ -134,6 +161,22 @@ async function searchChallenges (currentUser, criteria) {
       boolQuery.push(filter)
     }
   })
+
+  if (includedTypeIds.length > 0) {
+    boolQuery.push({
+      bool: {
+        should: _.map(includedTypeIds, t => ({ match_phrase: { typeId: t } }))
+      }
+    })
+  }
+
+  if (includedTrackIds.length > 0) {
+    boolQuery.push({
+      bool: {
+        should: _.map(includedTrackIds, t => ({ match_phrase: { trackId: t } }))
+      }
+    })
+  }
 
   if (criteria.name) {
     boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
@@ -306,7 +349,7 @@ async function searchChallenges (currentUser, criteria) {
   // FIXME: Tech Debt
   let excludeTasks = false
   // If you're not looking for a particular type or a specific challenge, exclude tasks
-  if (_.isUndefined(criteria.type) && _.isUndefined(criteria.typeId) && _.isUndefined(criteria.legacyId)) {
+  if (_.isUndefined(criteria.type) && includedTypeIds.length === 0 && _.isUndefined(criteria.legacyId)) {
     excludeTasks = true
   }
   if (!_.isUndefined(criteria.memberId)) {
@@ -504,6 +547,10 @@ searchChallenges.schema = {
     id: Joi.optionalId(),
     confidentialityType: Joi.string(),
     directProjectId: Joi.number(),
+    typeIds: Joi.array().items(Joi.optionalId()),
+    trackIds: Joi.array().items(Joi.optionalId()),
+    types: Joi.array().items(Joi.string()),
+    tracks: Joi.array().items(Joi.string()),
     typeId: Joi.optionalId(),
     trackId: Joi.optionalId(),
     type: Joi.string(),

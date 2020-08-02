@@ -80,6 +80,40 @@ paths:
             will be ignored
           required: false
           type: string
+        - name: types
+          in: query
+          description: >-
+            Filter by multiple type abbreviation, exact match. If types is provided, typeIds will be
+            ignored
+          required: false
+          type: array
+          items:
+            type: string
+        - name: typeIds
+          in: query
+          description: >-
+            Filter by multiple type IDs, exact match.
+          required: false
+          type: array
+          items:
+            type: string
+        - name: tracks
+          in: query
+          description: >-
+            Filter by multiple track abbreviation, exact match. If types is provided, trackIds will be
+            ignored
+          required: false
+          type: array
+          items:
+            type: string
+        - name: trackIds
+          in: query
+          description: >-
+            Filter by multiple track IDs, exact match.
+          required: false
+          type: array
+          items:
+            type: string
         - name: typeId
           in: query
           description: >-
