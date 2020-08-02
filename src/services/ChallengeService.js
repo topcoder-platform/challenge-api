@@ -83,8 +83,11 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  * @param {Object} data the challenge data to be updated
  * @param {String} challenge the original challenge data
  */
-
 async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge) {
+  const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
+  if (!needToCheckForGroupAccess) {
+    return
+  }
   const userGroups = await helper.getUserGroups(currentUser.userId)
   const userGroupsIds = _.map(userGroups, group => group.id)
   const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
