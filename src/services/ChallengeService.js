@@ -110,8 +110,9 @@ async function searchChallenges (currentUser, criteria) {
   const perPage = criteria.perPage || 20
   const boolQuery = []
 
-  const includedTrackIds = []
-  const includedTypeIds = []
+  const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
+
+  const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : []
 
   if (criteria.type) {
     const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: criteria.type })
