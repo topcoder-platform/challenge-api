@@ -135,7 +135,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
   if (criteria.tracks) {
-    for (const t of criteria.types) {
+    for (const t of criteria.tracks) {
       const trackSearchRes = await ChallengeTrackService.searchChallengeTracks({ abbreviation: t })
       if (trackSearchRes.total > 0) {
         includedTrackIds.push(_.get(trackSearchRes, 'result[0].id'))
