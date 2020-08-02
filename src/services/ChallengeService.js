@@ -687,6 +687,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   }
   await helper.ensureProjectExist(challenge.projectId, userToken)
   const { track, type } = await validateChallengeData(challenge)
+  if (_.get(type, 'isTask')) {
+    _.set(challenge, 'task.isTask', true)
+  }
   if (challenge.phases && challenge.phases.length > 0) {
     await helper.validatePhases(challenge.phases)
   }
