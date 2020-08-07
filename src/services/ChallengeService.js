@@ -945,8 +945,7 @@ async function getChallenge (currentUser, id) {
 
   // Check if challenge is task and apply security rules
   if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
-    const skipAccessCheck = !currentUser ? false : currentUser.isMachine || helper.hasAdminRole(currentUser)
-    if (!skipAccessCheck && currentUser && _.toString(currentUser.userId) !== _.toString(_.get(challenge, 'task.memberId'))) {
+    if (!currentUser || !(currentUser.isMachine || helper.hasAdminRole(currentUser)) || _.toString(currentUser.userId) !== _.toString(_.get(challenge, 'task.memberId'))) {
       throw new errors.ForbiddenError(`You don't have access to view this challenge`)
     }
   }
