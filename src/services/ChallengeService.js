@@ -339,33 +339,11 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  /*
-  Long and drawn out filter to hide tasks from challenge list unless:
-  1. You're not specifically searching for them (What if you include a task type in your filter, do you see assigned ones?)
-  2. You're not searching for a legacyId
-  3. You're not getting a member's challenges
-  4. You're not an M2M or Admin
-  5. The member ID is not the current requesting user JWT
-  */
   // FIXME: Tech Debt
-  let excludeTasks = false
-  // If you're not looking for a particular type or a specific challenge, exclude tasks
-  if (_.isUndefined(criteria.type) && includedTypeIds.length === 0 && _.isUndefined(criteria.legacyId)) {
-    excludeTasks = true
-  }
-  if (!_.isUndefined(criteria.memberId)) {
-    // If a memberId is provided by a non-admin/M2M, exclude tasks
-    if (!helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)) {
-      excludeTasks = true
-    }
-    // If the authenticated member is not looking for his own challenges, exclude tasks
-    if (criteria.memberId !== _.get(currentUser, 'userId')) {
-      excludeTasks = true
-    }
-  }
-  // Exclude tasks for unauthenticated users
-  if (_.isUndefined(currentUser)) {
-    excludeTasks = true
+  let excludeTasks = true
+  // if you're an admin or m2m, security rules wont be applied
+  if (currentUser && (helper.hasAdminRole(currentUser) || _.get(currentUser, 'isMachine', false))) {
+    excludeTasks = false
   }
 
   /**
@@ -384,8 +362,8 @@ async function searchChallenges (currentUser, criteria) {
     if (criteria.taskIsAssigned) {
       boolQuery.push({ match_phrase: { 'task.isAssigned': criteria.taskIsAssigned } })
     }
-    if (criteria.taskMemberId) {
-      boolQuery.push({ match_phrase: { 'task.memberId': criteria.taskMemberId } })
+    if (criteria.taskMemberId || criteria.memberId) {
+      boolQuery.push({ match_phrase: { 'task.memberId': criteria.taskMemberId || criteria.memberId } })
     }
   } else if (excludeTasks) {
     mustQuery.push({
