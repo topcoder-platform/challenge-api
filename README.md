@@ -1,6 +1,8 @@
 # Topcoder Challenge API
 
 This microservice provides access and interaction with all sorts of Challenge data.
+## Devlopment status
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/topcoder-platform/challenge-api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/topcoder-platform/challenge-api/alerts/)
 
 ### Deployment status
 Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop) Prod: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master)
