@@ -21,6 +21,6 @@
     "description": "A piece of work assigned to one person",
     "isActive": true,
     "isTask": true,
-    "abbreviation": "T"
+    "abbreviation": "TSK"
   }
 ]
