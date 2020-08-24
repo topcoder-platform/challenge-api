@@ -369,6 +369,7 @@ async function searchChallenges (currentUser, criteria) {
     mustQuery.push({
       bool: {
         should: [
+          { bool: { must_not: { exists: { field: 'task.isTask' } } } },
           { match_phrase: { 'task.isTask': false } },
           {
             bool: {
