@@ -70,6 +70,11 @@ const challengeTracks = {
   QA: 'QA'
 }
 
+const challengeTextSortField = {
+  Name: 'name',
+  TypeId: 'typeId'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -78,5 +83,6 @@ module.exports = {
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
   Topics,
-  challengeTracks
+  challengeTracks,
+  challengeTextSortField
 }
