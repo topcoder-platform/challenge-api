@@ -2,8 +2,9 @@
  * App constants
  */
 const UserRoles = {
-  Admin: 'Administrator',
-  Copilot: 'Copilot',
+  Admin: 'administrator',
+  Copilot: 'copilot',
+  Manager: 'Connect Manager',
   User: 'Topcoder User'
 }
 

@@ -16,14 +16,14 @@ module.exports = {
     get: {
       controller: 'ChallengeController',
       method: 'searchChallenges',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.User],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
       scopes: [READ, ALL]
     },
     post: {
       controller: 'ChallengeController',
       method: 'createChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [CREATE, ALL]
     }
   },
@@ -43,14 +43,14 @@ module.exports = {
       controller: 'ChallengeController',
       method: 'fullyUpdateChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     },
     patch: {
       controller: 'ChallengeController',
       method: 'partiallyUpdateChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     }
   },
@@ -63,7 +63,7 @@ module.exports = {
       controller: 'ChallengeTypeController',
       method: 'createChallengeType',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [CREATE, ALL]
     }
   },
@@ -76,14 +76,14 @@ module.exports = {
       controller: 'ChallengeTypeController',
       method: 'fullyUpdateChallengeType',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     },
     patch: {
       controller: 'ChallengeTypeController',
       method: 'partiallyUpdateChallengeType',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     }
   },
@@ -96,7 +96,7 @@ module.exports = {
       controller: 'ChallengeTrackController',
       method: 'createChallengeTrack',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [CREATE, ALL]
     }
   },
@@ -109,14 +109,14 @@ module.exports = {
       controller: 'ChallengeTrackController',
       method: 'fullyUpdateChallengeTrack',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     },
     patch: {
       controller: 'ChallengeTrackController',
       method: 'partiallyUpdateChallengeTrack',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     }
   },
@@ -132,7 +132,7 @@ module.exports = {
       controller: 'ChallengeTimelineTemplateController',
       method: 'createChallengeTimelineTemplate',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [CREATE, ALL]
     }
   },
@@ -148,14 +148,14 @@ module.exports = {
       controller: 'ChallengeTimelineTemplateController',
       method: 'fullyUpdateChallengeTimelineTemplate',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
     },
     delete: {
       controller: 'ChallengeTimelineTemplateController',
       method: 'deleteChallengeTimelineTemplate',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [DELETE, ALL]
     }
   },
@@ -187,7 +187,7 @@ module.exports = {
       controller: 'ChallengePhaseController',
       method: 'getPhase',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [READ, ALL]
     },
     put: {
@@ -231,7 +231,7 @@ module.exports = {
       controller: 'TimelineTemplateController',
       method: 'getTimelineTemplate',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [READ, ALL]
     },
     put: {
@@ -261,7 +261,7 @@ module.exports = {
       controller: 'AttachmentController',
       method: 'uploadAttachment',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [CREATE, ALL]
     }
   },
