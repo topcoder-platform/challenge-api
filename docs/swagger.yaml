@@ -184,7 +184,7 @@ paths:
         - name: events
           in: query
           description: >-
-            Filter by multiple event IDs
+            Filter by multiple event keys (ie: tco21)
           required: false
           type: array
           items:

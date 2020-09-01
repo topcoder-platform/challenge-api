@@ -277,11 +277,11 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.events) {
     if (criteria.includeAllEvents) {
       for (const e of criteria.events) {
-        boolQuery.push({ match_phrase: { 'events.id': e } })
+        boolQuery.push({ match_phrase: { 'events.key': e } })
       }
     } else {
       for (const e of criteria.events) {
-        shouldQuery.push({ match: { 'events.id': e } })
+        shouldQuery.push({ match: { 'events.key': e } })
       }
     }
   }
