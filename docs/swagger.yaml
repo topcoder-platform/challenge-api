@@ -184,12 +184,11 @@ paths:
         - name: events
           in: query
           description: >-
-            Filter by multiple event names, case-insensitive, partial matches are
-            allowed.
+            Filter by multiple event IDs
           required: false
           type: array
           items:
-            type: string
+            type: number
         - name: includeAllEvents
           in: query
           description: >-
