@@ -342,6 +342,29 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
+  const accessQuery = []
+  let memberChallengeIds
+
+  // FIXME: This is wrong!
+  // if (!_.isUndefined(currentUser) && currentUser.handle) {
+  //   accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
+  // }
+
+  if (criteria.memberId) {
+    // logger.error(`memberId ${criteria.memberId}`)
+    memberChallengeIds = await helper.listChallengesByMember(criteria.memberId)
+    // logger.error(`response ${JSON.stringify(ids)}`)
+    accessQuery.push({ terms: { _id: memberChallengeIds } })
+  }
+
+  if (accessQuery.length > 0) {
+    mustQuery.push({
+      bool: {
+        should: accessQuery
+      }
+    })
+  }
+
   // FIXME: Tech Debt
   let excludeTasks = true
   // if you're an admin or m2m, security rules wont be applied
@@ -372,6 +395,7 @@ async function searchChallenges (currentUser, criteria) {
     mustQuery.push({
       bool: {
         should: [
+          ...(_.get(memberChallengeIds, 'length', 0) > 0 ? { terms: { _id: memberChallengeIds } } : {}),
           { bool: { must_not: { exists: { field: 'task.isTask' } } } },
           { match_phrase: { 'task.isTask': false } },
           {
@@ -396,28 +420,6 @@ async function searchChallenges (currentUser, criteria) {
     mustQuery.push({
       bool: {
         should: shouldQuery
-      }
-    })
-  }
-
-  const accessQuery = []
-
-  // FIXME: This is wrong!
-  // if (!_.isUndefined(currentUser) && currentUser.handle) {
-  //   accessQuery.push({ match_phrase: { createdBy: currentUser.handle } })
-  // }
-
-  if (criteria.memberId) {
-    // logger.error(`memberId ${criteria.memberId}`)
-    const ids = await helper.listChallengesByMember(criteria.memberId)
-    // logger.error(`response ${JSON.stringify(ids)}`)
-    accessQuery.push({ terms: { _id: ids } })
-  }
-
-  if (accessQuery.length > 0) {
-    mustQuery.push({
-      bool: {
-        should: accessQuery
       }
     })
   }
@@ -722,6 +724,12 @@ async function createChallenge (currentUser, challenge, userToken) {
   const { track, type } = await validateChallengeData(challenge)
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
+    if (_.isUndefined(_.get(challenge, 'task.isAssigned'))) {
+      _.set(challenge, 'task.isAssigned', false)
+    }
+    if (_.isUndefined(_.get(challenge, 'task.memberId'))) {
+      _.set(challenge, 'task.memberId', null)
+    }
   }
   if (challenge.phases && challenge.phases.length > 0) {
     await helper.validatePhases(challenge.phases)
