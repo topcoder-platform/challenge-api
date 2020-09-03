@@ -947,23 +947,25 @@ async function getChallenge (currentUser, id) {
   // }
   // delete challenge.typeId
 
-  // Check if challenge is task and apply security rules
-  if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
-    if (!currentUser || (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && _.toString(currentUser.userId) !== _.toString(_.get(challenge, 'task.memberId')))) {
-      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
-    }
-  }
-
+  let memberChallengeIds
   // Remove privateDescription for unregistered users
   if (currentUser) {
     if (!currentUser.isMachine) {
-      const ids = await helper.listChallengesByMember(currentUser.userId)
-      if (!_.includes(ids, challenge.id)) {
+      memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
+      if (!_.includes(memberChallengeIds, challenge.id)) {
         _.unset(challenge, 'privateDescription')
       }
     }
   } else {
     _.unset(challenge, 'privateDescription')
+  }
+
+  // Check if challenge is task and apply security rules
+  if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
+    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || helper.hasAdminRole(currentUser)
+    if (!canAccesChallenge) {
+      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
+    }
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
