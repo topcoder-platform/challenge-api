@@ -154,7 +154,7 @@ async function searchChallenges (currentUser, criteria) {
   _.forIn(_.omit(criteria, ['types', 'tracks', 'typeIds', 'trackIds', 'type', 'name', 'trackId', 'typeId', 'description', 'page', 'perPage', 'tag',
     'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd', 'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
     'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
-    'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd',
+    'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd', 'includeAllEvents', 'events',
     'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight', 'isTask', 'taskIsAssigned', 'taskMemberId']), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
@@ -270,6 +270,18 @@ async function searchChallenges (currentUser, criteria) {
     } else {
       for (const tag of criteria.tags) {
         shouldQuery.push({ match: { tags: tag } })
+      }
+    }
+  }
+
+  if (criteria.events) {
+    if (criteria.includeAllEvents) {
+      for (const e of criteria.events) {
+        boolQuery.push({ match_phrase: { 'events.key': e } })
+      }
+    } else {
+      for (const e of criteria.events) {
+        shouldQuery.push({ match: { 'events.key': e } })
       }
     }
   }
@@ -579,7 +591,9 @@ searchChallenges.schema = {
     ids: Joi.array().items(Joi.optionalId()).unique().min(1),
     isTask: Joi.boolean(),
     taskIsAssigned: Joi.boolean(),
-    taskMemberId: Joi.string()
+    taskMemberId: Joi.string(),
+    events: Joi.array().items(Joi.number()),
+    includeAllEvents: Joi.boolean().default(true)
   })
 }
 
