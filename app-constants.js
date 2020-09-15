@@ -2,8 +2,9 @@
  * App constants
  */
 const UserRoles = {
-  Admin: 'Administrator',
-  Copilot: 'Copilot',
+  Admin: 'administrator',
+  Copilot: 'copilot',
+  Manager: 'Connect Manager',
   User: 'Topcoder User'
 }
 
@@ -70,6 +71,11 @@ const challengeTracks = {
   QA: 'QA'
 }
 
+const challengeTextSortField = {
+  Name: 'name',
+  TypeId: 'typeId'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -78,5 +84,6 @@ module.exports = {
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
   Topics,
-  challengeTracks
+  challengeTracks,
+  challengeTextSortField
 }
