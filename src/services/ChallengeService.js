@@ -1425,7 +1425,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
 
   if (_.get(type, 'isTask')) {
-    if (!_.isUndefined(_.get(challenge, 'task.memberId'))) {
+    if (!_.isEmpty(_.get(challenge, 'task.memberId'))) {
       const challengeResources = await helper.getChallengeResources(challengeId)
       const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
       if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(_.get(challenge, 'task.memberId')))) {
