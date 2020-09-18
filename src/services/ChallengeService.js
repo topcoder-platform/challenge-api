@@ -743,6 +743,8 @@ async function createChallenge (currentUser, challenge, userToken) {
     }
     if (_.isUndefined(_.get(challenge, 'task.memberId'))) {
       _.set(challenge, 'task.memberId', null)
+    } else {
+      throw new errors.BadRequestError(`Cannot assign a member before the challenge gets created.`)
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1420,6 +1422,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.winners = null
   }
 
+  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
+
+  if (_.get(type, 'isTask')) {
+    if (!_.isUndefined(_.get(challenge, 'task.memberId'))) {
+      const challengeResources = await helper.getChallengeResources(challengeId)
+      const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
+      if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(_.get(challenge, 'task.memberId')))) {
+        throw new errors.BadRequestError(`Member ${_.get(challenge, 'task.memberId')} is not a submitter resource of challenge ${challengeId}`)
+      }
+    }
+  }
+
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
@@ -1460,7 +1474,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   // Populate challenge.track and challenge.type based on the track/type IDs
-  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
 
   if (track) {
     challenge.track = track.name
