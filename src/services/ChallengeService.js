@@ -1159,8 +1159,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
-  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase()) {
-    throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
+  const userHasFullAccess = await helper.userHasFullAccess(challengeId, currentUser.userId)
+  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !userHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
   }
 
   // Validate the challenge terms
