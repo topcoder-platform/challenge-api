@@ -682,8 +682,17 @@ async function validateESRefreshMethod (method) {
 async function getProjectDefaultTerms (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
-  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-  return res.data.terms || []
+  try {
+    const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    return res.data.terms || []
+  } catch (err) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
 }
 
 /**
@@ -695,8 +704,17 @@ async function getProjectDefaultTerms (projectId) {
 async function getProjectBillingAccount (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
-  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-  return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+  try {
+    const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+  } catch (err) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
 }
 
 /**
