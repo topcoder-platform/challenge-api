@@ -109,6 +109,15 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
+  const matchPhraseKeys = [
+    'id',
+    'timelineTemplateId',
+    'projectId',
+    'legacyId',
+    'status',
+    'createdBy',
+    'updatedBy'
+  ]
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
@@ -151,15 +160,25 @@ async function searchChallenges (currentUser, criteria) {
     includedTrackIds.push(criteria.trackId)
   }
 
-  _.forIn(_.omit(criteria, ['types', 'tracks', 'typeIds', 'trackIds', 'type', 'name', 'trackId', 'typeId', 'description', 'page', 'perPage', 'tag',
-    'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd', 'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
-    'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
-    'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd', 'includeAllEvents', 'events',
-    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight', 'isTask', 'taskIsAssigned', 'taskMemberId']), (value, key) => {
+  _.forIn(_.pick(criteria, matchPhraseKeys), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
       boolQuery.push(filter)
+    }
+  })
+
+  _.forEach(_.keys(criteria), (key) => {
+    if (_.toString(key).indexOf('meta.') > -1) {
+      // Parse and use metadata key
+      if (!_.isUndefined(criteria[key])) {
+        const metaKey = key.split('meta.')[1]
+        const metaMustQuery = { must: [
+          { match_phrase: { 'metadata.name': metaKey } },
+          { match_phrase: { 'metadata.value': criteria[key] } }
+        ] }
+        boolQuery.push(metaMustQuery)
+      }
     }
   })
 
@@ -594,7 +613,7 @@ searchChallenges.schema = {
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.number()),
     includeAllEvents: Joi.boolean().default(true)
-  })
+  }).unknown(true)
 }
 
 /**
