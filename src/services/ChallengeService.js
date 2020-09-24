@@ -799,6 +799,11 @@ async function createChallenge (currentUser, challenge, userToken) {
   // this will need to be updated to associate project terms with a roleId
   challenge.terms = await helper.validateChallengeTerms(challenge.terms || [])
 
+  // default the descriptionFormat
+  if (!challenge.descriptionFormat) {
+    challenge.descriptionFormat = 'markdown'
+  }
+
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
