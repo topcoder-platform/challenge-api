@@ -109,6 +109,15 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
+  const matchPhraseKeys = [
+    'id',
+    'timelineTemplateId',
+    'projectId',
+    'legacyId',
+    'status',
+    'createdBy',
+    'updatedBy'
+  ]
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
@@ -151,15 +160,21 @@ async function searchChallenges (currentUser, criteria) {
     includedTrackIds.push(criteria.trackId)
   }
 
-  _.forIn(_.omit(criteria, ['types', 'tracks', 'typeIds', 'trackIds', 'type', 'name', 'trackId', 'typeId', 'description', 'page', 'perPage', 'tag',
-    'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd', 'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
-    'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
-    'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd', 'includeAllEvents', 'events',
-    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight', 'isTask', 'taskIsAssigned', 'taskMemberId']), (value, key) => {
+  _.forIn(_.pick(criteria, matchPhraseKeys), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
       boolQuery.push(filter)
+    }
+  })
+
+  _.forEach(_.keys(criteria), (key) => {
+    if (_.toString(key).indexOf('meta.') > -1) {
+      // Parse and use metadata key
+      if (!_.isUndefined(criteria[key])) {
+        const metaKey = key.split('meta.')[1]
+        boolQuery.push({ match_phrase: { [`metadata.${metaKey}`]: criteria[key] } })
+      }
     }
   })
 
@@ -594,7 +609,7 @@ searchChallenges.schema = {
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.number()),
     includeAllEvents: Joi.boolean().default(true)
-  })
+  }).unknown(true)
 }
 
 /**
@@ -743,6 +758,8 @@ async function createChallenge (currentUser, challenge, userToken) {
     }
     if (_.isUndefined(_.get(challenge, 'task.memberId'))) {
       _.set(challenge, 'task.memberId', null)
+    } else {
+      throw new errors.BadRequestError(`Cannot assign a member before the challenge gets created.`)
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1164,8 +1181,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
-  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase()) {
-    throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
+  const userHasFullAccess = await helper.userHasFullAccess(challengeId, currentUser.userId)
+  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !userHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
   }
 
   // Validate the challenge terms
@@ -1424,6 +1442,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.winners = null
   }
 
+  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
+
+  if (_.get(type, 'isTask')) {
+    if (!_.isEmpty(_.get(data, 'task.memberId'))) {
+      const challengeResources = await helper.getChallengeResources(challengeId)
+      const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
+      if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(_.get(data, 'task.memberId')))) {
+        throw new errors.BadRequestError(`Member ${_.get(data, 'task.memberId')} is not a submitter resource of challenge ${challengeId}`)
+      }
+    }
+  }
+
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
@@ -1464,7 +1494,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   // Populate challenge.track and challenge.type based on the track/type IDs
-  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
 
   if (track) {
     challenge.track = track.name
