@@ -196,10 +196,10 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (criteria.name) {
-    boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
+    boolQuery.push({ wildcard: { name: `*${criteria.name}*` } })
   }
   if (criteria.description) {
-    boolQuery.push({ match: { description: `.*${criteria.name}.*` } })
+    boolQuery.push({ wildcard: { description: `*${criteria.description}*` } })
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
