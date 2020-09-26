@@ -1452,6 +1452,15 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
 
+  // Only m2m tokens are allowed to modify the `task.*` information on a challenge
+  if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
+    if (!_.isUndefined(_.get(challenge, 'task'))) {
+      data.task = challenge.task
+    } else {
+      delete data.task
+    }
+  }
+
   if (_.get(type, 'isTask')) {
     if (!_.isEmpty(_.get(data, 'task.memberId'))) {
       const challengeResources = await helper.getChallengeResources(challengeId)
