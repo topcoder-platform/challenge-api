@@ -32,7 +32,15 @@ const initES = async () => {
     body.mappings[config.get('ES.ES_TYPE')] = {
       properties: {
         id: { type: 'keyword' }
-      }
+      },
+      dynamic_templates: [{
+        metadata: {
+          path_match: 'metadata.*',
+          mapping: {
+            type: 'text'
+          }
+        }
+      }]
     }
 
     await client.indices.create({
