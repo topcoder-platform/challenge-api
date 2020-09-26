@@ -6,6 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const config = require('config')
+const xss = require('xss')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
@@ -746,6 +747,8 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * @returns {Object} the created challenge
  */
 async function createChallenge (currentUser, challenge, userToken) {
+  challenge.name = xss(challenge.name)
+  challenge.description = xss(challenge.description)
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
@@ -1566,6 +1569,8 @@ function sanitizeChallenge (challenge) {
     'attachmentIds',
     'groups'
   ])
+  sanitized.name = xss(sanitized.name)
+  sanitized.description = xss(sanitized.description)
   if (challenge.legacy) {
     sanitized.legacy = _.pick(challenge.legacy, [
       'track',
