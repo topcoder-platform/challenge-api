@@ -2219,6 +2219,28 @@ definitions:
       - $ref: '#/definitions/EventData'
     required:
       - id
+  Discussion:
+    type: object
+    properties:
+      id:
+        type: string
+        format: UUID
+      name:
+        type: string
+      type:
+        type: string
+        enum:
+          - challenge
+      provider:
+        type: string
+      url:
+        type: string
+        description: Only M2M tokens can modify this
+      options:
+        type: array
+        description: Only M2M tokens can modify this
+        items:
+          type: object
   TimelineTemplate:
     type: object
     allOf:
@@ -2342,6 +2364,10 @@ definitions:
                     type: string
                   value:
                     type: number
+      discussions:
+        type: array
+        items:
+          $ref: '#/definitions/Discussion'
       tags:
         type: array
         items:
@@ -2655,6 +2681,10 @@ definitions:
               format: UUID
             duration:
               type: number
+      discussions:
+        type: array
+        items:
+          $ref: '#/definitions/Discussion'
       prizeSets:
         type: array
         items:

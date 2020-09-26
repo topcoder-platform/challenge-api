@@ -762,6 +762,11 @@ async function createChallenge (currentUser, challenge, userToken) {
       throw new errors.BadRequestError(`Cannot assign a member before the challenge gets created.`)
     }
   }
+  if (challenge.discussions && challenge.discussions.length > 0) {
+    for (let i = 0; i < challenge.discussions.length; i += 1) {
+      challenge.discussions[i].id = uuid()
+    }
+  }
   if (challenge.phases && challenge.phases.length > 0) {
     await helper.validatePhases(challenge.phases)
   }
@@ -887,6 +892,13 @@ createChallenge.schema = {
       id: Joi.number().required(),
       name: Joi.string(),
       key: Joi.string()
+    })),
+    discussions: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
     })),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1184,6 +1196,27 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const userHasFullAccess = await helper.userHasFullAccess(challengeId, currentUser.userId)
   if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !userHasFullAccess) {
     throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+
+  // Only M2M can update url and options of discussions
+  if (data.discussions && data.discussions.length > 0) {
+    for (let i = 0; i < data.discussions.length; i += 1) {
+      if (_.isUndefined(data.discussions[i].id)) {
+        data.discussions[i].id = uuid()
+        if (!currentUser.isMachine) {
+          _.unset(data.discussions, 'url')
+          _.unset(data.discussions, 'options')
+        }
+      } else if (!currentUser.isMachine) {
+        const existingDiscussion = _.find(_.get(challenge, 'discussions', []), d => d.id === data.discussions[i].id)
+        if (existingDiscussion) {
+          _.assign(data.discussions[i], _.pick(existingDiscussion, ['url', 'options']))
+        } else {
+          _.unset(data.discussions, 'url')
+          _.unset(data.discussions, 'options')
+        }
+      }
+    }
   }
 
   // Validate the challenge terms
@@ -1656,6 +1689,13 @@ fullyUpdateChallenge.schema = {
       name: Joi.string(),
       key: Joi.string()
     }).unknown(true)),
+    discussions: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
+    })),
     tags: Joi.array().items(Joi.string().required()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
@@ -1728,6 +1768,13 @@ partiallyUpdateChallenge.schema = {
       name: Joi.string(),
       key: Joi.string()
     }).unknown(true)),
+    discussions: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
+    })),
     startDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),

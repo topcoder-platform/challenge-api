@@ -47,6 +47,10 @@ const EVENT_ORIGINATOR = 'topcoder-challenges-api'
 
 const EVENT_MIME_TYPE = 'application/json'
 
+const DiscussionTypes = {
+  Challenge: 'challenge'
+}
+
 // using a testing topc, should be changed to use real topics in comments when they are created
 const Topics = {
   ChallengeCreated: 'challenge.notification.create',
@@ -85,5 +89,6 @@ module.exports = {
   EVENT_MIME_TYPE,
   Topics,
   challengeTracks,
-  challengeTextSortField
+  challengeTextSortField,
+  DiscussionTypes
 }
