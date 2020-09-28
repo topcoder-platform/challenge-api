@@ -383,6 +383,8 @@ async function searchChallenges (currentUser, criteria) {
     memberChallengeIds = await helper.listChallengesByMember(criteria.memberId)
     // logger.error(`response ${JSON.stringify(ids)}`)
     accessQuery.push({ terms: { _id: memberChallengeIds } })
+  } else if (currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)) {
+    memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
   }
 
   if (accessQuery.length > 0) {
