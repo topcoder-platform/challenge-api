@@ -423,7 +423,7 @@ async function searchChallenges (currentUser, criteria) {
     mustQuery.push({
       bool: {
         should: [
-          ...(_.get(memberChallengeIds, 'length', 0) > 0 ? [{ terms: { _id: memberChallengeIds } }] : []),
+          ...(_.get(memberChallengeIds, 'length', 0) > 0 ? [{ bool: { should: { terms: { _id: memberChallengeIds } } } }] : []),
           { bool: { must_not: { exists: { field: 'task.isTask' } } } },
           { match_phrase: { 'task.isTask': false } },
           {
