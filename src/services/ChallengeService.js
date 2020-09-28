@@ -1569,8 +1569,12 @@ function sanitizeChallenge (challenge) {
     'attachmentIds',
     'groups'
   ])
-  sanitized.name = xss(sanitized.name)
-  sanitized.description = xss(sanitized.description)
+  if (!_.isUndefined(sanitized.name)) {
+    sanitized.name = xss(sanitized.name)
+  }
+  if (!_.isUndefined(sanitized.description)) {
+    sanitized.description = xss(sanitized.description)
+  }
   if (challenge.legacy) {
     sanitized.legacy = _.pick(challenge.legacy, [
       'track',
