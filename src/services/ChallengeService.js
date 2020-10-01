@@ -1149,6 +1149,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
       billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
+      // if activating a challenge, the challenge must have a billing account id
+      if ((!billingAccountId || billingAccountId === null) &&
+        challenge.status === constants.challengeStatuses.Draft) {
+        throw new errors.BadRequestError('Cannot Activate this project, it has no active billing accounts.')
+      }
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (challenge.status !== constants.challengeStatuses.Active) {
