@@ -275,31 +275,23 @@ async function searchChallenges (currentUser, criteria) {
 
   const mustQuery = []
 
-  const shouldQuery = []
+  const groupsQuery = []
 
   // logger.debug(`Tags: ${criteria.tags}`)
   if (criteria.tags) {
-    if (criteria.includeAllTags) {
-      for (const tag of criteria.tags) {
-        boolQuery.push({ match_phrase: { tags: tag } })
+    boolQuery.push({
+      bool: {
+        [criteria.includeAllTags ? 'must' : 'should']: _.map(criteria.tags, t => ({ match_phrase: { tags: t } }))
       }
-    } else {
-      for (const tag of criteria.tags) {
-        shouldQuery.push({ match: { tags: tag } })
-      }
-    }
+    })
   }
 
   if (criteria.events) {
-    if (criteria.includeAllEvents) {
-      for (const e of criteria.events) {
-        boolQuery.push({ match_phrase: { 'events.key': e } })
+    boolQuery.push({
+      bool: {
+        [criteria.includeAllEvents ? 'must' : 'should']: _.map(criteria.events, e => ({ match_phrase: { 'events.key': e } }))
       }
-    } else {
-      for (const e of criteria.events) {
-        shouldQuery.push({ match: { 'events.key': e } })
-      }
-    }
+    })
   }
 
   const mustNotQuery = []
@@ -353,21 +345,23 @@ async function searchChallenges (currentUser, criteria) {
     } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
       _.each(accessibleGroups, (g) => {
-        shouldQuery.push({ match_phrase: { groups: g } })
+        groupsQuery.push({ match_phrase: { groups: g } })
       })
       // include public challenges
-      shouldQuery.push({ bool: { must_not: { exists: { field: 'groups' } } } })
+      groupsQuery.push({ bool: { must_not: { exists: { field: 'groups' } } } })
     }
   } else {
     _.each(groupsToFilter, (g) => {
-      shouldQuery.push({ match_phrase: { groups: g } })
+      groupsQuery.push({ match_phrase: { groups: g } })
     })
   }
 
   if (criteria.ids) {
-    for (const id of criteria.ids) {
-      shouldQuery.push({ match_phrase: { _id: id } })
-    }
+    boolQuery.push({
+      bool: {
+        should: _.map(criteria.ids, id => ({ match_phrase: { _id: id } }))
+      }
+    })
   }
 
   const accessQuery = []
@@ -446,10 +440,10 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  if (shouldQuery.length > 0) {
+  if (groupsQuery.length > 0) {
     mustQuery.push({
       bool: {
-        should: shouldQuery
+        should: groupsQuery
       }
     })
   }
