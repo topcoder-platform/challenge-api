@@ -1640,6 +1640,9 @@ function sanitizeChallenge (challenge) {
   if (challenge.winners) {
     sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
   }
+  if (challenge.discussions) {
+    sanitized.discussions = _.map(challenge.discussions, discussion => _.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']))
+  }
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
   }
