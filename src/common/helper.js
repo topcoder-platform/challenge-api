@@ -392,9 +392,44 @@ async function getM2MToken () {
  */
 async function getChallengeResources (challengeId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}`
-  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+  const perPage = 100
+  let page = 1
+  let result = []
+  while (true) {
+    const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}&perPage=${perPage}&page=${page}`
+    const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!res.data || res.data.length === 0) {
+      break
+    }
+    result = result.concat(res.data)
+    page += 1
+    if (res.headers['x-total-pages'] && page > Number(res.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return result
+}
+
+/**
+ * Get resource roles
+ * @returns {Promise<Array>} the challenge resources
+ */
+async function getResourceRoles () {
+  const token = await getM2MToken()
+  const res = await axios.get(config.RESOURCE_ROLES_API_URL, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
+}
+
+/**
+ * Check if a user has full access on a challenge
+ * @param {String} challengeId the challenge UUID
+ * @param {String} userId the user ID
+ */
+async function userHasFullAccess (challengeId, userId) {
+  const resourceRoles = await getResourceRoles()
+  const rolesWithFullAccess = _.map(_.filter(resourceRoles, r => r.fullAccess), 'id')
+  const challengeResources = await getChallengeResources(challengeId)
+  return _.filter(challengeResources, r => _.toString(r.memberId) === _.toString(userId) && _.includes(rolesWithFullAccess, r.roleId)).length > 0
 }
 
 /**
@@ -647,8 +682,17 @@ async function validateESRefreshMethod (method) {
 async function getProjectDefaultTerms (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
-  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-  return res.data.terms || []
+  try {
+    const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    return res.data.terms || []
+  } catch (err) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
 }
 
 /**
@@ -660,8 +704,17 @@ async function getProjectDefaultTerms (projectId) {
 async function getProjectBillingAccount (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
-  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-  return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+  try {
+    const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+  } catch (err) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
 }
 
 /**
@@ -723,5 +776,7 @@ module.exports = {
   getProjectBillingAccount,
   expandWithSubGroups,
   getCompleteUserGroupTreeIds,
-  expandWithParentGroups
+  expandWithParentGroups,
+  getResourceRoles,
+  userHasFullAccess
 }

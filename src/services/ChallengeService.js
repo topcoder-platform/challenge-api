@@ -6,6 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const config = require('config')
+const xss = require('xss')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 const errors = require('../common/errors')
@@ -109,6 +110,15 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
+  const matchPhraseKeys = [
+    'id',
+    'timelineTemplateId',
+    'projectId',
+    'legacyId',
+    'status',
+    'createdBy',
+    'updatedBy'
+  ]
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
@@ -151,15 +161,21 @@ async function searchChallenges (currentUser, criteria) {
     includedTrackIds.push(criteria.trackId)
   }
 
-  _.forIn(_.omit(criteria, ['types', 'tracks', 'typeIds', 'trackIds', 'type', 'name', 'trackId', 'typeId', 'description', 'page', 'perPage', 'tag',
-    'group', 'groups', 'memberId', 'ids', 'createdDateStart', 'createdDateEnd', 'updatedDateStart', 'updatedDateEnd', 'startDateStart', 'startDateEnd', 'endDateStart', 'endDateEnd',
-    'tags', 'registrationStartDateStart', 'registrationStartDateEnd', 'currentPhaseName', 'submissionStartDateStart', 'submissionStartDateEnd',
-    'registrationEndDateStart', 'registrationEndDateEnd', 'submissionEndDateStart', 'submissionEndDateEnd', 'includeAllEvents', 'events',
-    'forumId', 'track', 'reviewType', 'confidentialityType', 'directProjectId', 'sortBy', 'sortOrder', 'isLightweight', 'isTask', 'taskIsAssigned', 'taskMemberId']), (value, key) => {
+  _.forIn(_.pick(criteria, matchPhraseKeys), (value, key) => {
     if (!_.isUndefined(value)) {
       const filter = { match_phrase: {} }
       filter.match_phrase[key] = value
       boolQuery.push(filter)
+    }
+  })
+
+  _.forEach(_.keys(criteria), (key) => {
+    if (_.toString(key).indexOf('meta.') > -1) {
+      // Parse and use metadata key
+      if (!_.isUndefined(criteria[key])) {
+        const metaKey = key.split('meta.')[1]
+        boolQuery.push({ match_phrase: { [`metadata.${metaKey}`]: criteria[key] } })
+      }
     }
   })
 
@@ -180,10 +196,10 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (criteria.name) {
-    boolQuery.push({ match: { name: `.*${criteria.name}.*` } })
+    boolQuery.push({ wildcard: { name: `*${_.toLower(criteria.name)}*` } })
   }
   if (criteria.description) {
-    boolQuery.push({ match: { description: `.*${criteria.name}.*` } })
+    boolQuery.push({ wildcard: { description: `*${_.toLower(criteria.description)}*` } })
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
@@ -259,31 +275,23 @@ async function searchChallenges (currentUser, criteria) {
 
   const mustQuery = []
 
-  const shouldQuery = []
+  const groupsQuery = []
 
   // logger.debug(`Tags: ${criteria.tags}`)
   if (criteria.tags) {
-    if (criteria.includeAllTags) {
-      for (const tag of criteria.tags) {
-        boolQuery.push({ match_phrase: { tags: tag } })
+    boolQuery.push({
+      bool: {
+        [criteria.includeAllTags ? 'must' : 'should']: _.map(criteria.tags, t => ({ match_phrase: { tags: t } }))
       }
-    } else {
-      for (const tag of criteria.tags) {
-        shouldQuery.push({ match: { tags: tag } })
-      }
-    }
+    })
   }
 
   if (criteria.events) {
-    if (criteria.includeAllEvents) {
-      for (const e of criteria.events) {
-        boolQuery.push({ match_phrase: { 'events.key': e } })
+    boolQuery.push({
+      bool: {
+        [criteria.includeAllEvents ? 'must' : 'should']: _.map(criteria.events, e => ({ match_phrase: { 'events.key': e } }))
       }
-    } else {
-      for (const e of criteria.events) {
-        shouldQuery.push({ match: { 'events.key': e } })
-      }
-    }
+    })
   }
 
   const mustNotQuery = []
@@ -337,21 +345,23 @@ async function searchChallenges (currentUser, criteria) {
     } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
       _.each(accessibleGroups, (g) => {
-        shouldQuery.push({ match_phrase: { groups: g } })
+        groupsQuery.push({ match_phrase: { groups: g } })
       })
       // include public challenges
-      shouldQuery.push({ bool: { must_not: { exists: { field: 'groups' } } } })
+      groupsQuery.push({ bool: { must_not: { exists: { field: 'groups' } } } })
     }
   } else {
     _.each(groupsToFilter, (g) => {
-      shouldQuery.push({ match_phrase: { groups: g } })
+      groupsQuery.push({ match_phrase: { groups: g } })
     })
   }
 
   if (criteria.ids) {
-    for (const id of criteria.ids) {
-      shouldQuery.push({ match_phrase: { _id: id } })
-    }
+    boolQuery.push({
+      bool: {
+        should: _.map(criteria.ids, id => ({ match_phrase: { _id: id } }))
+      }
+    })
   }
 
   const accessQuery = []
@@ -367,6 +377,8 @@ async function searchChallenges (currentUser, criteria) {
     memberChallengeIds = await helper.listChallengesByMember(criteria.memberId)
     // logger.error(`response ${JSON.stringify(ids)}`)
     accessQuery.push({ terms: { _id: memberChallengeIds } })
+  } else if (currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)) {
+    memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
   }
 
   if (accessQuery.length > 0) {
@@ -407,7 +419,7 @@ async function searchChallenges (currentUser, criteria) {
     mustQuery.push({
       bool: {
         should: [
-          ...(_.get(memberChallengeIds, 'length', 0) > 0 ? [{ terms: { _id: memberChallengeIds } }] : []),
+          ...(_.get(memberChallengeIds, 'length', 0) > 0 ? [{ bool: { should: [ { terms: { _id: memberChallengeIds } } ] } }] : []),
           { bool: { must_not: { exists: { field: 'task.isTask' } } } },
           { match_phrase: { 'task.isTask': false } },
           {
@@ -428,10 +440,10 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  if (shouldQuery.length > 0) {
+  if (groupsQuery.length > 0) {
     mustQuery.push({
       bool: {
-        should: shouldQuery
+        should: groupsQuery
       }
     })
   }
@@ -594,7 +606,7 @@ searchChallenges.schema = {
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.number()),
     includeAllEvents: Joi.boolean().default(true)
-  })
+  }).unknown(true)
 }
 
 /**
@@ -731,6 +743,8 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * @returns {Object} the created challenge
  */
 async function createChallenge (currentUser, challenge, userToken) {
+  challenge.name = xss(challenge.name)
+  challenge.description = xss(challenge.description)
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
@@ -743,6 +757,13 @@ async function createChallenge (currentUser, challenge, userToken) {
     }
     if (_.isUndefined(_.get(challenge, 'task.memberId'))) {
       _.set(challenge, 'task.memberId', null)
+    } else {
+      throw new errors.BadRequestError(`Cannot assign a member before the challenge gets created.`)
+    }
+  }
+  if (challenge.discussions && challenge.discussions.length > 0) {
+    for (let i = 0; i < challenge.discussions.length; i += 1) {
+      challenge.discussions[i].id = uuid()
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -781,6 +802,11 @@ async function createChallenge (currentUser, challenge, userToken) {
   // TODO - challenge terms returned from projects api don't have a role associated
   // this will need to be updated to associate project terms with a roleId
   challenge.terms = await helper.validateChallengeTerms(challenge.terms || [])
+
+  // default the descriptionFormat
+  if (!challenge.descriptionFormat) {
+    challenge.descriptionFormat = 'markdown'
+  }
 
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
@@ -865,6 +891,13 @@ createChallenge.schema = {
       id: Joi.number().required(),
       name: Joi.string(),
       key: Joi.string()
+    })),
+    discussions: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
     })),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1122,6 +1155,11 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
       billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
+      // if activating a challenge, the challenge must have a billing account id
+      if ((!billingAccountId || billingAccountId === null) &&
+        challenge.status === constants.challengeStatuses.Draft) {
+        throw new errors.BadRequestError('Cannot Activate this project, it has no active billing accounts.')
+      }
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (challenge.status !== constants.challengeStatuses.Active) {
@@ -1159,8 +1197,30 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
-  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase()) {
-    throw new errors.ForbiddenError(`Only M2M, admin or challenge's copilot can perform modification.`)
+  const userHasFullAccess = await helper.userHasFullAccess(challengeId, currentUser.userId)
+  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !userHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+
+  // Only M2M can update url and options of discussions
+  if (data.discussions && data.discussions.length > 0) {
+    for (let i = 0; i < data.discussions.length; i += 1) {
+      if (_.isUndefined(data.discussions[i].id)) {
+        data.discussions[i].id = uuid()
+        if (!currentUser.isMachine) {
+          _.unset(data.discussions, 'url')
+          _.unset(data.discussions, 'options')
+        }
+      } else if (!currentUser.isMachine) {
+        const existingDiscussion = _.find(_.get(challenge, 'discussions', []), d => d.id === data.discussions[i].id)
+        if (existingDiscussion) {
+          _.assign(data.discussions[i], _.pick(existingDiscussion, ['url', 'options']))
+        } else {
+          _.unset(data.discussions, 'url')
+          _.unset(data.discussions, 'options')
+        }
+      }
+    }
   }
 
   // Validate the challenge terms
@@ -1211,7 +1271,15 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (data.phases || data.startDate) {
-    const newPhases = data.phases || challenge.phases
+    if (data.phases && data.phases.length > 0) {
+      for (let i = 0; i < challenge.phases.length; i += 1) {
+        const updatedPhaseInfo = _.find(data.phases, p => p.phaseId === challenge.phases[i].phaseId)
+        if (updatedPhaseInfo) {
+          _.extend(challenge.phases[i], updatedPhaseInfo)
+        }
+      }
+    }
+    const newPhases = challenge.phases
     const newStartDate = data.startDate || challenge.startDate
 
     await helper.validatePhases(newPhases)
@@ -1419,6 +1487,27 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     data.winners = null
   }
 
+  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
+
+  // Only m2m tokens are allowed to modify the `task.*` information on a challenge
+  if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
+    if (!_.isUndefined(_.get(challenge, 'task'))) {
+      data.task = challenge.task
+    } else {
+      delete data.task
+    }
+  }
+
+  if (_.get(type, 'isTask')) {
+    if (!_.isEmpty(_.get(data, 'task.memberId'))) {
+      const challengeResources = await helper.getChallengeResources(challengeId)
+      const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
+      if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(_.get(data, 'task.memberId')))) {
+        throw new errors.BadRequestError(`Member ${_.get(data, 'task.memberId')} is not a submitter resource of challenge ${challengeId}`)
+      }
+    }
+  }
+
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
@@ -1459,7 +1548,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   // Populate challenge.track and challenge.type based on the track/type IDs
-  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
 
   if (track) {
     challenge.track = track.name
@@ -1515,6 +1603,12 @@ function sanitizeChallenge (challenge) {
     'attachmentIds',
     'groups'
   ])
+  if (!_.isUndefined(sanitized.name)) {
+    sanitized.name = xss(sanitized.name)
+  }
+  if (!_.isUndefined(sanitized.description)) {
+    sanitized.description = xss(sanitized.description)
+  }
   if (challenge.legacy) {
     sanitized.legacy = _.pick(challenge.legacy, [
       'track',
@@ -1545,6 +1639,9 @@ function sanitizeChallenge (challenge) {
   }
   if (challenge.winners) {
     sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
+  }
+  if (challenge.discussions) {
+    sanitized.discussions = _.map(challenge.discussions, discussion => _.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']))
   }
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
@@ -1614,6 +1711,13 @@ fullyUpdateChallenge.schema = {
       name: Joi.string(),
       key: Joi.string()
     }).unknown(true)),
+    discussions: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
+    })),
     tags: Joi.array().items(Joi.string().required()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
@@ -1686,6 +1790,13 @@ partiallyUpdateChallenge.schema = {
       name: Joi.string(),
       key: Joi.string()
     }).unknown(true)),
+    discussions: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
+    })),
     startDate: Joi.date(),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
