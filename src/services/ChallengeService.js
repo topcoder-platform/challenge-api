@@ -196,10 +196,23 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (criteria.name) {
-    boolQuery.push({ wildcard: { name: `*${_.toLower(criteria.name)}*` } })
+    boolQuery.push({
+      multi_match: {
+        query: _.toLower(criteria.name),
+        fields: ['name'],
+        fuzziness: 'AUTO'
+      }
+    })
   }
   if (criteria.description) {
-    boolQuery.push({ wildcard: { description: `*${_.toLower(criteria.description)}*` } })
+    boolQuery.push({
+      multi_match: {
+        query: _.toLower(criteria.description),
+        fields: ['description'],
+        fuzziness: 'AUTO'
+      }
+    })
+  }
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
