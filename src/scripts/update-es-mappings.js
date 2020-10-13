@@ -33,8 +33,21 @@ function createIndex (indexName) {
 }
 
 async function updateMappings () {
+  const tempReindexing = config.get('ES.TEMP_REINDEXING')
   let indexName = config.get('ES.ES_INDEX')
   let newIndexName = `${indexName}_tmp_dont_use_for_querying`
+
+  if (tempReindexing) {
+    try {
+      logger.info(`Attemp to remove temporary index ${newIndexName}`)
+      await esClient.indices.delete({
+        index: newIndexName
+      })
+      await sleep(500)
+    } catch (e) {
+      logger.info(`Index ${newIndexName} does not exist`)
+    }
+  }
 
   await createIndex(newIndexName)
   await sleep(500)
@@ -46,6 +59,10 @@ async function updateMappings () {
     },
     waitForCompletion: true
   })
+
+  if (tempReindexing) {
+    return
+  }
 
   logger.warn(`Deleting ${indexName}. If script crashes after this point data may be lost and a recreation of index will be required.`)
 
