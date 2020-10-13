@@ -213,7 +213,7 @@ async function searchChallenges (currentUser, criteria) {
       }
     })
   }
-  }
+
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
