@@ -500,7 +500,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  // logger.debug(`es Query ${JSON.stringify(esQuery)}`)
 
   // Search with constructed query
   let docs
