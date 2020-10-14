@@ -1389,7 +1389,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
           newValue = JSON.stringify(value)
         }
-        logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
+        // logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
         auditLogs.push({
           id: uuid(),
           challengeId,
@@ -1521,7 +1521,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     }
   }
 
-  logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
+  // logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
   if (auditLogs.length > 0) {

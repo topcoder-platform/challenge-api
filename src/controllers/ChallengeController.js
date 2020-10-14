@@ -23,7 +23,7 @@ async function searchChallenges (req, res) {
  * @param {Object} res the response
  */
 async function createChallenge (req, res) {
-  logger.debug(`createChallenge User: ${req.authUser} - Token: ${req.userToken} - Body: ${JSON.stringify(req.body)}`)
+  logger.debug(`createChallenge User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`)
   const result = await service.createChallenge(req.authUser, req.body, req.userToken)
   res.status(HttpStatus.CREATED).send(result)
 }
@@ -44,7 +44,7 @@ async function getChallenge (req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateChallenge (req, res) {
-  logger.debug(`fullyUpdateChallenge User: ${req.authUser} - ChallengeID: ${req.params.challengeId} - Token: ${req.userToken} - Body: ${JSON.stringify(req.body)}`)
+  logger.debug(`fullyUpdateChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${req.params.challengeId} - Body: ${JSON.stringify(req.body)}`)
   const result = await service.fullyUpdateChallenge(req.authUser, req.params.challengeId, req.body, req.userToken)
   res.send(result)
 }
@@ -55,7 +55,7 @@ async function fullyUpdateChallenge (req, res) {
  * @param {Object} res the response
  */
 async function partiallyUpdateChallenge (req, res) {
-  logger.debug(`partiallyUpdateChallenge User: ${req.authUser} - ChallengeID: ${req.params.challengeId} - Token: ${req.userToken} - Body: ${JSON.stringify(req.body)}`)
+  logger.debug(`partiallyUpdateChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${req.params.challengeId} - Body: ${JSON.stringify(req.body)}`)
   const result = await service.partiallyUpdateChallenge(req.authUser, req.params.challengeId, req.body, req.userToken)
   res.send(result)
 }
