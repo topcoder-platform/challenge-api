@@ -306,10 +306,6 @@ async function searchChallenges (currentUser, criteria) {
 
   // Filter all groups from the criteria to make sure the user can access those
   if (!_.isUndefined(criteria.group) || !_.isUndefined(criteria.groups)) {
-    // check group access
-    if (_.isUndefined(currentUser)) {
-      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
-    }
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
