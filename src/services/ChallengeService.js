@@ -196,22 +196,10 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (criteria.name) {
-    boolQuery.push({
-      multi_match: {
-        query: _.toLower(criteria.name),
-        fields: ['name'],
-        fuzziness: 'AUTO'
-      }
-    })
+    boolQuery.push({ match: { 'name': criteria.name } })
   }
   if (criteria.description) {
-    boolQuery.push({
-      multi_match: {
-        query: _.toLower(criteria.description),
-        fields: ['description'],
-        fuzziness: 'AUTO'
-      }
-    })
+    boolQuery.push({ match: { 'description': criteria.description } })
   }
 
   if (criteria.forumId) {
