@@ -1,0 +1,862 @@
+{
+	"info": {
+		"_postman_id": "2c3e6ae7-6f87-4b5c-a6a9-4b66e9c49eac",
+		"name": "Test Challenge Creation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Verify",
+			"item": [
+				{
+					"name": "Verify V5 Challenge was created",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4f642519-d5a1-49f3-bc1d-fdb0c3e433a4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify the challenge was created on V5\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"V5_CHALLENGE_UUID\"));",
+									"    pm.environment.set(\"V4_CHALLENGE_ID\", jsonData.legacyId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/challenges/{{V5_CHALLENGE_UUID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges",
+								"{{V5_CHALLENGE_UUID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify V4 Challenge was created",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0c2c8744-135e-49df-83b6-f1c355445c73",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify the challenge was created on V4\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.result.content.challengeId).to.eql(pm.environment.get(\"V4_CHALLENGE_ID\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{V4_URL}}/challenges/{{V4_CHALLENGE_ID}}",
+							"host": [
+								"{{V4_URL}}"
+							],
+							"path": [
+								"challenges",
+								"{{V4_CHALLENGE_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Development",
+			"item": [
+				{
+					"name": "Create Challenge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "64c7b049-ec8f-4ddc-866d-c20d9c22b7b5",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"9b6fc876-f4d9-4ccb-9dfd-419247628825\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test Development - Challenge\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Heroku\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create First2Finish",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5bd16ae9-8424-4d0b-83b8-7d205d6e8efa",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"9b6fc876-f4d9-4ccb-9dfd-419247628825\",\n  \"typeId\": \"dc876fa4-ef2d-4eee-b701-b555fcc6544c\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test Development - First2Finish\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb\",\n  \"phases\": [\n    {\n      \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "07617fc5-576b-4e2f-bf62-c22abd5590e1",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"9b6fc876-f4d9-4ccb-9dfd-419247628825\",\n  \"typeId\": \"ecd58c69-238f-43a4-a4bb-d172719b9f31\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test Development - Task\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"53a307ce-b4b3-4d6f-b9a1-3741a58f77e6\",\n  \"phases\": [\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Design",
+			"item": [
+				{
+					"name": "Create Challenge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2d283936-8908-4f6a-8e06-8148a2906ea4",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"5fa04185-041f-49a6-bfd1-fe82533cd6c8\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test Design - Challenge\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Heroku\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Challenge - RUX",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ffd63636-f859-49cf-86bd-a5d4bfe3cfb5",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"5fa04185-041f-49a6-bfd1-fe82533cd6c8\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test Design - Challenge (RUX)\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"2d0807fa-ece1-4328-a260-76f5f6b559e0\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6\",\n            \"duration\": 7200\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n            \"duration\": 172800\n        }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Heroku\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Challenge - With checkpoints",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c9de6627-f88c-43a0-96ff-046c0b811517",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"5fa04185-041f-49a6-bfd1-fe82533cd6c8\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test Design - Challenge (with checkpoints)\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"d4201ca4-8437-4d63-9957-3f7708184b07\",\n    \"phases\": [\n        {\n            \"phaseId\": \"fb21431c-119e-4bc7-b447-d0af3f2be6b4\",\n            \"duration\": 86400\n        },\n        {\n            \"phaseId\": \"2752454b-0952-4a42-a4f0-f3fb88a9b065\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 345600\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 777600\n        },\n        {\n            \"phaseId\": \"d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8\",\n            \"duration\": 302400\n        },\n        {\n            \"phaseId\": \"ce1afb4c-74f9-496b-9e4b-087ae73ab032\",\n            \"duration\": 14400\n        },\n        {\n            \"phaseId\": \"84b43897-2aab-44d6-a95a-42c433657eed\",\n            \"duration\": 302400\n        },\n        {\n            \"phaseId\": \"2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"3e2afca6-9542-4763-a135-96b33f12c082\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59\",\n            \"duration\": 86400\n        },\n        {\n            \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n            \"duration\": 172800\n        }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Heroku\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create First2Finish",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "587011e1-b5a5-4943-b865-259b2eacde2d",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"5fa04185-041f-49a6-bfd1-fe82533cd6c8\",\n  \"typeId\": \"dc876fa4-ef2d-4eee-b701-b555fcc6544c\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test Design - First2Finish\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb\",\n  \"phases\": [\n    {\n      \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1a8486e6-73c0-4f98-a934-65f27a50160d",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"5fa04185-041f-49a6-bfd1-fe82533cd6c8\",\n  \"typeId\": \"ecd58c69-238f-43a4-a4bb-d172719b9f31\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test Design - Task\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"53a307ce-b4b3-4d6f-b9a1-3741a58f77e6\",\n  \"phases\": [\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "QA",
+			"item": [
+				{
+					"name": "Create Challenge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "53895fd5-81b1-490d-91a6-7fe4361192a0",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"36e6a8d0-7e1e-4608-a673-64279d99c115\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test QA - Challenge\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"predecessor\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 345600\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 259200\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        },\n        {\n            \"phaseId\": \"3e2afca6-9542-4763-a135-96b33f12c082\",\n            \"duration\": 86400\n        },\n        {\n            \"phaseId\": \"f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59\",\n            \"duration\": 86400\n        },\n        {\n            \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n            \"duration\": 172800\n        }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Heroku\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create First2Finish",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "12e5744c-2933-49ca-8650-ab71a3631848",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"36e6a8d0-7e1e-4608-a673-64279d99c115\",\n  \"typeId\": \"dc876fa4-ef2d-4eee-b701-b555fcc6544c\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test QA - First2Finish\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb\",\n  \"phases\": [\n    {\n      \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7e3c0598-c5dd-4ca4-8b52-dde6241da92a",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"36e6a8d0-7e1e-4608-a673-64279d99c115\",\n  \"typeId\": \"ecd58c69-238f-43a4-a4bb-d172719b9f31\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test QA - Task\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"53a307ce-b4b3-4d6f-b9a1-3741a58f77e6\",\n  \"phases\": [\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Data Science",
+			"item": [
+				{
+					"name": "Create Challenge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4f68e3c0-3356-4b61-80d5-5f7b0eec2ea6",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"c0f5d461-8219-4c14-878a-c3a3f356466d\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test Data Science - Challenge\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n       {\n        \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n        \"duration\": 1209600\n      },\n      {\n        \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n        \"duration\": 1209600\n      },\n      {\n        \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n        \"duration\": 604800\n      }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Heroku\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Challenge - MM",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b967414b-4128-48ab-9fbe-0718bd1259b7",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Draft\",\n    \"trackId\": \"c0f5d461-8219-4c14-878a-c3a3f356466d\",\n    \"typeId\": \"927abff4-7af9-4145-8ba1-577c16e64e2e\",\n    \"legacy\": {\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"name\": \"Test Data Science - Challenge (MM)\",\n    \"description\": \"description\",\n    \"projectId\": {{PROJECT_ID}},\n    \"timelineTemplateId\": \"6969125a-a12f-4b89-8de6-e66b0056f36b\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-08-15T05:10:35Z\",\n    \"prizeSets\": [\n        {\n            \"prizes\": [\n                {\n                    \"type\": \"USD\",\n                    \"value\": 1\n                }\n            ],\n            \"description\": \"Challenge Prizes\",\n            \"type\": \"placement\"\n        }\n    ],\n    \"tags\": [\n        \"Marathon Match\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create First2Finish",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1f1f754e-fa62-4b5f-baa6-589704c21164",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"c0f5d461-8219-4c14-878a-c3a3f356466d\",\n  \"typeId\": \"dc876fa4-ef2d-4eee-b701-b555fcc6544c\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test Data Science - First2Finish\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb\",\n  \"phases\": [\n    {\n      \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 2592000\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aeaf81bf-bc67-48f4-ae80-1dc64b4f6f55",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"V5_CHALLENGE_UUID\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Draft\",\n  \"trackId\": \"c0f5d461-8219-4c14-878a-c3a3f356466d\",\n  \"typeId\": \"ecd58c69-238f-43a4-a4bb-d172719b9f31\",\n  \"legacy\": {\n    \"reviewType\": \"COMMUNITY\"\n  },\n  \"name\": \"Test Data Science - Task\",\n  \"description\": \"description\",\n  \"projectId\": {{PROJECT_ID}},\n  \"timelineTemplateId\": \"53a307ce-b4b3-4d6f-b9a1-3741a58f77e6\",\n  \"phases\": [\n    {\n      \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"003a4b14-de5d-43fc-9e35-835dbeb6af1f\",\n      \"duration\": 86400\n    },\n    {\n      \"phaseId\": \"ad985cff-ad3e-44de-b54e-3992505ba0ae\",\n      \"duration\": 86400\n    }\n  ],\n  \"startDate\": \"2020-08-15T05:10:35Z\",\n  \"prizeSets\": [\n    {\n      \"prizes\": [\n        {\n          \"type\": \"USD\",\n          \"value\": 1\n        }\n      ],\n      \"description\": \"Challenge Prizes\",\n      \"type\": \"placement\"\n    }\n  ],\n  \"tags\": [\n    \"Heroku\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/challenges",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"challenges"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -13,7 +13,7 @@ const helper = require('../../src/common/helper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challengeTimelines`
+const basePath = `/${config.API_VERSION}/challenge-timelines`
 
 describe('challenge type timeline template API E2E tests', () => {
   // created entity id
@@ -437,7 +437,7 @@ describe('challenge type timeline template API E2E tests', () => {
     it('remove challenge type timeline template - not found 1', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 404)
       should.equal(response.body.message, `ChallengeTypeTimelineTemplate with id: ${id} doesn't exist`)
     })
@@ -445,7 +445,7 @@ describe('challenge type timeline template API E2E tests', () => {
     it('remove challenge type timeline template - not found 2', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/${notFoundId}`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 404)
       should.equal(response.body.message, `ChallengeTypeTimelineTemplate with id: ${notFoundId} doesn't exist`)
     })
@@ -453,7 +453,7 @@ describe('challenge type timeline template API E2E tests', () => {
     it('remove challenge type timeline template - invalid id', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/invalid`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 400)
       should.equal(response.body.message, '"challengeTypeTimelineTemplateId" must be a valid GUID')
     })

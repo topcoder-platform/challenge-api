@@ -12,7 +12,7 @@ const app = require('../../app')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challengeTypes`
+const basePath = `/${config.API_VERSION}/challenge-types`
 
 describe('challenge type API E2E tests', () => {
   // created entity ids
@@ -339,7 +339,7 @@ describe('challenge type API E2E tests', () => {
         .query({ name: 'xxjklsdjfihx' })
       should.equal(response.status, 200)
       should.equal(response.headers['x-page'], '1')
-      should.equal(response.headers['x-per-page'], '20')
+      should.equal(response.headers['x-per-page'], '100')
       should.equal(response.headers['x-total'], '0')
       should.equal(response.headers['x-total-pages'], '0')
       should.equal(response.body.length, 0)

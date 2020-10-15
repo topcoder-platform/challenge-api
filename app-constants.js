@@ -2,27 +2,54 @@
  * App constants
  */
 const UserRoles = {
-  Admin: 'Administrator',
-  Copilot: 'Copilot'
+  Admin: 'administrator',
+  Copilot: 'copilot',
+  Manager: 'Connect Manager',
+  User: 'Topcoder User'
 }
 
 const prizeSetTypes = {
-  ChallengePrizes: 'Challenge prizes',
-  CopilotPayment: 'Copilot payment',
-  ReviewerPayment: 'Reviewer payment',
-  CheckpointPrizes: 'Checkpoint prizes'
+  ChallengePrizes: 'placement',
+  CopilotPayment: 'copilot',
+  ReviewerPayment: 'reviewer',
+  CheckpointPrizes: 'checkpoint'
 }
 
 const challengeStatuses = {
+  New: 'New',
   Draft: 'Draft',
-  Canceled: 'Canceled',
+  Cancelled: 'Cancelled',
   Active: 'Active',
-  Completed: 'Completed'
+  Completed: 'Completed',
+  Deleted: 'Deleted',
+  CancelledFailedReview: 'Cancelled - Failed Review',
+  CancelledFailedScreening: 'Cancelled - Failed Screening',
+  CancelledZeroSubmissions: 'Cancelled - Zero Submissions',
+  CancelledWinnerUnresponsive: 'Cancelled - Winner Unresponsive',
+  CancelledClientRequest: 'Cancelled - Client Request',
+  CancelledRequirementsInfeasible: 'Cancelled - Requirements Infeasible',
+  CancelledZeroRegistrations: 'Cancelled - Zero Registrations'
+}
+
+const validChallengeParams = {
+  UpdatedBy: 'updatedBy',
+  Updated: 'updated',
+  CreatedBy: 'createdBy',
+  Created: 'created',
+  EndDate: 'endDate',
+  StartDate: 'startDate',
+  ProjectId: 'projectId',
+  Name: 'name',
+  TypeId: 'typeId'
 }
 
 const EVENT_ORIGINATOR = 'topcoder-challenges-api'
 
 const EVENT_MIME_TYPE = 'application/json'
+
+const DiscussionTypes = {
+  Challenge: 'challenge'
+}
 
 // using a testing topc, should be changed to use real topics in comments when they are created
 const Topics = {
@@ -30,8 +57,6 @@ const Topics = {
   ChallengeUpdated: 'challenge.notification.update',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
-  ChallengeSettingCreated: 'test.new.bus.events', // 'challenge.action.setting.created',
-  ChallengeSettingUpdated: 'test.new.bus.events', // 'challenge.action.setting.updated',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
   ChallengePhaseUpdated: 'test.new.bus.events', // 'challenge.action.phase.updated',
   ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',
@@ -43,11 +68,27 @@ const Topics = {
   ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.type.timeline.template.deleted'
 }
 
+const challengeTracks = {
+  DEVELOP: 'DEVELOP',
+  DESIGN: 'DESIGN',
+  DATA_SCIENCE: 'DATA_SCIENCE',
+  QA: 'QA'
+}
+
+const challengeTextSortField = {
+  Name: 'name',
+  TypeId: 'typeId'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
   challengeStatuses,
+  validChallengeParams,
   EVENT_ORIGINATOR,
   EVENT_MIME_TYPE,
-  Topics
+  Topics,
+  challengeTracks,
+  challengeTextSortField,
+  DiscussionTypes
 }

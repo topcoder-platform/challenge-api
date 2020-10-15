@@ -1,0 +1,335 @@
+{
+	"info": {
+		"_postman_id": "4ce83573-7d66-4f37-a968-52c1f4bfdc5d",
+		"name": "Challenge V5 Test processor",
+		"description": "Test API to see if processors are working.\n\n- [ ] Create a challenge using v5 API, make sure it goes back into v4 correctly\n- [ ] Review the legacy processor to make sure the updated properties correctly update v5 data. The following properties must be updated when a challenge gets created on legacy by the processor:\n  - [ ] `legacy.directProjectId`\n  - [ ] `legacy.forumId`\n  - [ ] `legacyId`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a new challenge with only basic info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b67c86f1-6a2d-42cb-a4da-ab69a63f9f67",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"CHALLENGE_ID\", jsonData.id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n\t\"name\": \"Thomas final test challenge 11 June\",\n\t\"projectId\": 16531,\n\t\"status\": \"New\",\n\t\"terms\": []\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges"
+					]
+				},
+				"description": "The legacy processor should ingore the event if the `challenge.status` is `New`"
+			},
+			"response": []
+		},
+		{
+			"name": "Create a draft challenge with full info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e0c5bbf6-2f1a-434d-b470-7d491056156e",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"CHALLENGE_ID\", jsonData.id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n    \"name\": \"Thomas test challenge 11 June\",\n    \"projectId\": 16531,\n    \"status\": \"Draft\",\n    \"terms\": [],\n    \"description\": \"This is the description\",\n    \"legacy\": {\n        \"track\": \"DEVELOP\",\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-06-12T14:00:00.000Z\",\n    \"prizeSets\": [\n        {\n            \"type\": \"placement\",\n            \"description\": \"Challenge Prizes\",\n            \"prizes\": [\n                {\n                    \"value\": 500,\n                    \"type\": \"USD\"\n                },\n                {\n                    \"value\": 250,\n                    \"type\": \"USD\"\n                }\n            ]\n        }\n    ],\n    \"tags\": [\n        \"JavaScript\",\n        \"Apex\",\n        \"Visualforce\",\n        \"Force.com\",\n        \"Salesforce.com\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges"
+					]
+				},
+				"description": "The legacy processor should create the challenge on legacy"
+			},
+			"response": []
+		},
+		{
+			"name": "Update challenge to include full info",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"typeId\": \"e885273d-aeda-42c0-917d-bfbf979afbba\",\n    \"name\": \"Thomas test challenge 9 June\",\n    \"projectId\": 16531,\n    \"status\": \"New\",\n    \"terms\": [],\n    \"description\": \"This is the description\",\n    \"legacy\": {\n        \"track\": \"DEVELOP\",\n        \"reviewType\": \"COMMUNITY\"\n    },\n    \"timelineTemplateId\": \"7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c\",\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ],\n    \"startDate\": \"2020-06-12T14:00:00.000Z\",\n    \"prizeSets\": [\n        {\n            \"type\": \"placement\",\n            \"description\": \"Challenge Prizes\",\n            \"prizes\": [\n                {\n                    \"value\": 500,\n                    \"type\": \"USD\"\n                },\n                {\n                    \"value\": 250,\n                    \"type\": \"USD\"\n                }\n            ]\n        }\n    ],\n    \"tags\": [\n        \"JavaScript\",\n        \"Apex\",\n        \"Visualforce\",\n        \"Force.com\",\n        \"Salesforce.com\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				},
+				"description": "The legacy processor should ingore the event if the `challenge.status` is `New`"
+			},
+			"response": []
+		},
+		{
+			"name": "Get challenge",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update challenge status to Draft",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"Draft\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				},
+				"description": "The legacy processor should create the challenge on legacy"
+			},
+			"response": []
+		},
+		{
+			"name": "Update challenge status to Active",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"Active\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				},
+				"description": "If the `challenge.legacy.directProjectId` is not set, meaning the challenge wasn't yet created on the legacy system, this will fail. Otherwise, the processor will activate the challenge on the legacy system."
+			},
+			"response": []
+		},
+		{
+			"name": "Open submission/registration phases",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"phases\": [\n        {\n            \"phaseId\": \"a93544bc-c165-4af4-b55e-18f3593b457a\",\n            \"duration\": 172800,\n            \"isOpen\": true\n        },\n        {\n            \"phaseId\": \"6950164f-3c5e-4bdc-abc8-22aaf5a1bd49\",\n            \"duration\": 432000,\n            \"isOpen\": true\n        },\n        {\n            \"phaseId\": \"aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b\",\n            \"duration\": 172800\n        },\n        {\n            \"phaseId\": \"1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6\",\n            \"duration\": 43200\n        },\n        {\n            \"phaseId\": \"797a6af7-cd3f-4436-9fca-9679f773bee9\",\n            \"duration\": 57600\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				},
+				"description": "The legacy processor should ingore the event if the `challenge.status` is `New`"
+			},
+			"response": []
+		},
+		{
+			"name": "Register member",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"challengeId\": \"{{CHALLENGE_ID}}\",\n  \"memberHandle\": \"TonyJ\",\n  \"roleId\": \"{{SUBMITTER_ROLE_ID}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://api.topcoder-dev.com/v5/resources",
+					"protocol": "http",
+					"host": [
+						"api",
+						"topcoder-dev",
+						"com"
+					],
+					"path": [
+						"v5",
+						"resources"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update challenge status to Completed and set winner",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"Completed\",\n    \"winners\": [\n        {\n            \"userId\": 8547899,\n            \"handle\": \"TonyJ\",\n            \"placement\": 1\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/challenges/{{CHALLENGE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"challenges",
+						"{{CHALLENGE_ID}}"
+					]
+				},
+				"description": "The legacy processor should close the challenge on the backend"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

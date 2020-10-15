@@ -14,7 +14,7 @@ const testHelper = require('../testHelper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challengeAuditLogs`
+const basePath = `/${config.API_VERSION}/challenge-audit-logs`
 
 describe('audit log API E2E tests', () => {
   // generated data
@@ -37,7 +37,7 @@ describe('audit log API E2E tests', () => {
         .patch(`/${config.API_VERSION}/challenges/${data.challenge.id}`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
         .send({
-          track: 'track-abc',
+          tags: ['tag-abc'],
           description: 'desc-abc'
         })
       should.equal(updateChallengeResponse.status, 200)
@@ -60,10 +60,10 @@ describe('audit log API E2E tests', () => {
       should.exist(response.headers['link'])
 
       should.equal(response.body.length, 2)
-      let log = _.find(response.body, (item) => item.fieldName === 'track')
+      let log = _.find(response.body, (item) => item.fieldName === 'tags')
       should.exist(log)
-      should.equal(log.oldValue, '"track"')
-      should.equal(log.newValue, '"track-abc"')
+      should.equal(log.oldValue, '["tag1"]')
+      should.equal(log.newValue, '["tag-abc"]')
       should.equal(log.challengeId, data.challenge.id)
       should.exist(log.createdBy)
       should.exist(log.created)

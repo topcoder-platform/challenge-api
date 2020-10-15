@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+// const logger = require('../common/logger')
 const constants = require('../../app-constants')
 
 /**
@@ -15,12 +15,14 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchTimelineTemplates (criteria) {
+  const page = criteria.page || 1
+  const perPage = criteria.perPage || 50
   const list = await helper.scan('TimelineTemplate')
   const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name))
   const total = records.length
-  const result = records.slice((criteria.page - 1) * criteria.perPage, criteria.page * criteria.perPage)
+  const result = records.slice((page - 1) * perPage, page * perPage)
 
-  return { total, page: criteria.page, perPage: criteria.perPage, result }
+  return { total, page, perPage, result }
 }
 
 searchTimelineTemplates.schema = {
@@ -176,4 +178,4 @@ module.exports = {
   deleteTimelineTemplate
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)

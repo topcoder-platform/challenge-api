@@ -1,6 +1,8 @@
 # Topcoder Challenge API
 
 This microservice provides access and interaction with all sorts of Challenge data.
+## Devlopment status
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/topcoder-platform/challenge-api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/topcoder-platform/challenge-api/alerts/)[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/topcoder-platform/challenge-api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/topcoder-platform/challenge-api/context:javascript)
 
 ### Deployment status
 Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop) Prod: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master)
@@ -10,7 +12,6 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 - [Swagger](https://api.topcoder.com/v5/challenges/docs/)
 
 ## Intended use
-
 - Production API
 
 ## Related repos
@@ -34,6 +35,7 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 Configuration for the application is at `config/default.js`.
 The following parameters can be set in config files or in env variables:
 
+- READONLY: sets the API in read-only mode. POST/PUT/PATCH/DELETE operations will return 403 Forbidden
 - LOG_LEVEL: the log level, default is 'debug'
 - PORT: the server port, default is 3000
 - AUTH_SECRET: The authorization secret used during token verification.
@@ -60,6 +62,7 @@ The following parameters can be set in config files or in env variables:
 - ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
 - RESOURCES_API_URL: TC resources API base URL
+- V3_PROJECTS_API_URL: TC direct projects API base URL
 - GROUPS_API_URL: TC groups API base URL
 - PROJECTS_API_URL: TC projects API base URL
 - TERMS_API_URL: TC Terms API Base URL
@@ -75,8 +78,8 @@ You can find sample `.env` files inside the `/docs` directory.
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
 4. Initialize/Clear database in default environment: `npm run init-db`
-5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `ChallengeSetting`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
-6. Create Elasticsearch index: `npm run init-db`, or to re-create index: `npm run init-db force`
+5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
+6. Create Elasticsearch index: `npm run init-es`, or to re-create index: `npm run init-es force`
 7. Synchronize ES data and DynamoDB data: `npm run sync-es`
 
 ### Notes
@@ -88,7 +91,7 @@ You can find sample `.env` files inside the `/docs` directory.
 Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
 
 ### Local services setup
-In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB and S3 compatible server.
+In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB, S3 compatible server and Mock API.
 
 ### Create Tables
 1. Make sure DynamoDB are running as per instructions above.
@@ -98,7 +101,15 @@ In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB 
 ### Mock API
 The provided mock API provides mock endpoint to fetch challenge resources and groups so you don't have to deploy the related services locally.
 You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
-Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mock-api listening on port 4000
+Mock API starts after running `docker-compose up` and expose port 4000.
+
+### Notes
+There are two parts need to be updated for local development
+- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116 
+`throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
+- https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
+Two aws config should be uncommented
+
 
 - Install dependencies `npm install`
 - Run lint `npm run lint`
@@ -109,7 +120,6 @@ Go to `mock-api` folder and run commands `npm i` and `npm start` to start the mo
 - Clear and init db `npm run init-db`
 - Start app `npm start`
 - App is running at `http://localhost:3000`
-- Start mock-api, go to `mock-api` folder, run `npm i` and `npm start`, mock api is running at `http://localhost:4000`
 
 ## Production deployment
 
@@ -133,8 +143,7 @@ The following test parameters can be set in config file or in env variables:
 - S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
 
 ### Prepare
-- Start Local services.
-- Start Mock API.
+- Start Local services in docker.
 - Create DynamoDB tables.
 - Initialize ES index.
 - Various config parameters should be properly set.

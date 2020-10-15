@@ -19,3 +19,13 @@ services:
       MINIO_ACCESS_KEY: "FAKE_ACCESS_KEY"
       MINIO_SECRET_KEY: "FAKE_SECRET_ACCESS_KEY"
     command: "server /data"
+  mock-api:
+    image: mock-api:latest
+    build:
+      context: ../
+      dockerfile: mock-api/Dockerfile
+    environment:
+      DYNAMODB_URL: http://dynamodb:7777
+      IS_LOCAL_DB: "true"
+    ports:
+      - "4000:4000"

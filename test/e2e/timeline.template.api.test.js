@@ -13,7 +13,7 @@ const helper = require('../../src/common/helper')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/timelineTemplates`
+const basePath = `/${config.API_VERSION}/timeline-templates`
 
 describe('timeline template API E2E tests', () => {
   // created entity ids
@@ -608,7 +608,7 @@ describe('timeline template API E2E tests', () => {
     it('remove timeline template - not found', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 404)
       should.equal(response.body.message, `TimelineTemplate with id: ${id} doesn't exist`)
     })
@@ -616,7 +616,7 @@ describe('timeline template API E2E tests', () => {
     it('remove timeline template - invalid id', async () => {
       const response = await chai.request(app)
         .delete(`${basePath}/invalid`)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 400)
       should.equal(response.body.message, '"timelineTemplateId" must be a valid GUID')
     })

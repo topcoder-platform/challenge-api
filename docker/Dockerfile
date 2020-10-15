@@ -1,5 +1,5 @@
 # Use the base image with Node.js
-FROM node:latest
+FROM node:10.20-jessie
 
 # Copy the current directory into the Docker image
 COPY . /challenge-api
@@ -9,9 +9,5 @@ WORKDIR /challenge-api
 
 # Install the dependencies from package.json
 RUN npm install
-RUN npm run lint
-RUN npm run lint:fix
-#RUN npm run build
-#RUN npm run test
 
 CMD npm start

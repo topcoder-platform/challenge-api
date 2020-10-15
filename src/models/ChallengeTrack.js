@@ -1,5 +1,5 @@
 /**
- * This defines ChallengeSetting model.
+ * This defines ChallengeTrack model.
  */
 
 const dynamoose = require('dynamoose')
@@ -13,6 +13,18 @@ const schema = new Schema({
     required: true
   },
   name: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: false
+  },
+  isActive: {
+    type: Boolean,
+    required: true
+  },
+  abbreviation: {
     type: String,
     required: true
   }

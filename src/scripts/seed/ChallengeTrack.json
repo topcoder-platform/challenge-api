@@ -1,0 +1,30 @@
+[
+  {
+    "id": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+    "name": "Design",
+    "description": "",
+    "isActive": true,
+    "abbreviation": "Des"
+  },
+  {
+    "id": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+    "name": "Development",
+    "description": "",
+    "isActive": true,
+    "abbreviation": "Dev"
+  },
+  {
+    "id": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+    "name": "Data Science",
+    "description": "",
+    "isActive": true,
+    "abbreviation": "DS"
+  },
+  {
+    "id": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+    "name": "Quality Assurance",
+    "description": "",
+    "isActive": true,
+    "abbreviation": "QA"
+  }
+]

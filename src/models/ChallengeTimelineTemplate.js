@@ -12,6 +12,10 @@ const schema = new Schema({
     hashKey: true,
     required: true
   },
+  trackId: {
+    type: String,
+    required: true
+  },
   typeId: {
     type: String,
     required: true

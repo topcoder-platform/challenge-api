@@ -17,6 +17,7 @@ const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 const moment = require('moment')
 const HttpStatus = require('http-status-codes')
+const xss = require('xss')
 
 // Bus API Client
 let busApiClient
@@ -75,7 +76,7 @@ function autoWrapExpress (obj) {
  */
 function getPageLink (req, page) {
   const q = _.assignIn({}, req.query, { page })
-  return `${req.protocol}://${req.get('Host')}${req.baseUrl}${req.path}?${querystring.stringify(q)}`
+  return `${config.API_BASE_URL}${req.path}?${querystring.stringify(q)}`
 }
 
 /**
@@ -114,9 +115,11 @@ function setResHeaders (req, res, result) {
  * @param {Object} authUser the user
  */
 function hasAdminRole (authUser) {
-  for (let i = 0; i < authUser.roles.length; i++) {
-    if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
-      return true
+  if (authUser && authUser.roles) {
+    for (let i = 0; i < authUser.roles.length; i++) {
+      if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
+        return true
+      }
     }
   }
   return false
@@ -301,7 +304,8 @@ async function scan (modelName, scanParams) {
 function partialMatch (filter, value) {
   if (filter) {
     if (value) {
-      return RegExp(filter, 'i').test(value)
+      const filtered = xss(filter)
+      return _.toLower(value).includes(_.toLower(filtered))
     } else {
       return false
     }
@@ -388,9 +392,44 @@ async function getM2MToken () {
  */
 async function getChallengeResources (challengeId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}`
-  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+  const perPage = 100
+  let page = 1
+  let result = []
+  while (true) {
+    const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}&perPage=${perPage}&page=${page}`
+    const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!res.data || res.data.length === 0) {
+      break
+    }
+    result = result.concat(res.data)
+    page += 1
+    if (res.headers['x-total-pages'] && page > Number(res.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return result
+}
+
+/**
+ * Get resource roles
+ * @returns {Promise<Array>} the challenge resources
+ */
+async function getResourceRoles () {
+  const token = await getM2MToken()
+  const res = await axios.get(config.RESOURCE_ROLES_API_URL, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
+}
+
+/**
+ * Check if a user has full access on a challenge
+ * @param {String} challengeId the challenge UUID
+ * @param {String} userId the user ID
+ */
+async function userHasFullAccess (challengeId, userId) {
+  const resourceRoles = await getResourceRoles()
+  const rolesWithFullAccess = _.map(_.filter(resourceRoles, r => r.fullAccess), 'id')
+  const challengeResources = await getChallengeResources(challengeId)
+  return _.filter(challengeResources, r => _.toString(r.memberId) === _.toString(userId) && _.includes(rolesWithFullAccess, r.roleId)).length > 0
 }
 
 /**
@@ -412,7 +451,7 @@ async function getUserGroups (userId) {
         membershipType: 'user'
       }
     })
-    const groups = result.data.result || []
+    const groups = result.data || []
     if (groups.length === 0) {
       break
     }
@@ -423,6 +462,68 @@ async function getUserGroups (userId) {
     }
   }
   return allGroups
+}
+
+/**
+ * Get all user groups including all parent groups for each child group
+ * @param {String} userId the user id
+ * @returns {Promise<Array>} the user groups
+ */
+async function getCompleteUserGroupTreeIds (userId) {
+  const childGroups = await getUserGroups(userId)
+  const childGroupIds = _.map(childGroups, 'id')
+  let result = []
+  for (const id of childGroupIds) {
+    if (!result.includes(id)) {
+      const expanded = await expandWithParentGroups(id)
+      result = _.concat(result, expanded)
+    }
+  }
+  return _.uniq(result)
+}
+
+/**
+ * Get all subgroups for the given group ID
+ * @param {String} groupId the group ID
+ * @returns {Array<String>} an array with the groups ID and the IDs of all subGroups
+ */
+async function expandWithSubGroups (groupId) {
+  const token = await getM2MToken()
+  const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      includeSubGroups: true
+    }
+  })
+  const groups = result.data || {}
+  return [groupId, ..._.map(_.get(groups, 'subGroups', []), 'id')]
+}
+
+/**
+ * Get the "up the chain" group tree for the given group ID
+ * @param {String} groupId the group ID
+ * @returns {Array<String>} an array with the group ID and the IDs of all parent groups up the chain
+ */
+async function expandWithParentGroups (groupId) {
+  const token = await getM2MToken()
+  const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      includeParentGroup: true,
+      oneLevel: false
+    }
+  })
+
+  const ids = []
+  const extractIds = (group) => {
+    ids.push(group.id)
+    _.each(_.get(group, 'parentGroups', []), (parent) => {
+      extractIds(parent)
+    })
+  }
+
+  extractIds(result.data || {})
+  return ids
 }
 
 /**
@@ -511,17 +612,10 @@ function getESClient () {
  * @param {String} userToken the user token
  */
 async function ensureProjectExist (projectId, userToken) {
-  let token
-  if (!userToken) {
-    token = await getM2MToken()
-  }
+  let token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   try {
-    if (userToken) {
-      await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } })
-    } else {
-      await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
-    }
+    await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
@@ -544,7 +638,7 @@ function calculateChallengeEndDate (challenge, data) {
   if (!phase || (!data.startDate && !challenge.startDate)) {
     return data.startDate || challenge.startDate
   }
-  const phases = challenge.phases.reduce((obj, elem) => {
+  const phases = (challenge.phases || []).reduce((obj, elem) => {
     obj[elem.id] = elem
     return obj
   }, {})
@@ -563,7 +657,7 @@ function calculateChallengeEndDate (challenge, data) {
  */
 async function listChallengesByMember (memberId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges`
+  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges?perPage=10000`
   const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
 }
@@ -588,32 +682,58 @@ async function validateESRefreshMethod (method) {
 async function getProjectDefaultTerms (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
-  const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-  return res.data.terms
+  try {
+    const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    return res.data.terms || []
+  } catch (err) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
+}
+
+/**
+ * This functions gets the default billing account for a given project id
+ *
+ * @param {Number} projectId The id of the project for which to get the default terms of use
+ * @returns {Promise<Number>} The billing account ID
+ */
+async function getProjectBillingAccount (projectId) {
+  const token = await getM2MToken()
+  const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
+  try {
+    const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+  } catch (err) {
+    if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+    } else {
+      // re-throw other error
+      throw err
+    }
+  }
 }
 
 /**
  * This function gets the challenge terms array with the terms data
  * The terms data is retrieved from the terms API using the specified terms ids
  *
- * @param {Array<Number>} termsIds The array of terms ids to retrieve from terms API
+ * @param {Array<Object>} terms The array of terms {id, roleId} to retrieve from terms API
  */
-async function getChallengeTerms (termsIds) {
-  const terms = []
+async function validateChallengeTerms (terms = []) {
+  const listOfTerms = []
   const token = await getM2MToken()
-  for (let id of termsIds) {
+  for (let term of terms) {
     // Get the terms details from the API
     try {
-      const res = await axios.get(`${config.TERMS_API_URL}/${id}?noauth=true`, { headers: { Authorization: `Bearer ${token}` } })
-      terms.push(_.assign({
-        id: res.data.id,
-        agreeabilityType: res.data.agreeabilityType,
-        title: res.data.title,
-        url: res.data.url
-      }, _.isNil(res.data.docusignTemplateId) ? null : { templateId: res.data.docusignTemplateId }))
+      await axios.get(`${config.TERMS_API_URL}/${term.id}`, { headers: { Authorization: `Bearer ${token}` } })
+      listOfTerms.push(term)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
-        throw new errors.BadRequestError(`Terms of use identified by the id ${id} does not exist`)
+        throw new errors.BadRequestError(`Terms of use identified by the id ${term.id} does not exist`)
       } else {
         // re-throw other error
         throw e
@@ -621,7 +741,7 @@ async function getChallengeTerms (termsIds) {
     }
   }
 
-  return terms
+  return listOfTerms
 }
 
 module.exports = {
@@ -652,5 +772,11 @@ module.exports = {
   listChallengesByMember,
   validateESRefreshMethod,
   getProjectDefaultTerms,
-  getChallengeTerms
+  validateChallengeTerms,
+  getProjectBillingAccount,
+  expandWithSubGroups,
+  getCompleteUserGroupTreeIds,
+  expandWithParentGroups,
+  getResourceRoles,
+  userHasFullAccess
 }
