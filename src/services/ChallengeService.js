@@ -1050,63 +1050,13 @@ function isDifferentPhases (phases = [], otherPhases) {
 }
 
 /**
- * Check whether given two Prize Array are the same.
- * @param {Array} prizes the first Prize Array
- * @param {Array} otherPrizes the second Prize Array
- * @returns {Boolean} true if the same, false otherwise
- */
-function isSamePrizeArray (prizes, otherPrizes) {
-  const length = otherPrizes.length
-  if (prizes.length === otherPrizes.length) {
-    let used = Array(length).fill(false)
-    for (const prize of prizes) {
-      let index = -1
-      for (let i = 0; i < length; i++) {
-        if (!used[i] && prize.description === otherPrizes[i].description &&
-          prize.type === otherPrizes[i].type &&
-          prize.value === otherPrizes[i].value) {
-          used[i] = true
-          index = i
-          break
-        }
-      }
-      if (index === -1) {
-        return false
-      }
-    }
-    return true
-  } else {
-    return false
-  }
-}
-
-/**
  * Check whether given two PrizeSet Array are different.
  * @param {Array} prizeSets the first PrizeSet Array
  * @param {Array} otherPrizeSets the second PrizeSet Array
  * @returns {Boolean} true if different, false otherwise
  */
-function isDifferentPrizeSets (prizeSets = [], otherPrizeSets) {
-  const length = otherPrizeSets.length
-  if (prizeSets.length === otherPrizeSets.length) {
-    let used = Array(length).fill(false)
-    for (const set of prizeSets) {
-      let index = -1
-      for (let i = 0; i < length; i++) {
-        if (!used[i] && set.type === otherPrizeSets[i].type &&
-          set.description === otherPrizeSets[i].description &&
-          isSamePrizeArray(set.prizes, otherPrizeSets[i].prizes)) {
-          used[i] = true
-          index = i
-          break
-        }
-      }
-      if (index === -1) {
-        return true
-      }
-    }
-  }
-  return false
+function isDifferentPrizeSets (prizeSets = [], otherPrizeSets = []) {
+  return !_.isEqual(_.sortBy(prizeSets, 'type'), _.sortBy(otherPrizeSets, 'type'))
 }
 
 /**
@@ -1160,7 +1110,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
-  logger.debug(`Dynamo Object before update: ${JSON.stringify(challenge)}`)
   // FIXME: Tech Debt
   let billingAccountId
   if (data.status) {
@@ -1523,8 +1472,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
-  logger.debug(`Dynamo Object before writing to dynamo: ${JSON.stringify(challenge)}`)
-  logger.debug(`Dynamo update operations: ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
   if (auditLogs.length > 0) {
@@ -1570,7 +1517,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (billingAccountId) {
     busEventPayload.billingAccountId = billingAccountId
   }
-  logger.debug(`ES Object before posting to bus: ${JSON.stringify(busEventPayload)}`)
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
 
   if (challenge.phases && challenge.phases.length > 0) {
