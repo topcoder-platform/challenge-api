@@ -500,7 +500,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  // logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
 
   // Search with constructed query
   let docs
@@ -1160,6 +1160,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  logger.debug(`Dynamo Object before update: ${JSON.stringify(challenge)}`)
   // FIXME: Tech Debt
   let billingAccountId
   if (data.status) {
@@ -1521,7 +1522,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     }
   }
 
-  // logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
+  logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`)
+  logger.debug(`Dynamo Object before writing to dynamo: ${JSON.stringify(challenge)}`)
+  logger.debug(`Dynamo update operations: ${JSON.stringify(updateDetails)}`)
   await models.Challenge.update({ id: challengeId }, updateDetails)
 
   if (auditLogs.length > 0) {
@@ -1530,14 +1533,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   delete data.attachmentIds
   delete data.terms
-  if (data.phases) {
-    _.each(data.phases, p => {
-      delete p.name
-      if (p.description) {
-        delete p.description
-      }
-    })
-  }
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
@@ -1575,6 +1570,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (billingAccountId) {
     busEventPayload.billingAccountId = billingAccountId
   }
+  logger.debug(`ES Object before posting to bus: ${JSON.stringify(busEventPayload)}`)
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
 
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1819,7 +1815,7 @@ partiallyUpdateChallenge.schema = {
         type: Joi.string().required(),
         value: Joi.number().min(0).required()
       })).min(1).required()
-    }).unknown(true)),
+    }).unknown(true)).min(1),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
