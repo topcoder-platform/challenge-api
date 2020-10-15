@@ -1819,7 +1819,7 @@ partiallyUpdateChallenge.schema = {
         type: Joi.string().required(),
         value: Joi.number().min(0).required()
       })).min(1).required()
-    }).unknown(true)).min(1),
+    }).unknown(true)),
     tags: Joi.array().items(Joi.string().required()).min(1), // tag names
     projectId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
