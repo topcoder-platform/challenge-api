@@ -14,7 +14,11 @@ function createIndex (indexName) {
   const body = { mappings: {} }
   body.mappings[config.get('ES.ES_TYPE')] = {
     properties: {
-      id: { type: 'keyword' }
+      id: { type: 'keyword' },
+      name: {
+        type: 'keyword',
+        normalizer: 'custom_sort_normalizer'
+      }
     },
     dynamic_templates: [{
       metadata: {
@@ -24,6 +28,17 @@ function createIndex (indexName) {
         }
       }
     }]
+  }
+  body.settings = {
+    analysis: {
+      normalizer: {
+        custom_sort_normalizer: {
+          type: 'custom',
+          char_filter: [],
+          filter: ['lowercase', 'asciifolding']
+        }
+      }
+    }
   }
 
   return esClient.indices.create({
