@@ -16,11 +16,11 @@ const constants = require('../../app-constants')
  * @returns {Array} the search result
  */
 async function searchChallengeTimelineTemplates (criteria) {
-  const list = await helper.scan('ChallengeTimelineTemplate')
-  const records = _.filter(list, e => (!criteria.typeId || criteria.typeId === e.typeId) &&
-  (!criteria.timelineTemplateId || criteria.timelineTemplateId === e.timelineTemplateId) &&
-  (!criteria.trackId || criteria.trackId === e.trackId) &&
-  (!criteria.isDefault || criteria.isDefault === e.isDefault))
+  let records = await helper.scan('ChallengeTimelineTemplate')
+  if (criteria.typeId) records = _.filter(records, e => (criteria.typeId === e.typeId))
+  if (criteria.trackId) records = _.filter(records, e => (criteria.trackId === e.trackId))
+  if (criteria.timelineTemplateId) records = _.filter(records, e => (criteria.timelineTemplateId === e.timelineTemplateId))
+  if (!_.isUndefined(criteria.isDefault)) records = _.filter(records, e => (e.isDefault === (criteria.isDefault === 'true')))
   return records
 }
 
