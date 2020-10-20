@@ -23,6 +23,10 @@ const schema = new Schema({
   timelineTemplateId: {
     type: String,
     required: true
+  },
+  isDefault: {
+    type: Boolean,
+    required: false
   }
 },
 {

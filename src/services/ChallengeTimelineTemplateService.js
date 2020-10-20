@@ -18,7 +18,9 @@ const constants = require('../../app-constants')
 async function searchChallengeTimelineTemplates (criteria) {
   const list = await helper.scan('ChallengeTimelineTemplate')
   const records = _.filter(list, e => (!criteria.typeId || criteria.typeId === e.typeId) &&
-  (!criteria.timelineTemplateId || criteria.timelineTemplateId === e.timelineTemplateId))
+  (!criteria.timelineTemplateId || criteria.timelineTemplateId === e.timelineTemplateId) &&
+  (!criteria.trackId || criteria.trackId === e.trackId) &&
+  (!criteria.isDefault || criteria.isDefault === e.isDefault))
   return records
 }
 
@@ -26,8 +28,24 @@ searchChallengeTimelineTemplates.schema = {
   criteria: Joi.object().keys({
     typeId: Joi.optionalId(),
     trackId: Joi.optionalId(),
-    timelineTemplateId: Joi.optionalId()
+    timelineTemplateId: Joi.optionalId(),
+    isDefault: Joi.boolean()
   })
+}
+
+/**
+ * Unset existing default timeline template in order to create a new one
+ * @param {String} typeId the type ID
+ * @param {String} trackId the track ID
+ */
+async function unsetDefaultTimelineTemplate (typeId, trackId) {
+  const records = await searchChallengeTimelineTemplates({ typeId, trackId, isDefault: true })
+  if (records.length === 0) {
+    return
+  }
+  for (const record of records) {
+    await fullyUpdateChallengeTimelineTemplate(record.id, { ...record, isDefault: false })
+  }
 }
 
 /**
@@ -46,6 +64,10 @@ async function createChallengeTimelineTemplate (data) {
   await helper.getById('ChallengeTrack', data.trackId)
   await helper.getById('TimelineTemplate', data.timelineTemplateId)
 
+  if (data.isDefault) {
+    await unsetDefaultTimelineTemplate(data.typeId, data.trackId)
+  }
+
   const ret = await helper.create('ChallengeTimelineTemplate', _.assign({ id: uuid() }, data))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateCreated, ret)
@@ -56,7 +78,8 @@ createChallengeTimelineTemplate.schema = {
   data: Joi.object().keys({
     typeId: Joi.id(),
     trackId: Joi.id(),
-    timelineTemplateId: Joi.id()
+    timelineTemplateId: Joi.id(),
+    isDefault: Joi.boolean().default(false).required()
   }).required()
 }
 
@@ -84,7 +107,8 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
 
   if (record.typeId === data.typeId &&
     record.trackId === data.trackId &&
-    record.timelineTemplateId === data.timelineTemplateId) {
+    record.timelineTemplateId === data.timelineTemplateId &&
+    record.isDefault === data.isDefault) {
     // no change
     return record
   }
@@ -98,6 +122,10 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
   await helper.getById('ChallengeType', data.typeId)
   await helper.getById('ChallengeTrack', data.trackId)
   await helper.getById('TimelineTemplate', data.timelineTemplateId)
+
+  if (data.isDefault) {
+    await unsetDefaultTimelineTemplate(data.typeId, data.trackId)
+  }
 
   const ret = await helper.update(record, data)
   // post bus event
