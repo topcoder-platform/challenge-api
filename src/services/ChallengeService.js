@@ -196,11 +196,12 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (criteria.name) {
-    boolQuery.push({ wildcard: { name: `*${_.toLower(criteria.name)}*` } })
+    boolQuery.push({ match: { 'name': criteria.name } })
   }
   if (criteria.description) {
-    boolQuery.push({ wildcard: { description: `*${_.toLower(criteria.description)}*` } })
+    boolQuery.push({ match: { 'description': criteria.description } })
   }
+
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -782,7 +783,8 @@ async function createChallenge (currentUser, challenge, userToken) {
     if (challenge.typeId && challenge.trackId) {
       const [challengeTimelineTemplate] = await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
         typeId: challenge.typeId,
-        trackId: challenge.trackId
+        trackId: challenge.trackId,
+        isDefault: true
       })
       if (!challengeTimelineTemplate) {
         throw new errors.BadRequestError(`The selected trackId ${challenge.trackId} and typeId: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`)
@@ -1037,63 +1039,13 @@ function isDifferentPhases (phases = [], otherPhases) {
 }
 
 /**
- * Check whether given two Prize Array are the same.
- * @param {Array} prizes the first Prize Array
- * @param {Array} otherPrizes the second Prize Array
- * @returns {Boolean} true if the same, false otherwise
- */
-function isSamePrizeArray (prizes, otherPrizes) {
-  const length = otherPrizes.length
-  if (prizes.length === otherPrizes.length) {
-    let used = Array(length).fill(false)
-    for (const prize of prizes) {
-      let index = -1
-      for (let i = 0; i < length; i++) {
-        if (!used[i] && prize.description === otherPrizes[i].description &&
-          prize.type === otherPrizes[i].type &&
-          prize.value === otherPrizes[i].value) {
-          used[i] = true
-          index = i
-          break
-        }
-      }
-      if (index === -1) {
-        return false
-      }
-    }
-    return true
-  } else {
-    return false
-  }
-}
-
-/**
  * Check whether given two PrizeSet Array are different.
  * @param {Array} prizeSets the first PrizeSet Array
  * @param {Array} otherPrizeSets the second PrizeSet Array
  * @returns {Boolean} true if different, false otherwise
  */
-function isDifferentPrizeSets (prizeSets = [], otherPrizeSets) {
-  const length = otherPrizeSets.length
-  if (prizeSets.length === otherPrizeSets.length) {
-    let used = Array(length).fill(false)
-    for (const set of prizeSets) {
-      let index = -1
-      for (let i = 0; i < length; i++) {
-        if (!used[i] && set.type === otherPrizeSets[i].type &&
-          set.description === otherPrizeSets[i].description &&
-          isSamePrizeArray(set.prizes, otherPrizeSets[i].prizes)) {
-          used[i] = true
-          index = i
-          break
-        }
-      }
-      if (index === -1) {
-        return true
-      }
-    }
-  }
-  return false
+function isDifferentPrizeSets (prizeSets = [], otherPrizeSets = []) {
+  return !_.isEqual(_.sortBy(prizeSets, 'type'), _.sortBy(otherPrizeSets, 'type'))
 }
 
 /**
@@ -1376,7 +1328,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : 'NULL'
           newValue = JSON.stringify(value)
         }
-        logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
+        // logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
         auditLogs.push({
           id: uuid(),
           challengeId,
@@ -1517,14 +1469,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   delete data.attachmentIds
   delete data.terms
-  if (data.phases) {
-    _.each(data.phases, p => {
-      delete p.name
-      if (p.description) {
-        delete p.description
-      }
-    })
-  }
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
