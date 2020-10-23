@@ -178,7 +178,7 @@ async function searchChallenges (currentUser, criteria) {
           bool: {
             must: [
               { match_phrase: { 'metadata.name': metaKey } },
-              { match_phrase: { 'metadata.value': criteria[key] } }
+              { match_phrase: { 'metadata.value': _.toString(criteria[key]) } }
             ]
           }
         })
