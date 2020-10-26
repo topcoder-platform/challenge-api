@@ -1743,6 +1743,11 @@ paths:
           description: Filter by timeline template id
           required: false
           type: string
+        - name: isDefault
+          in: query
+          description: Filter by is default flag
+          required: false
+          type: boolean
       responses:
         '200':
           description: OK
@@ -2587,6 +2592,9 @@ definitions:
       timelineTemplateId:
         type: string
         format: UUID
+      isDefault:
+        type: boolean
+        default: false
     required:
       - typeId
       - trackId
