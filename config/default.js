@@ -25,13 +25,13 @@ module.exports = {
   KAFKA_ERROR_TOPIC: process.env.KAFKA_ERROR_TOPIC || 'common.error.reporting',
 
   AMAZON: {
-    // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID,
-    // AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY,
+    // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
+    // AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY || 'FAKE_SECRET_ACCESS_KEY',
     AWS_REGION: process.env.AWS_REGION || 'ap-northeast-1',
     IS_LOCAL_DB: process.env.IS_LOCAL_DB || true,
-    DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:8000',
-    ATTACHMENT_S3_BUCKET: process.env.ATTACHMENT_S3_BUCKET || 'my-testing-bucket-12345',
-    S3_API_VERSION: process.env.S3_API_VERSION || '2006-03-01'
+    DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:7777',
+    S3_API_VERSION: process.env.S3_API_VERSION || '2006-03-01',
+    BUCKET_WHITELIST: process.env.BUCKET_WHITELIST || 'topcoder_01, topcoder_02'
   },
 
   ES: {

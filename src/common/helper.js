@@ -4,6 +4,7 @@
 const Joi = require('joi')
 const _ = require('lodash')
 const querystring = require('querystring')
+const request = require('superagent')
 const constants = require('../../app-constants')
 const models = require('../models')
 const errors = require('./errors')
@@ -334,34 +335,27 @@ async function validatePhases (phases) {
 }
 
 /**
- * Upload file to S3
- * @param {String} attachmentId the attachment id
- * @param {Buffer} data the file data
- * @param {String} mimetype the MIME type
- * @param {String} fileName the original file name
- * @return {Promise} promise to upload file to S3
+ * Download file from S3
+ * @param {String} bucket the bucket name
+ * @param {String} key the key name
+ * @return {Promise} promise resolved to downloaded data
  */
-async function uploadToS3 (attachmentId, data, mimetype, fileName) {
-  const params = {
-    Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET,
-    Key: attachmentId,
-    Body: data,
-    ContentType: mimetype,
-    Metadata: {
-      fileName
-    }
+async function downloadFromFileStack (url) {
+  const res = await request.get(url)
+  return {
+    data: res.body,
+    mimetype: res.type
   }
-  // Upload to S3
-  return s3.upload(params).promise()
 }
 
 /**
  * Download file from S3
- * @param {String} attachmentId the attachment id
+ * @param {String} bucket the bucket name
+ * @param {String} key the key name
  * @return {Promise} promise resolved to downloaded data
  */
-async function downloadFromS3 (attachmentId) {
-  const file = await s3.getObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+async function downloadFromS3 (bucket, key) {
+  const file = await s3.getObject({ Bucket: bucket, Key: key }).promise()
   return {
     data: file.Body,
     mimetype: file.ContentType
@@ -370,11 +364,12 @@ async function downloadFromS3 (attachmentId) {
 
 /**
  * Delete file from S3
- * @param {String} attachmentId the attachment id
+ * @param {String} bucket the bucket name
+ * @param {String} key the key name
  * @return {Promise} promise resolved to deleted data
  */
-async function deleteFromS3 (attachmentId) {
-  return s3.deleteObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+async function deleteFromS3 (bucket, key) {
+  return s3.deleteObject({ Bucket: bucket, Key: key }).promise()
 }
 
 /**
@@ -759,7 +754,7 @@ module.exports = {
   validateDuplicate,
   partialMatch,
   validatePhases,
-  uploadToS3,
+  downloadFromFileStack,
   downloadFromS3,
   deleteFromS3,
   getChallengeResources,

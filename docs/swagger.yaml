@@ -471,7 +471,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenges/:challengeId':
+  '/challenges/{challengeId}':
     get:
       tags:
         - Challenges
@@ -710,7 +710,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenge-types/:challengeTypeId':
+  '/challenge-types/{challengeTypeId}':
     get:
       tags:
         - ChallengeTypes
@@ -961,7 +961,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenge-tracks/:challengeTrackId':
+  '/challenge-tracks/{challengeTrackId}':
     get:
       tags:
         - ChallengeTracks
@@ -1209,7 +1209,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenge-phases/:challengePhaseId':
+  '/challenge-phases/{challengePhaseId}':
     get:
       tags:
         - ChallengePhases
@@ -1514,7 +1514,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/timeline-templates/:timelineTemplateId':
+  '/timeline-templates/{timelineTemplateId}':
     get:
       tags:
         - TimelineTemplates
@@ -1810,7 +1810,7 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenge-timelines/:challengeTimelineTemplateId':
+  '/challenge-timelines/{challengeTimelineTemplateId}':
     get:
       tags:
         - ChallengeTimelineTemplates
@@ -2037,26 +2037,31 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenges/:challengeId/attachments':
+  /challenges/{challengeId}/attachments:
     post:
       tags:
-        - Attachment
-      description: Upload attachment of challenge.
+        - Attachments
+      description: >
+        Create a new attachment in the system.
       security:
         - bearer: []
       produces:
         - application/json
-      consumes:
-        - multipart/form-data
       parameters:
-        - name: attachment
-          in: formData
-          description: The attachment file
+        - name: challengeId
+          in: path
           required: true
-          type: file
+          type: string
+          format: UUID
+          description: the challenge id
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateAttachmentRequestBody'
       responses:
-        '200':
-          description: uploaded successful
+        '201':
+          description: Created - The request was successful and the resource is returned.
           schema:
             $ref: '#/definitions/Attachment'
         '400':
@@ -2070,7 +2075,7 @@ paths:
         '403':
           description: >
             Forbidden.  The requester does not have the correct permission to
-            upload attachment
+            create the attachment
           schema:
             $ref: '#/definitions/ErrorModel'
         '404':
@@ -2081,10 +2086,217 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/challenges/:challengeId/attachments/:attachmentId':
+  '/challenges/{challengeId}/attachments/{attachmentId}':
     get:
       tags:
-        - Attachment
+        - Attachments
+      description: Retrieve the Attachment with provided attachment id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: the challenge id
+        - name: attachmentId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of attachment to retrieve
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Attachment'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            access the attachment
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Attachment not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      tags:
+        - Attachments
+      description: >-
+        Update the attachment with the specified id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: the challenge id
+        - name: attachmentId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of attachment to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateAttachmentRequestBody'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/Attachment'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the attachment
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Attachment not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    patch:
+      tags:
+        - Attachments
+      description: >
+        Partially update the attachment with the provided id. Only the
+        fields that are provided in the body will be changed.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: the challenge id
+        - name: attachmentId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of attachment to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/PartiallyUpdateAttachmentRequestBody'
+      responses:
+        '200':
+          description: Updated - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/Attachment'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the attachment
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Attachment not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    delete:
+      tags:
+        - Attachments
+      description: >-
+        Delete the Attachment with provided attachment id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: the challenge id
+        - name: attachmentId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of attachment to be deleted
+      responses:
+        '200':
+          description: Deleted - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/Attachment'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            delete the attachment
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Attachment not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/challenges/{challengeId}/attachments/{attachmentId}/download':
+    get:
+      tags:
+        - Attachments
       description: Download attachment of challenge.
       produces:
         - application/octet-stream
@@ -2455,21 +2667,76 @@ definitions:
       - status
   Attachment:
     type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The attachment id.
+            format: UUID
+      - $ref: '#/definitions/AttachmentData'
+    required:
+      - id
+  UpdateAttachmentRequestBody:
+    type: object
     properties:
-      id:
+      name:
         type: string
-        format: UUID
       fileSize:
         type: integer
-      fileName:
+      url:
+        type: string
+        example: "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew"
+      description:
+        type: string
+    required:
+      - url
+      - name
+  PartiallyUpdateAttachmentRequestBody:
+    type: object
+    properties:
+      name:
+        type: string
+      fileSize:
+        type: integer
+      url:
+        type: string
+        example: "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew"
+      description:
+        type: string
+  CreateAttachmentRequestBody:
+    type: object
+    properties:
+      name:
+        type: string
+      fileSize:
+        type: integer
+      url:
+        type: string
+        example: "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew"
+      description:
+        type: string
+    required:
+      - url
+      - name
+  AttachmentData:
+    type: object
+    properties:
+      name:
+        type: string
+      fileSize:
+        type: integer
+      url:
+        type: string
+        example: "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew"
+      description:
         type: string
       challengeId:
         type: string
         format: UUID
     required:
-      - id
-      - fileSize
-      - fileName
+      - url
+      - name
       - challengeId
   ChallengeTypeData:
     type: object

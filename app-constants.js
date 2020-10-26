@@ -65,7 +65,10 @@ const Topics = {
   TimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.timeline.template.deleted',
   ChallengeTypeTimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.created',
   ChallengeTypeTimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.updated',
-  ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.type.timeline.template.deleted'
+  ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.type.timeline.template.deleted'
+  ChallengeAttachmentCreated: 'test.new.bus.events', // 'challenge.action.attachment.created',
+  ChallengeAttachmentUpdated: 'test.new.bus.events', // 'challenge.action.attachment.updated',
+  ChallengeAttachmentDeleted: 'test.new.bus.events' // 'challenge.action.attachment.deleted',
 }
 
 const challengeTracks = {
