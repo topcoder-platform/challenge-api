@@ -411,6 +411,25 @@ async function getChallengeResources (challengeId) {
 }
 
 /**
+ * Create challenge resources
+ * @param {String} challengeId the challenge id
+ * @param {String} memberHandle the user's member handle
+ * @param {String} roleId the resource role ID to assign
+ */
+async function createResource (challengeId, memberHandle, roleId) {
+  const token = await getM2MToken()
+
+  const userObj = {
+    challengeId,
+    memberHandle,
+    roleId
+  }
+  const url = `${config.RESOURCES_API_URL}`
+  const res = await axios.post(url, userObj, { headers: { Authorization: `Bearer ${token}` } })
+  return res || false
+}
+
+/**
  * Get resource roles
  * @returns {Promise<Array>} the challenge resources
  */
@@ -763,6 +782,7 @@ module.exports = {
   downloadFromS3,
   deleteFromS3,
   getChallengeResources,
+  createResource,
   getUserGroups,
   ensureNoDuplicateOrNullElements,
   postBusEvent,

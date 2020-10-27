@@ -846,6 +846,14 @@ async function createChallenge (currentUser, challenge, userToken) {
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
 
+  // if created by a user, add user as a manager
+  if (currentUser.handle) {
+    logger.debug(`Adding user as manager ${currentUser.handle}`)
+    await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
+  } else {
+    logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+  }
+
   // Create in ES
   await esClient.create({
     index: config.get('ES.ES_INDEX'),
