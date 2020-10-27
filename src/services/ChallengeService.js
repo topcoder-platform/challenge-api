@@ -174,7 +174,14 @@ async function searchChallenges (currentUser, criteria) {
       // Parse and use metadata key
       if (!_.isUndefined(criteria[key])) {
         const metaKey = key.split('meta.')[1]
-        boolQuery.push({ match_phrase: { [`metadata.${metaKey}`]: criteria[key] } })
+        boolQuery.push({
+          bool: {
+            must: [
+              { match_phrase: { 'metadata.name': metaKey } },
+              { match_phrase: { 'metadata.value': _.toString(criteria[key]) } }
+            ]
+          }
+        })
       }
     }
   })
