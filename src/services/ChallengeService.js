@@ -850,8 +850,14 @@ async function createChallenge (currentUser, challenge, userToken) {
     ret.type = type.name
   }
 
-  // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
+  // Create in ES
+  await esClient.create({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: ret.id,
+    body: ret
+  })
 
   // if created by a user, add user as a manager
   if (currentUser.handle) {
@@ -861,14 +867,9 @@ async function createChallenge (currentUser, challenge, userToken) {
     logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
   }
 
-  // Create in ES
-  await esClient.create({
-    index: config.get('ES.ES_INDEX'),
-    type: config.get('ES.ES_TYPE'),
-    refresh: config.get('ES.ES_REFRESH'),
-    id: ret.id,
-    body: ret
-  })
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
+
   return ret
 }
 
