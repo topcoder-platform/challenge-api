@@ -446,7 +446,7 @@ async function getResourceRoles () {
  */
 async function userHasFullAccess (challengeId, userId) {
   const resourceRoles = await getResourceRoles()
-  const rolesWithFullAccess = _.map(_.filter(resourceRoles, r => r.fullAccess), 'id')
+  const rolesWithFullAccess = _.map(_.filter(resourceRoles, r => r.fullWriteAccess), 'id')
   const challengeResources = await getChallengeResources(challengeId)
   return _.filter(challengeResources, r => _.toString(r.memberId) === _.toString(userId) && _.includes(rolesWithFullAccess, r.roleId)).length > 0
 }
