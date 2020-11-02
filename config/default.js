@@ -40,7 +40,8 @@ module.exports = {
     API_VERSION: process.env.ES_API_VERSION || '6.8',
     ES_INDEX: process.env.ES_INDEX || 'challenge',
     ES_TYPE: process.env.ES_TYPE || '_doc', // ES 6.x accepts only 1 Type per index and it's mandatory to define it
-    ES_REFRESH: process.env.ES_REFRESH || 'true'
+    ES_REFRESH: process.env.ES_REFRESH || 'true',
+    TEMP_REINDEXING: process.env.TEMP_REINDEXING || true // if true, it won't delete the existing index when reindexing data
   },
 
   // in bytes
