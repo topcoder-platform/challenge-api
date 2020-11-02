@@ -87,24 +87,24 @@ function getPageLink (req, page) {
  */
 function setResHeaders (req, res, result) {
   const totalPages = Math.ceil(result.total / result.perPage)
-  if (result.page > 1) {
-    res.set('X-Prev-Page', result.page - 1)
+  if (parseInt(result.page, 10) > 1) {
+    res.set('X-Prev-Page', parseInt(result.page, 10) - 1)
   }
-  if (result.page < totalPages) {
-    res.set('X-Next-Page', result.page + 1)
+  if (parseInt(result.page, 10) < totalPages) {
+    res.set('X-Next-Page', parseInt(result.page, 10) + 1)
   }
-  res.set('X-Page', result.page)
+  res.set('X-Page', parseInt(result.page, 10))
   res.set('X-Per-Page', result.perPage)
   res.set('X-Total', result.total)
   res.set('X-Total-Pages', totalPages)
   // set Link header
   if (totalPages > 0) {
     let link = `<${getPageLink(req, 1)}>; rel="first", <${getPageLink(req, totalPages)}>; rel="last"`
-    if (result.page > 1) {
-      link += `, <${getPageLink(req, result.page - 1)}>; rel="prev"`
+    if (parseInt(result.page, 10) > 1) {
+      link += `, <${getPageLink(req, parseInt(result.page, 10) - 1)}>; rel="prev"`
     }
-    if (result.page < totalPages) {
-      link += `, <${getPageLink(req, result.page + 1)}>; rel="next"`
+    if (parseInt(result.page, 10) < totalPages) {
+      link += `, <${getPageLink(req, parseInt(result.page, 10) + 1)}>; rel="next"`
     }
     res.set('Link', link)
   }
@@ -411,6 +411,25 @@ async function getChallengeResources (challengeId) {
 }
 
 /**
+ * Create challenge resources
+ * @param {String} challengeId the challenge id
+ * @param {String} memberHandle the user's member handle
+ * @param {String} roleId the resource role ID to assign
+ */
+async function createResource (challengeId, memberHandle, roleId) {
+  const token = await getM2MToken()
+
+  const userObj = {
+    challengeId,
+    memberHandle,
+    roleId
+  }
+  const url = `${config.RESOURCES_API_URL}`
+  const res = await axios.post(url, userObj, { headers: { Authorization: `Bearer ${token}` } })
+  return res || false
+}
+
+/**
  * Get resource roles
  * @returns {Promise<Array>} the challenge resources
  */
@@ -427,7 +446,7 @@ async function getResourceRoles () {
  */
 async function userHasFullAccess (challengeId, userId) {
   const resourceRoles = await getResourceRoles()
-  const rolesWithFullAccess = _.map(_.filter(resourceRoles, r => r.fullAccess), 'id')
+  const rolesWithFullAccess = _.map(_.filter(resourceRoles, r => r.fullWriteAccess), 'id')
   const challengeResources = await getChallengeResources(challengeId)
   return _.filter(challengeResources, r => _.toString(r.memberId) === _.toString(userId) && _.includes(rolesWithFullAccess, r.roleId)).length > 0
 }
@@ -763,6 +782,7 @@ module.exports = {
   downloadFromS3,
   deleteFromS3,
   getChallengeResources,
+  createResource,
   getUserGroups,
   ensureNoDuplicateOrNullElements,
   postBusEvent,

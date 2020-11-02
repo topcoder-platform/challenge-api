@@ -108,6 +108,10 @@ const schema = new Schema({
     type: Array,
     required: false
   },
+  discussions: {
+    type: [Object],
+    required: false
+  },
   created: {
     type: Date,
     required: true
