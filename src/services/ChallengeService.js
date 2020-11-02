@@ -203,7 +203,7 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   if (criteria.name) {
-    boolQuery.push({ match: { 'name': criteria.name } })
+    boolQuery.push({ wildcard: { 'name': `*${criteria.name}*` } })
   }
   if (criteria.description) {
     boolQuery.push({ match: { 'description': criteria.description } })
