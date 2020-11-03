@@ -31,7 +31,22 @@ const initES = async () => {
     const body = { mappings: {} }
     body.mappings[config.get('ES.ES_TYPE')] = {
       properties: {
-        id: { type: 'keyword' }
+        id: { type: 'keyword' },
+        name: {
+          type: 'keyword',
+          normalizer: 'custom_sort_normalizer'
+        },
+        prizeSets: {
+          properties: {
+            type: { type: 'text' },
+            prizes: {
+              properties: {
+                type: { type: 'text' },
+                value: { type: 'float' }
+              }
+            }
+          }
+        }
       },
       dynamic_templates: [{
         metadata: {
@@ -41,6 +56,17 @@ const initES = async () => {
           }
         }
       }]
+    }
+    body.settings = {
+      analysis: {
+        normalizer: {
+          custom_sort_normalizer: {
+            type: 'custom',
+            char_filter: [],
+            filter: ['lowercase', 'asciifolding']
+          }
+        }
+      }
     }
 
     await client.indices.create({

@@ -18,6 +18,17 @@ function createIndex (indexName) {
       name: {
         type: 'keyword',
         normalizer: 'custom_sort_normalizer'
+      },
+      prizeSets: {
+        properties: {
+          type: { type: 'text' },
+          prizes: {
+            properties: {
+              type: { type: 'text' },
+              value: { type: 'float' }
+            }
+          }
+        }
       }
     },
     dynamic_templates: [{
@@ -50,59 +61,73 @@ function createIndex (indexName) {
 async function updateMappings () {
   const tempReindexing = config.get('ES.TEMP_REINDEXING')
   let indexName = config.get('ES.ES_INDEX')
-  let newIndexName = `${indexName}_tmp_dont_use_for_querying`
+  let backupIndex = 'challenge_tmp_dont_use_for_querying_backup'
+  let newIndexName = 'challenge_tmp_dont_use_for_querying'
 
-  if (tempReindexing) {
-    try {
-      logger.info(`Attemp to remove temporary index ${newIndexName}`)
-      await esClient.indices.delete({
-        index: newIndexName
-      })
-      await sleep(500)
-    } catch (e) {
-      logger.info(`Index ${newIndexName} does not exist`)
-    }
-  }
+  // if (tempReindexing) {
+  //   try {
+  //     logger.info(`Attemp to remove temporary index ${newIndexName}`)
+  //     await esClient.indices.delete({
+  //       index: newIndexName
+  //     })
+  //     await sleep(500)
+  //   } catch (e) {
+  //     logger.info(`Index ${newIndexName} does not exist`)
+  //   }
+  // }
 
-  await createIndex(newIndexName)
-  await sleep(500)
-  logger.info(`Reindexing from ${indexName} to ${newIndexName}`)
-  await esClient.reindex({
-    body: {
-      source: { index: indexName },
-      dest: { index: newIndexName }
-    },
-    waitForCompletion: true
-  })
+  // await createIndex(backupIndex)
+  // await sleep(500)
+  // logger.info(`Reindexing from ${indexName} to ${backupIndex}`)
+  // await esClient.reindex({
+  //   body: {
+  //     source: { index: indexName },
+  //     dest: { index: backupIndex }
+  //   },
+  //   waitForCompletion: true
+  // })
 
-  if (tempReindexing) {
-    return
-  }
+  // await createIndex(newIndexName)
+  // await sleep(500)
+  // logger.info(`Reindexing from ${indexName} to ${newIndexName}`)
+  // await esClient.reindex({
+  //   body: {
+  //     source: { index: indexName },
+  //     dest: { index: newIndexName }
+  //   },
+  //   waitForCompletion: true
+  // })
 
-  logger.warn(`Deleting ${indexName}. If script crashes after this point data may be lost and a recreation of index will be required.`)
+  // if (tempReindexing) {
+  //   return
+  // }
 
-  await esClient.indices.delete({
-    index: indexName
-  })
+  // logger.warn(`Deleting ${indexName}. If script crashes after this point data may be lost and a recreation of index will be required.`)
 
-  logger.info(`Copying data back into ${indexName}`)
+  // await esClient.indices.delete({
+  //   index: indexName
+  // })
 
-  // This should be replaced with cloneIndex after migration to 7.4+
-  await createIndex(indexName)
-  await sleep(500)
-  await esClient.reindex({
-    body: {
-      source: { index: newIndexName },
-      dest: { index: indexName }
-    },
-    waitForCompletion: true
-  })
+  // indexName = 'challenge' // overridding source so it's not deleted.
 
-  logger.info(`Removing ${newIndexName} index`)
+  // logger.info(`Copying data back into ${indexName}`)
 
-  await esClient.indices.delete({
-    index: newIndexName
-  })
+  // // This should be replaced with cloneIndex after migration to 7.4+
+  // await createIndex(indexName)
+  // await sleep(500)
+  // await esClient.reindex({
+  //   body: {
+  //     source: { index: 'challenge_tmp_dont_use_for_querying' },
+  //     dest: { index: 'challenge' }
+  //   },
+  //   waitForCompletion: true
+  // })
+
+  // logger.info(`Removing ${newIndexName} index`)
+
+  // await esClient.indices.delete({
+  //   index: newIndexName
+  // })
 }
 
 updateMappings()

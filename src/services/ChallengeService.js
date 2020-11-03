@@ -110,6 +110,7 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
+  let sortByScore = false
   const matchPhraseKeys = [
     'id',
     'timelineTemplateId',
@@ -202,11 +203,46 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  if (criteria.name) {
-    boolQuery.push({ wildcard: { 'name': `*${criteria.name}*` } })
+  if (criteria.search) {
+    boolQuery.push({
+      bool: {
+        should: [
+          { match_phrase_prefix: { 'name': criteria.search } },
+          { match_phrase_prefix: { 'description': criteria.search } },
+          { match_phrase_prefix: { 'tags': criteria.search } }
+        ]
+      }
+    })
+  } else {
+    if (criteria.name) {
+      // boolQuery.push({ wildcard: { 'name': `*${criteria.name}*` } })
+      boolQuery.push({ match_phrase_prefix: { 'name': criteria.name } })
+    }
+
+    if (criteria.description) {
+      boolQuery.push({ match_phrase_prefix: { 'description': criteria.description } })
+    }
   }
-  if (criteria.description) {
-    boolQuery.push({ match: { 'description': criteria.description } })
+
+  // 'search', 'name', 'description' fields should be sorted by function score unless sortBy param provided.
+  if (!criteria.sortBy && (
+    criteria.search ||
+      criteria.name ||
+      criteria.description
+  )) {
+    sortByScore = true
+  }
+
+  if (criteria.tag) {
+    boolQuery.push({ match_phrase: { tags: criteria.tag } })
+  }
+
+  if (criteria.tags) {
+    boolQuery.push({
+      bool: {
+        [criteria.includeAllTags ? 'must' : 'should']: _.map(criteria.tags, t => ({ match_phrase: { tags: t } }))
+      }
+    })
   }
 
   if (criteria.forumId) {
@@ -220,9 +256,6 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.directProjectId) {
     boolQuery.push({ match_phrase: { 'legacy.directProjectId': criteria.directProjectId } })
-  }
-  if (criteria.tag) {
-    boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
   if (criteria.currentPhaseName) {
     boolQuery.push({ match_phrase: { 'currentPhaseNames': criteria.currentPhaseName } })
@@ -277,22 +310,11 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   let sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
-  // If property to sort is text, then use its sub-field 'keyword' for sorting
-  sortByProp = _.includes(constants.challengeTextSortField, sortByProp) ? sortByProp + '.keyword' : sortByProp
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'desc'
 
   const mustQuery = []
 
   const groupsQuery = []
-
-  // logger.debug(`Tags: ${criteria.tags}`)
-  if (criteria.tags) {
-    boolQuery.push({
-      bool: {
-        [criteria.includeAllTags ? 'must' : 'should']: _.map(criteria.tags, t => ({ match_phrase: { tags: t } }))
-      }
-    })
-  }
 
   if (criteria.events) {
     boolQuery.push({
@@ -491,7 +513,7 @@ async function searchChallenges (currentUser, criteria) {
     from: (page - 1) * perPage, // Es Index starts from 0
     body: {
       query: finalQuery,
-      sort: [{ [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
+      sort: [sortByScore ? { '_score': { 'order': 'desc' } } : { [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
 
@@ -573,6 +595,7 @@ searchChallenges.schema = {
     type: Joi.string(),
     track: Joi.string(),
     name: Joi.string(),
+    search: Joi.string(),
     description: Joi.string(),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     reviewType: Joi.string(),
