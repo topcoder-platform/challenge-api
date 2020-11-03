@@ -310,8 +310,6 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   let sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
-  // If property to sort is text, then use its sub-field 'keyword' for sorting
-  sortByProp = _.includes(constants.challengeTextSortField, sortByProp) ? sortByProp + '.keyword' : sortByProp
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'desc'
 
   const mustQuery = []
