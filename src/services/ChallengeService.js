@@ -215,8 +215,13 @@ async function searchChallenges (currentUser, criteria) {
     })
   } else {
     if (criteria.name) {
-      // boolQuery.push({ wildcard: { 'name': `*${criteria.name}*` } })
-      boolQuery.push({ match_phrase_prefix: { 'name': criteria.name } })
+      boolQuery.push({ bool: {
+        should: [
+          { wildcard: { name: `*${criteria.name}*` } },
+          { wildcard: { name: `${criteria.name}*` } },
+          { wildcard: { name: `*${criteria.name}` } }
+        ]
+      } })
     }
 
     if (criteria.description) {
