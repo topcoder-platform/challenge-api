@@ -215,6 +215,7 @@ async function searchChallenges (currentUser, criteria) {
     })
   } else {
     if (criteria.name) {
+      // boolQuery.push({ wildcard: { 'name': `*${criteria.name}*` } })
       boolQuery.push({ match_phrase_prefix: { 'name': criteria.name } })
     }
 
@@ -874,9 +875,6 @@ async function createChallenge (currentUser, challenge, userToken) {
     ret.type = type.name
   }
 
-  // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
-
   // Create in ES
   await esClient.create({
     index: config.get('ES.ES_INDEX'),
@@ -885,6 +883,18 @@ async function createChallenge (currentUser, challenge, userToken) {
     id: ret.id,
     body: ret
   })
+
+  // if created by a user, add user as a manager
+  if (currentUser.handle) {
+    logger.debug(`Adding user as manager ${currentUser.handle}`)
+    await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
+  } else {
+    logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+  }
+
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
+
   return ret
 }
 
