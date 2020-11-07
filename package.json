@@ -13,6 +13,7 @@
     "drop-tables": "node src/scripts/drop-tables.js",
     "create-tables": "node src/scripts/create-tables.js",
     "seed-tables": "node src/scripts/seed-tables.js",
+    "seed-challenges": "node src/scripts/seed-challenges.js",
     "view-data": "node src/scripts/view-data.js",
     "view-es-data": "node src/scripts/view-es-data.js",
     "test": "mocha --require test/prepare.js -t 20000 test/unit/*.test.js --exit",

@@ -285,7 +285,7 @@ async function update (dbItem, data) {
  */
 async function scan (modelName, scanParams) {
   return new Promise((resolve, reject) => {
-    models[modelName].scan(scanParams).exec((err, result) => {
+    models[modelName].scan(scanParams).all().exec((err, result) => {
       if (err) {
         return reject(err)
       } else {

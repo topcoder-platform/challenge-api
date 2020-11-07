@@ -77,6 +77,12 @@ You can find sample `.env` files inside the `/docs` directory.
 1. Drop/delete tables: `npm run drop-tables`
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
+3. Seed challenge data: `npm run seed-challenges [input_path]`
+
+      The `input_path` argument is the path to the challenge data file.
+      The challenge data file must be a json file and contains an array of challenges.
+      If you omit the `input_path` argument, the script will default to `./src/scripts/challenges.json` as the challenge data file.
+
 4. Initialize/Clear database in default environment: `npm run init-db`
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
 6. Create Elasticsearch index: `npm run init-es`, or to re-create index: `npm run init-es force`
@@ -118,6 +124,8 @@ Two aws config should be uncommented
   or re-create the index: `npm run init-es force`
 - Create tables `npm run create-tables`
 - Clear and init db `npm run init-db`
+- Seed challenge data `npm run seed-challenges`
+- Sync challenge data from DB to ES: `npm run sync-es`
 - Start app `npm start`
 - App is running at `http://localhost:3000`
 

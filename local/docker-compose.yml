@@ -1,10 +1,10 @@
 version: '3'
 services:
   dynamodb:
-    image: tray/dynamodb-local
+    image: amazon/dynamodb-local
     ports:
-      - "7777:7777"
-    command: "-inMemory -port 7777"
+      - "8000:8000"
+    command: -Xmx1g -Xms1g -jar DynamoDBLocal.jar -inMemory
   esearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.0"
     ports:
@@ -25,7 +25,7 @@ services:
       context: ../
       dockerfile: mock-api/Dockerfile
     environment:
-      DYNAMODB_URL: http://dynamodb:7777
+      DYNAMODB_URL: http://dynamodb:8000
       IS_LOCAL_DB: "true"
     ports:
       - "4000:4000"
