@@ -135,6 +135,13 @@ paths:
           required: false
           type: string
           format: UUID
+        - name: search
+          in: query
+          description: >-
+            Filter by name, description and tags fields,
+            case-insensitive, partial matches are allowed.
+          required: false
+          type: string
         - name: name
           in: query
           description: 'Filter by name, case-insensitive, partial matches are allowed.'
