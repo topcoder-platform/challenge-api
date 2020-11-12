@@ -40,7 +40,8 @@ module.exports = {
     API_VERSION: process.env.ES_API_VERSION || '6.8',
     ES_INDEX: process.env.ES_INDEX || 'challenge',
     ES_TYPE: process.env.ES_TYPE || '_doc', // ES 6.x accepts only 1 Type per index and it's mandatory to define it
-    ES_REFRESH: process.env.ES_REFRESH || 'true'
+    ES_REFRESH: process.env.ES_REFRESH || 'true',
+    TEMP_REINDEXING: process.env.TEMP_REINDEXING || true // if true, it won't delete the existing index when reindexing data
   },
 
   // in bytes
@@ -57,6 +58,9 @@ module.exports = {
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],
   SUBMITTER_ROLE_ID: process.env.SUBMITTER_ROLE_ID || '732339e7-8e30-49d7-9198-cccf9451e221',
+
+  MANAGER_ROLE_ID: process.env.MANAGER_ROLE_ID || '0e9c6879-39e4-4eb6-b8df-92407890faf1',
+  OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || '2a4dc376-a31c-4d00-b173-13934d89e286',
 
   // health check timeout in milliseconds
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
