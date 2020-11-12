@@ -112,6 +112,9 @@ const schema = new Schema({
     type: [Object],
     required: false
   },
+  overview: {
+    type: Object
+  },
   created: {
     type: Date,
     required: true

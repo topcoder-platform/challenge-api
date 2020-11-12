@@ -22,6 +22,20 @@ const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateSer
 const esClient = helper.getESClient()
 
 /**
+ * Check if user can perform modification/deletion to a challenge
+ *
+ * @param {Object} user the JwT user object
+ * @param {Object} challenge the challenge object
+ * @returns {undefined}
+ */
+async function ensureAccessibleForChallenge (user, challenge) {
+  const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId)
+  if (!user.isMachine && !helper.hasAdminRole(user) && challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() && !userHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+}
+
+/**
  * Filter challenges by groups access
  * @param {Object} currentUser the user who perform operation
  * @param {Array} challenges the challenges to filter
@@ -315,9 +329,27 @@ async function searchChallenges (currentUser, criteria) {
   if (!_.isUndefined(criteria.group) || !_.isUndefined(criteria.groups)) {
     // check group access
     if (_.isUndefined(currentUser)) {
-      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
-    }
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      if (criteria.group) {
+        const group = await helper.getGroupById(criteria.group)
+        if (group && !group.privateGroup) {
+          groupsToFilter.push(criteria.group)
+        }
+      }
+      if (criteria.groups && criteria.groups.length > 0) {
+        const promises = []
+        _.each(criteria.groups, (g) => {
+          promises.push(
+            (async () => {
+              const group = await helper.getGroupById(g)
+              if (group && !group.privateGroup) {
+                groupsToFilter.push(g)
+              }
+            })()
+          )
+        })
+        await Promise.all(promises)
+      }
+    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
       }
@@ -820,6 +852,16 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
+
+  // auto-populate totalPrizes
+  if (challenge.prizeSets) {
+    const prizeSetsGroup = _.groupBy(challenge.prizeSets, 'type')
+    if (prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes]) {
+      const totalPrizes = helper.sumOfPrizes(prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes)
+      _.assign(challenge, { overview: { totalPrizes } })
+    }
+  }
+
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
     created: moment().utc(),
@@ -1156,10 +1198,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
-  const userHasFullAccess = await helper.userHasFullAccess(challengeId, currentUser.userId)
-  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !userHasFullAccess) {
-    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
-  }
+  await ensureAccessibleForChallenge(currentUser, challenge)
 
   // Only M2M can update url and options of discussions
   if (data.discussions && data.discussions.length > 0) {
@@ -1227,6 +1266,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
   if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
     throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
+  }
+
+  if (data.prizeSets) {
+    const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
+    if (!prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] && _.get(challenge, 'overview.totalPrizes')) {
+      // remove the totalPrizes if challenge prizes are empty
+      challenge.overview = _.omit(challenge.overview, ['totalPrizes'])
+    } else {
+      const totalPrizes = helper.sumOfPrizes(prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes)
+      logger.debug(`re-calculate total prizes, current value is ${totalPrizes.value}`)
+      _.assign(challenge, { overview: { totalPrizes } })
+    }
   }
 
   if (data.phases || data.startDate) {
@@ -1518,6 +1569,17 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
+    const registrationPhase = _.find(challenge.phases, p => p.name === 'Registration')
+    const submissionPhase = _.find(challenge.phases, p => p.name === 'Submission')
+    challenge.currentPhaseNames = _.map(_.filter(challenge.phases, p => p.isOpen === true), 'name')
+    if (registrationPhase) {
+      challenge.registrationStartDate = registrationPhase.actualStartDate || registrationPhase.scheduledStartDate
+      challenge.registrationEndDate = registrationPhase.actualEndDate || registrationPhase.scheduledEndDate
+    }
+    if (submissionPhase) {
+      challenge.submissionStartDate = submissionPhase.actualStartDate || submissionPhase.scheduledStartDate
+      challenge.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate
+    }
   }
   // Update ES
   await esClient.update({
@@ -1685,7 +1747,8 @@ fullyUpdateChallenge.schema = {
     terms: Joi.array().items(Joi.object().keys({
       id: Joi.id(),
       roleId: Joi.id()
-    }).unknown(true)).optional().allow([])
+    }).unknown(true)).optional().allow([]),
+    overview: Joi.any().forbidden()
   }).unknown(true).required(),
   userToken: Joi.any()
 }
@@ -1770,9 +1833,43 @@ partiallyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     }).unknown(true)).min(1),
-    terms: Joi.array().items(Joi.id().optional()).optional().allow([])
+    terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
+    overview: Joi.any().forbidden()
   }).unknown(true).required(),
   userToken: Joi.any()
+}
+
+/**
+ * Delete challenge.
+ * @param {Object} currentUser the user who perform operation
+ * @param {String} challengeId the challenge id
+ * @returns {Object} the deleted challenge
+ */
+async function deleteChallenge (currentUser, challengeId) {
+  const challenge = await helper.getById('Challenge', challengeId)
+  if (challenge.status !== constants.challengeStatuses.New) {
+    throw new errors.BadRequestError(`Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`)
+  }
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check if user are allowed to delete the challenge
+  await ensureAccessibleForChallenge(currentUser, challenge)
+  // delete DB record
+  await models.Challenge.delete(challenge)
+  // delete ES document
+  await esClient.delete({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: challengeId
+  })
+  await helper.postBusEvent(constants.Topics.ChallengeDeleted, { id: challengeId })
+  return challenge
+}
+
+deleteChallenge.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id()
 }
 
 module.exports = {
@@ -1780,7 +1877,8 @@ module.exports = {
   createChallenge,
   getChallenge,
   fullyUpdateChallenge,
-  partiallyUpdateChallenge
+  partiallyUpdateChallenge,
+  deleteChallenge
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)
