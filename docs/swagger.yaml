@@ -34,6 +34,8 @@ info:
 
     - It will be considered as admin user if using valid M2M token(having read
     challenge scope) to list challenges or retrieve challenge by id
+
+    - Users can access attachments of a challenge only when the user can access the challenge itself.
 host: api.topcoder.com
 basePath: /v5
 schemes:

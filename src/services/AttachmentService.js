@@ -34,18 +34,18 @@ function validateUrl (url) {
 }
 
 /**
- * Get attachment by both challengeId and attachmentId
+ * Get challenge and attachment by both challengeId and attachmentId
  * @param {String} challengeId the challenge id
  * @param {String} attachmentId the attachment id
- * @returns {Object} the attachment with given id
+ * @returns {Object} the challenge and the attachment
  */
-async function getChallengeAttachment (challengeId, attachmentId) {
-  await helper.getById('Challenge', challengeId)
+async function _getChallengeAttachment (challengeId, attachmentId) {
+  const challenge = await helper.getById('Challenge', challengeId)
   const attachment = await models.Attachment.get(attachmentId)
   if (!attachment || attachment.challengeId !== challengeId) {
     throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
   }
-  return attachment
+  return { challenge, attachment }
 }
 
 /**
@@ -54,8 +54,9 @@ async function getChallengeAttachment (challengeId, attachmentId) {
  * @param {Object} attachment the attachment to created
  * @returns {Object} the created attachment
  */
-async function createAttachment (challengeId, attachment) {
-  await helper.getById('Challenge', challengeId)
+async function createAttachment (currentUser, challengeId, attachment) {
+  const challenge = await helper.getById('Challenge', challengeId)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   validateUrl(attachment.url)
   const attachmentObject = { id: uuid(), challengeId, ...attachment }
   const ret = await helper.create('Attachment', attachmentObject)
@@ -65,6 +66,7 @@ async function createAttachment (challengeId, attachment) {
 }
 
 createAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachment: Joi.object().keys({
     name: Joi.string().required(),
@@ -80,11 +82,14 @@ createAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the attachment with given id
  */
-async function getAttachment (challengeId, attachmentId) {
-  return getChallengeAttachment(challengeId, attachmentId)
+async function getAttachment (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanViewChallenge(currentUser, challenge)
+  return attachment
 }
 
 getAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }
@@ -97,8 +102,9 @@ getAttachment.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated attachment
  */
-async function update (challengeId, attachmentId, data, isFull) {
-  const attachment = await getChallengeAttachment(challengeId, attachmentId)
+async function update (currentUser, challengeId, attachmentId, data, isFull) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   validateUrl(data.url)
 
   if (isFull) {
@@ -121,11 +127,12 @@ async function update (challengeId, attachmentId, data, isFull) {
  * @param {Object} data the attachment data to be updated
  * @returns {Object} the updated attachment
  */
-async function fullyUpdateAttachment (challengeId, attachmentId, data) {
-  return update(challengeId, attachmentId, data, true)
+async function fullyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
+  return update(currentUser, challengeId, attachmentId, data, true)
 }
 
 fullyUpdateAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id(),
   data: Joi.object().keys({
@@ -143,11 +150,12 @@ fullyUpdateAttachment.schema = {
  * @param {Object} data the attachment data to be updated
  * @returns {Object} the updated attachment
  */
-async function partiallyUpdateAttachment (challengeId, attachmentId, data) {
-  return update(challengeId, attachmentId, data)
+async function partiallyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
+  return update(currentUser, challengeId, attachmentId, data)
 }
 
 partiallyUpdateAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id(),
   data: Joi.object().keys({
@@ -163,8 +171,9 @@ partiallyUpdateAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the deleted attachment
  */
-async function deleteAttachment (challengeId, attachmentId) {
-  const attachment = await getChallengeAttachment(challengeId, attachmentId)
+async function deleteAttachment (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   const s3UrlObject = s3ParseUrl(attachment.url)
   if (s3UrlObject) {
     await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key)
@@ -176,6 +185,7 @@ async function deleteAttachment (challengeId, attachmentId) {
 }
 
 deleteAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }
@@ -186,8 +196,9 @@ deleteAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Promise<Object>} the downloaded attachment data
  */
-async function downloadAttachment (challengeId, attachmentId) {
-  const attachment = await getChallengeAttachment(challengeId, attachmentId)
+async function downloadAttachment (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanViewChallenge(currentUser, challenge)
   const s3UrlObject = s3ParseUrl(attachment.url)
   if (s3UrlObject) {
     // download from S3
@@ -201,6 +212,7 @@ async function downloadAttachment (challengeId, attachmentId) {
 }
 
 downloadAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }

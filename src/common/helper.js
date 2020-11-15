@@ -739,6 +739,118 @@ async function validateChallengeTerms (terms = []) {
   return listOfTerms
 }
 
+/**
+ * Filter challenges by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Array} challenges the challenges to filter
+ * @returns {Array} the challenges that can be accessed by current user
+ */
+async function _filterChallengesByGroupsAccess (currentUser, challenges) {
+  const res = []
+  let userGroups
+  const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !hasAdminRole(currentUser)
+  const subGroupsMap = {}
+  for (const challenge of challenges) {
+    challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
+    let expandedGroups = []
+    if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
+      res.push(challenge)
+    } else if (currentUser) {
+      // get user groups if not yet
+      if (_.isNil(userGroups)) {
+        userGroups = await getUserGroups(currentUser.userId)
+      }
+      // Expand challenge groups by subGroups
+      // results are being saved on a hashmap for efficiency
+      for (const group of challenge.groups) {
+        let subGroups
+        if (subGroupsMap[group]) {
+          subGroups = subGroupsMap[group]
+        } else {
+          subGroups = await expandWithSubGroups(group)
+          subGroupsMap[group] = subGroups
+        }
+        expandedGroups = [
+          ..._.concat(expandedGroups, subGroups)
+        ]
+      }
+      // check if there is matched group
+      // logger.debug('Groups', challenge.groups, userGroups)
+      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+        res.push(challenge)
+      }
+    }
+  }
+  return res
+}
+
+/**
+ * Ensure the user can access the challenge by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
+  const filtered = await _filterChallengesByGroupsAccess(currentUser, [challenge])
+  if (filtered.length === 0) {
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
+  }
+}
+
+/**
+ * Ensure the user can access a task challenge.
+ *
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
+  let memberChallengeIds
+  // Remove privateDescription for unregistered users
+  if (currentUser) {
+    if (!currentUser.isMachine) {
+      memberChallengeIds = await listChallengesByMember(currentUser.userId)
+      if (!_.includes(memberChallengeIds, challenge.id)) {
+      }
+    }
+  }
+  // Check if challenge is task and apply security rules
+  if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
+    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || hasAdminRole(currentUser)
+    if (!canAccesChallenge) {
+      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
+    }
+  }
+}
+
+/**
+ * Ensure the user can view a challenge.
+ *
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function ensureUserCanViewChallenge (currentUser, challenge) {
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check if user can access a challenge that is a task
+  await _ensureAccessibleForTaskChallenge(currentUser, challenge)
+}
+
+/**
+ * Ensure user can perform modification to a challenge
+ *
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ * @returns {undefined}
+ */
+async function ensureUserCanModifyChallenge (currentUser, challenge) {
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check full access
+  const isUserHasFullAccess = await userHasFullAccess(challenge.id, currentUser.userId)
+  if (!currentUser.isMachine && !hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !isUserHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -773,5 +885,7 @@ module.exports = {
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,
   getResourceRoles,
-  userHasFullAccess
+  ensureAccessibleByGroupsAccess,
+  ensureUserCanViewChallenge,
+  ensureUserCanModifyChallenge
 }
