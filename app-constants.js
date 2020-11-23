@@ -55,6 +55,7 @@ const DiscussionTypes = {
 const Topics = {
   ChallengeCreated: 'challenge.notification.create',
   ChallengeUpdated: 'challenge.notification.update',
+  ChallengeDeleted: 'challenge.notification.delete',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',

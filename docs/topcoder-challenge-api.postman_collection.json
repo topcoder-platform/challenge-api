@@ -20343,6 +20343,516 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "delete challenge",
+					"item": [
+						{
+							"name": "[STUB] CHALLENGE_ID1 can be set by running \"create challenge by admin\"",
+							"request": {
+								"method": "VIEW",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[STUB] CHALLENGE_ID2 can be set by running \"create challenge by copilot\"",
+							"request": {
+								"method": "VIEW",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete challenge 1 by admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7748e11e-0536-4d66-821e-2acb8b9ee4e4",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID1}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete challenge 2 by copilot",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "21ce91c2-727e-4942-94ce-f7b9ad0e1922",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot1_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge by different copilot 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b27f9844-172a-45ab-8d78-d8e648162de7",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{copilot2_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge by user 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1d6af907-bdc2-437f-9883-3040c1e12e79",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge without token 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "df9d716a-9a0f-4764-9154-2bd57532f0ea",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge with invalid token 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "db2448ac-deda-4c6c-a47b-6c7af95ddf8b",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer invalid"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge with expire token 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2edcc5f2-8a0f-4791-93b2-da3a897daf76",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expire_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge not found 404",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9e8ed6d8-7a40-4ced-8176-fed5a8d8b095",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/:challengeId",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										":challengeId"
+									],
+									"variable": [
+										{
+											"key": "challengeId",
+											"value": "19d20d64-e84e-452f-abd5-018e6abc68ab"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete challenge using m2m token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c46553ad-8bb4-46b2-84ec-ba7a029b74ee",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenges_delete}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "failure delete challenge using forbidden m2m token 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3eeabff3-ceee-47f5-a23c-b2ff1322a2e8",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{m2m_challenge_attachments_read}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/challenges/{{CHALLENGE_ID2}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"challenges",
+										"{{CHALLENGE_ID2}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}

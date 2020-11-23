@@ -14,8 +14,32 @@ app.set('port', config.PORT)
 
 app.use(cors())
 
+const groups = {
+  '33ba038e-48da-487b-96e8-8d3b99b6d181': {
+    id: '33ba038e-48da-487b-96e8-8d3b99b6d181',
+    name: 'group1',
+    description: 'desc1',
+    privateGroup: false,
+    selfRegister: true,
+    domain: 'domain1'
+  },
+  '33ba038e-48da-487b-96e8-8d3b99b6d182': {
+    id: '33ba038e-48da-487b-96e8-8d3b99b6d182',
+    name: 'group2',
+    description: 'desc2',
+    privateGroup: true,
+    selfRegister: false,
+    domain: 'domain2'
+  }
+}
+
 // get challenge resources
 app.get('/v5/resources', (req, res) => {
+  winston.debug(`query: ${JSON.stringify(req.query, null, 2)}`)
+  if (Number(req.query.page) > 1) {
+    res.json([])
+    return
+  }
   const challengeId = req.query.challengeId
   winston.info(`Get resources of challenge id ${challengeId}`)
 
@@ -114,6 +138,17 @@ app.get('/v5/groups', (req, res) => {
     }]
   }
 
+  winston.info(`Result: ${JSON.stringify(result, null, 4)}`)
+  res.json(result)
+})
+
+// get group by id
+app.get('/v5/groups/:groupId', (req, res) => {
+  winston.info(`Find group, groupId: ${req.params.groupId}`)
+  if (!groups[req.params.groupId]) {
+    res.status(404).send({ message: `group ${req.params.groupId} not found` })
+  }
+  const result = groups[req.params.groupId]
   winston.info(`Result: ${JSON.stringify(result, null, 4)}`)
   res.json(result)
 })

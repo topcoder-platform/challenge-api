@@ -763,6 +763,43 @@ async function validateChallengeTerms (terms = []) {
   return listOfTerms
 }
 
+/**
+ * Calculate the sum of prizes.
+ *
+ * @param {Array} prizes the list of prize
+ * @returns {Number} the result prize
+ */
+function sumOfPrizes (prizes) {
+  let sum = 0
+  if (!prizes.length) {
+    return sum
+  }
+  for (const prize of prizes) {
+    sum += prize.value
+  }
+  return sum
+}
+
+/**
+ * Get group by id
+ * @param {String} groupId the group id
+ * @returns {Promise<Object>} the group
+ */
+async function getGroupById (groupId) {
+  const token = await getM2MToken()
+  try {
+    const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return result.data
+  } catch (err) {
+    if (err.response.status === HttpStatus.NOT_FOUND) {
+      return
+    }
+    throw err
+  }
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -798,5 +835,7 @@ module.exports = {
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,
   getResourceRoles,
-  userHasFullAccess
+  userHasFullAccess,
+  sumOfPrizes,
+  getGroupById
 }
