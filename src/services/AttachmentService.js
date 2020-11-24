@@ -1,3 +1,4 @@
+
 /**
  * This service provides operations of attachments.
  */
@@ -6,125 +7,223 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const config = require('config')
-const helper = require('../common/helper')
-// const logger = require('../common/logger')
 const errors = require('../common/errors')
+const helper = require('../common/helper')
+const s3ParseUrl = require('../common/s3ParseUrl')
+const models = require('../models')
+const logger = require('../common/logger')
+const constants = require('../../app-constants')
+
+const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(',').map((bucketName) => bucketName.trim())
 
 /**
- * Check whether user can upload attachment of challenge.
- * @param {Object} authUser the current user
- * @param {String} challengeId the challenge id
- * @returns {Promise<boolean>} whether the user can upload attachment of challenge
+ * Check if a url is acceptable.
+ *
+ * @param {String} url the url
+ * @returns {undefined}
  */
-async function canUploadChallengeAttachment (authUser, challengeId) {
-  // admin can upload attachments
-  if (helper.hasAdminRole(authUser)) {
-    return true
+function validateUrl (url) {
+  const s3UrlObject = s3ParseUrl(url)
+  if (!s3UrlObject) {
+    return
   }
-
-  // if user is one of configured copilot resource of challenge, then s/he can upload attachment
-  const resources = await helper.getChallengeResources(challengeId)
-  return !!_.find(resources, (r) => String(r.memberId) === String(authUser.userId) &&
-    _.includes(config.COPILOT_RESOURCE_ROLE_IDS, r.roleId))
+  if (bucketWhitelist.includes(s3UrlObject.bucket)) {
+    return
+  }
+  throw new errors.BadRequestError(`The bucket ${s3UrlObject.bucket} is not in the whitelist`)
 }
 
 /**
- * Upload attachment.
- * @param {Object} authUser the current user
+ * Get challenge and attachment by both challengeId and attachmentId
  * @param {String} challengeId the challenge id
- * @param {Object} files the uploaded files
- * @returns {Promise<Object>} the created attachment
+ * @param {String} attachmentId the attachment id
+ * @returns {Object} the challenge and the attachment
  */
-async function uploadAttachment (authUser, challengeId, files) {
-  // ensure challenge exists
-  await helper.getById('Challenge', challengeId)
-
-  if (!authUser.isMachine) {
-    // check authorization
-    if (!(await canUploadChallengeAttachment(authUser, challengeId))) {
-      throw new errors.ForbiddenError('You are not allowed to upload attachment of the challenge.')
-    }
+async function _getChallengeAttachment (challengeId, attachmentId) {
+  const challenge = await helper.getById('Challenge', challengeId)
+  const attachment = await models.Attachment.get(attachmentId)
+  if (!attachment || attachment.challengeId !== challengeId) {
+    throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
   }
-
-  const file = files.attachment
-  if (file.truncated) {
-    throw new errors.BadRequestError(`The attachment is too large, it should not exceed ${
-      (config.FILE_UPLOAD_SIZE_LIMIT / 1024 / 1024).toFixed(2)
-    } MB.`)
-  }
-
-  const id = uuid()
-  // upload file to AWS S3
-  await helper.uploadToS3(id, file.data, file.mimetype, file.name)
-
-  // create attachment in db
-  const attachment = {
-    id,
-    fileSize: file.size,
-    fileName: file.name,
-    challengeId
-  }
-  return helper.create('Attachment', attachment)
+  return { challenge, attachment }
 }
 
-uploadAttachment.schema = {
-  authUser: Joi.object().required(),
+/**
+ * Create attachment.
+ * @param {String} challengeId the challenge id
+ * @param {Object} attachment the attachment to created
+ * @returns {Object} the created attachment
+ */
+async function createAttachment (currentUser, challengeId, attachment) {
+  const challenge = await helper.getById('Challenge', challengeId)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
+  validateUrl(attachment.url)
+  const attachmentObject = { id: uuid(), challengeId, ...attachment }
+  const ret = await helper.create('Attachment', attachmentObject)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, ret)
+  return ret
+}
+
+createAttachment.schema = {
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
-  files: Joi.object().keys({
-    attachment: Joi.object().required()
+  attachment: Joi.object().keys({
+    name: Joi.string().required(),
+    url: Joi.string().uri().required(),
+    fileSize: Joi.fileSize(),
+    description: Joi.string()
   }).required()
 }
 
 /**
- * Check whether user can download attachment of challenge.
- * @param {Object} authUser the current user
+ * Get attachment
  * @param {String} challengeId the challenge id
- * @returns {Promise<boolean>} whether the user can download attachment of challenge
+ * @param {String} attachmentId the attachment id
+ * @returns {Object} the attachment with given id
  */
-async function canDownloadChallengeAttachment (authUser, challengeId) {
-  // admin can download attachments
-  if (helper.hasAdminRole(authUser)) {
-    return true
+async function getAttachment (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanViewChallenge(currentUser, challenge)
+  return attachment
+}
+
+getAttachment.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  attachmentId: Joi.id()
+}
+
+/**
+ * Update attachment.
+ * @param {String} challengeId the challenge id
+ * @param {String} attachmentId the attachment id
+ * @param {Object} data the attachment data to be updated
+ * @param {Boolean} isFull the flag indicate it is a fully update operation.
+ * @returns {Object} the updated attachment
+ */
+async function update (currentUser, challengeId, attachmentId, data, isFull) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
+  validateUrl(data.url)
+
+  if (isFull) {
+    // optional fields can be undefined
+    attachment.fileSize = data.fileSize
+    attachment.description = data.description
   }
 
-  // if user is resource of challenge, then s/he can download attachment
-  const resources = await helper.getChallengeResources(challengeId)
-  return !!_.find(resources, (r) => String(r.memberId) === String(authUser.userId))
+  const ret = await helper.update(attachment, data)
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeAttachmentUpdated,
+    isFull ? ret : _.assignIn({ id: attachmentId }, data))
+  return ret
+}
+
+/**
+ * Fully update attachment.
+ * @param {String} challengeId the challenge id
+ * @param {String} attachmentId the attachment id
+ * @param {Object} data the attachment data to be updated
+ * @returns {Object} the updated attachment
+ */
+async function fullyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
+  return update(currentUser, challengeId, attachmentId, data, true)
+}
+
+fullyUpdateAttachment.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  attachmentId: Joi.id(),
+  data: Joi.object().keys({
+    name: Joi.string().required(),
+    url: Joi.string().uri().required(),
+    fileSize: Joi.fileSize(),
+    description: Joi.string()
+  }).required()
+}
+
+/**
+ * Partially update attachment.
+ * @param {String} challengeId the challenge id
+ * @param {String} attachmentId the attachment id
+ * @param {Object} data the attachment data to be updated
+ * @returns {Object} the updated attachment
+ */
+async function partiallyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
+  return update(currentUser, challengeId, attachmentId, data)
+}
+
+partiallyUpdateAttachment.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  attachmentId: Joi.id(),
+  data: Joi.object().keys({
+    name: Joi.string(),
+    url: Joi.string().uri(),
+    fileSize: Joi.fileSize(),
+    description: Joi.string()
+  }).required()
+}
+
+/**
+ * Delete attachment.
+ * @param {String} attachmentId the attachment id
+ * @returns {Object} the deleted attachment
+ */
+async function deleteAttachment (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
+  const s3UrlObject = s3ParseUrl(attachment.url)
+  if (s3UrlObject) {
+    await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key)
+  }
+  await attachment.delete()
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeAttachmentDeleted, attachment)
+  return attachment
+}
+
+deleteAttachment.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  attachmentId: Joi.id()
 }
 
 /**
  * Download attachment.
- * @param {Object} authUser the current user
  * @param {String} challengeId the challenge id
  * @param {String} attachmentId the attachment id
  * @returns {Promise<Object>} the downloaded attachment data
  */
-async function downloadAttachment (authUser, challengeId, attachmentId) {
-  if (!authUser.isMachine) {
-    // check authorization
-    if (!(await canDownloadChallengeAttachment(authUser, challengeId))) {
-      throw new errors.ForbiddenError('You are not allowed to download attachment of the challenge.')
-    }
+async function downloadAttachment (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+  await helper.ensureUserCanViewChallenge(currentUser, challenge)
+  const s3UrlObject = s3ParseUrl(attachment.url)
+  if (s3UrlObject) {
+    // download from S3
+    const data = await helper.downloadFromS3(s3UrlObject.bucket, s3UrlObject.key)
+    data.fileName = attachment.name
+    return data
   }
-  const attachment = await helper.getById('Attachment', attachmentId)
-  if (attachment.challengeId !== challengeId) {
-    throw new errors.BadRequestError('The attachment challengeId does not match the path challengeId.')
-  }
-  // download from S3
-  const result = await helper.downloadFromS3(attachmentId)
-  result.fileName = attachment.fileName
-  return result
+  const data = await helper.downloadFromFileStack(attachment.url)
+  data.fileName = attachment.name
+  return data
 }
 
 downloadAttachment.schema = {
-  authUser: Joi.object().required(),
+  currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }
 
 module.exports = {
-  uploadAttachment,
+  createAttachment,
+  getAttachment,
+  fullyUpdateAttachment,
+  partiallyUpdateAttachment,
+  deleteAttachment,
   downloadAttachment
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

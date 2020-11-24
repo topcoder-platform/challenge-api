@@ -4,6 +4,7 @@
 const Joi = require('joi')
 const _ = require('lodash')
 const querystring = require('querystring')
+const request = require('superagent')
 const constants = require('../../app-constants')
 const models = require('../models')
 const errors = require('./errors')
@@ -334,34 +335,27 @@ async function validatePhases (phases) {
 }
 
 /**
- * Upload file to S3
- * @param {String} attachmentId the attachment id
- * @param {Buffer} data the file data
- * @param {String} mimetype the MIME type
- * @param {String} fileName the original file name
- * @return {Promise} promise to upload file to S3
+ * Download file from S3
+ * @param {String} bucket the bucket name
+ * @param {String} key the key name
+ * @return {Promise} promise resolved to downloaded data
  */
-async function uploadToS3 (attachmentId, data, mimetype, fileName) {
-  const params = {
-    Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET,
-    Key: attachmentId,
-    Body: data,
-    ContentType: mimetype,
-    Metadata: {
-      fileName
-    }
+async function downloadFromFileStack (url) {
+  const res = await request.get(url)
+  return {
+    data: res.body,
+    mimetype: res.type
   }
-  // Upload to S3
-  return s3.upload(params).promise()
 }
 
 /**
  * Download file from S3
- * @param {String} attachmentId the attachment id
+ * @param {String} bucket the bucket name
+ * @param {String} key the key name
  * @return {Promise} promise resolved to downloaded data
  */
-async function downloadFromS3 (attachmentId) {
-  const file = await s3.getObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+async function downloadFromS3 (bucket, key) {
+  const file = await s3.getObject({ Bucket: bucket, Key: key }).promise()
   return {
     data: file.Body,
     mimetype: file.ContentType
@@ -370,11 +364,12 @@ async function downloadFromS3 (attachmentId) {
 
 /**
  * Delete file from S3
- * @param {String} attachmentId the attachment id
+ * @param {String} bucket the bucket name
+ * @param {String} key the key name
  * @return {Promise} promise resolved to deleted data
  */
-async function deleteFromS3 (attachmentId) {
-  return s3.deleteObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+async function deleteFromS3 (bucket, key) {
+  return s3.deleteObject({ Bucket: bucket, Key: key }).promise()
 }
 
 /**
@@ -764,11 +759,123 @@ async function validateChallengeTerms (terms = []) {
 }
 
 /**
- * Calculate the sum of prizes.
- *
- * @param {Array} prizes the list of prize
- * @returns {Number} the result prize
+ * Filter challenges by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Array} challenges the challenges to filter
+ * @returns {Array} the challenges that can be accessed by current user
  */
+async function _filterChallengesByGroupsAccess (currentUser, challenges) {
+  const res = []
+  let userGroups
+  const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !hasAdminRole(currentUser)
+  const subGroupsMap = {}
+  for (const challenge of challenges) {
+    challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
+    let expandedGroups = []
+    if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
+      res.push(challenge)
+    } else if (currentUser) {
+      // get user groups if not yet
+      if (_.isNil(userGroups)) {
+        userGroups = await getUserGroups(currentUser.userId)
+      }
+      // Expand challenge groups by subGroups
+      // results are being saved on a hashmap for efficiency
+      for (const group of challenge.groups) {
+        let subGroups
+        if (subGroupsMap[group]) {
+          subGroups = subGroupsMap[group]
+        } else {
+          subGroups = await expandWithSubGroups(group)
+          subGroupsMap[group] = subGroups
+        }
+        expandedGroups = [
+          ..._.concat(expandedGroups, subGroups)
+        ]
+      }
+      // check if there is matched group
+      // logger.debug('Groups', challenge.groups, userGroups)
+      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+        res.push(challenge)
+      }
+    }
+  }
+  return res
+}
+
+/**
+ * Ensure the user can access the challenge by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
+  const filtered = await _filterChallengesByGroupsAccess(currentUser, [challenge])
+  if (filtered.length === 0) {
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
+  }
+}
+
+/**
+ * Ensure the user can access a task challenge.
+ *
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
+  let memberChallengeIds
+  // Remove privateDescription for unregistered users
+  if (currentUser) {
+    if (!currentUser.isMachine) {
+      memberChallengeIds = await listChallengesByMember(currentUser.userId)
+      if (!_.includes(memberChallengeIds, challenge.id)) {
+      }
+    }
+  }
+  // Check if challenge is task and apply security rules
+  if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
+    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || hasAdminRole(currentUser)
+    if (!canAccesChallenge) {
+      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
+    }
+  }
+}
+
+/**
+ * Ensure the user can view a challenge.
+ *
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function ensureUserCanViewChallenge (currentUser, challenge) {
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check if user can access a challenge that is a task
+  await _ensureAccessibleForTaskChallenge(currentUser, challenge)
+}
+
+/**
+ * Ensure user can perform modification to a challenge
+ *
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ * @returns {undefined}
+ */
+async function ensureUserCanModifyChallenge (currentUser, challenge) {
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check full access
+  const isUserHasFullAccess = await userHasFullAccess(challenge.id, currentUser.userId)
+  if (!currentUser.isMachine && !hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !isUserHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+}
+
+/**
+  * Calculate the sum of prizes.
+  *
+  * @param {Array} prizes the list of prize
+  * @returns {Number} the result prize
+  */
 function sumOfPrizes (prizes) {
   let sum = 0
   if (!prizes.length) {
@@ -781,10 +888,10 @@ function sumOfPrizes (prizes) {
 }
 
 /**
- * Get group by id
- * @param {String} groupId the group id
- * @returns {Promise<Object>} the group
- */
+  * Get group by id
+  * @param {String} groupId the group id
+  * @returns {Promise<Object>} the group
+  */
 async function getGroupById (groupId) {
   const token = await getM2MToken()
   try {
@@ -815,7 +922,7 @@ module.exports = {
   validateDuplicate,
   partialMatch,
   validatePhases,
-  uploadToS3,
+  downloadFromFileStack,
   downloadFromS3,
   deleteFromS3,
   getChallengeResources,
@@ -835,6 +942,9 @@ module.exports = {
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,
   getResourceRoles,
+  ensureAccessibleByGroupsAccess,
+  ensureUserCanViewChallenge,
+  ensureUserCanModifyChallenge,
   userHasFullAccess,
   sumOfPrizes,
   getGroupById

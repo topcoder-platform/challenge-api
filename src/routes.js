@@ -266,13 +266,42 @@ module.exports = {
   '/challenges/:challengeId/attachments': {
     post: {
       controller: 'AttachmentController',
-      method: 'uploadAttachment',
+      method: 'createAttachment',
       auth: 'jwt',
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [CREATE, ALL]
     }
   },
   '/challenges/:challengeId/attachments/:attachmentId': {
+    get: {
+      controller: 'AttachmentController',
+      method: 'getAttachment',
+      auth: 'jwt', // any authenticated role is allowed
+      scopes: [READ, ALL]
+    },
+    put: {
+      controller: 'AttachmentController',
+      method: 'updateAttachment',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      scopes: [UPDATE, ALL]
+    },
+    patch: {
+      controller: 'AttachmentController',
+      method: 'partiallyUpdateAttachment',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      scopes: [UPDATE, ALL]
+    },
+    delete: {
+      controller: 'AttachmentController',
+      method: 'deleteAttachment',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      scopes: [DELETE, ALL]
+    }
+  },
+  '/challenges/:challengeId/attachments/:attachmentId/download': {
     get: {
       controller: 'AttachmentController',
       method: 'downloadAttachment',

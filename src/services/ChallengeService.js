@@ -843,7 +843,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
 
   // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await helper.ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
   if (!challenge.timelineTemplateId) {
@@ -1052,8 +1052,8 @@ async function getChallenge (currentUser, id) {
       throw e
     }
   }
-  // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await helper.ensureUserCanViewChallenge(currentUser, challenge)
+
   // // FIXME: Temporarily hard coded as the migrad
   // // populate type property based on the typeId
   // if (challenge.typeId) {
@@ -1068,8 +1068,8 @@ async function getChallenge (currentUser, id) {
   // }
   // delete challenge.typeId
 
-  let memberChallengeIds
   // Remove privateDescription for unregistered users
+  let memberChallengeIds
   if (currentUser) {
     if (!currentUser.isMachine) {
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
@@ -1079,14 +1079,6 @@ async function getChallenge (currentUser, id) {
     }
   } else {
     _.unset(challenge, 'privateDescription')
-  }
-
-  // Check if challenge is task and apply security rules
-  if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
-    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || helper.hasAdminRole(currentUser)
-    if (!canAccesChallenge) {
-      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
-    }
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1222,8 +1214,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     _.extend(challenge.legacy, data.legacy)
   }
 
-  // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
 
   // check groups access to be updated group values
   if (data.groups) {
