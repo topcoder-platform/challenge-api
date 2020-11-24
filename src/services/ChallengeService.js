@@ -1716,8 +1716,6 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      track: Joi.string().required(),
-      subTrack: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
