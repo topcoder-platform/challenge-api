@@ -22,6 +22,77 @@ const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateSer
 const esClient = helper.getESClient()
 
 /**
+ * Check if user can perform modification/deletion to a challenge
+ *
+ * @param {Object} user the JwT user object
+ * @param {Object} challenge the challenge object
+ * @returns {undefined}
+ */
+async function ensureAccessibleForChallenge (user, challenge) {
+  const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId)
+  if (!user.isMachine && !helper.hasAdminRole(user) && challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() && !userHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+}
+
+/**
+ * Filter challenges by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Array} challenges the challenges to filter
+ * @returns {Array} the challenges that can be accessed by current user
+ */
+async function filterChallengesByGroupsAccess (currentUser, challenges) {
+  const res = []
+  let userGroups
+  const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
+  const subGroupsMap = {}
+  for (const challenge of challenges) {
+    challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
+    let expandedGroups = []
+    if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
+      res.push(challenge)
+    } else if (currentUser) {
+      // get user groups if not yet
+      if (_.isNil(userGroups)) {
+        userGroups = await helper.getUserGroups(currentUser.userId)
+      }
+      // Expand challenge groups by subGroups
+      // results are being saved on a hashmap for efficiency
+      for (const group of challenge.groups) {
+        let subGroups
+        if (subGroupsMap[group]) {
+          subGroups = subGroupsMap[group]
+        } else {
+          subGroups = await helper.expandWithSubGroups(group)
+          subGroupsMap[group] = subGroups
+        }
+        expandedGroups = [
+          ..._.concat(expandedGroups, subGroups)
+        ]
+      }
+      // check if there is matched group
+      // logger.debug('Groups', challenge.groups, userGroups)
+      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+        res.push(challenge)
+      }
+    }
+  }
+  return res
+}
+
+/**
+ * Ensure the user can access the challenge by groups access
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the challenge to check
+ */
+async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
+  const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge])
+  if (filtered.length === 0) {
+    throw new errors.ForbiddenError(`You don't have access to this group!`)
+  }
+}
+
+/**
  * Ensure the user can access the groups being updated to
  * @param {Object} currentUser the user who perform operation
  * @param {Object} data the challenge data to be updated
@@ -53,6 +124,7 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   const boolQuery = []
+  let sortByScore = false
   const matchPhraseKeys = [
     'id',
     'timelineTemplateId',
@@ -145,11 +217,51 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  if (criteria.name) {
-    boolQuery.push({ match: { 'name': criteria.name } })
+  if (criteria.search) {
+    boolQuery.push({
+      bool: {
+        should: [
+          { match_phrase_prefix: { 'name': criteria.search } },
+          { match_phrase_prefix: { 'description': criteria.search } },
+          { match_phrase_prefix: { 'tags': criteria.search } }
+        ]
+      }
+    })
+  } else {
+    if (criteria.name) {
+      boolQuery.push({ bool: {
+        should: [
+          { wildcard: { name: `*${criteria.name}*` } },
+          { wildcard: { name: `${criteria.name}*` } },
+          { wildcard: { name: `*${criteria.name}` } }
+        ]
+      } })
+    }
+
+    if (criteria.description) {
+      boolQuery.push({ match_phrase_prefix: { 'description': criteria.description } })
+    }
   }
-  if (criteria.description) {
-    boolQuery.push({ match: { 'description': criteria.description } })
+
+  // 'search', 'name', 'description' fields should be sorted by function score unless sortBy param provided.
+  if (!criteria.sortBy && (
+    criteria.search ||
+      criteria.name ||
+      criteria.description
+  )) {
+    sortByScore = true
+  }
+
+  if (criteria.tag) {
+    boolQuery.push({ match_phrase: { tags: criteria.tag } })
+  }
+
+  if (criteria.tags) {
+    boolQuery.push({
+      bool: {
+        [criteria.includeAllTags ? 'must' : 'should']: _.map(criteria.tags, t => ({ match_phrase: { tags: t } }))
+      }
+    })
   }
 
   if (criteria.forumId) {
@@ -163,9 +275,6 @@ async function searchChallenges (currentUser, criteria) {
   }
   if (criteria.directProjectId) {
     boolQuery.push({ match_phrase: { 'legacy.directProjectId': criteria.directProjectId } })
-  }
-  if (criteria.tag) {
-    boolQuery.push({ match_phrase: { tags: criteria.tag } })
   }
   if (criteria.currentPhaseName) {
     boolQuery.push({ match_phrase: { 'currentPhaseNames': criteria.currentPhaseName } })
@@ -220,22 +329,11 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   let sortByProp = criteria.sortBy ? criteria.sortBy : 'created'
-  // If property to sort is text, then use its sub-field 'keyword' for sorting
-  sortByProp = _.includes(constants.challengeTextSortField, sortByProp) ? sortByProp + '.keyword' : sortByProp
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'desc'
 
   const mustQuery = []
 
   const groupsQuery = []
-
-  // logger.debug(`Tags: ${criteria.tags}`)
-  if (criteria.tags) {
-    boolQuery.push({
-      bool: {
-        [criteria.includeAllTags ? 'must' : 'should']: _.map(criteria.tags, t => ({ match_phrase: { tags: t } }))
-      }
-    })
-  }
 
   if (criteria.events) {
     boolQuery.push({
@@ -258,9 +356,27 @@ async function searchChallenges (currentUser, criteria) {
   if (!_.isUndefined(criteria.group) || !_.isUndefined(criteria.groups)) {
     // check group access
     if (_.isUndefined(currentUser)) {
-      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
-    }
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      if (criteria.group) {
+        const group = await helper.getGroupById(criteria.group)
+        if (group && !group.privateGroup) {
+          groupsToFilter.push(criteria.group)
+        }
+      }
+      if (criteria.groups && criteria.groups.length > 0) {
+        const promises = []
+        _.each(criteria.groups, (g) => {
+          promises.push(
+            (async () => {
+              const group = await helper.getGroupById(g)
+              if (group && !group.privateGroup) {
+                groupsToFilter.push(g)
+              }
+            })()
+          )
+        })
+        await Promise.all(promises)
+      }
+    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
       }
@@ -434,7 +550,7 @@ async function searchChallenges (currentUser, criteria) {
     from: (page - 1) * perPage, // Es Index starts from 0
     body: {
       query: finalQuery,
-      sort: [{ [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
+      sort: [sortByScore ? { '_score': { 'order': 'desc' } } : { [sortByProp]: { 'order': sortOrderProp, 'missing': '_last', 'unmapped_type': 'String' } }]
     }
   }
 
@@ -516,6 +632,7 @@ searchChallenges.schema = {
     type: Joi.string(),
     track: Joi.string(),
     name: Joi.string(),
+    search: Joi.string(),
     description: Joi.string(),
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     reviewType: Joi.string(),
@@ -763,6 +880,16 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
+
+  // auto-populate totalPrizes
+  if (challenge.prizeSets) {
+    const prizeSetsGroup = _.groupBy(challenge.prizeSets, 'type')
+    if (prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes]) {
+      const totalPrizes = helper.sumOfPrizes(prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes)
+      _.assign(challenge, { overview: { totalPrizes } })
+    }
+  }
+
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
     created: moment().utc(),
@@ -793,9 +920,6 @@ async function createChallenge (currentUser, challenge, userToken) {
     ret.type = type.name
   }
 
-  // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
-
   // Create in ES
   await esClient.create({
     index: config.get('ES.ES_INDEX'),
@@ -804,6 +928,18 @@ async function createChallenge (currentUser, challenge, userToken) {
     id: ret.id,
     body: ret
   })
+
+  // if created by a user, add user as a manager
+  if (currentUser.handle) {
+    logger.debug(`Adding user as manager ${currentUser.handle}`)
+    await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
+  } else {
+    logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+  }
+
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
+
   return ret
 }
 
@@ -1090,6 +1226,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
   }
 
+  await ensureAccessibleForChallenge(currentUser, challenge)
+
   // Only M2M can update url and options of discussions
   if (data.discussions && data.discussions.length > 0) {
     for (let i = 0; i < data.discussions.length; i += 1) {
@@ -1156,6 +1294,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
   if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
     throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
+  }
+
+  if (data.prizeSets) {
+    const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
+    if (!prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] && _.get(challenge, 'overview.totalPrizes')) {
+      // remove the totalPrizes if challenge prizes are empty
+      challenge.overview = _.omit(challenge.overview, ['totalPrizes'])
+    } else {
+      const totalPrizes = helper.sumOfPrizes(prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes)
+      logger.debug(`re-calculate total prizes, current value is ${totalPrizes.value}`)
+      _.assign(challenge, { overview: { totalPrizes } })
+    }
   }
 
   if (data.phases || data.startDate) {
@@ -1447,6 +1597,17 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
+    const registrationPhase = _.find(challenge.phases, p => p.name === 'Registration')
+    const submissionPhase = _.find(challenge.phases, p => p.name === 'Submission')
+    challenge.currentPhaseNames = _.map(_.filter(challenge.phases, p => p.isOpen === true), 'name')
+    if (registrationPhase) {
+      challenge.registrationStartDate = registrationPhase.actualStartDate || registrationPhase.scheduledStartDate
+      challenge.registrationEndDate = registrationPhase.actualEndDate || registrationPhase.scheduledEndDate
+    }
+    if (submissionPhase) {
+      challenge.submissionStartDate = submissionPhase.actualStartDate || submissionPhase.scheduledStartDate
+      challenge.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate
+    }
   }
   // Update ES
   await esClient.update({
@@ -1546,8 +1707,6 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      track: Joi.string().required(),
-      subTrack: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
@@ -1614,7 +1773,8 @@ fullyUpdateChallenge.schema = {
     terms: Joi.array().items(Joi.object().keys({
       id: Joi.id(),
       roleId: Joi.id()
-    }).unknown(true)).optional().allow([])
+    }).unknown(true)).optional().allow([]),
+    overview: Joi.any().forbidden()
   }).unknown(true).required(),
   userToken: Joi.any()
 }
@@ -1699,9 +1859,43 @@ partiallyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     }).unknown(true)).min(1),
-    terms: Joi.array().items(Joi.id().optional()).optional().allow([])
+    terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
+    overview: Joi.any().forbidden()
   }).unknown(true).required(),
   userToken: Joi.any()
+}
+
+/**
+ * Delete challenge.
+ * @param {Object} currentUser the user who perform operation
+ * @param {String} challengeId the challenge id
+ * @returns {Object} the deleted challenge
+ */
+async function deleteChallenge (currentUser, challengeId) {
+  const challenge = await helper.getById('Challenge', challengeId)
+  if (challenge.status !== constants.challengeStatuses.New) {
+    throw new errors.BadRequestError(`Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`)
+  }
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check if user are allowed to delete the challenge
+  await ensureAccessibleForChallenge(currentUser, challenge)
+  // delete DB record
+  await models.Challenge.delete(challenge)
+  // delete ES document
+  await esClient.delete({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: challengeId
+  })
+  await helper.postBusEvent(constants.Topics.ChallengeDeleted, { id: challengeId })
+  return challenge
+}
+
+deleteChallenge.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id()
 }
 
 module.exports = {
@@ -1709,7 +1903,8 @@ module.exports = {
   createChallenge,
   getChallenge,
   fullyUpdateChallenge,
-  partiallyUpdateChallenge
+  partiallyUpdateChallenge,
+  deleteChallenge
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

@@ -10711,7 +10711,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "ChallengeTypetimeline-templates",
+			"name": "ChallengeTimelineTemplates",
 			"item": [
 				{
 					"name": "create challenge type timeline template",
@@ -16067,6 +16067,38 @@
 						},
 						{
 							"name": "failure update challenge with winners array - same member with multiple placements",
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4da50c05-788c-46d9-bb78-1832285e97de",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b94eeda7-a239-494d-b0f8-ee39b2f55541",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "update challenge",
+					"item": [
+						{
+							"name": "update challenge 1 by admin",
 							"event": [
 								{
 									"listen": "test",

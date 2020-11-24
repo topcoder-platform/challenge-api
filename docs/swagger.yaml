@@ -137,6 +137,13 @@ paths:
           required: false
           type: string
           format: UUID
+        - name: search
+          in: query
+          description: >-
+            Filter by name, description and tags fields,
+            case-insensitive, partial matches are allowed.
+          required: false
+          type: string
         - name: name
           in: query
           description: 'Filter by name, case-insensitive, partial matches are allowed.'
@@ -578,6 +585,50 @@ paths:
           description: Updated - The request was successful and the resource is returned.
           schema:
             $ref: '#/definitions/ChallengeResponseBodyForCreateOrUpdate'
+        '400':
+          description: Bad request.  Request parameters were invalid.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '401':
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '403':
+          description: >
+            Forbidden.  The requester does not have the correct permission to
+            update the challenge.
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Challenge not found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    delete:
+      tags:
+        - Challenges
+      description: >
+        Delete the challenge with the provided id.
+        Only challenges with status of "New" can be deleted.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challenge to update
+      responses:
+        '200':
+          description: Deleted - The request was successful and the resource is returned.
+          schema:
+            $ref: '#/definitions/Challenge'
         '400':
           description: Bad request.  Request parameters were invalid.
           schema:
@@ -2640,6 +2691,9 @@ definitions:
       numOfRegistrants:
         type: integer
         description: number of registrants
+      overview:
+        description: the overview of the challenge
+        type: object
       created:
         type: string
         format: date-time
@@ -3165,6 +3219,9 @@ definitions:
       numOfRegistrants:
         type: integer
         description: number of registrants
+      overview:
+        description: the overview of the challenge
+        type: object
       created:
         type: string
         format: date-time

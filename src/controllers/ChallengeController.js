@@ -60,10 +60,22 @@ async function partiallyUpdateChallenge (req, res) {
   res.send(result)
 }
 
+/**
+ * Delete challenge
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function deleteChallenge (req, res) {
+  logger.debug(`deleteChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${req.params.challengeId}`)
+  const result = await service.deleteChallenge(req.authUser, req.params.challengeId)
+  res.send(result)
+}
+
 module.exports = {
   searchChallenges,
   createChallenge,
   getChallenge,
   fullyUpdateChallenge,
-  partiallyUpdateChallenge
+  partiallyUpdateChallenge,
+  deleteChallenge
 }

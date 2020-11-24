@@ -52,6 +52,13 @@ module.exports = {
       auth: 'jwt',
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL]
+    },
+    delete: {
+      controller: 'ChallengeController',
+      method: 'deleteChallenge',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      scopes: [DELETE, ALL]
     }
   },
   '/challenge-types': {
