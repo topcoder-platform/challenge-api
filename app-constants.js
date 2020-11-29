@@ -40,7 +40,8 @@ const validChallengeParams = {
   StartDate: 'startDate',
   ProjectId: 'projectId',
   Name: 'name',
-  TypeId: 'typeId'
+  TypeId: 'typeId',
+  Prizes: 'overview.totalPrizes'
 }
 
 const EVENT_ORIGINATOR = 'topcoder-challenges-api'
