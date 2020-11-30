@@ -13,6 +13,7 @@ const s3ParseUrl = require('../common/s3ParseUrl')
 const models = require('../models')
 const logger = require('../common/logger')
 const constants = require('../../app-constants')
+const challengeService = require('./ChallengeService')
 
 const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(',').map((bucketName) => bucketName.trim())
 
@@ -60,6 +61,13 @@ async function createAttachment (currentUser, challengeId, attachment) {
   validateUrl(attachment.url)
   const attachmentObject = { id: uuid(), challengeId, ...attachment }
   const ret = await helper.create('Attachment', attachmentObject)
+  // update challenge object
+  await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
+    attachments: [
+      ...challenge.attachments,
+      ret
+    ]
+  })
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, ret)
   return ret
@@ -114,6 +122,16 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
   }
 
   const ret = await helper.update(attachment, data)
+  // update challenge object
+  const newAttachments = challenge.attachments
+  try {
+    newAttachments[_.findIndex(newAttachments, a => a.id === attachmentId)] = ret
+    await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
+      attachments: newAttachments
+    })
+  } catch (e) {
+    logger.warn(`The attachment ${attachmentId} does not exist on the challenge object`)
+  }
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeAttachmentUpdated,
     isFull ? ret : _.assignIn({ id: attachmentId }, data))
@@ -179,6 +197,16 @@ async function deleteAttachment (currentUser, challengeId, attachmentId) {
     await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key)
   }
   await attachment.delete()
+  // update challenge object
+  const newAttachments = challenge.attachments
+  try {
+    newAttachments.splice(_.findIndex(newAttachments, a => a.id === attachmentId), 1)
+    await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
+      attachments: newAttachments
+    })
+  } catch (e) {
+    logger.warn(`The attachment ${attachmentId} does not exist on the challenge object`)
+  }
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeAttachmentDeleted, attachment)
   return attachment
