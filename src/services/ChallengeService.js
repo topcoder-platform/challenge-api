@@ -1668,7 +1668,7 @@ function sanitizeChallenge (challenge) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
   }
   if (challenge.attachments) {
-    sanitized.attachments = _.map(challenge.attachments, attachment => _.pick(attachment, ['id', 'name', 'url', 'fileSize', 'description']))
+    sanitized.attachments = _.map(challenge.attachments, attachment => _.pick(attachment, ['id', 'name', 'url', 'fileSize', 'description', 'challengeId']))
   }
   return sanitized
 }
@@ -1746,6 +1746,8 @@ fullyUpdateChallenge.schema = {
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
     attachments: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      challengeId: Joi.id(),
       name: Joi.string().required(),
       url: Joi.string().uri().required(),
       fileSize: Joi.fileSize(),
@@ -1840,6 +1842,8 @@ partiallyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     attachments: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      challengeId: Joi.id(),
       name: Joi.string().required(),
       url: Joi.string().uri().required(),
       fileSize: Joi.fileSize(),
