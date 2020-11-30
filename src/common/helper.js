@@ -4,7 +4,6 @@
 const Joi = require('joi')
 const _ = require('lodash')
 const querystring = require('querystring')
-const request = require('superagent')
 const constants = require('../../app-constants')
 const models = require('../models')
 const errors = require('./errors')
@@ -341,10 +340,10 @@ async function validatePhases (phases) {
  * @return {Promise} promise resolved to downloaded data
  */
 async function downloadFromFileStack (url) {
-  const res = await request.get(url)
+  const res = await axios.get(url)
   return {
-    data: res.body,
-    mimetype: res.type
+    data: res.data,
+    mimetype: _.get(res, `headers['content-type']`, 'application/json')
   }
 }
 
