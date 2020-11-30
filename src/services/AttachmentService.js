@@ -64,7 +64,7 @@ async function createAttachment (currentUser, challengeId, attachment) {
   // update challenge object
   await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
     attachments: [
-      ...challenge.attachments,
+      ..._.get(challenge, 'attachments', []),
       ret
     ]
   })
@@ -123,7 +123,7 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
 
   const ret = await helper.update(attachment, data)
   // update challenge object
-  const newAttachments = challenge.attachments
+  const newAttachments = _.get(challenge, 'attachments', [])
   try {
     newAttachments[_.findIndex(newAttachments, a => a.id === attachmentId)] = ret
     await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
@@ -198,7 +198,7 @@ async function deleteAttachment (currentUser, challengeId, attachmentId) {
   }
   await attachment.delete()
   // update challenge object
-  const newAttachments = challenge.attachments
+  const newAttachments = _.get(challenge, 'attachments', [])
   try {
     newAttachments.splice(_.findIndex(newAttachments, a => a.id === attachmentId), 1)
     await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
