@@ -1172,7 +1172,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
-  helper.ensureNoDuplicateOrNullElements(data.attachmentIds, 'attachmentIds')
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
@@ -1220,10 +1219,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (data.groups) {
     await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
   }
-
   let newAttachments
-  if (isFull || !_.isUndefined(data.attachmentIds)) {
-    newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
+  if (isFull || !_.isUndefined(data.attachments)) {
+    newAttachments = data.attachments
   }
 
   await ensureAccessibleForChallenge(currentUser, challenge)
@@ -1268,16 +1266,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     }
     // newTermsOfUse = await helper.validateChallengeTerms(_.union(data.terms, defaultTerms))
     newTermsOfUse = await helper.validateChallengeTerms(data.terms)
-  }
-
-  // find out attachment ids to delete
-  const attachmentIdsToDelete = []
-  if (isFull || !_.isUndefined(data.attachmentIds)) {
-    _.forEach(challenge.attachments || [], (attachment) => {
-      if (!_.find(data.attachmentIds || [], (id) => id === attachment.id)) {
-        attachmentIdsToDelete.push(attachment.id)
-      }
-    })
   }
 
   await validateChallengeData(data)
@@ -1358,10 +1346,10 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         _.intersection(challenge[key], value).length !== value.length) {
         op = '$PUT'
       }
-    } else if (key === 'attachmentIds') {
+    } else if (key === 'attachments') {
       const oldIds = _.map(challenge.attachments || [], (a) => a.id)
       if (oldIds.length !== value.length ||
-        _.intersection(oldIds, value).length !== value.length) {
+        _.intersection(oldIds, _.map(value, a => a.id)).length !== value.length) {
         op = '$PUT'
       }
     } else if (key === 'groups') {
@@ -1394,7 +1382,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       if (_.isUndefined(updateDetails[op])) {
         updateDetails[op] = {}
       }
-      if (key === 'attachmentIds') {
+      if (key === 'attachments') {
         updateDetails[op].attachments = newAttachments
       } else if (key === 'terms') {
         updateDetails[op].terms = newTermsOfUse
@@ -1404,7 +1392,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       if (key !== 'updated' && key !== 'updatedBy') {
         let oldValue
         let newValue
-        if (key === 'attachmentIds') {
+        if (key === 'attachments') {
           oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : 'NULL'
           newValue = JSON.stringify(newAttachments)
         } else if (key === 'terms') {
@@ -1445,7 +1433,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     // send null to Elasticsearch to clear the field
     data.metadata = null
   }
-  if (isFull && _.isUndefined(data.attachmentIds) && challenge.attachments) {
+  if (isFull && _.isUndefined(data.attachments) && challenge.attachments) {
     if (!updateDetails['$DELETE']) {
       updateDetails['$DELETE'] = {}
     }
@@ -1553,7 +1541,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await models.AuditLog.batchPut(auditLogs)
   }
 
-  delete data.attachmentIds
+  delete data.attachments
   delete data.terms
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
@@ -1564,13 +1552,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (!_.isUndefined(newTermsOfUse)) {
     challenge.terms = newTermsOfUse
     data.terms = newTermsOfUse
-  }
-
-  // delete unused attachments
-  for (const attachmentId of attachmentIdsToDelete) {
-    await helper.deleteFromS3(attachmentId)
-    const attachment = await helper.getById('Attachment', attachmentId)
-    await attachment.delete()
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1641,7 +1622,7 @@ function sanitizeChallenge (challenge) {
     'startDate',
     'status',
     'task',
-    'attachmentIds',
+    'attachments',
     'groups'
   ])
   if (!_.isUndefined(sanitized.name)) {
@@ -1762,7 +1743,12 @@ fullyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-    attachmentIds: Joi.array().items(Joi.optionalId()),
+    attachments: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      url: Joi.string().uri().required(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string()
+    })),
     groups: Joi.array().items(Joi.optionalId()),
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     winners: Joi.array().items(Joi.object().keys({
@@ -1851,7 +1837,12 @@ partiallyUpdateChallenge.schema = {
     projectId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
-    attachmentIds: Joi.array().items(Joi.optionalId()),
+    attachments: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      url: Joi.string().uri().required(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string()
+    })),
     groups: Joi.array().items(Joi.id()), // group names
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     winners: Joi.array().items(Joi.object().keys({
