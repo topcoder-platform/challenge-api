@@ -1622,7 +1622,6 @@ function sanitizeChallenge (challenge) {
     'startDate',
     'status',
     'task',
-    'attachments',
     'groups'
   ])
   if (!_.isUndefined(sanitized.name)) {
@@ -1667,6 +1666,9 @@ function sanitizeChallenge (challenge) {
   }
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
+  }
+  if (challenge.attachments) {
+    sanitized.attachments = _.map(challenge.attachments, attachment => _.pick(attachment, ['id', 'name', 'url', 'fileSize', 'description']))
   }
   return sanitized
 }
