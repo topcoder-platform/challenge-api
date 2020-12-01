@@ -981,6 +981,7 @@ createChallenge.schema = {
       key: Joi.string()
     })),
     discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
       name: Joi.string().required(),
       type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
       provider: Joi.string().required(),
@@ -1734,6 +1735,7 @@ fullyUpdateChallenge.schema = {
       key: Joi.string()
     }).unknown(true)),
     discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
       name: Joi.string().required(),
       type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
       provider: Joi.string().required(),
@@ -1821,6 +1823,7 @@ partiallyUpdateChallenge.schema = {
       key: Joi.string()
     }).unknown(true)),
     discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
       name: Joi.string().required(),
       type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
       provider: Joi.string().required(),
