@@ -672,7 +672,7 @@ searchChallenges.schema = {
     isTask: Joi.boolean(),
     taskIsAssigned: Joi.boolean(),
     taskMemberId: Joi.string(),
-    events: Joi.array().items(Joi.number()),
+    events: Joi.array().items(Joi.string()),
     includeAllEvents: Joi.boolean().default(true)
   }).unknown(true)
 }
