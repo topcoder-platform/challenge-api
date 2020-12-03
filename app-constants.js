@@ -40,7 +40,8 @@ const validChallengeParams = {
   StartDate: 'startDate',
   ProjectId: 'projectId',
   Name: 'name',
-  TypeId: 'typeId'
+  TypeId: 'typeId',
+  Prizes: 'overview.totalPrizes'
 }
 
 const EVENT_ORIGINATOR = 'topcoder-challenges-api'
@@ -55,6 +56,7 @@ const DiscussionTypes = {
 const Topics = {
   ChallengeCreated: 'challenge.notification.create',
   ChallengeUpdated: 'challenge.notification.update',
+  ChallengeDeleted: 'challenge.notification.delete',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
@@ -65,7 +67,10 @@ const Topics = {
   TimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.timeline.template.deleted',
   ChallengeTypeTimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.created',
   ChallengeTypeTimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.updated',
-  ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events' // 'challenge.action.type.timeline.template.deleted'
+  ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.type.timeline.template.deleted'
+  ChallengeAttachmentCreated: 'test.new.bus.events', // 'challenge.action.attachment.created',
+  ChallengeAttachmentUpdated: 'test.new.bus.events', // 'challenge.action.attachment.updated',
+  ChallengeAttachmentDeleted: 'test.new.bus.events' // 'challenge.action.attachment.deleted',
 }
 
 const challengeTracks = {

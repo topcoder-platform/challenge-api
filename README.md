@@ -110,7 +110,11 @@ There are two parts need to be updated for local development
 - https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
 Two aws config should be uncommented
 
+and AUTH0 related configuration must be set at config file or in env variables.
 
+### Deploy the app
+
+- Follow the Notes section above
 - Install dependencies `npm install`
 - Run lint `npm run lint`
 - Run lint fix `npm run lint:fix`
@@ -118,6 +122,7 @@ Two aws config should be uncommented
   or re-create the index: `npm run init-es force`
 - Create tables `npm run create-tables`
 - Clear and init db `npm run init-db`
+- Seed tables: `npm run seed-tables`
 - Start app `npm start`
 - App is running at `http://localhost:3000`
 

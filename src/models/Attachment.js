@@ -12,17 +12,24 @@ const schema = new Schema({
     hashKey: true,
     required: true
   },
+  url: {
+    type: String,
+    required: true
+  },
   fileSize: {
     type: Number,
     required: true
   },
-  fileName: {
+  name: {
     type: String,
     required: true
   },
   challengeId: {
     type: String,
     required: true
+  },
+  description: {
+    type: String
   }
 },
 {

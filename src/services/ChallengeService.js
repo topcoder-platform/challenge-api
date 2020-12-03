@@ -22,6 +22,20 @@ const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateSer
 const esClient = helper.getESClient()
 
 /**
+ * Check if user can perform modification/deletion to a challenge
+ *
+ * @param {Object} user the JwT user object
+ * @param {Object} challenge the challenge object
+ * @returns {undefined}
+ */
+async function ensureAccessibleForChallenge (user, challenge) {
+  const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId)
+  if (!user.isMachine && !helper.hasAdminRole(user) && challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() && !userHasFullAccess) {
+    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
+  }
+}
+
+/**
  * Filter challenges by groups access
  * @param {Object} currentUser the user who perform operation
  * @param {Array} challenges the challenges to filter
@@ -342,9 +356,27 @@ async function searchChallenges (currentUser, criteria) {
   if (!_.isUndefined(criteria.group) || !_.isUndefined(criteria.groups)) {
     // check group access
     if (_.isUndefined(currentUser)) {
-      throw new errors.BadRequestError('Authentication is required to filter challenges based on groups')
-    }
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      if (criteria.group) {
+        const group = await helper.getGroupById(criteria.group)
+        if (group && !group.privateGroup) {
+          groupsToFilter.push(criteria.group)
+        }
+      }
+      if (criteria.groups && criteria.groups.length > 0) {
+        const promises = []
+        _.each(criteria.groups, (g) => {
+          promises.push(
+            (async () => {
+              const group = await helper.getGroupById(g)
+              if (group && !group.privateGroup) {
+                groupsToFilter.push(g)
+              }
+            })()
+          )
+        })
+        await Promise.all(promises)
+      }
+    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
       }
@@ -640,7 +672,7 @@ searchChallenges.schema = {
     isTask: Joi.boolean(),
     taskIsAssigned: Joi.boolean(),
     taskMemberId: Joi.string(),
-    events: Joi.array().items(Joi.number()),
+    events: Joi.array().items(Joi.string()),
     includeAllEvents: Joi.boolean().default(true)
   }).unknown(true)
 }
@@ -811,7 +843,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
 
   // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await helper.ensureAccessibleByGroupsAccess(currentUser, challenge)
 
   // populate phases
   if (!challenge.timelineTemplateId) {
@@ -848,6 +880,16 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
+
+  // auto-populate totalPrizes
+  if (challenge.prizeSets) {
+    const prizeSetsGroup = _.groupBy(challenge.prizeSets, 'type')
+    if (prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes]) {
+      const totalPrizes = helper.sumOfPrizes(prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes)
+      _.assign(challenge, { overview: { totalPrizes } })
+    }
+  }
+
   const ret = await helper.create('Challenge', _.assign({
     id: uuid(),
     created: moment().utc(),
@@ -939,6 +981,7 @@ createChallenge.schema = {
       key: Joi.string()
     })),
     discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
       name: Joi.string().required(),
       type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
       provider: Joi.string().required(),
@@ -1010,8 +1053,8 @@ async function getChallenge (currentUser, id) {
       throw e
     }
   }
-  // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await helper.ensureUserCanViewChallenge(currentUser, challenge)
+
   // // FIXME: Temporarily hard coded as the migrad
   // // populate type property based on the typeId
   // if (challenge.typeId) {
@@ -1026,8 +1069,8 @@ async function getChallenge (currentUser, id) {
   // }
   // delete challenge.typeId
 
-  let memberChallengeIds
   // Remove privateDescription for unregistered users
+  let memberChallengeIds
   if (currentUser) {
     if (!currentUser.isMachine) {
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
@@ -1037,14 +1080,6 @@ async function getChallenge (currentUser, id) {
     }
   } else {
     _.unset(challenge, 'privateDescription')
-  }
-
-  // Check if challenge is task and apply security rules
-  if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
-    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || helper.hasAdminRole(currentUser)
-    if (!canAccesChallenge) {
-      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
-    }
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1138,7 +1173,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
-  helper.ensureNoDuplicateOrNullElements(data.attachmentIds, 'attachmentIds')
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
@@ -1180,23 +1214,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     _.extend(challenge.legacy, data.legacy)
   }
 
-  // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
 
   // check groups access to be updated group values
   if (data.groups) {
     await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
   }
-
   let newAttachments
-  if (isFull || !_.isUndefined(data.attachmentIds)) {
-    newAttachments = await helper.getByIds('Attachment', data.attachmentIds || [])
+  if (isFull || !_.isUndefined(data.attachments)) {
+    newAttachments = data.attachments
   }
 
-  const userHasFullAccess = await helper.userHasFullAccess(challengeId, currentUser.userId)
-  if (!currentUser.isMachine && !helper.hasAdminRole(currentUser) && challenge.createdBy.toLowerCase() !== currentUser.handle.toLowerCase() && !userHasFullAccess) {
-    throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
-  }
+  await ensureAccessibleForChallenge(currentUser, challenge)
 
   // Only M2M can update url and options of discussions
   if (data.discussions && data.discussions.length > 0) {
@@ -1240,16 +1269,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     newTermsOfUse = await helper.validateChallengeTerms(data.terms)
   }
 
-  // find out attachment ids to delete
-  const attachmentIdsToDelete = []
-  if (isFull || !_.isUndefined(data.attachmentIds)) {
-    _.forEach(challenge.attachments || [], (attachment) => {
-      if (!_.find(data.attachmentIds || [], (id) => id === attachment.id)) {
-        attachmentIdsToDelete.push(attachment.id)
-      }
-    })
-  }
-
   await validateChallengeData(data)
   if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Cancelled) && data.status && data.status !== challenge.status) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
@@ -1264,6 +1283,18 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
   if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
     throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
+  }
+
+  if (data.prizeSets) {
+    const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
+    if (!prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] && _.get(challenge, 'overview.totalPrizes')) {
+      // remove the totalPrizes if challenge prizes are empty
+      challenge.overview = _.omit(challenge.overview, ['totalPrizes'])
+    } else {
+      const totalPrizes = helper.sumOfPrizes(prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes)
+      logger.debug(`re-calculate total prizes, current value is ${totalPrizes.value}`)
+      _.assign(challenge, { overview: { totalPrizes } })
+    }
   }
 
   if (data.phases || data.startDate) {
@@ -1316,10 +1347,10 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         _.intersection(challenge[key], value).length !== value.length) {
         op = '$PUT'
       }
-    } else if (key === 'attachmentIds') {
+    } else if (key === 'attachments') {
       const oldIds = _.map(challenge.attachments || [], (a) => a.id)
       if (oldIds.length !== value.length ||
-        _.intersection(oldIds, value).length !== value.length) {
+        _.intersection(oldIds, _.map(value, a => a.id)).length !== value.length) {
         op = '$PUT'
       }
     } else if (key === 'groups') {
@@ -1352,7 +1383,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       if (_.isUndefined(updateDetails[op])) {
         updateDetails[op] = {}
       }
-      if (key === 'attachmentIds') {
+      if (key === 'attachments') {
         updateDetails[op].attachments = newAttachments
       } else if (key === 'terms') {
         updateDetails[op].terms = newTermsOfUse
@@ -1362,7 +1393,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       if (key !== 'updated' && key !== 'updatedBy') {
         let oldValue
         let newValue
-        if (key === 'attachmentIds') {
+        if (key === 'attachments') {
           oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : 'NULL'
           newValue = JSON.stringify(newAttachments)
         } else if (key === 'terms') {
@@ -1403,7 +1434,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     // send null to Elasticsearch to clear the field
     data.metadata = null
   }
-  if (isFull && _.isUndefined(data.attachmentIds) && challenge.attachments) {
+  if (isFull && _.isUndefined(data.attachments) && challenge.attachments) {
     if (!updateDetails['$DELETE']) {
       updateDetails['$DELETE'] = {}
     }
@@ -1511,7 +1542,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await models.AuditLog.batchPut(auditLogs)
   }
 
-  delete data.attachmentIds
+  delete data.attachments
   delete data.terms
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
@@ -1522,13 +1553,6 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (!_.isUndefined(newTermsOfUse)) {
     challenge.terms = newTermsOfUse
     data.terms = newTermsOfUse
-  }
-
-  // delete unused attachments
-  for (const attachmentId of attachmentIdsToDelete) {
-    await helper.deleteFromS3(attachmentId)
-    const attachment = await helper.getById('Attachment', attachmentId)
-    await attachment.delete()
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1555,6 +1579,17 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
+    const registrationPhase = _.find(challenge.phases, p => p.name === 'Registration')
+    const submissionPhase = _.find(challenge.phases, p => p.name === 'Submission')
+    challenge.currentPhaseNames = _.map(_.filter(challenge.phases, p => p.isOpen === true), 'name')
+    if (registrationPhase) {
+      challenge.registrationStartDate = registrationPhase.actualStartDate || registrationPhase.scheduledStartDate
+      challenge.registrationEndDate = registrationPhase.actualEndDate || registrationPhase.scheduledEndDate
+    }
+    if (submissionPhase) {
+      challenge.submissionStartDate = submissionPhase.actualStartDate || submissionPhase.scheduledStartDate
+      challenge.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate
+    }
   }
   // Update ES
   await esClient.update({
@@ -1588,7 +1623,6 @@ function sanitizeChallenge (challenge) {
     'startDate',
     'status',
     'task',
-    'attachmentIds',
     'groups'
   ])
   if (!_.isUndefined(sanitized.name)) {
@@ -1634,6 +1668,9 @@ function sanitizeChallenge (challenge) {
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
   }
+  if (challenge.attachments) {
+    sanitized.attachments = _.map(challenge.attachments, attachment => _.pick(attachment, ['id', 'name', 'url', 'fileSize', 'description', 'challengeId']))
+  }
   return sanitized
 }
 
@@ -1654,8 +1691,6 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      track: Joi.string().required(),
-      subTrack: Joi.string().required(),
       reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
@@ -1700,6 +1735,7 @@ fullyUpdateChallenge.schema = {
       key: Joi.string()
     }).unknown(true)),
     discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
       name: Joi.string().required(),
       type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
       provider: Joi.string().required(),
@@ -1711,7 +1747,14 @@ fullyUpdateChallenge.schema = {
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-    attachmentIds: Joi.array().items(Joi.optionalId()),
+    attachments: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      challengeId: Joi.id(),
+      name: Joi.string().required(),
+      url: Joi.string().uri().required(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string()
+    })),
     groups: Joi.array().items(Joi.optionalId()),
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     winners: Joi.array().items(Joi.object().keys({
@@ -1722,7 +1765,8 @@ fullyUpdateChallenge.schema = {
     terms: Joi.array().items(Joi.object().keys({
       id: Joi.id(),
       roleId: Joi.id()
-    }).unknown(true)).optional().allow([])
+    }).unknown(true)).optional().allow([]),
+    overview: Joi.any().forbidden()
   }).unknown(true).required(),
   userToken: Joi.any()
 }
@@ -1779,6 +1823,7 @@ partiallyUpdateChallenge.schema = {
       key: Joi.string()
     }).unknown(true)),
     discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
       name: Joi.string().required(),
       type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
       provider: Joi.string().required(),
@@ -1799,7 +1844,14 @@ partiallyUpdateChallenge.schema = {
     projectId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
-    attachmentIds: Joi.array().items(Joi.optionalId()),
+    attachments: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      challengeId: Joi.id(),
+      name: Joi.string().required(),
+      url: Joi.string().uri().required(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string()
+    })),
     groups: Joi.array().items(Joi.id()), // group names
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     winners: Joi.array().items(Joi.object().keys({
@@ -1807,9 +1859,43 @@ partiallyUpdateChallenge.schema = {
       handle: Joi.string().required(),
       placement: Joi.number().integer().positive().required()
     }).unknown(true)).min(1),
-    terms: Joi.array().items(Joi.id().optional()).optional().allow([])
+    terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
+    overview: Joi.any().forbidden()
   }).unknown(true).required(),
   userToken: Joi.any()
+}
+
+/**
+ * Delete challenge.
+ * @param {Object} currentUser the user who perform operation
+ * @param {String} challengeId the challenge id
+ * @returns {Object} the deleted challenge
+ */
+async function deleteChallenge (currentUser, challengeId) {
+  const challenge = await helper.getById('Challenge', challengeId)
+  if (challenge.status !== constants.challengeStatuses.New) {
+    throw new errors.BadRequestError(`Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`)
+  }
+  // check groups authorization
+  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  // check if user are allowed to delete the challenge
+  await ensureAccessibleForChallenge(currentUser, challenge)
+  // delete DB record
+  await models.Challenge.delete(challenge)
+  // delete ES document
+  await esClient.delete({
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    refresh: config.get('ES.ES_REFRESH'),
+    id: challengeId
+  })
+  await helper.postBusEvent(constants.Topics.ChallengeDeleted, { id: challengeId })
+  return challenge
+}
+
+deleteChallenge.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id()
 }
 
 module.exports = {
@@ -1817,7 +1903,8 @@ module.exports = {
   createChallenge,
   getChallenge,
   fullyUpdateChallenge,
-  partiallyUpdateChallenge
+  partiallyUpdateChallenge,
+  deleteChallenge
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)
