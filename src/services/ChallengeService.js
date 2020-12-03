@@ -728,8 +728,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   const template = await helper.getById('TimelineTemplate', timelineTemplateId)
   if (!phases || phases.length === 0) {
     // auto populate phases
-    phases = []
-    for (const p in template.phases) {
+    for (const p of template.phases) {
       phases.push({
         phaseId: p.phaseId,
         duration: p.defaultDuration
