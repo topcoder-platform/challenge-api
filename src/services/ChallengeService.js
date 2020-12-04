@@ -1322,6 +1322,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     await helper.validatePhases(newPhases)
     // populate phases
     await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    logger.debug('The updated phases')
+    logger.debug(newPhases)
     data.phases = newPhases
     data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
