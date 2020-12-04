@@ -1337,6 +1337,8 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
   const auditLogs = []
+  logger.debug(`Challenge phases, ${JSON.stringify(challenge.phases, null, 2)}`)
+  logger.debug(`data phases, ${JSON.stringify(data.phases, null, 2)}`)
   _.each(data, (value, key) => {
     let op
     if (key === 'metadata') {
