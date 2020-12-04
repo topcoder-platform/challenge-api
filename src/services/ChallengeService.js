@@ -1309,6 +1309,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   if (data.phases || data.startDate) {
     if (data.phases && data.phases.length > 0) {
+      logger.debug('will extend phase objects')
       for (let i = 0; i < challenge.phases.length; i += 1) {
         const updatedPhaseInfo = _.find(data.phases, p => p.phaseId === challenge.phases[i].phaseId)
         if (updatedPhaseInfo) {
@@ -1316,11 +1317,16 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         }
       }
     }
+    logger.debug('The updated phases')
+    logger.debug(JSON.stringify(challenge.phases, null, 2))
     const newPhases = challenge.phases || []
     const newStartDate = data.startDate || challenge.startDate
 
     await helper.validatePhases(newPhases)
     // populate phases
+
+    logger.debug('before populatePhases')
+    logger.debug(JSON.stringify(newPhases, null, 2))
     await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
     logger.debug('The updated phases')
     logger.debug(JSON.stringify(newPhases, null, 2))
