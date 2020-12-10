@@ -3,6 +3,7 @@
  */
 const HttpStatus = require('http-status-codes')
 const service = require('../services/ChallengeTimelineTemplateService')
+const helper = require('../common/helper')
 
 /**
  * Search challenge type timeline templates.
@@ -11,7 +12,8 @@ const service = require('../services/ChallengeTimelineTemplateService')
  */
 async function searchChallengeTimelineTemplates (req, res) {
   const result = await service.searchChallengeTimelineTemplates(req.query)
-  res.send(result)
+  helper.setResHeaders(req, res, result)
+  res.send(result.result)
 }
 
 /**
