@@ -1082,7 +1082,7 @@ async function getChallenge (currentUser, id) {
   // Remove privateDescription for unregistered users
   let memberChallengeIds
   if (currentUser) {
-    if (!currentUser.isMachine) {
+    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
       if (!_.includes(memberChallengeIds, challenge.id)) {
         _.unset(challenge, 'privateDescription')
