@@ -640,7 +640,7 @@ searchChallenges.schema = {
     tags: Joi.array().items(Joi.string()),
     includeAllTags: Joi.boolean().default(true),
     projectId: Joi.number().integer().positive(),
-    forumId: Joi.number().integer().positive(),
+    forumId: Joi.number().integer(),
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
@@ -1805,7 +1805,7 @@ partiallyUpdateChallenge.schema = {
       reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
-      forumId: Joi.number().integer().positive(),
+      forumId: Joi.number().integer(),
       isTask: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
