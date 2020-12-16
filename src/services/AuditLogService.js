@@ -15,7 +15,7 @@ const helper = require('../common/helper')
 async function searchAuditLogs (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
-  let records = await helper.scan('AuditLog')
+  let records = await helper.scanAll('AuditLog')
   // TODO this needs to be in ES
   if (criteria.fieldName) records = _.filter(records, e => helper.partialMatch(criteria.fieldName, e.fieldName))
   if (criteria.createdDateStart) records = _.filter(records, e => criteria.createdDateStart.getTime() <= e.created.getTime())

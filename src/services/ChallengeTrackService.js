@@ -16,7 +16,7 @@ const constants = require('../../app-constants')
  */
 async function searchChallengeTracks (criteria) {
   // TODO - move this to ES
-  let records = await helper.scan('ChallengeTrack')
+  let records = await helper.scanAll('ChallengeTrack')
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
 

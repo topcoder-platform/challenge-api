@@ -17,7 +17,7 @@ const constants = require('../../app-constants')
 async function searchTimelineTemplates (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
-  const list = await helper.scan('TimelineTemplate')
+  const list = await helper.scanAll('TimelineTemplate')
   const records = _.filter(list, e => helper.partialMatch(criteria.name, e.name))
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)

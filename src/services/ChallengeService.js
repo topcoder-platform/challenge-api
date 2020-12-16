@@ -640,7 +640,7 @@ searchChallenges.schema = {
     tags: Joi.array().items(Joi.string()),
     includeAllTags: Joi.boolean().default(true),
     projectId: Joi.number().integer().positive(),
-    forumId: Joi.number().integer().positive(),
+    forumId: Joi.number().integer(),
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
@@ -722,13 +722,19 @@ async function validateChallengeData (challenge) {
  * @param {String} timelineTemplateId the timeline template id
  */
 async function populatePhases (phases, startDate, timelineTemplateId) {
-  if (!phases || phases.length === 0) {
-    return
-  }
   if (_.isUndefined(timelineTemplateId)) {
     throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
   }
   const template = await helper.getById('TimelineTemplate', timelineTemplateId)
+  if (!phases || phases.length === 0) {
+    // auto populate phases
+    for (const p of template.phases) {
+      phases.push({
+        phaseId: p.phaseId,
+        duration: p.defaultDuration
+      })
+    }
+  }
   const phaseDefinitions = await helper.scan('Phase')
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
@@ -861,7 +867,11 @@ async function createChallenge (currentUser, challenge, userToken) {
       throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`)
     }
   }
-  if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
+
+  if (challenge.timelineTemplateId) {
+    if (!challenge.phases) {
+      challenge.phases = []
+    }
     await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
   }
 
@@ -1072,7 +1082,7 @@ async function getChallenge (currentUser, id) {
   // Remove privateDescription for unregistered users
   let memberChallengeIds
   if (currentUser) {
-    if (!currentUser.isMachine) {
+    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
       if (!_.includes(memberChallengeIds, challenge.id)) {
         _.unset(challenge, 'privateDescription')
@@ -1306,11 +1316,13 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         }
       }
     }
-    const newPhases = challenge.phases
+
+    const newPhases = _.cloneDeep(challenge.phases) || []
     const newStartDate = data.startDate || challenge.startDate
 
     await helper.validatePhases(newPhases)
     // populate phases
+
     await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.phases = newPhases
     data.startDate = newStartDate
@@ -1793,7 +1805,7 @@ partiallyUpdateChallenge.schema = {
       reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
-      forumId: Joi.number().integer().positive(),
+      forumId: Joi.number().integer(),
       isTask: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
