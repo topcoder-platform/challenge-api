@@ -1296,6 +1296,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (data.prizeSets) {
+    if (isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) && finalStatus === constants.challengeStatuses.Completed) {
+      throw new errors.BadRequestError(`Cannot update prizeSets for challenges with status: ${finalStatus}!`)
+    }
     const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
     if (!prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] && _.get(challenge, 'overview.totalPrizes')) {
       // remove the totalPrizes if challenge prizes are empty
