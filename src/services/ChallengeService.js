@@ -983,7 +983,7 @@ createChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer()
+      duration: Joi.number().integer().min(0)
     })),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
@@ -1729,7 +1729,7 @@ fullyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer(),
+      duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
@@ -1826,7 +1826,7 @@ partiallyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer(),
+      duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
