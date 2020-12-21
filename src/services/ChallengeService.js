@@ -817,6 +817,9 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * @returns {Object} the created challenge
  */
 async function createChallenge (currentUser, challenge, userToken) {
+  if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
+    _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
+  }
   challenge.name = xss(challenge.name)
   challenge.description = xss(challenge.description)
   if (challenge.status === constants.challengeStatuses.Active) {
@@ -959,7 +962,7 @@ createChallenge.schema = {
     typeId: Joi.id(),
     trackId: Joi.id(),
     legacy: Joi.object().keys({
-      reviewType: Joi.string().required(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
       directProjectId: Joi.number().integer(),
@@ -1178,6 +1181,9 @@ async function validateWinners (winners, challengeId) {
  * @returns {Object} the updated challenge
  */
 async function update (currentUser, challengeId, data, userToken, isFull) {
+  if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
+    _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
+  }
   if (data.projectId) {
     await helper.ensureProjectExist(data.projectId, userToken)
   }
@@ -1703,7 +1709,7 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      reviewType: Joi.string().required(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
       directProjectId: Joi.number().integer(),
@@ -1802,7 +1808,7 @@ partiallyUpdateChallenge.schema = {
     legacy: Joi.object().keys({
       track: Joi.string(),
       subTrack: Joi.string(),
-      reviewType: Joi.string(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer(),
