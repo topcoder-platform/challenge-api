@@ -959,7 +959,7 @@ createChallenge.schema = {
     typeId: Joi.id(),
     trackId: Joi.id(),
     legacy: Joi.object().keys({
-      reviewType: Joi.string().required(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).default(constants.reviewTypes.Internal),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
       directProjectId: Joi.number().integer(),
@@ -1703,7 +1703,7 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      reviewType: Joi.string().required(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).default(constants.reviewTypes.Internal),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
       directProjectId: Joi.number().integer(),
@@ -1802,7 +1802,7 @@ partiallyUpdateChallenge.schema = {
     legacy: Joi.object().keys({
       track: Joi.string(),
       subTrack: Joi.string(),
-      reviewType: Joi.string(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).default(constants.reviewTypes.Internal),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer(),

@@ -85,6 +85,11 @@ const challengeTextSortField = {
   TypeId: 'typeId'
 }
 
+const reviewTypes = {
+  Community: 'COMMUNITY',
+  Internal: 'INTERNAL'
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -95,5 +100,6 @@ module.exports = {
   Topics,
   challengeTracks,
   challengeTextSortField,
-  DiscussionTypes
+  DiscussionTypes,
+  reviewTypes
 }
