@@ -207,21 +207,6 @@ async function getById (modelName, id) {
 }
 
 /**
- * Get Data by model ids
- * @param {String} modelName The dynamoose model name
- * @param {Array} ids The ids
- * @returns {Promise<Array>} the found entities
- */
-async function getByIds (modelName, ids) {
-  const entities = []
-  const theIds = ids || []
-  for (const id of theIds) {
-    entities.push(await getById(modelName, id))
-  }
-  return entities
-}
-
-/**
  * Validate the data to ensure no duplication
  * @param {Object} modelName The dynamoose model name
  * @param {String} name The attribute name of dynamoose model
@@ -293,23 +278,6 @@ async function scan (modelName, scanParams) {
       }
     })
   })
-}
-
-/**
- * Get all data collection (avoid default page limit of DynamoDB) by scan parameters
- * @param {Object} modelName The dynamoose model name
- * @param {Object} scanParams The scan parameters object
- * @returns {Array}
- */
-async function scanAll (modelName, scanParams) {
-  let results = await models[modelName].scan(scanParams).exec()
-  let lastKey = results.lastKey
-  while (!_.isUndefined(results.lastKey)) {
-    const newResult = await models[modelName].scan(scanParams).startAt(lastKey).exec()
-    results = [...results, ...newResult]
-    lastKey = newResult.lastKey
-  }
-  return results
 }
 
 /**
@@ -931,11 +899,9 @@ module.exports = {
   hasAdminRole,
   toString,
   getById,
-  getByIds,
   create,
   update,
   scan,
-  scanAll,
   validateDuplicate,
   partialMatch,
   validatePhases,

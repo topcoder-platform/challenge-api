@@ -61,6 +61,11 @@ app.get('/v5/resources', (req, res) => {
   res.json(resources)
 })
 
+// post challenge resources
+app.post('/v5/resources', (req, res) => {
+  res.json({})
+})
+
 // get challenges member can access to
 app.get('/v5/resources/:memberId/challenges', (req, res) => {
   const memberId = req.params.memberId
@@ -214,6 +219,33 @@ app.get('/v5/terms/:termId', (req, res) => {
   if (!_.isUndefined(terms[termId])) {
     winston.info(`Terms details : ${JSON.stringify(terms[termId])}`)
     res.json(terms[termId])
+  } else {
+    res.status(404).end()
+  }
+})
+
+// get direct project
+app.get('/v3/direct/projects/:projectId', (req, res) => {
+  const projectId = req.params.projectId
+  if (projectId === '111' || projectId === '123' || projectId === '112233') {
+    res.json({
+      projectId,
+      terms: ['0fcb41d1-ec7c-44bb-8f3b-f017a61cd708', 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb'],
+      result: {
+        content: {
+          billingAccountIds: ['0fcb41d1-ec7c-44bb-8f3b-f017a61cd708', 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb']
+        }
+      }
+    })
+  } else if (projectId === '200') {
+    res.status(403).send({
+      id: '6e97fe68-f89c-4c45-b25b-d17933a3c4b9',
+      result: {
+        success: false,
+        status: 403,
+        content: { message: 'You do not have permissions to perform this action' }
+      }
+    })
   } else {
     res.status(404).end()
   }

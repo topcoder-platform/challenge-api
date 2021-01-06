@@ -59,15 +59,17 @@ const Topics = {
   ChallengeDeleted: 'challenge.notification.delete',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
+  ChallengeTrackCreated: 'test.new.bus.events', // 'challenge.action.track.created',
+  ChallengeTrackUpdated: 'test.new.bus.events', // 'challenge.action.track.updated',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
   ChallengePhaseUpdated: 'test.new.bus.events', // 'challenge.action.phase.updated',
   ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',
   TimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.timeline.template.created',
   TimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.timeline.template.updated',
   TimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.timeline.template.deleted',
-  ChallengeTypeTimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.created',
-  ChallengeTypeTimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.type.timeline.template.updated',
-  ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.type.timeline.template.deleted'
+  ChallengeTimelineTemplateCreated: 'test.new.bus.events', // 'challenge.action.timeline.template.created',
+  ChallengeTimelineTemplateUpdated: 'test.new.bus.events', // 'challenge.action.timeline.template.updated',
+  ChallengeTimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.timeline.template.deleted'
   ChallengeAttachmentCreated: 'test.new.bus.events', // 'challenge.action.attachment.created',
   ChallengeAttachmentUpdated: 'test.new.bus.events', // 'challenge.action.attachment.updated',
   ChallengeAttachmentDeleted: 'test.new.bus.events' // 'challenge.action.attachment.deleted',
@@ -85,11 +87,6 @@ const challengeTextSortField = {
   TypeId: 'typeId'
 }
 
-const reviewTypes = {
-  Community: 'COMMUNITY',
-  Internal: 'INTERNAL'
-}
-
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -100,6 +97,5 @@ module.exports = {
   Topics,
   challengeTracks,
   challengeTextSortField,
-  DiscussionTypes,
-  reviewTypes
+  DiscussionTypes
 }

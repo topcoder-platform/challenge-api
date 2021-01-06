@@ -35,79 +35,118 @@ describe('attachment API E2E tests', () => {
     await testHelper.clearData()
   })
 
-  describe('upload attachment API tests', () => {
-    it('upload attachment successfully', async () => {
+  describe('create attachment API tests', () => {
+    it('create attachment successfully', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .attach('attachment', attachmentContent, 'attachment.txt')
-      should.equal(response.status, 200)
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
+      should.equal(response.status, 201)
       const result = response.body
       should.exist(result.id)
       id = result.id
       should.equal(result.fileSize, attachmentContent.length)
-      should.equal(result.fileName, 'attachment.txt')
+      should.equal(result.name, 'attachment.txt')
       should.equal(result.challengeId, data.challenge.id)
     })
 
-    it('upload attachment - missing token', async () => {
+    it('create attachment - missing token', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
-        .attach('attachment', attachmentContent, 'attachment.txt')
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'No token provided.')
     })
 
-    it('upload attachment - invalid bearer format', async () => {
+    it('create attachment - invalid bearer format', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', 'invalid format')
-        .attach('attachment', attachmentContent, 'attachment.txt')
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'No token provided.')
     })
 
-    it('upload attachment - invalid token', async () => {
+    it('create attachment - invalid token', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.INVALID_TOKEN}`)
-        .attach('attachment', attachmentContent, 'attachment.txt')
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'Failed to authenticate token.')
     })
 
-    it('upload attachment - expired token', async () => {
+    it('create attachment - expired token', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.EXPIRED_TOKEN}`)
-        .attach('attachment', attachmentContent, 'attachment.txt')
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 401)
       should.equal(response.body.message, 'Failed to authenticate token.')
     })
 
-    it('upload attachment - invalid attachment', async () => {
+    it('create attachment - missing attachment name', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .attach('invalid', attachmentContent, 'attachment.txt')
+        .send({
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"attachment" is required')
+      should.equal(response.body.message, '"name" is required')
     })
 
-    it('upload attachment - challenge not found', async () => {
+    it('create attachment - challenge not found', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${notFoundId}/attachments`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .attach('attachment', attachmentContent, 'attachment.txt')
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 404)
       should.equal(response.body.message, `Challenge with id: ${notFoundId} doesn't exist`)
     })
 
-    it('upload attachment - forbidden', async () => {
+    it('create attachment - forbidden', async () => {
       const response = await chai.request(app)
         .post(`${baseUrl}/${data.challenge.id}/attachments`)
         .set('Authorization', `Bearer ${config.USER_TOKEN}`)
-        .attach('attachment', attachmentContent, 'attachment.txt')
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: attachmentContent.length,
+          description: 'desc'
+        })
       should.equal(response.status, 403)
       should.equal(response.body.message, 'You are not allowed to perform this action!')
     })
@@ -116,39 +155,105 @@ describe('attachment API E2E tests', () => {
   describe('download attachment API tests', () => {
     it('download attachment successfully', async () => {
       const response = await chai.request(app)
-        .get(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
+        .get(`${baseUrl}/${data.challenge.id}/attachments/${id}/download`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 200)
-      should.equal(response.text, 'test') // attachment content is 'test'
-    })
-
-    it('download attachment - forbidden', async () => {
-      const response = await chai.request(app)
-        .get(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
-        .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
-      should.equal(response.status, 403)
-      should.equal(response.body.message, 'You are not allowed to download attachment of the challenge.')
     })
 
     it('download attachment - attachment not found', async () => {
       const response = await chai.request(app)
+        .get(`${baseUrl}/${data.challenge.id}/attachments/${notFoundId}/download`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
+      should.equal(response.status, 404)
+      should.equal(response.body.message.indexOf('not found') >= 0, true)
+    })
+  })
+
+  describe('get attachment API tests', () => {
+    it('get attachment successfully', async () => {
+      const response = await chai.request(app)
+        .get(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
+      should.equal(response.status, 200)
+      should.equal(response.body.name, 'attachment.txt')
+    })
+
+    it('get attachment - attachment not found', async () => {
+      const response = await chai.request(app)
         .get(`${baseUrl}/${data.challenge.id}/attachments/${notFoundId}`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
       should.equal(response.status, 404)
-      should.equal(response.body.message, `Attachment with id: ${notFoundId} doesn't exist`)
+      should.equal(response.body.message.indexOf('not found') >= 0, true)
     })
 
-    it('download attachment - challenge id mismatched', async () => {
+    it('get attachment - challenge id mismatched', async () => {
       const response = await chai.request(app)
         .get(`${baseUrl}/${notFoundId}/attachments/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, 'The attachment challengeId does not match the path challengeId.')
+      should.equal(response.status, 404)
+      should.equal(response.body.message.indexOf('doesn\'t exist') >= 0, true)
     })
 
-    it('download attachment - invalid id', async () => {
+    it('get attachment - invalid id', async () => {
       const response = await chai.request(app)
         .get(`${baseUrl}/${notFoundId}/attachments/invalid`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"attachmentId" must be a valid GUID')
+    })
+  })
+
+  describe('fully update attachment API tests', () => {
+    it('fully update attachment successfully', async () => {
+      const response = await chai.request(app)
+        .put(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
+        .send({
+          name: 'attachment.txt',
+          url: 'http://s3.amazonaws.com/bucket/key1/key2',
+          fileSize: 13,
+          description: 'desc2'
+        })
+      should.equal(response.status, 200)
+      should.equal(response.body.fileSize, 13)
+      should.equal(response.body.description, 'desc2')
+    })
+  })
+
+  describe('partially update attachment API tests', () => {
+    it('partially update attachment successfully', async () => {
+      const response = await chai.request(app)
+        .patch(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
+        .send({
+          fileSize: 15,
+          description: 'desc3'
+        })
+      should.equal(response.status, 200)
+      should.equal(response.body.fileSize, 15)
+      should.equal(response.body.description, 'desc3')
+    })
+  })
+
+  describe('delete attachment API tests', () => {
+    it('delete attachment successfully', async () => {
+      const response = await chai.request(app)
+        .delete(`${baseUrl}/${data.challenge.id}/attachments/${id}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
+      should.equal(response.status, 200)
+    })
+
+    it('delete attachment - attachment not found', async () => {
+      const response = await chai.request(app)
+        .delete(`${baseUrl}/${data.challenge.id}/attachments/${notFoundId}`)
+        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
+      should.equal(response.status, 404)
+      should.equal(response.body.message.indexOf('not found') >= 0, true)
+    })
+
+    it('delete attachment - invalid id', async () => {
+      const response = await chai.request(app)
+        .delete(`${baseUrl}/${notFoundId}/attachments/invalid`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 400)
       should.equal(response.body.message, '"attachmentId" must be a valid GUID')

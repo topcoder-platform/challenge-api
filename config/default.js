@@ -25,13 +25,14 @@ module.exports = {
   KAFKA_ERROR_TOPIC: process.env.KAFKA_ERROR_TOPIC || 'common.error.reporting',
 
   AMAZON: {
-    // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
-    // AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY || 'FAKE_SECRET_ACCESS_KEY',
+    AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY || 'FAKE_SECRET_ACCESS_KEY',
     AWS_REGION: process.env.AWS_REGION || 'ap-northeast-1',
     IS_LOCAL_DB: process.env.IS_LOCAL_DB || true,
     DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:7777',
     S3_API_VERSION: process.env.S3_API_VERSION || '2006-03-01',
-    BUCKET_WHITELIST: process.env.BUCKET_WHITELIST || 'topcoder_01, topcoder_02'
+    // BUCKET_WHITELIST: process.env.BUCKET_WHITELIST || 'topcoder_01, topcoder_02, key1, key2'
+    BUCKET_WHITELIST: process.env.BUCKET_WHITELIST || 'topcoder_01, topcoder_02, bucket, key1'
   },
 
   ES: {
@@ -57,7 +58,7 @@ module.exports = {
   // copilot resource role ids allowed to upload attachment
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],
-  SUBMITTER_ROLE_ID: process.env.SUBMITTER_ROLE_ID || '732339e7-8e30-49d7-9198-cccf9451e221',
+  SUBMITTER_ROLE_ID: process.env.SUBMITTER_ROLE_ID || '10ba038e-48da-487b-96e8-8d3b99b6d18a',
 
   MANAGER_ROLE_ID: process.env.MANAGER_ROLE_ID || '0e9c6879-39e4-4eb6-b8df-92407890faf1',
   OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || '2a4dc376-a31c-4d00-b173-13934d89e286',
