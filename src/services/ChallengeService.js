@@ -813,10 +813,9 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
- * @param {String} userToken the user token
  * @returns {Object} the created challenge
  */
-async function createChallenge (currentUser, challenge, userToken) {
+async function createChallenge (currentUser, challenge) {
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
     _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
   }
@@ -825,7 +824,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
-  await helper.ensureProjectExist(challenge.projectId, userToken)
+  await helper.ensureProjectExist(challenge.projectId, currentUser)
   const { track, type } = await validateChallengeData(challenge)
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
@@ -1021,8 +1020,7 @@ createChallenge.schema = {
       id: Joi.id(),
       roleId: Joi.id()
     }))
-  }).required(),
-  userToken: Joi.any()
+  }).required()
 }
 
 /**
@@ -1176,16 +1174,15 @@ async function validateWinners (winners, challengeId) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update (currentUser, challengeId, data, userToken, isFull) {
+async function update (currentUser, challengeId, data, isFull) {
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
   }
   if (data.projectId) {
-    await helper.ensureProjectExist(data.projectId, userToken)
+    await helper.ensureProjectExist(data.projectId, currentUser)
   }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
@@ -1697,11 +1694,10 @@ function sanitizeChallenge (challenge) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function fullyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), userToken, true)
+async function fullyUpdateChallenge (currentUser, challengeId, data) {
+  return update(currentUser, challengeId, sanitizeChallenge(data), true)
 }
 
 fullyUpdateChallenge.schema = {
@@ -1785,8 +1781,7 @@ fullyUpdateChallenge.schema = {
       roleId: Joi.id()
     }).unknown(true)).optional().allow([]),
     overview: Joi.any().forbidden()
-  }).unknown(true).required(),
-  userToken: Joi.any()
+  }).unknown(true).required()
 }
 
 /**
@@ -1794,11 +1789,10 @@ fullyUpdateChallenge.schema = {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function partiallyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), userToken)
+async function partiallyUpdateChallenge (currentUser, challengeId, data) {
+  return update(currentUser, challengeId, sanitizeChallenge(data))
 }
 
 partiallyUpdateChallenge.schema = {
@@ -1879,8 +1873,7 @@ partiallyUpdateChallenge.schema = {
     }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
     overview: Joi.any().forbidden()
-  }).unknown(true).required(),
-  userToken: Joi.any()
+  }).unknown(true).required()
 }
 
 /**
