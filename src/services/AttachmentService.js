@@ -52,36 +52,40 @@ async function _getChallengeAttachment (challengeId, attachmentId) {
 /**
  * Create attachment.
  * @param {String} challengeId the challenge id
- * @param {Object} attachment the attachment to created
+ * @param {Array} attachments the attachments to be created
  * @returns {Object} the created attachment
  */
-async function createAttachment (currentUser, challengeId, attachment) {
+async function createAttachment (currentUser, challengeId, attachments) {
   const challenge = await helper.getById('Challenge', challengeId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
-  validateUrl(attachment.url)
-  const attachmentObject = { id: uuid(), challengeId, ...attachment }
-  const ret = await helper.create('Attachment', attachmentObject)
+  const newAttachments = []
+  for (const attachment of attachments) {
+    validateUrl(attachment.url)
+    const attachmentObject = { id: uuid(), challengeId, ...attachment }
+    const newAttachment = await helper.create('Attachment', attachmentObject)
+    await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, ret)
+    newAttachments.push(newAttachment)
+  }
   // update challenge object
   await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
     attachments: [
       ..._.get(challenge, 'attachments', []),
-      ret
+      ...newAttachments
     ]
   })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, ret)
-  return ret
+  return newAttachments
 }
 
 createAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  attachment: Joi.object().keys({
+  attachments: Joi.array().items(Joi.object().keys({
     name: Joi.string().required(),
     url: Joi.string().uri().required(),
     fileSize: Joi.fileSize(),
     description: Joi.string()
-  }).required()
+  })).required().min(1)
 }
 
 /**
