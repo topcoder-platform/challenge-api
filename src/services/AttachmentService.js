@@ -63,7 +63,7 @@ async function createAttachment (currentUser, challengeId, attachments) {
     validateUrl(attachment.url)
     const attachmentObject = { id: uuid(), challengeId, ...attachment }
     const newAttachment = await helper.create('Attachment', attachmentObject)
-    await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, ret)
+    await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, newAttachment)
     newAttachments.push(newAttachment)
   }
   // update challenge object
