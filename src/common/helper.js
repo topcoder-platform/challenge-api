@@ -639,13 +639,19 @@ function getESClient () {
 /**
  * Ensure project exist
  * @param {String} projectId the project id
- * @param {String} userToken the user token
+ * @param {String} currentUser the user
  */
-async function ensureProjectExist (projectId, userToken) {
+async function ensureProjectExist (projectId, currentUser) {
   let token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   try {
-    await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (currentUser.isMachine || hasAdminRole(currentUser)) {
+      return
+    }
+    if (!_.find(_.get(res, 'data.members', []), m => _.toString(m.userId) === _.toString(currentUser.userId))) {
+      throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`)
+    }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)

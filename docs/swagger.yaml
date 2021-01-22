@@ -2095,7 +2095,7 @@ paths:
       tags:
         - Attachments
       description: >
-        Create a new attachment in the system.
+        Create a new attachment in the system. If you want to create multiple attachment, you can pass an array of objects instead of a single object.
       security:
         - bearer: []
       produces:
