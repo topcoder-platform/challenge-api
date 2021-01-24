@@ -400,6 +400,11 @@ paths:
             Will be ignored for regular users or not authenticated users
           required: false
           type: string
+        - name: useSchedulingAPI
+          in: query
+          description: Search based on `legacy.useSchedulingAPI`
+          type: boolean
+          required: false
         - in: body
           name: body
           required: false
