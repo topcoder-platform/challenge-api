@@ -264,6 +264,9 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  if (criteria.useSchedulingAPI) {
+    boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -673,7 +676,8 @@ searchChallenges.schema = {
     taskIsAssigned: Joi.boolean(),
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.string()),
-    includeAllEvents: Joi.boolean().default(true)
+    includeAllEvents: Joi.boolean().default(true),
+    useSchedulingAPI: Joi.boolean()
   }).unknown(true)
 }
 
@@ -967,7 +971,8 @@ createChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean()
     }),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1222,6 +1227,9 @@ async function update (currentUser, challengeId, data, isFull) {
   if (_.get(challenge, 'typeId') && _.get(data, 'typeId') && _.get(challenge, 'typeId') !== _.get(data, 'typeId')) {
     throw new errors.ForbiddenError('Cannot change typeId')
   }
+  if (_.get(challenge, 'legacy.useSchedulingAPI') && _.get(data, 'legacy.useSchedulingAPI') && _.get(challenge, 'legacy.useSchedulingAPI') !== _.get(data, 'legacy.useSchedulingAPI')) {
+    throw new errors.ForbiddenError('Cannot change legacy.useSchedulingAPI')
+  }
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
     _.extend(challenge.legacy, data.legacy)
@@ -1340,6 +1348,7 @@ async function update (currentUser, challengeId, data, isFull) {
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
   const auditLogs = []
+  let phasesHaveBeenModified = false
   _.each(data, (value, key) => {
     let op
     if (key === 'metadata') {
@@ -1349,6 +1358,7 @@ async function update (currentUser, challengeId, data, isFull) {
       }
     } else if (key === 'phases') {
       if (isDifferentPhases(challenge[key], value)) {
+        phasesHaveBeenModified = true
         logger.info('update phases')
         op = '$PUT'
       }
@@ -1590,7 +1600,9 @@ async function update (currentUser, challengeId, data, isFull) {
     busEventPayload.billingAccountId = billingAccountId
   }
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
-
+  if (phasesHaveBeenModified === true && _.get(challenge, 'legacy.useSchedulingAPI')) {
+    await helper.postBusEvent(config.SCHEDULING_TOPIC, { id: challengeId })
+  }
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
@@ -1656,7 +1668,8 @@ function sanitizeChallenge (challenge) {
       'directProjectId',
       'screeningScorecardId',
       'reviewScorecardId',
-      'isTask'
+      'isTask',
+      'useSchedulingAPI'
     ])
   }
   if (challenge.metadata) {
@@ -1711,7 +1724,8 @@ fullyUpdateChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1806,7 +1820,8 @@ partiallyUpdateChallenge.schema = {
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
