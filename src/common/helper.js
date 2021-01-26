@@ -693,9 +693,28 @@ function calculateChallengeEndDate (challenge, data) {
  */
 async function listChallengesByMember (memberId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges?perPage=10000`
-  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
-  return res.data || []
+  let allIds = []
+  // get search is paginated, we need to get all pages' data
+  let page = 1
+  while (true) {
+    const result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page,
+        perPage: 10000
+      }
+    })
+    const ids = result.data || []
+    if (ids.length === 0) {
+      break
+    }
+    allIds = allIds.concat(ids)
+    page += 1
+    if (result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return allIds
 }
 
 /**
