@@ -876,7 +876,7 @@ async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
   if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
     const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || hasAdminRole(currentUser)
     if (!canAccesChallenge) {
-      throw new errors.ForbiddenError(`You don't have access to view this challenge`)
+      throw new errors.ForbiddenError(`You don't have access to view this task as you don't have a resource on it`)
     }
   }
 }
