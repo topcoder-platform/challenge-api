@@ -863,18 +863,19 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  * @param {Object} challenge the challenge to check
  */
 async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
-  let memberChallengeIds
+  let challengeResourceIds
   // Remove privateDescription for unregistered users
   if (currentUser) {
     if (!currentUser.isMachine) {
-      memberChallengeIds = await listChallengesByMember(currentUser.userId)
-      if (!_.includes(memberChallengeIds, challenge.id)) {
+      const challengeResources = await getChallengeResources(challenge.id)
+      challengeResourceIds = _.map(challengeResources, r => _.toString(r.memberId))
+      if (!_.includes(challengeResourceIds, _.toString(currentUser.userId))) {
       }
     }
   }
   // Check if challenge is task and apply security rules
   if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
-    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || hasAdminRole(currentUser)
+    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((challengeResourceIds || []), _.toString(currentUser.userId)) || currentUser.isMachine || hasAdminRole(currentUser)
     if (!canAccesChallenge) {
       throw new errors.ForbiddenError(`You don't have access to view this task as you don't have a resource on it`)
     }
