@@ -557,7 +557,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  // logger.debug(`es Query ${JSON.stringify(esQuery)}`)
 
   // Search with constructed query
   let docs
@@ -947,10 +947,10 @@ async function createChallenge (currentUser, challenge) {
 
   // if created by a user, add user as a manager
   if (currentUser.handle) {
-    logger.debug(`Adding user as manager ${currentUser.handle}`)
+    // logger.debug(`Adding user as manager ${currentUser.handle}`)
     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
   } else {
-    logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+    // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
   }
 
   // post bus event
@@ -1933,4 +1933,4 @@ module.exports = {
   deleteChallenge
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)
