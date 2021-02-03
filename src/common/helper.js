@@ -647,11 +647,12 @@ async function ensureProjectExist (projectId, currentUser) {
   try {
     const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
     if (currentUser.isMachine || hasAdminRole(currentUser)) {
-      return
+      return res.data
     }
     if (!_.find(_.get(res, 'data.members', []), m => _.toString(m.userId) === _.toString(currentUser.userId))) {
       throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`)
     }
+    return res.data
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)

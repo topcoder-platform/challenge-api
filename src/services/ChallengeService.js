@@ -828,7 +828,10 @@ async function createChallenge (currentUser, challenge) {
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
-  await helper.ensureProjectExist(challenge.projectId, currentUser)
+  const { directProjectId } = await helper.ensureProjectExist(challenge.projectId, currentUser)
+  if (_.get(challenge, 'legacy.pureV5Task')) {
+    _.set(challenge, 'legacy.directProjectId', directProjectId)
+  }
   const { track, type } = await validateChallengeData(challenge)
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
@@ -972,7 +975,8 @@ createChallenge.schema = {
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
       isTask: Joi.boolean(),
-      useSchedulingAPI: Joi.boolean()
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1199,7 +1203,7 @@ async function update (currentUser, challengeId, data, isFull) {
   let billingAccountId
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (_.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
       billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
@@ -1229,6 +1233,9 @@ async function update (currentUser, challengeId, data, isFull) {
   }
   if (_.get(challenge, 'legacy.useSchedulingAPI') && _.get(data, 'legacy.useSchedulingAPI') && _.get(challenge, 'legacy.useSchedulingAPI') !== _.get(data, 'legacy.useSchedulingAPI')) {
     throw new errors.ForbiddenError('Cannot change legacy.useSchedulingAPI')
+  }
+  if (_.get(challenge, 'legacy.pureV5Task') && _.get(data, 'legacy.pureV5Task') && _.get(challenge, 'legacy.pureV5Task') !== _.get(data, 'legacy.pureV5Task')) {
+    throw new errors.ForbiddenError('Cannot change legacy.pureV5Task')
   }
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
@@ -1672,7 +1679,8 @@ function sanitizeChallenge (challenge) {
       'screeningScorecardId',
       'reviewScorecardId',
       'isTask',
-      'useSchedulingAPI'
+      'useSchedulingAPI',
+      'pureV5Task'
     ])
   }
   if (challenge.metadata) {
@@ -1728,7 +1736,8 @@ fullyUpdateChallenge.schema = {
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
       isTask: Joi.boolean(),
-      useSchedulingAPI: Joi.boolean()
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1824,7 +1833,8 @@ partiallyUpdateChallenge.schema = {
       directProjectId: Joi.number(),
       forumId: Joi.number().integer(),
       isTask: Joi.boolean(),
-      useSchedulingAPI: Joi.boolean()
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
