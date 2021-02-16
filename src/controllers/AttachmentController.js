@@ -2,6 +2,7 @@
  * Controller for attachment endpoints
  */
 const HttpStatus = require('http-status-codes')
+const _ = require('lodash')
 const service = require('../services/AttachmentService')
 
 /**
@@ -10,7 +11,8 @@ const service = require('../services/AttachmentService')
  * @param {Object} res the response
  */
 async function createAttachment (req, res) {
-  const result = await service.createAttachment(req.authUser, req.params.challengeId, req.body)
+  const body = _.isArray(req.body) ? req.body : [req.body]
+  const result = await service.createAttachment(req.authUser, req.params.challengeId, body)
   res.status(HttpStatus.CREATED).send(result)
 }
 

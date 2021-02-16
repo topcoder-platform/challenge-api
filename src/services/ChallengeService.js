@@ -264,6 +264,9 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  if (criteria.useSchedulingAPI) {
+    boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -554,7 +557,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  // logger.debug(`es Query ${JSON.stringify(esQuery)}`)
 
   // Search with constructed query
   let docs
@@ -673,7 +676,8 @@ searchChallenges.schema = {
     taskIsAssigned: Joi.boolean(),
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.string()),
-    includeAllEvents: Joi.boolean().default(true)
+    includeAllEvents: Joi.boolean().default(true),
+    useSchedulingAPI: Joi.boolean()
   }).unknown(true)
 }
 
@@ -813,10 +817,9 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
- * @param {String} userToken the user token
  * @returns {Object} the created challenge
  */
-async function createChallenge (currentUser, challenge, userToken) {
+async function createChallenge (currentUser, challenge) {
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
     _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
   }
@@ -825,7 +828,10 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
-  await helper.ensureProjectExist(challenge.projectId, userToken)
+  const { directProjectId } = await helper.ensureProjectExist(challenge.projectId, currentUser)
+  if (_.get(challenge, 'legacy.pureV5Task')) {
+    _.set(challenge, 'legacy.directProjectId', directProjectId)
+  }
   const { track, type } = await validateChallengeData(challenge)
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
@@ -944,10 +950,10 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // if created by a user, add user as a manager
   if (currentUser.handle) {
-    logger.debug(`Adding user as manager ${currentUser.handle}`)
+    // logger.debug(`Adding user as manager ${currentUser.handle}`)
     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
   } else {
-    logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+    // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
   }
 
   // post bus event
@@ -968,7 +974,9 @@ createChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1021,8 +1029,7 @@ createChallenge.schema = {
       id: Joi.id(),
       roleId: Joi.id()
     }))
-  }).required(),
-  userToken: Joi.any()
+  }).required()
 }
 
 /**
@@ -1176,16 +1183,15 @@ async function validateWinners (winners, challengeId) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update (currentUser, challengeId, data, userToken, isFull) {
+async function update (currentUser, challengeId, data, isFull) {
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
   }
   if (data.projectId) {
-    await helper.ensureProjectExist(data.projectId, userToken)
+    await helper.ensureProjectExist(data.projectId, currentUser)
   }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
@@ -1197,7 +1203,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   let billingAccountId
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (_.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
       billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
@@ -1224,6 +1230,12 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
   if (_.get(challenge, 'typeId') && _.get(data, 'typeId') && _.get(challenge, 'typeId') !== _.get(data, 'typeId')) {
     throw new errors.ForbiddenError('Cannot change typeId')
+  }
+  if (_.get(challenge, 'legacy.useSchedulingAPI') && _.get(data, 'legacy.useSchedulingAPI') && _.get(challenge, 'legacy.useSchedulingAPI') !== _.get(data, 'legacy.useSchedulingAPI')) {
+    throw new errors.ForbiddenError('Cannot change legacy.useSchedulingAPI')
+  }
+  if (_.get(challenge, 'legacy.pureV5Task') && _.get(data, 'legacy.pureV5Task') && _.get(challenge, 'legacy.pureV5Task') !== _.get(data, 'legacy.pureV5Task')) {
+    throw new errors.ForbiddenError('Cannot change legacy.pureV5Task')
   }
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
@@ -1302,6 +1314,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (data.prizeSets) {
+    if (isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) && finalStatus === constants.challengeStatuses.Completed) {
+      throw new errors.BadRequestError(`Cannot update prizeSets for challenges with status: ${finalStatus}!`)
+    }
     const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
     if (!prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] && _.get(challenge, 'overview.totalPrizes')) {
       // remove the totalPrizes if challenge prizes are empty
@@ -1343,6 +1358,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
   const auditLogs = []
+  let phasesHaveBeenModified = false
   _.each(data, (value, key) => {
     let op
     if (key === 'metadata') {
@@ -1352,6 +1368,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       }
     } else if (key === 'phases') {
       if (isDifferentPhases(challenge[key], value)) {
+        phasesHaveBeenModified = true
         logger.info('update phases')
         op = '$PUT'
       }
@@ -1593,7 +1610,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
     busEventPayload.billingAccountId = billingAccountId
   }
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
-
+  if (phasesHaveBeenModified === true && _.get(challenge, 'legacy.useSchedulingAPI')) {
+    await helper.postBusEvent(config.SCHEDULING_TOPIC, { id: challengeId })
+  }
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
@@ -1659,7 +1678,9 @@ function sanitizeChallenge (challenge) {
       'directProjectId',
       'screeningScorecardId',
       'reviewScorecardId',
-      'isTask'
+      'isTask',
+      'useSchedulingAPI',
+      'pureV5Task'
     ])
   }
   if (challenge.metadata) {
@@ -1697,11 +1718,10 @@ function sanitizeChallenge (challenge) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function fullyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), userToken, true)
+async function fullyUpdateChallenge (currentUser, challengeId, data) {
+  return update(currentUser, challengeId, sanitizeChallenge(data), true)
 }
 
 fullyUpdateChallenge.schema = {
@@ -1715,7 +1735,9 @@ fullyUpdateChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1785,8 +1807,7 @@ fullyUpdateChallenge.schema = {
       roleId: Joi.id()
     }).unknown(true)).optional().allow([]),
     overview: Joi.any().forbidden()
-  }).unknown(true).required(),
-  userToken: Joi.any()
+  }).unknown(true).required()
 }
 
 /**
@@ -1794,11 +1815,10 @@ fullyUpdateChallenge.schema = {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function partiallyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), userToken)
+async function partiallyUpdateChallenge (currentUser, challengeId, data) {
+  return update(currentUser, challengeId, sanitizeChallenge(data))
 }
 
 partiallyUpdateChallenge.schema = {
@@ -1812,7 +1832,9 @@ partiallyUpdateChallenge.schema = {
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1879,8 +1901,7 @@ partiallyUpdateChallenge.schema = {
     }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
     overview: Joi.any().forbidden()
-  }).unknown(true).required(),
-  userToken: Joi.any()
+  }).unknown(true).required()
 }
 
 /**
@@ -1925,4 +1946,4 @@ module.exports = {
   deleteChallenge
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)
