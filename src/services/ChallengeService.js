@@ -789,10 +789,13 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
           doing = true
         } else {
           const preIndex = _.findIndex(phases, (p) => p.id === phase.predecessor)
+          let canProcess = true
           if (preIndex < 0) {
-            throw new Error(`Invalid phase predecessor: ${phase.predecessor}`)
+            canProcess = false
+            delete phase.predecessor
+            i -= 1
           }
-          if (done[preIndex]) {
+          if (canProcess && done[preIndex]) {
             phase.scheduledStartDate = phases[preIndex].scheduledEndDate
             phase.scheduledEndDate = moment(phase.scheduledStartDate).add(phase.duration || 0, 'seconds').toDate()
             phase.actualStartDate = phase.scheduledStartDate
