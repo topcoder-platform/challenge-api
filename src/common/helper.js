@@ -759,10 +759,10 @@ async function getProjectDefaultTerms (projectId) {
  */
 async function getProjectBillingAccount (projectId) {
   const token = await getM2MToken()
-  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
+  const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
   try {
     const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-    return _.get(res, 'data.billingAccountId', null)
+    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
