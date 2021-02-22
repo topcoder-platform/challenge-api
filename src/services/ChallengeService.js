@@ -1209,7 +1209,7 @@ async function update (currentUser, challengeId, data, isFull) {
       if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
-      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
+      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'projectId'))
       // if activating a challenge, the challenge must have a billing account id
       if ((!billingAccountId || billingAccountId === null) &&
         challenge.status === constants.challengeStatuses.Draft) {
@@ -1220,7 +1220,7 @@ async function update (currentUser, challengeId, data, isFull) {
       if (challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
-      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
+      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'projectId'))
     }
   }
 
