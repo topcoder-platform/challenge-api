@@ -788,7 +788,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
           done[i] = true
           doing = true
         } else {
-          const preIndex = _.findIndex(phases, (p) => p.id === phase.predecessor)
+          const preIndex = _.findIndex(phases, (p) => p.phaseId === phase.predecessor)
           let canProcess = true
           if (preIndex < 0) {
             canProcess = false
