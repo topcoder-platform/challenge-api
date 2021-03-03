@@ -761,7 +761,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
         if (!prePhase) {
           throw new errors.BadRequestError(`Predecessor ${templatePhase.predecessor} not found from given phases.`)
         }
-        phase.predecessor = prePhase.id
+        phase.predecessor = prePhase.phaseId
       }
     }
   }
