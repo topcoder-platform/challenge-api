@@ -744,6 +744,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   for (let i = 0; i < phases.length; i += 1) {
     phases[i].id = uuid()
   }
+
   for (let i = 0; i < phases.length; i += 1) {
     const phase = phases[i]
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
