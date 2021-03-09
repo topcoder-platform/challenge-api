@@ -744,6 +744,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   for (let i = 0; i < phases.length; i += 1) {
     phases[i].id = uuid()
   }
+
   for (let i = 0; i < phases.length; i += 1) {
     const phase = phases[i]
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
@@ -761,7 +762,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
         if (!prePhase) {
           throw new errors.BadRequestError(`Predecessor ${templatePhase.predecessor} not found from given phases.`)
         }
-        phase.predecessor = prePhase.id
+        phase.predecessor = prePhase.phaseId
       }
     }
   }
@@ -788,7 +789,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
           done[i] = true
           doing = true
         } else {
-          const preIndex = _.findIndex(phases, (p) => p.id === phase.predecessor)
+          const preIndex = _.findIndex(phases, (p) => p.phaseId === phase.predecessor)
           let canProcess = true
           if (preIndex < 0) {
             canProcess = false
