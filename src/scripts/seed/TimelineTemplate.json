@@ -2,12 +2,12 @@
   {
     "id": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
     "name": "Default Challenge",
-    "description": "Standard Default Challenge Timeline",
+    "description": "Default Challenge Timeline",
     "isActive": true,
     "phases": [
       {
         "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 172800
+        "defaultDuration": 432000
       },
       {
         "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
@@ -103,7 +103,7 @@
   {
     "id": "d4201ca4-8437-4d63-9957-3f7708184b07",
     "name": "Design with Checkpoints",
-    "description": "Standard Design challenge timeline",
+    "description": "Standard Design Challenge Timeline",
     "isActive": true,
     "phases": [
       {
@@ -116,7 +116,6 @@
       },
       {
         "phaseId": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "defaultDuration": 259200
       },
       {
@@ -131,7 +130,7 @@
       },
       {
         "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "predecessor": "84b43897-2aab-44d6-a95a-42c433657eed",
+        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
         "defaultDuration": 14400
       },
       {
