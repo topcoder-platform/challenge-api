@@ -28,9 +28,10 @@ module.exports = {
   AMAZON: {
     // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
     // AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY || 'FAKE_SECRET_ACCESS_KEY',
+    // ATTACHMENT_S3_BUCKET: process.env.ATTACHMENT_S3_BUCKET || 'tc-test-bucket',
     AWS_REGION: process.env.AWS_REGION || 'ap-northeast-1',
     IS_LOCAL_DB: process.env.IS_LOCAL_DB || true,
-    DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:7777',
+    DYNAMODB_URL: process.env.DYNAMODB_URL || 'http://localhost:8000',
     S3_API_VERSION: process.env.S3_API_VERSION || '2006-03-01',
     BUCKET_WHITELIST: process.env.BUCKET_WHITELIST || 'topcoder_01, topcoder_02'
   },

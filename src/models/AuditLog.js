@@ -14,7 +14,13 @@ const schema = new Schema({
   },
   challengeId: {
     type: String,
-    required: true
+    required: true,
+    index: {
+      name: 'challengeIdIdx',
+      global: true,
+      rangeKey: 'created',
+      throughput: { read: 4, write: 2 }
+    }
   },
   fieldName: {
     type: String,
@@ -30,7 +36,8 @@ const schema = new Schema({
   },
   created: {
     type: Date,
-    required: true
+    required: true,
+    rangeKey: true
   },
   createdBy: {
     type: String,

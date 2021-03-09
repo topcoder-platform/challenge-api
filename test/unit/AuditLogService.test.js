@@ -34,12 +34,14 @@ describe('audit log service unit tests', () => {
         privateDescription: 'private Desc.'
       })
 
+      const dateStart = new Date(new Date().getTime() - 1000 * 60 * 60 * 30)
+      const dateEndStr = '2022-01-02'
       const res = await service.searchAuditLogs({
         page: 1,
         perPage: 10,
         challengeId: data.challenge.id,
-        createdDateStart: new Date(new Date().getTime() - 1000 * 60 * 60 * 30),
-        createdDateEnd: '2022-01-02',
+        createdDateStart: dateStart,
+        createdDateEnd: dateEndStr,
         createdBy: 'sub'
       })
       should.equal(res.total, 2)
@@ -52,6 +54,8 @@ describe('audit log service unit tests', () => {
       should.equal(log.challengeId, data.challenge.id)
       should.equal(log.createdBy, 'sub')
       should.exist(log.created)
+      should.equal(log.created.getTime() <= new Date(dateEndStr).getTime(), true)
+      should.equal(log.created.getTime() >= dateStart.getTime(), true)
       should.exist(log.id)
       log = _.find(res.result, (item) => item.fieldName === 'description')
       should.exist(log)
@@ -69,6 +73,26 @@ describe('audit log service unit tests', () => {
       should.equal(result.page, 1)
       should.equal(result.perPage, 20)
       should.equal(result.result.length, 0)
+    })
+
+    it('throw error if challengeId or id not present', async () => {
+      try {
+        await service.searchAuditLogs({ fieldName: 'field1' })
+      } catch (e) {
+        should.equal(e.message.indexOf('You should pass at least one of challengeId or id in params') >= 0, true)
+      }
+    })
+
+    it('createdDateStart should be less than or equal to createdDateEnd', async () => {
+      try {
+        await service.searchAuditLogs({
+          challengeId: data.challenge.id,
+          createdDateStart: '2021-12-12',
+          createdDateEnd: '2021-12-11'
+        })
+      } catch (e) {
+        should.equal(e.message.indexOf('createdDateEnd param should be greater than or equal to createdDateStart') >= 0, true)
+      }
     })
 
     it('search audit logs - invalid fieldName', async () => {
@@ -127,6 +151,26 @@ describe('audit log service unit tests', () => {
         await service.searchAuditLogs({ perPage: -1 })
       } catch (e) {
         should.equal(e.message.indexOf('"perPage" must be larger than or equal to 1') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('search audit logs - invalid oldValue', async () => {
+      try {
+        await service.searchAuditLogs({ oldValue: ['old1'] })
+      } catch (e) {
+        should.equal(e.message.indexOf('"oldValue" must be a string') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('search audit logs - invalid newValue', async () => {
+      try {
+        await service.searchAuditLogs({ newValue: ['new1'] })
+      } catch (e) {
+        should.equal(e.message.indexOf('"newValue" must be a string') >= 0, true)
         return
       }
       throw new Error('should not reach here')

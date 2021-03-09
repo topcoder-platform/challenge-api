@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "challengeId": "Challenge1",
+    "fieldName": "field1",
+    "oldValue": "old1",
+    "newValue": "new1",
+    "created": 1611081000000,
+    "createdBy": "test1",
+    "memberId": "testmem1"
+  },
+  {
+    "id": "2",
+    "challengeId": "Challenge2",
+    "fieldName": "field2",
+    "oldValue": "old2",
+    "newValue": "new2",
+    "created": 1611253800000,
+    "createdBy": "test1",
+    "memberId": "testmem1"
+  },
+  {
+    "id": "3",
+    "challengeId": "Challenge3",
+    "fieldName": "field3",
+    "oldValue": "old3",
+    "newValue": "new3",
+    "created": 1611426600000,
+    "createdBy": "test2",
+    "memberId": "testmem1"
+  },
+  {
+    "id": "4",
+    "challengeId": "Challenge4",
+    "fieldName": "field4",
+    "oldValue": "old4",
+    "newValue": "new4",
+    "created": 1611599400000,
+    "createdBy": "test2",
+    "memberId": "testmem1"
+  },
+  {
+    "id": "5",
+    "challengeId": "Challenge5",
+    "fieldName": "field5",
+    "oldValue": "old5",
+    "newValue": "new5",
+    "created": 1611772200000,
+    "createdBy": "test3",
+    "memberId": "testmem1"
+  },
+  {
+    "id": "6",
+    "challengeId": "Challenge5",
+    "fieldName": "field6",
+    "oldValue": "old6",
+    "newValue": "new6",
+    "created": 1611772200000,
+    "createdBy": "test3",
+    "memberId": "testmem2"
+  }
+]

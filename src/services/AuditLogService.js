@@ -5,7 +5,9 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
+const models = require('../models')
+const errors = require('../common/errors')
 
 /**
  * Search audit logs
@@ -13,19 +15,51 @@ const helper = require('../common/helper')
  * @returns {Object} the search result
  */
 async function searchAuditLogs (criteria) {
+  logger.info(`searching audit logs with criteria ${JSON.stringify(criteria)}`)
+
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
-  let records = await helper.scanAll('AuditLog')
-  // TODO this needs to be in ES
-  if (criteria.fieldName) records = _.filter(records, e => helper.partialMatch(criteria.fieldName, e.fieldName))
-  if (criteria.createdDateStart) records = _.filter(records, e => criteria.createdDateStart.getTime() <= e.created.getTime())
-  if (criteria.createdDateEnd) records = _.filter(records, e => criteria.createdDateEnd.getTime() <= e.created.getTime())
-  if (criteria.challengeId) records = _.filter(records, e => criteria.challengeId === e.challengeId)
-  if (criteria.createdBy) records = _.filter(records, e => criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase())
+  const AuditTable = models['AuditLog']
+  let results = []
+  let query = null
 
-  const total = records.length
-  const result = records.slice((page - 1) * perPage, page * perPage)
+  // atleast one of these fields must be present for the compulsory equality check for dynamoose query function
+  if (!criteria.id && !criteria.challengeId) {
+    throw new errors.BadRequestError('You should pass at least one of challengeId or id in params')
+  }
 
+  // equality filters
+  if (criteria.challengeId) query = AuditTable.query('challengeId').eq(criteria.challengeId)
+  if (criteria.id) query = query ? query.and().filter('id').eq(criteria.id) : AuditTable.query('id').eq(criteria.id)
+
+  // range filters
+  if (criteria.createdDateStart && criteria.createdDateEnd) {
+    if (criteria.createdDateEnd.getTime() < criteria.createdDateStart.getTime()) {
+      throw new errors.BadRequestError('createdDateEnd param should be greater than or equal to createdDateStart')
+    }
+    query = query.and().filter('created').between(criteria.createdDateStart, criteria.createdDateEnd)
+  } else if (criteria.createdDateStart) {
+    query = query.and().filter('created').ge(criteria.createdDateStart)
+  } else if (criteria.createdDateEnd) {
+    query = query.and().filter('created').le(criteria.createdDateEnd)
+  }
+
+  results = await query.all().exec()
+
+  // we can't execute case insensitive matches directly on dynamodb.
+  // hence filtering after fetching the data
+  // case insensitive exact matches
+  if (criteria.createdBy) results = _.filter(results, res => res.createdBy.toLowerCase() === criteria.createdBy.toLowerCase())
+
+  // case insensitive partial matches
+  if (criteria.fieldName) results = _.filter(results, res => helper.partialMatch(criteria.fieldName, res.fieldName))
+  if (criteria.oldValue) results = _.filter(results, res => helper.partialMatch(criteria.oldValue, res.oldValue))
+  if (criteria.newValue) results = _.filter(results, res => helper.partialMatch(criteria.newValue, res.newValue))
+
+  const total = results.length
+  const result = results.slice((page - 1) * perPage, page * perPage)
+
+  logger.info(`querying audit logs complete totalCount:${total} currentPageCount:${result.length}`)
   return { total, page, perPage, result }
 }
 
@@ -37,7 +71,10 @@ searchAuditLogs.schema = {
     fieldName: Joi.string(),
     createdDateStart: Joi.date(),
     createdDateEnd: Joi.date(),
-    createdBy: Joi.string()
+    createdBy: Joi.string(),
+    id: Joi.string(),
+    oldValue: Joi.string(),
+    newValue: Joi.string()
   })
 }
 
@@ -45,4 +82,5 @@ module.exports = {
   searchAuditLogs
 }
 
+logger.decorateWithValidators(module.exports)
 // logger.buildService(module.exports)

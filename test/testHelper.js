@@ -71,6 +71,7 @@ async function createData () {
   const challengeData = {
     id: uuid(),
     typeId: challengeType.id,
+    trackId: '9b6fc876-f4d9-4ccb-9dfd-419247628825',
     name: nm,
     description: 'desc',
     metadata: [{ name: nm, value: 'value' }],

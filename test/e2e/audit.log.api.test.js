@@ -42,6 +42,8 @@ describe('audit log API E2E tests', () => {
         })
       should.equal(updateChallengeResponse.status, 200)
 
+      const dateStart = new Date(new Date().getTime() - 1000 * 60 * 60 * 30)
+      const dateEndStr = '2022-01-02'
       const response = await chai.request(app)
         .get(basePath)
         .set('Authorization', `Bearer ${config.M2M_READ_ACCESS_TOKEN}`)
@@ -49,8 +51,8 @@ describe('audit log API E2E tests', () => {
           page: 1,
           perPage: 10,
           challengeId: data.challenge.id,
-          createdDateStart: new Date(new Date().getTime() - 1000 * 60 * 60 * 30),
-          createdDateEnd: '2022-01-02'
+          createdDateStart: dateStart,
+          createdDateEnd: dateEndStr
         })
       should.equal(response.status, 200)
       should.equal(response.headers['x-page'], '1')
@@ -67,6 +69,8 @@ describe('audit log API E2E tests', () => {
       should.equal(log.challengeId, data.challenge.id)
       should.exist(log.createdBy)
       should.exist(log.created)
+      should.equal(log.created <= dateEndStr, true)
+      should.equal(log.created >= dateStart.toISOString(), true)
       should.exist(log.id)
       log = _.find(response.body, (item) => item.fieldName === 'description')
       should.exist(log)
@@ -89,6 +93,28 @@ describe('audit log API E2E tests', () => {
       should.equal(response.headers['x-total'], '0')
       should.equal(response.headers['x-total-pages'], '0')
       should.equal(response.body.length, 0)
+    })
+
+    it('throw error if challengeId or id not present', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .query({ fieldName: 'field' })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, 'You should pass at least one of challengeId or id in params')
+    })
+
+    it('createdDateStart should be less than or equal to createdDateEnd', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .query({
+          challengeId: data.challenge.id,
+          createdDateStart: '2021-12-12',
+          createdDateEnd: '2021-12-11'
+        })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, 'createdDateEnd param should be greater than or equal to createdDateStart')
     })
 
     it('search audit logs - invalid page', async () => {
@@ -125,6 +151,24 @@ describe('audit log API E2E tests', () => {
         .query({ createdDateEnd: 'abc' })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"createdDateEnd" must be a number of milliseconds or valid date string')
+    })
+
+    it('search audit logs - invalid oldValue', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .query({ oldValue: ['old1', 'old2'] })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"oldValue" must be a string')
+    })
+
+    it('search audit logs - invalid newValue', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .query({ newValue: ['new1', 'new2'] })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"newValue" must be a string')
     })
 
     it('search audit logs - unexpected field', async () => {
