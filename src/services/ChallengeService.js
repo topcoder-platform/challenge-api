@@ -851,6 +851,7 @@ async function createChallenge (currentUser, challenge) {
   if (challenge.discussions && challenge.discussions.length > 0) {
     for (let i = 0; i < challenge.discussions.length; i += 1) {
       challenge.discussions[i].id = uuid()
+      challenge.discussions[i].name = challenge.discussions[i].name.slice(0, config.FORUM_TITLE_LENGTH_LIMIT - 1)
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1706,7 +1707,10 @@ function sanitizeChallenge (challenge) {
     sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
   }
   if (challenge.discussions) {
-    sanitized.discussions = _.map(challenge.discussions, discussion => _.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']))
+    sanitized.discussions = _.map(challenge.discussions, discussion => ({
+      ..._.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']),
+      name: _.get(discussion, 'name', '').slice(0, config.FORUM_TITLE_LENGTH_LIMIT - 1)
+    }))
   }
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
