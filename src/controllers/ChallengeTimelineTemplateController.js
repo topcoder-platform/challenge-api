@@ -32,7 +32,7 @@ async function createChallengeTimelineTemplate (req, res) {
  * @param {Object} res the response
  */
 async function getChallengeTimelineTemplate (req, res) {
-  const result = await service.getChallengeTimelineTemplate(req.params.challengeTypeTimelineTemplateId)
+  const result = await service.getChallengeTimelineTemplate(req.params.challengeTimelineTemplateId)
   res.send(result)
 }
 
@@ -42,7 +42,7 @@ async function getChallengeTimelineTemplate (req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateChallengeTimelineTemplate (req, res) {
-  const result = await service.fullyUpdateChallengeTimelineTemplate(req.params.challengeTypeTimelineTemplateId, req.body)
+  const result = await service.fullyUpdateChallengeTimelineTemplate(req.params.challengeTimelineTemplateId, req.body)
   res.send(result)
 }
 
@@ -52,7 +52,7 @@ async function fullyUpdateChallengeTimelineTemplate (req, res) {
  * @param {Object} res the response
  */
 async function deleteChallengeTimelineTemplate (req, res) {
-  const result = await service.deleteChallengeTimelineTemplate(req.params.challengeTypeTimelineTemplateId)
+  const result = await service.deleteChallengeTimelineTemplate(req.params.challengeTimelineTemplateId)
   res.send(result)
 }
 

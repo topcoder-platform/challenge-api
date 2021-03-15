@@ -30,8 +30,8 @@ const schema = new Schema({
   }
 },
 {
-  throughput: 'ON_DEMAND'
-  // throughput: { read: 4, write: 2 }
+  // throughput: 'ON_DEMAND'
+  throughput: { read: 4, write: 2 }
 })
 
 module.exports = schema

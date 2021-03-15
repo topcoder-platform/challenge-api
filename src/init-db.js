@@ -12,6 +12,10 @@ const initDB = async () => {
   for (const auditLog of auditLogs) {
     await auditLog.delete()
   }
+  const challengeTracks = await helper.scan('ChallengeTrack')
+  for (const challengeTrack of challengeTracks) {
+    await challengeTrack.delete()
+  }
   const challenges = await helper.scan('Challenge')
   for (const challenge of challenges) {
     await challenge.delete()

@@ -1,0 +1,17 @@
+[
+  {
+    "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+    "phaseState": true,
+    "httpCode": 200
+  },
+  {
+    "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+    "phaseState": false,
+    "httpCode": 200
+  },
+  {
+    "phaseId": "abc",
+    "phaseState": false,
+    "httpCode": 404
+  }
+]

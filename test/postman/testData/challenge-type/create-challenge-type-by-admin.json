@@ -1,0 +1,26 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "TSK",
+        "description": "A piece of work assigned to one person",
+        "name": "Task",
+        "isTask": true,
+        "httpCode": 201
+    },
+    {
+        "isActive": true,
+        "abbreviation": "CH",
+        "description": "A Multi-person Competition with Reviews and Winners",
+        "name": "Challenge",
+        "isTask": false,
+        "httpCode": 201
+    },
+    {
+        "isActive": true,
+        "abbreviation": "F2F",
+        "description": "A challenge where the first submission that satisfies the spec wins",
+        "name": "First2Finish",
+        "isTask": false,
+        "httpCode": 201
+    }
+]

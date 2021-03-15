@@ -1,0 +1,26 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "TSK",
+        "description": "develop task",
+        "name": "develop",
+        "legacyId": 12,
+        "track": "DEVELOP"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "CH",
+        "description": "design challenge",
+        "name": "design",
+        "legacyId": 13,
+        "track": "DESIGN"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "F2F",
+        "description": "qa test",
+        "name": "First2Finish",
+        "legacyId": 14,
+        "track": "QA"
+    }
+]

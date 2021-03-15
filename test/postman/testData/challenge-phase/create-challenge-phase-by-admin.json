@@ -1,0 +1,14 @@
+[
+    {
+        "isOpen": true,
+        "description": "first phase",
+        "name": "start phase",
+        "duration": 1
+    },
+    {
+        "isOpen": true,
+        "description": "second phase",
+        "name": "end phase",
+        "duration": 100
+    }
+]

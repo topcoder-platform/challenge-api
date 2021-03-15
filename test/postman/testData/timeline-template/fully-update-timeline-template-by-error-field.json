@@ -1,0 +1,12 @@
+[
+    {
+        "description": "first timeline",
+        "name": "first timeline",
+        "isActive": true,
+        "defaultDuration":100,
+        "httpCode": 409,
+        "message": "TimelineTemplate with name: first timeline already exist"
+    }
+]
+
+

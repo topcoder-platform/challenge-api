@@ -1,0 +1,48 @@
+[
+  {
+    "name": "UPDATE_CO-PILOT-m2m",
+    "fullReadAccess": true,
+    "fullWriteAccess": true,
+    "isActive": true,
+    "selfObtainable": false,
+    "httpCode": 200
+  },
+  {
+    "name": "UPDATE_OBSERVER-m2m",
+    "fullReadAccess": true,
+    "fullWriteAccess": true,
+    "isActive": false,
+    "selfObtainable": false,
+    "httpCode": 200
+  },
+  {
+    "name": "UPDATE_SUBMITTER-m2m",
+    "fullReadAccess": true,
+    "fullWriteAccess": true,
+    "isActive": true,
+    "selfObtainable": true,
+    "httpCode": 200
+  },
+  {
+    "name": "UPDATE_REVIEWER-m2m",
+    "fullReadAccess": false,
+    "fullWriteAccess": false,
+    "isActive": true,
+    "selfObtainable": false,
+    "httpCode": 200
+  },
+  {
+    "name": "UPDATE_REVIEWER-m2m1",
+    "isActive": true,
+    "selfObtainable": false,
+    "httpCode": 400
+  },
+  {
+    "name": "SUBMITTER",
+    "fullReadAccess": true,
+    "fullWriteAccess": false,
+    "isActive": true,
+    "selfObtainable": false,
+    "httpCode": 409
+  }
+]

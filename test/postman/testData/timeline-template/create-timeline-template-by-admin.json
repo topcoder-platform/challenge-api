@@ -1,0 +1,14 @@
+[
+    {
+        "name": "first timeline",
+        "description": "first timeline",
+        "isActive": true,
+        "defaultDuration":100
+    },
+    {
+        "name": "second timeline",
+        "description": "second timeline",
+        "isActive": true,
+        "defaultDuration": 200
+    }
+]

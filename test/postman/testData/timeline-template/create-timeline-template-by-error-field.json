@@ -1,0 +1,11 @@
+[
+    {
+        "description": "second phase",
+        "name": "first timeline",
+        "description": "second timeline",
+        "isActive": true,
+        "defaultDuration": 200,
+        "httpCode": 409,
+        "message": "TimelineTemplate with name: first timeline already exist"
+    }
+]

@@ -1,0 +1,10 @@
+[
+    {
+        "isActive": false,
+        "abbreviation": "F2F",
+        "description": "A challenge where the first submission that satisfies the spec wins",
+        "name": "First2Finish",
+        "isTask": true,
+        "httpCode": 200
+    }
+]

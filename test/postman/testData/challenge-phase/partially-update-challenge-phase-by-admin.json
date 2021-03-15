@@ -1,0 +1,10 @@
+[
+    {
+        "isOpen": true,
+        "description": "second phase 3",
+        "name": "end phase 3",
+        "duration": 200,
+        "httpCode": 200
+    }
+]
+

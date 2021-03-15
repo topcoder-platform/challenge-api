@@ -133,8 +133,8 @@ const schema = new Schema({
   }
 },
 {
-  // throughput: { read: 4, write: 2 },
-  throughput: 'ON_DEMAND',
+  throughput: { read: 4, write: 2 },
+  // throughput: 'ON_DEMAND',
   useDocumentTypes: true
 }
 )

@@ -1,0 +1,55 @@
+[
+  {
+    "name": "co-pilot",
+    "fullReadAccess": true,
+    "fullWriteAccess": false,
+    "isActive": true,
+    "selfObtainable": false,
+    "httpCode": 200
+  },
+  {
+    "name": "Observer",
+    "fullReadAccess": true,
+    "fullWriteAccess": true,
+    "isActive": false,
+    "selfObtainable": false,
+    "httpCode": 200
+  },
+  {
+    "name": "submitter",
+    "fullReadAccess": true,
+    "fullWriteAccess": true,
+    "isActive": true,
+    "selfObtainable": true,
+    "httpCode": 200
+  },
+  {
+    "name": "reviewer",
+    "fullReadAccess": false,
+    "fullWriteAccess": false,
+    "isActive": true,
+    "selfObtainable": false,
+    "httpCode": 200
+  },
+  {
+    "invalid": "invalid",
+    "fullReadAccess": true,
+    "fullWriteAccess": false,
+    "isActive": true,
+    "httpCode": 400
+  },
+  {
+    "name": "failure-test",
+    "fullReadAccess": true,
+    "fullWriteAccess": false,
+    "httpCode": 400
+  },
+  {
+    "name": "submitter",
+    "fullReadAccess": true,
+    "fullWriteAccess": true,
+    "isActive": true,
+    "selfObtainable": true,
+    "httpCode": 409
+  }
+]

@@ -180,6 +180,8 @@ To run integration tests with coverage report
 ```bash
 npm run e2e:cov
 ```
+### Running Postman PoC test
+Refer to the PoC test document [**PoC-test.md**](PoC-test.md)
 
 ## Verification
 Refer to the verification document `Verification.md`

@@ -1,0 +1,12 @@
+[
+    {
+        "isOpen": true,
+        "description": "second phase223",
+        "name": "start phase",
+        "duration": 100,
+        "httpCode": 409,
+        "message": "Phase with name: start phase already exist"
+    }
+]
+
+

@@ -1,0 +1,9 @@
+[
+    {
+        "name": "second timeline",
+        "description": "second timeline2",
+        "isActive": false,
+        "defaultDuration": 200,
+        "httpCode": 200
+    }
+]

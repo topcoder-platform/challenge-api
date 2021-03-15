@@ -1,0 +1,20 @@
+[
+    {
+        "isActive": false,
+        "abbreviation": "F2F",
+        "description": "A challenge where the first submission that satisfies the spec wins",
+        "name": "Challenge",
+        "isTask": true,
+        "httpCode": 409,
+        "message":  "ChallengeType with name: Challenge already exist"
+    },
+    {
+        "isActive": false,
+        "abbreviation": "CH",
+        "description": "A challenge where the first submission that satisfies the spec wins",
+        "name": "First2Finish",
+        "isTask": true,
+        "httpCode": 409,
+        "message":  "ChallengeType with abbreviation: CH already exist"
+    }
+]

@@ -18,7 +18,8 @@
     "test": "mocha --require test/prepare.js -t 20000 test/unit/*.test.js --exit",
     "e2e": "mocha --require test/prepare.js -t 20000 test/e2e/*.test.js --exit",
     "test:cov": "nyc --reporter=html --reporter=text npm test",
-    "e2e:cov": "nyc --reporter=html --reporter=text npm run e2e"
+    "e2e:cov": "nyc --reporter=html --reporter=text npm run e2e",
+    "test:newman": "node test/postman/newman.js"
   },
   "author": "TCSCODER",
   "license": "none",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
+    "newman": "^5.2.2",
     "mocha": "^6.1.4",
     "mocha-prepare": "^0.1.0",
     "nyc": "^14.0.0",

@@ -1,0 +1,20 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "TSK",
+        "description": "A piece of work assigned to one person1",
+        "isTask": true,
+        "name": "Task",
+        "httpCode": 409,
+        "message": "ChallengeType with name: Task already exist"
+    },
+    {
+        "isActive": true,
+        "description": "A Multi-person Competition with Reviews and Winners",
+        "abbreviation": "CH",
+        "name": "Challenge2",
+        "isTask": false,
+        "httpCode": 409,
+        "message": "ChallengeType with abbreviation: CH already exist"
+    }
+]
