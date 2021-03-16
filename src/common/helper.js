@@ -757,12 +757,15 @@ async function getProjectDefaultTerms (projectId) {
  * @param {Number} projectId The id of the project for which to get the default terms of use
  * @returns {Promise<Number>} The billing account ID
  */
-async function getProjectBillingAccount (projectId) {
+async function getProjectBillingInformation (projectId) {
   const token = await getM2MToken()
-  const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
+  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
   try {
     const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+    return {
+      billingAccountId: _.get(res, 'data.billingAccountId', null),
+      markup: _.get(res, 'data.markup', null) ? _.toNumber(_.get(res, 'data.markup', null)) : null
+    }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
@@ -978,7 +981,7 @@ module.exports = {
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
-  getProjectBillingAccount,
+  getProjectBillingInformation,
   expandWithSubGroups,
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,
