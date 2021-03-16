@@ -759,12 +759,17 @@ async function getProjectDefaultTerms (projectId) {
  */
 async function getProjectBillingInformation (projectId) {
   const token = await getM2MToken()
-  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
+  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
     const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
+    let markup = _.get(res, 'data.markup', null) ? _.toNumber(_.get(res, 'data.markup', null)) : null
+    if (markup && markup > 0) {
+      // TODO - Hack to change int returned from api to decimal
+      markup = markup / 100
+    }
     return {
-      billingAccountId: _.get(res, 'data.billingAccountId', null),
-      markup: _.get(res, 'data.markup', null) ? _.toNumber(_.get(res, 'data.markup', null)) : null
+      billingAccountId: _.get(res, 'data.tcBillingAccountId', null),
+      markup
     }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
