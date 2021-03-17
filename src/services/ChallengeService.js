@@ -414,16 +414,12 @@ async function searchChallenges (currentUser, criteria) {
       mustNotQuery.push({ exists: { field: 'groups' } })
     } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
-      _.each(accessibleGroups, (g) => {
-        groupsQuery.push({ match_phrase: { groups: g } })
-      })
+      groupsQuery.push({ terms: { groups: accessibleGroups } })
       // include public challenges
       groupsQuery.push({ bool: { must_not: { exists: { field: 'groups' } } } })
     }
   } else {
-    _.each(groupsToFilter, (g) => {
-      groupsQuery.push({ match_phrase: { groups: g } })
-    })
+    groupsQuery.push({ terms: { groups: groupsToFilter } })
   }
 
   if (criteria.ids) {
