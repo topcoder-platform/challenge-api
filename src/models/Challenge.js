@@ -28,6 +28,10 @@ const schema = new Schema({
     type: Object,
     required: false
   },
+  billing: {
+    type: Object,
+    required: false
+  },
   name: {
     type: String,
     required: true
