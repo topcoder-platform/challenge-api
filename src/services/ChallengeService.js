@@ -264,6 +264,9 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  if (criteria.useSchedulingAPI) {
+    boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -555,7 +558,6 @@ async function searchChallenges (currentUser, criteria) {
   }
 
   logger.debug(`es Query ${JSON.stringify(esQuery)}`)
-
   // Search with constructed query
   let docs
   try {
@@ -577,6 +579,7 @@ async function searchChallenges (currentUser, criteria) {
   // Hide privateDescription for non-register challenges
   if (currentUser) {
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      result = _.each(result, (val) => _.unset(val, 'billing'))
       const ids = await helper.listChallengesByMember(currentUser.userId)
       result = _.each(result, (val) => {
         if (!_.includes(ids, val.id)) {
@@ -585,7 +588,11 @@ async function searchChallenges (currentUser, criteria) {
       })
     }
   } else {
-    result = _.each(result, val => _.unset(val, 'privateDescription'))
+    result = _.each(result, val => {
+      _.unset(val, 'billing')
+      _.unset(val, 'privateDescription')
+      return val
+    })
   }
 
   if (criteria.isLightweight === 'true') {
@@ -673,7 +680,8 @@ searchChallenges.schema = {
     taskIsAssigned: Joi.boolean(),
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.number()),
-    includeAllEvents: Joi.boolean().default(true)
+    includeAllEvents: Joi.boolean().default(true),
+    useSchedulingAPI: Joi.boolean()
   }).unknown(true)
 }
 
@@ -734,6 +742,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   for (let i = 0; i < phases.length; i += 1) {
     phases[i].id = uuid()
   }
+
   for (let i = 0; i < phases.length; i += 1) {
     const phase = phases[i]
     const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
@@ -751,7 +760,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
         if (!prePhase) {
           throw new errors.BadRequestError(`Predecessor ${templatePhase.predecessor} not found from given phases.`)
         }
-        phase.predecessor = prePhase.id
+        phase.predecessor = prePhase.phaseId
       }
     }
   }
@@ -778,11 +787,14 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
           done[i] = true
           doing = true
         } else {
-          const preIndex = _.findIndex(phases, (p) => p.id === phase.predecessor)
+          const preIndex = _.findIndex(phases, (p) => p.phaseId === phase.predecessor)
+          let canProcess = true
           if (preIndex < 0) {
-            throw new Error(`Invalid phase predecessor: ${phase.predecessor}`)
+            canProcess = false
+            delete phase.predecessor
+            i -= 1
           }
-          if (done[preIndex]) {
+          if (canProcess && done[preIndex]) {
             phase.scheduledStartDate = phases[preIndex].scheduledEndDate
             phase.scheduledEndDate = moment(phase.scheduledStartDate).add(phase.duration || 0, 'seconds').toDate()
             phase.actualStartDate = phase.scheduledStartDate
@@ -807,17 +819,29 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
- * @param {String} userToken the user token
  * @returns {Object} the created challenge
  */
-async function createChallenge (currentUser, challenge, userToken) {
+async function createChallenge (currentUser, challenge) {
+  if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
+    _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
+  }
   challenge.name = xss(challenge.name)
   challenge.description = xss(challenge.description)
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
-  await helper.ensureProjectExist(challenge.projectId, userToken)
+  const { directProjectId } = await helper.ensureProjectExist(challenge.projectId, currentUser)
+  if (_.get(challenge, 'legacy.pureV5Task')) {
+    _.set(challenge, 'legacy.directProjectId', directProjectId)
+  }
   const { track, type } = await validateChallengeData(challenge)
+  const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
+  if (_.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+    _.set(challenge, 'billing.billingAccountId', billingAccountId)
+  }
+  if (_.isUndefined(_.get(challenge, 'billing.markup'))) {
+    _.set(challenge, 'billing.markup', markup)
+  }
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
     if (_.isUndefined(_.get(challenge, 'task.isAssigned'))) {
@@ -832,6 +856,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (challenge.discussions && challenge.discussions.length > 0) {
     for (let i = 0; i < challenge.discussions.length; i += 1) {
       challenge.discussions[i].id = uuid()
+      challenge.discussions[i].name = challenge.discussions[i].name.slice(0, config.FORUM_TITLE_LENGTH_LIMIT - 1)
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -931,10 +956,10 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // if created by a user, add user as a manager
   if (currentUser.handle) {
-    logger.debug(`Adding user as manager ${currentUser.handle}`)
+    // logger.debug(`Adding user as manager ${currentUser.handle}`)
     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
   } else {
-    logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+    // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
   }
 
   // post bus event
@@ -955,8 +980,14 @@ createChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
+    }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
       isAssigned: Joi.boolean().default(false),
@@ -1008,8 +1039,7 @@ createChallenge.schema = {
       id: Joi.id(),
       roleId: Joi.id()
     }))
-  }).required(),
-  userToken: Joi.any()
+  }).required()
 }
 
 /**
@@ -1072,13 +1102,15 @@ async function getChallenge (currentUser, id) {
   // Remove privateDescription for unregistered users
   let memberChallengeIds
   if (currentUser) {
-    if (!currentUser.isMachine) {
+    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      _.unset(challenge, 'billing')
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
       if (!_.includes(memberChallengeIds, challenge.id)) {
         _.unset(challenge, 'privateDescription')
       }
     }
   } else {
+    _.unset(challenge, 'billing')
     _.unset(challenge, 'privateDescription')
   }
 
@@ -1163,13 +1195,15 @@ async function validateWinners (winners, challengeId) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update (currentUser, challengeId, data, userToken, isFull) {
+async function update (currentUser, challengeId, data, isFull) {
+  if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
+    _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
+  }
   if (data.projectId) {
-    await helper.ensureProjectExist(data.projectId, userToken)
+    await helper.ensureProjectExist(data.projectId, currentUser)
   }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
@@ -1177,25 +1211,28 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
-  // FIXME: Tech Debt
-  let billingAccountId
+  const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
+  if (_.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+    _.set(data, 'billing.billingAccountId', billingAccountId)
+  }
+  if (_.isUndefined(_.get(challenge, 'billing.markup'))) {
+    _.set(data, 'billing.markup', markup)
+  }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (_.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacyId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
-      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
       // if activating a challenge, the challenge must have a billing account id
-      if ((!billingAccountId || billingAccountId === null) &&
+      if ((!_.get(challenge, 'billing.billingAccountId') || _.get(challenge, 'billing.billingAccountId') === null) &&
         challenge.status === constants.challengeStatuses.Draft) {
-        throw new errors.BadRequestError('Cannot Activate this project, it has no active billing accounts.')
+        throw new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
       }
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
-      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
     }
   }
 
@@ -1209,9 +1246,19 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   if (_.get(challenge, 'typeId') && _.get(data, 'typeId') && _.get(challenge, 'typeId') !== _.get(data, 'typeId')) {
     throw new errors.ForbiddenError('Cannot change typeId')
   }
+  if (_.get(challenge, 'legacy.useSchedulingAPI') && _.get(data, 'legacy.useSchedulingAPI') && _.get(challenge, 'legacy.useSchedulingAPI') !== _.get(data, 'legacy.useSchedulingAPI')) {
+    throw new errors.ForbiddenError('Cannot change legacy.useSchedulingAPI')
+  }
+  if (_.get(challenge, 'legacy.pureV5Task') && _.get(data, 'legacy.pureV5Task') && _.get(challenge, 'legacy.pureV5Task') !== _.get(data, 'legacy.pureV5Task')) {
+    throw new errors.ForbiddenError('Cannot change legacy.pureV5Task')
+  }
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
     _.extend(challenge.legacy, data.legacy)
+  }
+
+  if (!_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
+    _.extend(challenge.billing, data.billing)
   }
 
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
@@ -1286,6 +1333,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   }
 
   if (data.prizeSets) {
+    if (isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) && finalStatus === constants.challengeStatuses.Completed) {
+      throw new errors.BadRequestError(`Cannot update prizeSets for challenges with status: ${finalStatus}!`)
+    }
     const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
     if (!prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] && _.get(challenge, 'overview.totalPrizes')) {
       // remove the totalPrizes if challenge prizes are empty
@@ -1325,6 +1375,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
   const auditLogs = []
+  let phasesHaveBeenModified = false
   _.each(data, (value, key) => {
     let op
     if (key === 'metadata') {
@@ -1334,6 +1385,7 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
       }
     } else if (key === 'phases') {
       if (isDifferentPhases(challenge[key], value)) {
+        phasesHaveBeenModified = true
         logger.info('update phases')
         op = '$PUT'
       }
@@ -1375,6 +1427,9 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
         _.intersection(oldIds, newIds).length !== value.length) {
         op = '$PUT'
       }
+    } else if (key === 'billing' || key === 'legacy') {
+      // make sure that's always being udpated
+      op = '$PUT'
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
       op = '$PUT'
     }
@@ -1570,12 +1625,10 @@ async function update (currentUser, challengeId, data, userToken, isFull) {
 
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
-  const busEventPayload = { ...challenge }
-  if (billingAccountId) {
-    busEventPayload.billingAccountId = billingAccountId
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
+  if (phasesHaveBeenModified === true && _.get(challenge, 'legacy.useSchedulingAPI')) {
+    await helper.postBusEvent(config.SCHEDULING_TOPIC, { id: challengeId })
   }
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
-
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases.slice().reverse().find(phase => phase.isOpen)
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
@@ -1641,7 +1694,15 @@ function sanitizeChallenge (challenge) {
       'directProjectId',
       'screeningScorecardId',
       'reviewScorecardId',
-      'isTask'
+      'isTask',
+      'useSchedulingAPI',
+      'pureV5Task'
+    ])
+  }
+  if (challenge.billing) {
+    sanitized.billing = _.pick(challenge.billing, [
+      'billingAccountId',
+      'markup'
     ])
   }
   if (challenge.metadata) {
@@ -1663,7 +1724,10 @@ function sanitizeChallenge (challenge) {
     sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
   }
   if (challenge.discussions) {
-    sanitized.discussions = _.map(challenge.discussions, discussion => _.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']))
+    sanitized.discussions = _.map(challenge.discussions, discussion => ({
+      ..._.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']),
+      name: _.get(discussion, 'name', '').slice(0, config.FORUM_TITLE_LENGTH_LIMIT - 1)
+    }))
   }
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
@@ -1679,11 +1743,10 @@ function sanitizeChallenge (challenge) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function fullyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), userToken, true)
+async function fullyUpdateChallenge (currentUser, challengeId, data) {
+  return update(currentUser, challengeId, sanitizeChallenge(data), true)
 }
 
 fullyUpdateChallenge.schema = {
@@ -1697,7 +1760,13 @@ fullyUpdateChallenge.schema = {
       directProjectId: Joi.number().integer(),
       screeningScorecardId: Joi.number().integer(),
       reviewScorecardId: Joi.number().integer(),
-      isTask: Joi.boolean()
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
+    }).unknown(true),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1767,8 +1836,7 @@ fullyUpdateChallenge.schema = {
       roleId: Joi.id()
     }).unknown(true)).optional().allow([]),
     overview: Joi.any().forbidden()
-  }).unknown(true).required(),
-  userToken: Joi.any()
+  }).unknown(true).required()
 }
 
 /**
@@ -1776,11 +1844,10 @@ fullyUpdateChallenge.schema = {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {String} userToken the user token
  * @returns {Object} the updated challenge
  */
-async function partiallyUpdateChallenge (currentUser, challengeId, data, userToken) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), userToken)
+async function partiallyUpdateChallenge (currentUser, challengeId, data) {
+  return update(currentUser, challengeId, sanitizeChallenge(data))
 }
 
 partiallyUpdateChallenge.schema = {
@@ -1793,14 +1860,20 @@ partiallyUpdateChallenge.schema = {
       reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
-      forumId: Joi.number().integer().positive(),
-      isTask: Joi.boolean()
+      forumId: Joi.number().integer(),
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
       isAssigned: Joi.boolean().default(false),
       memberId: Joi.string().allow(null)
     }),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
+    }).unknown(true),
     trackId: Joi.optionalId(),
     typeId: Joi.optionalId(),
     name: Joi.string(),
@@ -1861,8 +1934,7 @@ partiallyUpdateChallenge.schema = {
     }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
     overview: Joi.any().forbidden()
-  }).unknown(true).required(),
-  userToken: Joi.any()
+  }).unknown(true).required()
 }
 
 /**
@@ -1907,4 +1979,4 @@ module.exports = {
   deleteChallenge
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)

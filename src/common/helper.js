@@ -607,13 +607,20 @@ function getESClient () {
 /**
  * Ensure project exist
  * @param {String} projectId the project id
- * @param {String} userToken the user token
+ * @param {String} currentUser the user
  */
-async function ensureProjectExist (projectId, userToken) {
+async function ensureProjectExist (projectId, currentUser) {
   let token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   try {
-    await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (currentUser.isMachine || hasAdminRole(currentUser)) {
+      return res.data
+    }
+    if (!_.find(_.get(res, 'data.members', []), m => _.toString(m.userId) === _.toString(currentUser.userId))) {
+      throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`)
+    }
+    return res.data
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
@@ -655,9 +662,28 @@ function calculateChallengeEndDate (challenge, data) {
  */
 async function listChallengesByMember (memberId) {
   const token = await getM2MToken()
-  const url = `${config.RESOURCES_API_URL}/${memberId}/challenges?perPage=10000`
-  const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
-  return res.data || []
+  let allIds = []
+  // get search is paginated, we need to get all pages' data
+  let page = 1
+  while (true) {
+    const result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page,
+        perPage: 10000
+      }
+    })
+    const ids = result.data || []
+    if (ids.length === 0) {
+      break
+    }
+    allIds = allIds.concat(ids)
+    page += 1
+    if (result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return allIds
 }
 
 /**
@@ -699,12 +725,20 @@ async function getProjectDefaultTerms (projectId) {
  * @param {Number} projectId The id of the project for which to get the default terms of use
  * @returns {Promise<Number>} The billing account ID
  */
-async function getProjectBillingAccount (projectId) {
+async function getProjectBillingInformation (projectId) {
   const token = await getM2MToken()
-  const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
+  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
     const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+    let markup = _.get(res, 'data.markup', null) ? _.toNumber(_.get(res, 'data.markup', null)) : null
+    if (markup && markup > 0) {
+      // TODO - Hack to change int returned from api to decimal
+      markup = markup / 100
+    }
+    return {
+      billingAccountId: _.get(res, 'data.tcBillingAccountId', null),
+      markup
+    }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
@@ -806,18 +840,16 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  * @param {Object} challenge the challenge to check
  */
 async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
-  let memberChallengeIds
-  // Remove privateDescription for unregistered users
+  let challengeResourceIds
   if (currentUser) {
     if (!currentUser.isMachine) {
-      memberChallengeIds = await listChallengesByMember(currentUser.userId)
-      if (!_.includes(memberChallengeIds, challenge.id)) {
-      }
+      const challengeResources = await getChallengeResources(challenge.id)
+      challengeResourceIds = _.map(challengeResources, r => _.toString(r.memberId))
     }
   }
   // Check if challenge is task and apply security rules
   if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
-    const canAccesChallenge = _.isUndefined(currentUser) ? false : _.includes((memberChallengeIds || []), challenge.id) || currentUser.isMachine || hasAdminRole(currentUser)
+    const canAccesChallenge = _.isUndefined(currentUser) ? false : currentUser.isMachine || hasAdminRole(currentUser) || _.includes((challengeResourceIds || []), _.toString(currentUser.userId))
     if (!canAccesChallenge) {
       throw new errors.ForbiddenError(`You don't have access to view this challenge`)
     }
@@ -920,7 +952,7 @@ module.exports = {
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
-  getProjectBillingAccount,
+  getProjectBillingInformation,
   expandWithSubGroups,
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,
