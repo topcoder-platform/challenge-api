@@ -2555,6 +2555,10 @@ definitions:
           reviewType:
             type: string
             description: the review type
+            enum:
+              - 'INTERNAL'
+              - 'COMMUNITY'
+            default: 'INTERNAL'
           forumId:
             type: integer
             description: the forum id
@@ -2723,7 +2727,6 @@ definitions:
       - prizeSets
       - created
       - createdBy
-      - reviewType
       - tags
       - status
   Attachment:
@@ -2967,13 +2970,16 @@ definitions:
             type: string
           reviewType:
             type: string
+            enum:
+              - 'INTERNAL'
+              - 'COMMUNITY'
+            default: 'INTERNAL'
           confidentialityType:
             type: string
           forumId:
             type: number
         required:
           - track
-          - reviewType
       name:
         type: string
       description:
@@ -3251,7 +3257,6 @@ definitions:
       - prizeSets
       - created
       - createdBy
-      - reviewType
       - tags
       - projectId
       - forumId

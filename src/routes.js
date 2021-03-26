@@ -23,7 +23,7 @@ module.exports = {
       controller: 'ChallengeController',
       method: 'createChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
       scopes: [CREATE, ALL]
     }
   },
@@ -43,21 +43,21 @@ module.exports = {
       controller: 'ChallengeController',
       method: 'fullyUpdateChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
       scopes: [UPDATE, ALL]
     },
     patch: {
       controller: 'ChallengeController',
       method: 'partiallyUpdateChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
       scopes: [UPDATE, ALL]
     },
     delete: {
       controller: 'ChallengeController',
       method: 'deleteChallenge',
       auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
       scopes: [DELETE, ALL]
     }
   },

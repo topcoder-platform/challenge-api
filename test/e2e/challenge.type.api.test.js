@@ -23,6 +23,8 @@ describe('challenge type API E2E tests', () => {
   const name2 = `test2${new Date().getTime()}`
   const abbreviation = `abb1${new Date().getTime()}`
   const abbreviation2 = `abb2${new Date().getTime()}`
+  const legacyId = new Date().getTime()
+  const legacyId2 = legacyId + 123
   const notFoundId = uuid()
 
   describe('create challenge type API tests', () => {
@@ -34,7 +36,8 @@ describe('challenge type API E2E tests', () => {
           name,
           description: 'desc',
           isActive: true,
-          abbreviation
+          abbreviation,
+          legacyId
         })
       should.equal(response.status, 201)
       const result = response.body
@@ -42,6 +45,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
       should.equal(result.abbreviation, abbreviation)
+      should.equal(result.legacyId, legacyId)
       should.exist(result.id)
       id = result.id
     })
@@ -54,7 +58,8 @@ describe('challenge type API E2E tests', () => {
           name: name2,
           description: 'desc2',
           isActive: false,
-          abbreviation: abbreviation2
+          abbreviation: abbreviation2,
+          legacyId: legacyId2
         })
       should.equal(response.status, 201)
       const result = response.body
@@ -62,6 +67,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.description, 'desc2')
       should.equal(result.isActive, false)
       should.equal(result.abbreviation, abbreviation2)
+      should.equal(result.legacyId, legacyId2)
       should.exist(result.id)
       id2 = result.id
     })
@@ -149,6 +155,21 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
     })
 
+    it('create challenge type - legacyId already used', async () => {
+      const response = await chai.request(app)
+        .post(basePath)
+        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .send({
+          name: `${name}-xyz`,
+          description: 'desc',
+          isActive: false,
+          abbreviation: `${abbreviation}-123123`,
+          legacyId: legacyId2
+        })
+      should.equal(response.status, 409)
+      should.equal(response.body.message, `ChallengeType with legacyId: ${legacyId2} already exist`)
+    })
+
     it('create challenge type - forbidden', async () => {
       const response = await chai.request(app)
         .post(basePath)
@@ -187,6 +208,21 @@ describe('challenge type API E2E tests', () => {
         })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"abbreviation" is required')
+    })
+
+    it('create challenge type - invalid legacyId', async () => {
+      const response = await chai.request(app)
+        .post(basePath)
+        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .send({
+          name: 'nnnnnxxx',
+          description: 'desc',
+          isActive: false,
+          abbreviation: 'abb',
+          legacyId: 'abc'
+        })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"legacyId" must be a number')
     })
 
     it('create challenge type - invalid name', async () => {
@@ -245,6 +281,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.description, 'desc2')
       should.equal(result.isActive, false)
       should.equal(result.abbreviation, abbreviation2)
+      should.equal(result.legacyId, legacyId2)
     })
 
     it('get challenge type - not found', async () => {
@@ -275,7 +312,8 @@ describe('challenge type API E2E tests', () => {
           name: name2.substring(1).toUpperCase(),
           description: 'desc',
           isActive: false,
-          abbreviation: abbreviation2
+          abbreviation: abbreviation2,
+          legacyId: legacyId2
         })
       should.equal(response.status, 200)
       should.equal(response.headers['x-page'], '1')
@@ -291,6 +329,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result[0].description, 'desc2')
       should.equal(result[0].isActive, false)
       should.equal(result[0].abbreviation, abbreviation2)
+      should.equal(result[0].legacyId, legacyId2)
     })
 
     it('search challenge types successfully 2', async () => {
@@ -343,7 +382,8 @@ describe('challenge type API E2E tests', () => {
           name: `${name2}-updated`,
           description: 'desc222',
           isActive: true,
-          abbreviation: `${abbreviation2}-updated`
+          abbreviation: `${abbreviation2}-updated`,
+          legacyId: legacyId2
         })
       should.equal(response.status, 200)
       const result = response.body
@@ -352,6 +392,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.description, 'desc222')
       should.equal(result.isActive, true)
       should.equal(result.abbreviation, `${abbreviation2}-updated`)
+      should.equal(result.legacyId, legacyId2)
     })
 
     it('fully update challenge type - name already used', async () => {
@@ -380,6 +421,21 @@ describe('challenge type API E2E tests', () => {
         })
       should.equal(response.status, 409)
       should.equal(response.body.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+    })
+
+    it('fully update challenge type - legacyId already used', async () => {
+      const response = await chai.request(app)
+        .put(`${basePath}/${id2}`)
+        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .send({
+          name: name2,
+          description: 'desc',
+          isActive: false,
+          abbreviation: abbreviation2,
+          legacyId
+        })
+      should.equal(response.status, 409)
+      should.equal(response.body.message, `ChallengeType with legacyId: ${legacyId} already exist`)
     })
 
     it('fully update challenge type - forbidden', async () => {
@@ -498,6 +554,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.description, 'desc33')
       should.equal(result.isActive, true)
       should.equal(result.abbreviation, `${abbreviation2}-33`)
+      should.equal(result.legacyId, legacyId2)
     })
 
     it('partially update challenge type - name already used', async () => {
@@ -516,6 +573,15 @@ describe('challenge type API E2E tests', () => {
         .send({ abbreviation })
       should.equal(response.status, 409)
       should.equal(response.body.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+    })
+
+    it('partially update challenge type - legacyId already used', async () => {
+      const response = await chai.request(app)
+        .patch(`${basePath}/${id2}`)
+        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
+        .send({ legacyId })
+      should.equal(response.status, 409)
+      should.equal(response.body.message, `ChallengeType with legacyId: ${legacyId} already exist`)
     })
 
     it('partially update challenge type - forbidden', async () => {
@@ -588,6 +654,15 @@ describe('challenge type API E2E tests', () => {
         .send({ abbreviation: { invalid: 123 } })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"abbreviation" must be a string')
+    })
+
+    it('partially update challenge type - invalid legacyId', async () => {
+      const response = await chai.request(app)
+        .patch(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+        .send({ legacyId: { invalid: 123 } })
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"legacyId" must be a number')
     })
   })
 })
