@@ -846,6 +846,12 @@ async function createChallenge (currentUser, challenge) {
   }
   challenge.name = xss(challenge.name)
   challenge.description = xss(challenge.description)
+  if (!challenge.status) {
+    challenge.status = constants.challengeStatuses.New
+  }
+  if (!challenge.startDate) {
+    challenge.startDate = new Date()
+  }
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
@@ -1055,7 +1061,7 @@ createChallenge.schema = {
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
-    status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)),
     groups: Joi.array().items(Joi.optionalId()).unique(),
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     terms: Joi.array().items(Joi.object().keys({
