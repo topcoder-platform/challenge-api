@@ -105,9 +105,7 @@ Mock API starts after running `docker-compose up` and expose port 4000.
 
 ### Notes
 There are two parts need to be updated for local development
-- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116
-`throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
-- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Phase.js#L33
+- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116 
 `throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
 - https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
 Two aws config should be uncommented

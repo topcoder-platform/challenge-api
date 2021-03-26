@@ -5,7 +5,7 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+// const logger = require('../common/logger')
 
 /**
  * Search audit logs
@@ -15,11 +15,11 @@ const logger = require('../common/logger')
 async function searchAuditLogs (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
-  let records = await helper.scan('AuditLog')
+  let records = await helper.scanAll('AuditLog')
   // TODO this needs to be in ES
   if (criteria.fieldName) records = _.filter(records, e => helper.partialMatch(criteria.fieldName, e.fieldName))
   if (criteria.createdDateStart) records = _.filter(records, e => criteria.createdDateStart.getTime() <= e.created.getTime())
-  if (criteria.createdDateEnd) records = _.filter(records, e => criteria.createdDateEnd.getTime() >= e.created.getTime())
+  if (criteria.createdDateEnd) records = _.filter(records, e => criteria.createdDateEnd.getTime() <= e.created.getTime())
   if (criteria.challengeId) records = _.filter(records, e => criteria.challengeId === e.challengeId)
   if (criteria.createdBy) records = _.filter(records, e => criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase())
 
@@ -45,4 +45,4 @@ module.exports = {
   searchAuditLogs
 }
 
-logger.decorateWithValidators(module.exports)
+// logger.buildService(module.exports)

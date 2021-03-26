@@ -16,8 +16,8 @@
     "check-timeline-templates": "node src/scripts/check-templates.js",
     "view-data": "node src/scripts/view-data.js",
     "view-es-data": "node src/scripts/view-es-data.js",
-    "test": "mocha --require test/prepare.js -t 30000 test/unit/*.test.js --exit",
-    "e2e": "mocha --require test/prepare.js -t 30000 test/e2e/*.test.js --exit",
+    "test": "mocha --require test/prepare.js -t 20000 test/unit/*.test.js --exit",
+    "e2e": "mocha --require test/prepare.js -t 20000 test/e2e/*.test.js --exit",
     "test:cov": "nyc --reporter=html --reporter=text npm test",
     "e2e:cov": "nyc --reporter=html --reporter=text npm run e2e"
   },

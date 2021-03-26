@@ -39,7 +39,7 @@ describe('audit log service unit tests', () => {
         perPage: 10,
         challengeId: data.challenge.id,
         createdDateStart: new Date(new Date().getTime() - 1000 * 60 * 60 * 30),
-        createdDateEnd: new Date(2029, 1, 2),
+        createdDateEnd: '2022-01-02',
         createdBy: 'sub'
       })
       should.equal(res.total, 2)
