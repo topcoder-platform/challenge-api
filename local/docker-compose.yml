@@ -3,8 +3,8 @@ services:
   dynamodb:
     image: tray/dynamodb-local
     ports:
-      - "8000:8000"
-    command: "-inMemory -port 8000"
+      - "7777:7777"
+    command: "-inMemory -port 7777"
   esearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.0"
     ports:

@@ -29,38 +29,37 @@ describe('challenge API E2E tests', () => {
   let attachment
   const winners = [
     {
-      userId: 12345678,
+      userId: 251280,
       handle: 'thomaskranitsas',
       placement: 1
-    },
-    {
-      userId: 3456789,
-      handle: 'tonyj',
-      placement: 2
     }
   ]
   // generated data
   let data
   let testChallengeData
   let testCompletedChallengeData
+  let newChallengeData
   const notFoundId = uuid()
 
   before(async () => {
     await testHelper.createData()
     data = testHelper.getData()
     // create an attachment for test
-    attachment = await AttachmentService.uploadAttachment({
-      isMachine: true
+    attachment = await AttachmentService.createAttachment({
+      isMachine: true,
+      handle: 'abc',
+      sub: 'def'
     }, data.challenge.id, {
-      attachment: {
-        data: attachmentContent,
-        mimetype: 'plain/text',
-        name: 'attachment.txt',
-        size: attachmentContent.length
-      }
+      name: 'attachment.txt',
+      url: 'http://s3.amazonaws.com/bucket/key1/key2',
+      fileSize: attachmentContent.length,
+      description: 'desc'
     })
 
     testChallengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
+    delete testChallengeData.legacy.track
+    testChallengeData.groups[0] = '33ba038e-48da-487b-96e8-8d3b99b6d181'
+    testChallengeData.status = 'Draft'
     testChallengeData.phases = [{
       phaseId: data.phase.id,
       duration: 100
@@ -70,6 +69,8 @@ describe('challenge API E2E tests', () => {
     }]
 
     testCompletedChallengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
+    delete testCompletedChallengeData.legacy.track
+    testCompletedChallengeData.groups[0] = '33ba038e-48da-487b-96e8-8d3b99b6d181'
     testCompletedChallengeData.phases = [{
       phaseId: data.phase.id,
       duration: 100
@@ -77,6 +78,12 @@ describe('challenge API E2E tests', () => {
       phaseId: data.phase2.id,
       duration: 200
     }]
+
+    newChallengeData = _.omit(data.newChallenge, ['id', 'created', 'createdBy'])
+    newChallengeData.groups[0] = '33ba038e-48da-487b-96e8-8d3b99b6d181'
+    delete newChallengeData.legacy.track
+    delete newChallengeData.timelineTemplateId
+    delete newChallengeData.descriptionFormat
   })
 
   after(async () => {
@@ -131,11 +138,8 @@ describe('challenge API E2E tests', () => {
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.challenge.tags[0])
       should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
       should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.status, data.challenge.status)
+      should.equal(result.status, 'Draft')
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.challenge.groups[0])
       should.exist(result.startDate)
@@ -143,8 +147,6 @@ describe('challenge API E2E tests', () => {
       should.exist(result.createdBy)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('create challenge successfully with completed status', async () => {
@@ -193,9 +195,6 @@ describe('challenge API E2E tests', () => {
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.completedChallenge.tags[0])
       should.equal(result.projectId, data.completedChallenge.projectId)
-      should.equal(result.legacy.track, data.completedChallenge.legacy.track)
-      should.equal(result.legacy.reviewType, data.completedChallenge.legacy.reviewType)
-      should.equal(result.legacy.forumId, data.completedChallenge.legacy.forumId)
       should.equal(result.legacyId, data.completedChallenge.legacyId)
       should.equal(result.status, data.completedChallenge.status)
       should.equal(result.groups.length, 1)
@@ -205,13 +204,10 @@ describe('challenge API E2E tests', () => {
       should.exist(result.createdBy)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
-    it('create challenge successfully 1', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.additionalTerm.id]
+    it('create challenge successfully with task', async () => {
+      const challengeData = _.cloneDeep(newChallengeData)
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
@@ -219,98 +215,6 @@ describe('challenge API E2E tests', () => {
       should.equal(response.status, 201)
       const result = response.body
       should.exist(result.id)
-      should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, data.challenge.description)
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
-      should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.exist(result.startDate)
-      should.exist(result.created)
-      should.exist(result.createdBy)
-      should.equal(result.numOfSubmissions, 0)
-      should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 3)
-      should.equal(
-        testHelper.deepCompareArrays(
-          result.terms,
-          _.union(_.map(data.defaultProjectTerms, t => t.id), [data.additionalTerm.id])
-        ),
-        true
-      )
-    })
-
-    it('should not create challenge with duplicate terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.mockTerms[0], data.mockTerms[0]]
-
-      const response = await chai.request(app)
-        .post(basePath)
-        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `There are duplicate elements (${data.mockTerms[0]}) for terms.`)
-    })
-
-    it('should not create challenge with non existing terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.mockTerms[0], data.mockTerms[1].replace('c', 'a')]
-
-      const response = await chai.request(app)
-        .post(basePath)
-        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Terms of use identified by the id ${data.mockTerms[1].replace('c', 'a')} does not exist`)
-    })
-
-    it('should not create challenge with invalid terms ids data type', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = ['20653']
-
-      const response = await chai.request(app)
-        .post(basePath)
-        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message.indexOf('"0" must be a valid GUID') >= 0, true)
     })
 
     it('create challenge - missing token', async () => {
@@ -390,17 +294,6 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.message, `Project with id: ${challengeData.projectId} doesn't exist`)
     })
 
-    it('create challenge - invalid track', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.legacy.track = [1, 2]
-      const response = await chai.request(app)
-        .post(basePath)
-        .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, '"track" must be a string')
-    })
-
     it('create challenge - invalid description', async () => {
       const challengeData = _.cloneDeep(testChallengeData)
       challengeData.description = [1, 2]
@@ -425,13 +318,13 @@ describe('challenge API E2E tests', () => {
 
     it('create challenge - invalid forumId', async () => {
       const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.legacy.forumId = -1
+      challengeData.legacy.forumId = 'abc'
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
         .send(challengeData)
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"forumId" must be a positive number')
+      should.equal(response.body.message, '"forumId" must be a number')
     })
 
     it('create challenge - invalid legacyId', async () => {
@@ -475,7 +368,7 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
         .send(challengeData)
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"status" must be one of [New, Draft, Cancelled, Active, Completed]')
+      should.equal(response.body.message.indexOf('"status" must be one of') >= 0, true)
     })
 
     it('create challenge - unexpected field', async () => {
@@ -518,13 +411,9 @@ describe('challenge API E2E tests', () => {
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.challenge.tags[0])
       should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
       should.equal(result.legacyId, data.challenge.legacyId)
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.createdBy)
@@ -575,30 +464,23 @@ describe('challenge API E2E tests', () => {
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.challenge.tags[0])
       should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
       should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.status, data.challenge.status)
+      should.equal(result.status, 'Draft')
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(result.createdBy, 'TopcoderService')
       should.exist(result.startDate)
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
+      should.equal(result.terms.length, 0)
     })
 
-    it('get challenge - forbidden', async () => {
+    it('get challenge - group1 not found', async () => {
       const response = await chai.request(app)
         .get(`${basePath}/${data.challenge.id}`)
         .set('Authorization', `Bearer ${config.USER_TOKEN}`)
-      should.equal(response.status, 403)
-      should.equal(response.body.message, 'You don\'t have access to this group!')
+      should.equal(response.status, 404)
+      should.equal(response.body.message, 'group group1 not found')
     })
 
     it('get challenge - not found', async () => {
@@ -632,17 +514,14 @@ describe('challenge API E2E tests', () => {
           name: data.challenge.name.substring(2).trim().toUpperCase(),
           description: data.challenge.description,
           timelineTemplateId: data.challenge.timelineTemplateId,
-          reviewType: data.challenge.legacy.reviewType,
           tag: data.challenge.tags[0],
           projectId: data.challenge.projectId,
           forumId: data.challenge.legacy.forumId,
           legacyId: data.challenge.legacyId,
-          status: data.challenge.status,
-          group: data.challenge.groups[0],
+          status: 'Active',
           createdDateStart: '1992-01-02',
           createdDateEnd: '2022-01-02',
-          createdBy: data.challenge.createdBy,
-          memberId: 40309246
+          createdBy: data.challenge.createdBy
         })
       should.equal(response.status, 200)
       should.equal(response.headers['x-page'], '1')
@@ -674,13 +553,9 @@ describe('challenge API E2E tests', () => {
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.challenge.tags[0])
       should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
       should.equal(result.legacyId, data.challenge.legacyId)
       should.equal(result.status, data.challenge.status)
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.createdBy)
@@ -794,19 +669,58 @@ describe('challenge API E2E tests', () => {
       should.equal(result.tags[0], data.challenge.tags[0])
       should.equal(result.projectId, data.challenge.projectId)
       should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
-      should.equal(result.status, data.challenge.status)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, 'Draft')
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
       should.equal(result.createdBy, 'TopcoderService')
       should.exist(result.startDate)
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
+    })
+
+    it('search challenges successfully 5 - with full criteria', async () => {
+      const response = await chai.request(app)
+        .get(basePath)
+        .set('Authorization', `Bearer ${config.M2M_READ_ACCESS_TOKEN}`)
+        .query({
+          page: 1,
+          perPage: 10,
+          type: 'abbr',
+          track: 'abbr',
+          types: ['abbr', 'abbr2'],
+          tracks: ['abbr', 'abbr2'],
+          trackId: notFoundId,
+          'meta.name': 'name',
+          tags: ['tag1', 'tag2'],
+          forumId: 111,
+          reviewType: notFoundId,
+          confidentialityType: '111',
+          directProjectId: 111,
+          currentPhaseName: '111',
+          registrationStartDateStart: '2020-01-01',
+          registrationStartDateEnd: '2029-01-01',
+          registrationEndDateStart: '2020-01-01',
+          registrationEndDateEnd: '2029-01-01',
+          submissionStartDateStart: '2020-01-01',
+          submissionStartDateEnd: '2029-01-01',
+          submissionEndDateStart: '2020-01-01',
+          submissionEndDateEnd: '2029-01-01',
+          updatedDateStart: '2020-01-01',
+          updatedDateEnd: '2029-01-01',
+          startDateStart: '2020-01-01',
+          startDateEnd: '2029-01-01',
+          endDateStart: '2020-01-01',
+          endDateEnd: '2029-01-01',
+          events: [1234, 5678]
+        })
+      should.equal(response.status, 200)
+      should.equal(response.headers['x-page'], '1')
+      should.equal(response.headers['x-per-page'], '10')
+      should.equal(response.headers['x-total'], '0')
+      should.equal(response.headers['x-total-pages'], '0')
+
+      should.equal(response.body.length, 0)
     })
 
     it('search challenges - invalid page', async () => {
@@ -816,15 +730,6 @@ describe('challenge API E2E tests', () => {
         .query({ page: -1 })
       should.equal(response.status, 400)
       should.equal(response.body.message, '"page" must be larger than or equal to 1')
-    })
-
-    it('search challenges - invalid memberId', async () => {
-      const response = await chai.request(app)
-        .get(basePath)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .query({ memberId: 'abcde' })
-      should.equal(response.status, 400)
-      should.equal(response.body.message, '"memberId" must be a number')
     })
 
     it('search challenges - invalid perPage', async () => {
@@ -896,7 +801,7 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .query({ status: 'abc' })
       should.equal(response.status, 400)
-      should.equal(response.body.message, '"status" must be one of [New, Draft, Cancelled, Active, Completed]')
+      should.equal(response.body.message.indexOf('"status" must be one of') >= 0, true)
     })
 
     it('search challenges - invalid createdDateStart', async () => {
@@ -934,15 +839,6 @@ describe('challenge API E2E tests', () => {
       should.equal(response.status, 400)
       should.equal(response.body.message, '"updatedDateEnd" must be a number of milliseconds or valid date string')
     })
-
-    it('search challenges - unexpected field', async () => {
-      const response = await chai.request(app)
-        .get(basePath)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .query({ other: 123 })
-      should.equal(response.status, 400)
-      should.equal(response.body.message, '"other" is not allowed')
-    })
   })
 
   describe('fully update challenge API tests', () => {
@@ -951,7 +847,6 @@ describe('challenge API E2E tests', () => {
       challengeData.projectId = 112233
       challengeData.legacyId = 445566
       challengeData.attachmentIds = [attachment.id]
-      challengeData.terms = _.union(_.map(data.defaultProjectTerms, t => t.id), [data.additionalTerm.id])
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -960,7 +855,6 @@ describe('challenge API E2E tests', () => {
       const result = response.body
       should.equal(result.id, id)
       should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
       should.equal(result.name, data.challenge.name)
       should.equal(result.description, data.challenge.description)
       should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
@@ -993,33 +887,19 @@ describe('challenge API E2E tests', () => {
       should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
       should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
       should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
+      should.equal(result.reviewType, data.challenge.reviewType)
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.challenge.tags[0])
       should.equal(result.projectId, 112233)
       should.equal(result.legacyId, 445566)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
-      should.equal(result.status, data.challenge.status)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, 'Draft')
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.attachments.length, 1)
-      should.equal(result.attachments[0].id, attachment.id)
-      should.equal(result.attachments[0].fileSize, attachment.fileSize)
-      should.equal(result.attachments[0].fileName, attachment.fileName)
-      should.equal(result.attachments[0].challengeId, attachment.challengeId)
       should.exist(result.startDate)
       should.exist(result.createdBy)
       should.exist(result.updatedBy)
       should.exist(result.created)
       should.exist(result.updated)
-      should.equal(result.terms.length, 3)
-      should.equal(
-        testHelper.deepCompareArrays(
-          result.terms,
-          _.union(_.map(data.defaultProjectTerms, t => t.id), [data.additionalTerm.id])
-        ),
-        true
-      )
     })
 
     it('fully update challenge with winners successfully', async () => {
@@ -1027,42 +907,20 @@ describe('challenge API E2E tests', () => {
       challengeData.projectId = 112233
       challengeData.legacyId = 445566
       challengeData.attachmentIds = [attachment.id]
+      challengeData.status = 'Completed'
       challengeData.winners = winners
-      challengeData.terms = _.map(data.defaultProjectTerms, t => t.id)
       const response = await chai.request(app)
-        .put(`${basePath}/${id2}`)
+        .put(`${basePath}/${data.activeChallenge.id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send(challengeData)
       should.equal(response.status, 200)
       const result = response.body
-      should.equal(result.id, id2)
+      should.equal(result.id, data.activeChallenge.id)
       should.equal(result.typeId, data.completedChallenge.typeId)
-      should.equal(result.legacy.track, data.completedChallenge.legacy.track)
       should.equal(result.name, data.completedChallenge.name)
       should.equal(result.description, data.completedChallenge.description)
       should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(result.phases.length, 0)
       should.equal(result.prizeSets.length, 1)
       should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
       should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
@@ -1070,82 +928,24 @@ describe('challenge API E2E tests', () => {
       should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
       should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
       should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
-      should.equal(result.legacy.reviewType, data.completedChallenge.legacy.reviewType)
+      should.equal(result.reviewType, data.completedChallenge.reviewType)
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.completedChallenge.tags[0])
       should.equal(result.projectId, 112233)
       should.equal(result.legacyId, 445566)
-      should.equal(result.legacy.forumId, data.completedChallenge.legacy.forumId)
-      should.equal(result.status, data.completedChallenge.status)
+      should.equal(result.forumId, data.completedChallenge.forumId)
+      should.equal(result.status, 'Completed')
       should.equal(result.groups.length, 1)
       should.equal(result.groups[0], data.completedChallenge.groups[0])
-      should.equal(result.attachments.length, 1)
-      should.equal(result.attachments[0].id, attachment.id)
-      should.equal(result.attachments[0].fileSize, attachment.fileSize)
-      should.equal(result.attachments[0].fileName, attachment.fileName)
-      should.equal(result.attachments[0].challengeId, attachment.challengeId)
-      should.equal(result.winners.length, 2)
+      should.equal(result.winners.length, 1)
       should.equal(result.winners[0].userId, winners[0].userId)
       should.equal(result.winners[0].handle, winners[0].handle)
       should.equal(result.winners[0].placement, winners[0].placement)
-      should.equal(result.winners[1].userId, winners[1].userId)
-      should.equal(result.winners[1].handle, winners[1].handle)
-      should.equal(result.winners[1].placement, winners[1].placement)
       should.exist(result.startDate)
       should.exist(result.createdBy)
       should.exist(result.updatedBy)
       should.exist(result.created)
       should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
-
-    it('should not fully update challenge with duplicate terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.mockTerms[0], data.mockTerms[0]]
-
-      const response = await chai.request(app)
-        .put(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `There are duplicate elements (${data.mockTerms[0]}) for terms.`)
-    })
-
-    it('should not fully update challenge when removing default project terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.additionalTerm.id]
-
-      const response = await chai.request(app)
-        .put(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Default project terms ${_.map(data.defaultProjectTerms, t => t.id)} should not be removed`)
-    })
-
-    it('should not fully update challenge with non existing terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.defaultProjectTerms[0].id, data.defaultProjectTerms[1].id, data.mockTerms[1].replace('c', 'b')]
-
-      const response = await chai.request(app)
-        .put(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Terms of use identified by the id ${data.mockTerms[1].replace('c', 'b')} does not exist`)
-    })
-
-    it('should not fully update challenge with invalid terms ids data type', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = ['20653']
-
-      const response = await chai.request(app)
-        .put(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message.indexOf('"0" must be a valid GUID') >= 0, true)
     })
 
     it('fully update challenge - forbidden', async () => {
@@ -1208,17 +1008,6 @@ describe('challenge API E2E tests', () => {
         .send(challengeData)
       should.equal(response.status, 400)
       should.equal(response.body.message, '"name" must be a string')
-    })
-
-    it('fully update challenge - invalid track', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.legacy.track = ['updated-track']
-      const response = await chai.request(app)
-        .put(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, '"track" must be a string')
     })
 
     it('fully update challenge - invalid timelineTemplateId', async () => {
@@ -1317,7 +1106,7 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.message, 'Cannot change Completed challenge status to Active status')
     })
 
-    it('fully update challenge - set winners with non-completed Active status', async () => {
+    it('fully update challenge - set winners with non-completed Draft status', async () => {
       const challengeData = _.cloneDeep(testChallengeData)
       challengeData.winners = winners
       const response = await chai.request(app)
@@ -1325,73 +1114,7 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send(challengeData)
       should.equal(response.status, 400)
-      should.equal(response.body.message, 'Cannot set winners for challenge with non-completed Active status')
-    })
-
-    it('fully update challenge - Duplicate member with placement 1', async () => {
-      const challengeData = _.cloneDeep(testCompletedChallengeData)
-      challengeData.winners = [
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 1
-        },
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 1
-        }
-      ]
-      const response = await chai.request(app)
-        .put(`${basePath}/${id2}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Duplicate member with placement: { userId: 12345678, handle: 'thomaskranitsas', placement: 1 }`)
-    })
-
-    it('fully update challenge - Only one member can have placement 1', async () => {
-      const challengeData = _.cloneDeep(testCompletedChallengeData)
-      challengeData.winners = [
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 1
-        },
-        {
-          userId: 3456789,
-          handle: 'tonyj',
-          placement: 1
-        }
-      ]
-      const response = await chai.request(app)
-        .put(`${basePath}/${id2}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, 'Only one member can have a placement: 1')
-    })
-
-    it('fully update challenge - The same member 12345678 cannot have multiple placements', async () => {
-      const challengeData = _.cloneDeep(testCompletedChallengeData)
-      challengeData.winners = [
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 1
-        },
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 2
-        }
-      ]
-      const response = await chai.request(app)
-        .put(`${basePath}/${id2}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, 'The same member 12345678 cannot have multiple placements')
+      should.equal(response.body.message, 'Cannot set winners for challenge with non-completed Draft status')
     })
   })
 
@@ -1410,7 +1133,6 @@ describe('challenge API E2E tests', () => {
       const result = response.body
       should.equal(result.id, id)
       should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
       should.equal(result.name, data.challenge.name)
       should.equal(result.description, 'updated desc')
       should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
@@ -1443,29 +1165,20 @@ describe('challenge API E2E tests', () => {
       should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
       should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
       should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
+      should.equal(result.reviewType, data.challenge.reviewType)
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], 'tag-abc')
       should.equal(result.projectId, 112233)
       should.equal(result.legacyId, 445566)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
-      should.equal(result.status, data.challenge.status)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status, 'Draft')
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
       should.equal(!result.attachments || result.attachments.length === 0, true)
       should.exist(result.startDate)
       should.exist(result.createdBy)
       should.exist(result.updatedBy)
       should.exist(result.created)
       should.exist(result.updated)
-      should.equal(result.terms.length, 3)
-      should.equal(
-        testHelper.deepCompareArrays(
-          result.terms,
-          _.union(_.map(data.defaultProjectTerms, t => t.id), [data.additionalTerm.id])
-        ),
-        true
-      )
     })
 
     it('partially update challenge successfully with winners', async () => {
@@ -1475,7 +1188,7 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
         .send({
           winners: [{
-            userId: 12345678,
+            userId: 251280,
             handle: 'thomaskranitsas',
             placement: 1
           }]
@@ -1484,7 +1197,6 @@ describe('challenge API E2E tests', () => {
       const result = response.body
       should.equal(result.id, id2)
       should.equal(result.typeId, data.completedChallenge.typeId)
-      should.equal(result.legacy.track, data.completedChallenge.legacy.track)
       should.equal(result.name, data.completedChallenge.name)
       should.equal(result.description, data.completedChallenge.description)
       should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
@@ -1517,15 +1229,14 @@ describe('challenge API E2E tests', () => {
       should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
       should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
       should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
-      should.equal(result.legacy.reviewType, data.completedChallenge.legacy.reviewType)
+      should.equal(result.reviewType, data.completedChallenge.reviewType)
       should.equal(result.tags.length, 1)
       should.equal(result.tags[0], data.completedChallenge.tags[0])
-      should.equal(result.projectId, 112233)
-      should.equal(result.legacyId, 445566)
-      should.equal(result.legacy.forumId, data.completedChallenge.legacy.forumId)
+      should.equal(result.projectId, 111)
+      should.equal(result.legacyId, 222)
+      should.equal(result.forumId, data.completedChallenge.forumId)
       should.equal(result.status, data.completedChallenge.status)
       should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.completedChallenge.groups[0])
       should.equal(result.winners.length, 1)
       should.equal(result.winners[0].userId, winners[0].userId)
       should.equal(result.winners[0].handle, winners[0].handle)
@@ -1535,123 +1246,6 @@ describe('challenge API E2E tests', () => {
       should.exist(result.updatedBy)
       should.exist(result.created)
       should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
-
-    it('should partially update challenge terms successfully', async () => {
-      const challengeData = testChallengeData
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
-        .send({
-          terms: _.map(data.defaultProjectTerms, t => t.id)
-        })
-      should.equal(response.status, 200)
-      const result = response.body
-      should.equal(result.id, id)
-      should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.legacy.track, data.challenge.legacy.track)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, 'updated desc')
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.legacy.reviewType, data.challenge.legacy.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], 'tag-abc')
-      should.equal(result.projectId, 112233)
-      should.equal(result.legacyId, 445566)
-      should.equal(result.legacy.forumId, data.challenge.legacy.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(!result.attachments || result.attachments.length === 0, true)
-      should.exist(result.startDate)
-      should.exist(result.createdBy)
-      should.exist(result.updatedBy)
-      should.exist(result.created)
-      should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
-
-    it('should not partially update challenge with duplicate terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.defaultProjectTerms[0].id, data.defaultProjectTerms[0].id]
-
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `There are duplicate elements (${data.defaultProjectTerms[0].id}) for terms.`)
-    })
-
-    it('should not partially update challenge when removing default project terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = [data.additionalTerm.id]
-
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Default project terms ${_.map(data.defaultProjectTerms, t => t.id)} should not be removed`)
-    })
-
-    it('should not partially update challenge with non existing terms', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = _.union(
-        _.map(data.defaultProjectTerms, t => t.id),
-        [ data.mockTerms[0].replace('c', 'b') ]
-      )
-
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message, `Terms of use identified by the id ${data.mockTerms[0].replace('c', 'b')} does not exist`)
-    })
-
-    it('should not partially update challenge with invalid terms ids data type', async () => {
-      const challengeData = _.cloneDeep(testChallengeData)
-      challengeData.terms = ['20653']
-
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send(challengeData)
-      should.equal(response.status, 400)
-      should.equal(response.body.message.indexOf('"0" must be a valid GUID') >= 0, true)
     })
 
     it('partially update challenge - forbidden', async () => {
@@ -1744,15 +1338,6 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.message, '"groups" must be an array')
     })
 
-    it('partially update challenge - invalid attachmentIds', async () => {
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send({ attachmentIds: ['abc'] })
-      should.equal(response.status, 400)
-      should.equal(response.body.message, '"0" must be a valid GUID')
-    })
-
     it('partially update challenge - invalid placement', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id2}`)
@@ -1797,13 +1382,13 @@ describe('challenge API E2E tests', () => {
       should.equal(response.body.message, 'Cannot change Completed challenge status to Active status')
     })
 
-    it('partially update challenge - set winners with non-completed Active status', async () => {
+    it('partially update challenge - set winners with non-completed Draft status', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send({ winners })
       should.equal(response.status, 400)
-      should.equal(response.body.message, 'Cannot set winners for challenge with non-completed Active status')
+      should.equal(response.body.message, 'Cannot set winners for challenge with non-completed Draft status')
     })
 
     it('partially update challenge - Duplicate member with placement 1', async () => {
@@ -1812,58 +1397,55 @@ describe('challenge API E2E tests', () => {
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send({ winners: [
           {
-            userId: 12345678,
+            userId: 251280,
             handle: 'thomaskranitsas',
             placement: 1
           },
           {
-            userId: 12345678,
+            userId: 251280,
             handle: 'thomaskranitsas',
             placement: 1
           }
         ] })
       should.equal(response.status, 400)
-      should.equal(response.body.message, `Duplicate member with placement: { userId: 12345678, handle: 'thomaskranitsas', placement: 1 }`)
+      should.equal(response.body.message.indexOf('Duplicate member with placement') >= 0, true)
     })
 
-    it('partially update challenge - Only one member can have placement 1', async () => {
+    it('partially update challenge -The same member 251280 cannot have multiple placements', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send({ winners: [
           {
-            userId: 12345678,
+            userId: 251280,
             handle: 'thomaskranitsas',
             placement: 1
           },
           {
-            userId: 3456789,
-            handle: 'tonyj',
-            placement: 1
-          }
-        ] })
-      should.equal(response.status, 400)
-      should.equal(response.body.message, 'Only one member can have a placement: 1')
-    })
-
-    it('partially update challenge -The same member 12345678 cannot have multiple placements', async () => {
-      const response = await chai.request(app)
-        .patch(`${basePath}/${id2}`)
-        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
-        .send({ winners: [
-          {
-            userId: 12345678,
-            handle: 'thomaskranitsas',
-            placement: 1
-          },
-          {
-            userId: 12345678,
+            userId: 251280,
             handle: 'thomaskranitsas',
             placement: 2
           }
         ] })
       should.equal(response.status, 400)
-      should.equal(response.body.message, 'The same member 12345678 cannot have multiple placements')
+      should.equal(response.body.message, 'The same member 251280 cannot have multiple placements')
+    })
+  })
+
+  describe('delete challenge API tests', () => {
+    it('delete challenge successfully', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/${data.newChallenge.id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 200)
+    })
+
+    it('delete challenge with not NEW challenge ', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/${id2}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 400)
+      should.equal(response.body.message, 'Challenge with status other than "New" cannot be removed')
     })
   })
 })

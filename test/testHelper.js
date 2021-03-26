@@ -10,11 +10,16 @@ const constants = require('../app-constants')
 const esClient = helper.getESClient()
 
 let challengeType
+let challengeType2
 let phase
 let phase2
 let timelineTemplate
 let challenge
 let completedChallenge
+let newChallenge
+let challengeTrack
+let activeChallenge
+let challengeTimelineTemplate
 
 /**
  * function to deeply compare arrays  regardeless of the order
@@ -31,6 +36,13 @@ const deepCompareArrays = (arr1, arr2) => {
  * Create test data
  */
 async function createData () {
+  challengeTrack = await helper.create('ChallengeTrack', {
+    id: uuid(),
+    name: `track-${new Date().getTime()}`,
+    description: 'desc',
+    isActive: true,
+    abbreviation: 'abbr'
+  })
   challengeType = await helper.create('ChallengeType', {
     id: uuid(),
     name: `type-${new Date().getTime()}`,
@@ -38,6 +50,15 @@ async function createData () {
     isActive: true,
     abbreviation: 'abbr',
     legacyId: 123
+  })
+  challengeType2 = await helper.create('ChallengeType', {
+    id: uuid(),
+    name: `type2-${new Date().getTime()}`,
+    description: 'desc',
+    isActive: true,
+    abbreviation: 'abbr',
+    legacyId: 123,
+    isTask: true
   })
   phase = await helper.create('Phase', {
     id: uuid(),
@@ -67,11 +88,18 @@ async function createData () {
       defaultDuration: 20000
     }]
   })
+  challengeTimelineTemplate = await helper.create('ChallengeTimelineTemplate', {
+    id: uuid(),
+    typeId: challengeType2.id,
+    trackId: challengeTrack.id,
+    timelineTemplateId: timelineTemplate.id,
+    isDefault: true
+  })
   const nm = `a B c challenge${new Date().getTime()}`
   const challengeData = {
     id: uuid(),
     typeId: challengeType.id,
-    trackId: '9b6fc876-f4d9-4ccb-9dfd-419247628825',
+    trackId: challengeTrack.id,
     name: nm,
     description: 'desc',
     metadata: [{ name: nm, value: 'value' }],
@@ -97,13 +125,44 @@ async function createData () {
     startDate: new Date(),
     status: constants.challengeStatuses.Active,
     groups: ['group1'],
-    gitRepoURLs: ['https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B'],
+    // gitRepoURLs: ['https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B'],
     created: new Date(),
     createdBy: 'admin'
   }
 
   challenge = await helper.create('Challenge', challengeData)
-  completedChallenge = await helper.create('Challenge', _.assign(challengeData, { id: uuid(), status: constants.challengeStatuses.Completed }))
+  completedChallenge = await helper.create('Challenge', _.assign(challengeData, {
+    id: uuid(),
+    status: constants.challengeStatuses.Completed,
+    legacy: {
+      track: 'track',
+      reviewType: 'Virus Scan',
+      forumId: 123456,
+      directProjectId: 111
+    }
+  }))
+
+  activeChallenge = await helper.create('Challenge', _.assign(challengeData, {
+    id: uuid(),
+    status: constants.challengeStatuses.Active,
+    legacy: {
+      track: 'track',
+      reviewType: 'Virus Scan',
+      forumId: 123456,
+      directProjectId: 111
+    },
+    phases: []
+  }))
+
+  newChallenge = await helper.create('Challenge', _.assign(challengeData, {
+    id: uuid(),
+    status: constants.challengeStatuses.New,
+    typeId: challengeType2.id,
+    task: {
+      isTask: true,
+      isAssigned: true
+    }
+  }))
 
   // create challenge in Elasticsearch
   await esClient.create({
@@ -120,6 +179,24 @@ async function createData () {
     type: config.ES.ES_TYPE,
     id: completedChallenge.id,
     body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, completedChallenge.originalItem()),
+    refresh: 'true' // refresh ES so that it is visible for read operations instantly
+  })
+
+  // create activeChallenge in Elasticsearch
+  await esClient.create({
+    index: config.ES.ES_INDEX,
+    type: config.ES.ES_TYPE,
+    id: activeChallenge.id,
+    body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, activeChallenge.originalItem()),
+    refresh: 'true' // refresh ES so that it is visible for read operations instantly
+  })
+
+  // create newChallenge in Elasticsearch
+  await esClient.create({
+    index: config.ES.ES_INDEX,
+    type: config.ES.ES_TYPE,
+    id: newChallenge.id,
+    body: _.assignIn({ numOfSubmissions: 0, numOfRegistrants: 0 }, newChallenge.originalItem()),
     refresh: 'true' // refresh ES so that it is visible for read operations instantly
   })
 }
@@ -171,12 +248,24 @@ async function clearData () {
     refresh: 'true' // refresh ES so that it is effective for read operations instantly
   })
 
+  // remove activeChallenge in Elasticsearch
+  await esClient.delete({
+    index: config.ES.ES_INDEX,
+    type: config.ES.ES_TYPE,
+    id: activeChallenge.id,
+    refresh: 'true' // refresh ES so that it is effective for read operations instantly
+  })
+
   await challenge.delete()
   await completedChallenge.delete()
+  await activeChallenge.delete()
+  await challengeTimelineTemplate.delete()
   await timelineTemplate.delete()
   await phase.delete()
   await phase2.delete()
   await challengeType.delete()
+  await challengeType2.delete()
+  await challengeTrack.delete()
 }
 
 /**
@@ -185,11 +274,15 @@ async function clearData () {
 function getData () {
   return {
     challengeType: challengeType.originalItem(),
+    challengeType2: challengeType2.originalItem(),
     phase: phase.originalItem(),
     phase2: phase2.originalItem(),
     timelineTemplate: timelineTemplate.originalItem(),
+    challengeTimelineTemplate: challengeTimelineTemplate.originalItem(),
     challenge: challenge.originalItem(),
     completedChallenge: completedChallenge.originalItem(),
+    activeChallenge: activeChallenge.originalItem(),
+    newChallenge: newChallenge.originalItem(),
     defaultProjectTerms,
     additionalTerm,
     mockTerms

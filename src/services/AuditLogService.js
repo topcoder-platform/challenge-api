@@ -83,4 +83,3 @@ module.exports = {
 }
 
 logger.decorateWithValidators(module.exports)
-// logger.buildService(module.exports)

@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
 const constants = require('../../app-constants')
 
 /**
@@ -16,16 +16,15 @@ const constants = require('../../app-constants')
  */
 async function searchChallengeTracks (criteria) {
   // TODO - move this to ES
-  let records = await helper.scanAll('ChallengeTrack')
+  let records = await helper.scan('ChallengeTrack')
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
 
   if (criteria.name) records = _.filter(records, e => helper.partialMatch(criteria.name, e.name))
   if (criteria.description) records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
-  if (criteria.track) records = _.filter(records, e => _.toLower(criteria.track) === _.toLower(e.track))
+  // if (criteria.track) records = _.filter(records, e => _.toLower(criteria.track) === _.toLower(e.track))
   if (criteria.abbreviation) records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
   if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive === 'true')))
-  // if (criteria.legacyId) records = _.filter(records, e => (e.legacyId === criteria.legacyId))
 
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
@@ -40,9 +39,8 @@ searchChallengeTracks.schema = {
     name: Joi.string(),
     description: Joi.string(),
     isActive: Joi.boolean(),
-    abbreviation: Joi.string(),
-    legacyId: Joi.number().integer().positive(),
-    track: Joi.string().valid(_.values(constants.challengeTracks))
+    abbreviation: Joi.string()
+    // track: Joi.string().valid(_.values(constants.challengeTracks))
   })
 }
 
@@ -54,9 +52,6 @@ searchChallengeTracks.schema = {
 async function createChallengeTrack (type) {
   await helper.validateDuplicate('ChallengeTrack', 'name', type.name)
   await helper.validateDuplicate('ChallengeTrack', 'abbreviation', type.abbreviation)
-  if (type.legacyId) {
-    await helper.validateDuplicate('ChallengeTrack', 'legacyId', type.legacyId)
-  }
   const ret = await helper.create('ChallengeTrack', _.assign({ id: uuid() }, type))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackCreated, ret)
@@ -68,9 +63,7 @@ createChallengeTrack.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     isActive: Joi.boolean().required(),
-    abbreviation: Joi.string().required(),
-    legacyId: Joi.number().integer().positive(),
-    track: Joi.string().valid(_.values(constants.challengeTracks))
+    abbreviation: Joi.string().required()
   }).required()
 }
 
@@ -102,18 +95,12 @@ async function fullyUpdateChallengeTrack (id, data) {
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
     await helper.validateDuplicate('ChallengeTrack', 'abbreviation', data.abbreviation)
   }
-  if (data.legacyId && type.legacyId !== data.legacyId) {
-    await helper.validateDuplicate('ChallengeTrack', 'legacyId', data.legacyId)
-  }
   if (_.isUndefined(data.description)) {
     type.description = undefined
   }
-  if (_.isUndefined(data.legacyId)) {
-    type.legacyId = undefined
-  }
-  if (_.isUndefined(data.track)) {
-    type.track = undefined
-  }
+  // if (_.isUndefined(data.track)) {
+  //   type.track = undefined
+  // }
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackUpdated, ret)
@@ -126,9 +113,8 @@ fullyUpdateChallengeTrack.schema = {
     name: Joi.string().required(),
     description: Joi.string(),
     isActive: Joi.boolean().required(),
-    abbreviation: Joi.string().required(),
-    legacyId: Joi.number().integer().positive(),
-    track: Joi.string().valid(_.values(constants.challengeTracks))
+    abbreviation: Joi.string().required()
+    // track: Joi.string().valid(_.values(constants.challengeTracks))
   }).required()
 }
 
@@ -146,9 +132,6 @@ async function partiallyUpdateChallengeTrack (id, data) {
   if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
     await helper.validateDuplicate('ChallengeTrack', 'abbreviation', data.abbreviation)
   }
-  if (data.legacyId && type.legacyId !== data.legacyId) {
-    await helper.validateDuplicate('ChallengeTrack', 'legacyId', data.legacyId)
-  }
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackUpdated, _.assignIn({ id }, data))
@@ -161,9 +144,8 @@ partiallyUpdateChallengeTrack.schema = {
     name: Joi.string(),
     description: Joi.string(),
     isActive: Joi.boolean(),
-    abbreviation: Joi.string(),
-    legacyId: Joi.number().integer().positive(),
-    track: Joi.string().valid(_.values(constants.challengeTracks))
+    abbreviation: Joi.string()
+    // track: Joi.string().valid(_.values(constants.challengeTracks))
   }).required()
 }
 
@@ -175,4 +157,4 @@ module.exports = {
   partiallyUpdateChallengeTrack
 }
 
-// logger.buildService(module.exports)
+logger.decorateWithValidators(module.exports)
