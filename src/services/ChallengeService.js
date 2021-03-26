@@ -264,6 +264,17 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  if (criteria.totalPrizesFrom || criteria.totalPrizesTo) {
+    const prizeRangeQuery = {}
+    if (criteria.totalPrizesFrom) {
+      prizeRangeQuery.gte = criteria.totalPrizesFrom
+    }
+    if (criteria.totalPrizesTo) {
+      prizeRangeQuery.lte = criteria.totalPrizesTo
+    }
+    boolQuery.push({ range: { 'overview.totalPrizes': prizeRangeQuery } })
+  }
+
   if (criteria.useSchedulingAPI) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
@@ -681,7 +692,9 @@ searchChallenges.schema = {
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.string()),
     includeAllEvents: Joi.boolean().default(true),
-    useSchedulingAPI: Joi.boolean()
+    useSchedulingAPI: Joi.boolean(),
+    totalPrizesFrom: Joi.number().min(0),
+    totalPrizesTo: Joi.number().min(0)
   }).unknown(true)
 }
 

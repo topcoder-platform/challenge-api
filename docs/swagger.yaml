@@ -190,6 +190,18 @@ paths:
           required: false
           default: true
           type: boolean
+        - name: totalPrizesFrom
+          in: query
+          description: >-
+            Filter by the lowest amount of total prizes on the challenge
+          type: number
+          required: false
+        - name: totalPrizesTo
+          in: query
+          description: >-
+            Filter by the highest amount of total prizes on the challenge
+          type: number
+          required: false
         - name: events
           in: query
           description: >-
