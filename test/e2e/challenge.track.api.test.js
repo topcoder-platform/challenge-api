@@ -1,5 +1,5 @@
 /*
- * E2E tests of challenge type API
+ * E2E tests of challenge track API
  */
 
 require('../../app-bootstrap')
@@ -12,9 +12,9 @@ const app = require('../../app')
 const should = chai.should()
 chai.use(chaiHttp)
 
-const basePath = `/${config.API_VERSION}/challenge-types`
+const basePath = `/${config.API_VERSION}/challenge-tracks`
 
-describe('challenge type API E2E tests', () => {
+describe('challenge track API E2E tests', () => {
   // created entity ids
   let id
   let id2
@@ -25,8 +25,8 @@ describe('challenge type API E2E tests', () => {
   const abbreviation2 = `abb2${new Date().getTime()}`
   const notFoundId = uuid()
 
-  describe('create challenge type API tests', () => {
-    it('create challenge type successfully 1', async () => {
+  describe('create challenge track API tests', () => {
+    it('create challenge track successfully 1', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
@@ -46,7 +46,7 @@ describe('challenge type API E2E tests', () => {
       id = result.id
     })
 
-    it('create challenge type successfully 2', async () => {
+    it('create challenge track successfully 2', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -66,7 +66,7 @@ describe('challenge type API E2E tests', () => {
       id2 = result.id
     })
 
-    it('create challenge type - missing token', async () => {
+    it('create challenge track - missing token', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .send({
@@ -79,7 +79,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'No token provided.')
     })
 
-    it('create challenge type - invalid bearer format', async () => {
+    it('create challenge track - invalid bearer format', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', 'invalid format')
@@ -93,7 +93,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'No token provided.')
     })
 
-    it('create challenge type - invalid token', async () => {
+    it('create challenge track - invalid token', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.INVALID_TOKEN}`)
@@ -107,7 +107,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'Failed to authenticate token.')
     })
 
-    it('create challenge type - expired token', async () => {
+    it('create challenge track - expired token', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.EXPIRED_TOKEN}`)
@@ -121,7 +121,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'Failed to authenticate token.')
     })
 
-    it('create challenge type - name already used', async () => {
+    it('create challenge track - name already used', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -132,10 +132,10 @@ describe('challenge type API E2E tests', () => {
           abbreviation: `${abbreviation}-454545`
         })
       should.equal(response.status, 409)
-      should.equal(response.body.message, `ChallengeType with name: ${name} already exist`)
+      should.equal(response.body.message, `ChallengeTrack with name: ${name} already exist`)
     })
 
-    it('create challenge type - abbreviation already used', async () => {
+    it('create challenge track - abbreviation already used', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -146,10 +146,10 @@ describe('challenge type API E2E tests', () => {
           abbreviation
         })
       should.equal(response.status, 409)
-      should.equal(response.body.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+      should.equal(response.body.message, `ChallengeTrack with abbreviation: ${abbreviation} already exist`)
     })
 
-    it('create challenge type - forbidden', async () => {
+    it('create challenge track - forbidden', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_READ_ACCESS_TOKEN}`)
@@ -163,7 +163,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'You are not allowed to perform this action!')
     })
 
-    it('create challenge type - missing name', async () => {
+    it('create challenge track - missing name', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -176,7 +176,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" is required')
     })
 
-    it('create challenge type - missing abbreviation', async () => {
+    it('create challenge track - missing abbreviation', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -189,7 +189,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"abbreviation" is required')
     })
 
-    it('create challenge type - invalid name', async () => {
+    it('create challenge track - invalid name', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -203,7 +203,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" must be a string')
     })
 
-    it('create challenge type - invalid isActive', async () => {
+    it('create challenge track - invalid isActive', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -217,7 +217,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"isActive" must be a boolean')
     })
 
-    it('create challenge type - unexpected field', async () => {
+    it('create challenge track - unexpected field', async () => {
       const response = await chai.request(app)
         .post(basePath)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -233,8 +233,8 @@ describe('challenge type API E2E tests', () => {
     })
   })
 
-  describe('get challenge type API tests', () => {
-    it('get challenge type successfully', async () => {
+  describe('get challenge track API tests', () => {
+    it('get challenge track successfully', async () => {
       const response = await chai.request(app)
         .get(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
@@ -247,15 +247,15 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.abbreviation, abbreviation2)
     })
 
-    it('get challenge type - not found', async () => {
+    it('get challenge track - not found', async () => {
       const response = await chai.request(app)
         .get(`${basePath}/${notFoundId}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
       should.equal(response.status, 404)
-      should.equal(response.body.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
+      should.equal(response.body.message, `ChallengeTrack with id: ${notFoundId} doesn't exist`)
     })
 
-    it('get challenge type - invalid id', async () => {
+    it('get challenge track - invalid id', async () => {
       const response = await chai.request(app)
         .get(`${basePath}/invalid`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -264,8 +264,8 @@ describe('challenge type API E2E tests', () => {
     })
   })
 
-  describe('search challenge types API tests', () => {
-    it('search challenge types successfully 1', async () => {
+  describe('search challenge tracks API tests', () => {
+    it('search challenge tracks successfully 1', async () => {
       const response = await chai.request(app)
         .get(basePath)
         .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
@@ -293,7 +293,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result[0].abbreviation, abbreviation2)
     })
 
-    it('search challenge types successfully 2', async () => {
+    it('search challenge tracks successfully 2', async () => {
       const response = await chai.request(app)
         .get(basePath)
         .set('Authorization', `Bearer ${config.COPILOT_TOKEN}`)
@@ -306,7 +306,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.length, 0)
     })
 
-    it('search challenge types - invalid page', async () => {
+    it('search challenge tracks - invalid page', async () => {
       const response = await chai.request(app)
         .get(basePath)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -315,7 +315,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"page" must be larger than or equal to 1')
     })
 
-    it('search challenge types - invalid perPage', async () => {
+    it('search challenge tracks - invalid perPage', async () => {
       const response = await chai.request(app)
         .get(basePath)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -324,7 +324,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"perPage" must be a number')
     })
 
-    it('search challenge types - unexpected field', async () => {
+    it('search challenge tracks - unexpected field', async () => {
       const response = await chai.request(app)
         .get(basePath)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -334,8 +334,8 @@ describe('challenge type API E2E tests', () => {
     })
   })
 
-  describe('fully update challenge type API tests', () => {
-    it('fully update challenge type successfully', async () => {
+  describe('fully update challenge track API tests', () => {
+    it('fully update challenge track successfully', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -354,7 +354,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.abbreviation, `${abbreviation2}-updated`)
     })
 
-    it('fully update challenge type - name already used', async () => {
+    it('fully update challenge track - name already used', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -365,10 +365,10 @@ describe('challenge type API E2E tests', () => {
           abbreviation: `${abbreviation}-aaa123`
         })
       should.equal(response.status, 409)
-      should.equal(response.body.message, `ChallengeType with name: ${name} already exist`)
+      should.equal(response.body.message, `ChallengeTrack with name: ${name} already exist`)
     })
 
-    it('fully update challenge type - abbreviation already used', async () => {
+    it('fully update challenge track - abbreviation already used', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
@@ -379,10 +379,10 @@ describe('challenge type API E2E tests', () => {
           abbreviation
         })
       should.equal(response.status, 409)
-      should.equal(response.body.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+      should.equal(response.body.message, `ChallengeTrack with abbreviation: ${abbreviation} already exist`)
     })
 
-    it('fully update challenge type - forbidden', async () => {
+    it('fully update challenge track - forbidden', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.USER_TOKEN}`)
@@ -396,7 +396,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'You are not allowed to perform this action!')
     })
 
-    it('fully update challenge type - not found', async () => {
+    it('fully update challenge track - not found', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${notFoundId}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -407,10 +407,10 @@ describe('challenge type API E2E tests', () => {
           abbreviation: 'ab'
         })
       should.equal(response.status, 404)
-      should.equal(response.body.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
+      should.equal(response.body.message, `ChallengeTrack with id: ${notFoundId} doesn't exist`)
     })
 
-    it('fully update challenge type - invalid id', async () => {
+    it('fully update challenge track - invalid id', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/invalid`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -424,7 +424,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"id" must be a valid GUID')
     })
 
-    it('fully update challenge type - null name', async () => {
+    it('fully update challenge track - null name', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -438,7 +438,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" must be a string')
     })
 
-    it('fully update challenge type - invalid name', async () => {
+    it('fully update challenge track - invalid name', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -452,7 +452,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" must be a string')
     })
 
-    it('fully update challenge type - empty name', async () => {
+    it('fully update challenge track - empty name', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -466,7 +466,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" is not allowed to be empty')
     })
 
-    it('fully update challenge type - invalid isActive', async () => {
+    it('fully update challenge track - invalid isActive', async () => {
       const response = await chai.request(app)
         .put(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -481,8 +481,8 @@ describe('challenge type API E2E tests', () => {
     })
   })
 
-  describe('partially update challenge type API tests', () => {
-    it('partially update challenge type successfully', async () => {
+  describe('partially update challenge track API tests', () => {
+    it('partially update challenge track successfully', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.M2M_FULL_ACCESS_TOKEN}`)
@@ -500,25 +500,25 @@ describe('challenge type API E2E tests', () => {
       should.equal(result.abbreviation, `${abbreviation2}-33`)
     })
 
-    it('partially update challenge type - name already used', async () => {
+    it('partially update challenge track - name already used', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
         .send({ name })
       should.equal(response.status, 409)
-      should.equal(response.body.message, `ChallengeType with name: ${name} already exist`)
+      should.equal(response.body.message, `ChallengeTrack with name: ${name} already exist`)
     })
 
-    it('partially update challenge type - abbreviation already used', async () => {
+    it('partially update challenge track - abbreviation already used', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id2}`)
         .set('Authorization', `Bearer ${config.M2M_UPDATE_ACCESS_TOKEN}`)
         .send({ abbreviation })
       should.equal(response.status, 409)
-      should.equal(response.body.message, `ChallengeType with abbreviation: ${abbreviation} already exist`)
+      should.equal(response.body.message, `ChallengeTrack with abbreviation: ${abbreviation} already exist`)
     })
 
-    it('partially update challenge type - forbidden', async () => {
+    it('partially update challenge track - forbidden', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.M2M_READ_ACCESS_TOKEN}`)
@@ -527,16 +527,16 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, 'You are not allowed to perform this action!')
     })
 
-    it('partially update challenge type - not found', async () => {
+    it('partially update challenge track - not found', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${notFoundId}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
         .send({ name: 'testing2' })
       should.equal(response.status, 404)
-      should.equal(response.body.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
+      should.equal(response.body.message, `ChallengeTrack with id: ${notFoundId} doesn't exist`)
     })
 
-    it('partially update challenge type - invalid id', async () => {
+    it('partially update challenge track - invalid id', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/invalid`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -545,7 +545,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"id" must be a valid GUID')
     })
 
-    it('partially update challenge type - null name', async () => {
+    it('partially update challenge track - null name', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -554,7 +554,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" must be a string')
     })
 
-    it('partially update challenge type - invalid name', async () => {
+    it('partially update challenge track - invalid name', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -563,7 +563,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" must be a string')
     })
 
-    it('partially update challenge type - empty name', async () => {
+    it('partially update challenge track - empty name', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -572,7 +572,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"name" is not allowed to be empty')
     })
 
-    it('partially update challenge type - invalid description', async () => {
+    it('partially update challenge track - invalid description', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
@@ -581,7 +581,7 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"description" must be a string')
     })
 
-    it('partially update challenge type - invalid abbreviation', async () => {
+    it('partially update challenge track - invalid abbreviation', async () => {
       const response = await chai.request(app)
         .patch(`${basePath}/${id}`)
         .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)

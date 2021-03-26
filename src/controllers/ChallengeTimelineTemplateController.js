@@ -3,7 +3,6 @@
  */
 const HttpStatus = require('http-status-codes')
 const service = require('../services/ChallengeTimelineTemplateService')
-const helper = require('../common/helper')
 
 /**
  * Search challenge type timeline templates.
@@ -12,8 +11,7 @@ const helper = require('../common/helper')
  */
 async function searchChallengeTimelineTemplates (req, res) {
   const result = await service.searchChallengeTimelineTemplates(req.query)
-  helper.setResHeaders(req, res, result)
-  res.send(result.result)
+  res.send(result)
 }
 
 /**
@@ -32,7 +30,7 @@ async function createChallengeTimelineTemplate (req, res) {
  * @param {Object} res the response
  */
 async function getChallengeTimelineTemplate (req, res) {
-  const result = await service.getChallengeTimelineTemplate(req.params.challengeTypeTimelineTemplateId)
+  const result = await service.getChallengeTimelineTemplate(req.params.challengeTimelineTemplateId)
   res.send(result)
 }
 
@@ -42,7 +40,7 @@ async function getChallengeTimelineTemplate (req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateChallengeTimelineTemplate (req, res) {
-  const result = await service.fullyUpdateChallengeTimelineTemplate(req.params.challengeTypeTimelineTemplateId, req.body)
+  const result = await service.fullyUpdateChallengeTimelineTemplate(req.params.challengeTimelineTemplateId, req.body)
   res.send(result)
 }
 
@@ -52,7 +50,7 @@ async function fullyUpdateChallengeTimelineTemplate (req, res) {
  * @param {Object} res the response
  */
 async function deleteChallengeTimelineTemplate (req, res) {
-  const result = await service.deleteChallengeTimelineTemplate(req.params.challengeTypeTimelineTemplateId)
+  const result = await service.deleteChallengeTimelineTemplate(req.params.challengeTimelineTemplateId)
   res.send(result)
 }
 

@@ -647,7 +647,7 @@ searchChallenges.schema = {
     tags: Joi.array().items(Joi.string()),
     includeAllTags: Joi.boolean().default(true),
     projectId: Joi.number().integer().positive(),
-    forumId: Joi.number().integer(),
+    forumId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
     group: Joi.string(),
@@ -679,7 +679,7 @@ searchChallenges.schema = {
     isTask: Joi.boolean(),
     taskIsAssigned: Joi.boolean(),
     taskMemberId: Joi.string(),
-    events: Joi.array().items(Joi.string()),
+    events: Joi.array().items(Joi.number()),
     includeAllEvents: Joi.boolean().default(true),
     useSchedulingAPI: Joi.boolean()
   }).unknown(true)
@@ -730,19 +730,13 @@ async function validateChallengeData (challenge) {
  * @param {String} timelineTemplateId the timeline template id
  */
 async function populatePhases (phases, startDate, timelineTemplateId) {
+  if (!phases || phases.length === 0) {
+    return
+  }
   if (_.isUndefined(timelineTemplateId)) {
     throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
   }
   const template = await helper.getById('TimelineTemplate', timelineTemplateId)
-  if (!phases || phases.length === 0) {
-    // auto populate phases
-    for (const p of template.phases) {
-      phases.push({
-        phaseId: p.phaseId,
-        duration: p.defaultDuration
-      })
-    }
-  }
   const phaseDefinitions = await helper.scan('Phase')
   // generate phase instance ids
   for (let i = 0; i < phases.length; i += 1) {
@@ -892,11 +886,7 @@ async function createChallenge (currentUser, challenge) {
       throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`)
     }
   }
-
-  if (challenge.timelineTemplateId) {
-    if (!challenge.phases) {
-      challenge.phases = []
-    }
+  if (challenge.timelineTemplateId && challenge.phases && challenge.phases.length > 0) {
     await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
   }
 
@@ -984,7 +974,7 @@ createChallenge.schema = {
     typeId: Joi.id(),
     trackId: Joi.id(),
     legacy: Joi.object().keys({
-      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
+      reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
       directProjectId: Joi.number().integer(),
@@ -1014,7 +1004,7 @@ createChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer().min(0)
+      duration: Joi.number().positive()
     })),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
@@ -1058,7 +1048,7 @@ createChallenge.schema = {
  */
 async function getPhasesAndPopulate (data) {
   _.each(data.phases, async p => {
-    const phase = await PhaseService.getPhase(p.phaseId)
+    const phase = await PhaseService.getPhase(p.id)
     p.name = phase.name
     if (phase.description) {
       p.description = phase.description
@@ -1366,13 +1356,11 @@ async function update (currentUser, challengeId, data, isFull) {
         }
       }
     }
-
-    const newPhases = _.cloneDeep(challenge.phases) || []
+    const newPhases = challenge.phases
     const newStartDate = data.startDate || challenge.startDate
 
     await helper.validatePhases(newPhases)
     // populate phases
-
     await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.phases = newPhases
     data.startDate = newStartDate
@@ -1766,7 +1754,7 @@ fullyUpdateChallenge.schema = {
   challengeId: Joi.id(),
   data: Joi.object().keys({
     legacy: Joi.object().keys({
-      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
+      reviewType: Joi.string().required(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       forumId: Joi.number().integer(),
       directProjectId: Joi.number().integer(),
@@ -1798,7 +1786,7 @@ fullyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer().min(0),
+      duration: Joi.number().positive(),
       isOpen: Joi.boolean()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
@@ -1869,7 +1857,7 @@ partiallyUpdateChallenge.schema = {
     legacy: Joi.object().keys({
       track: Joi.string(),
       subTrack: Joi.string(),
-      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
+      reviewType: Joi.string(),
       confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
       directProjectId: Joi.number(),
       forumId: Joi.number().integer(),
@@ -1899,7 +1887,7 @@ partiallyUpdateChallenge.schema = {
     timelineTemplateId: Joi.string(), // changing this to update migrated challenges
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer().min(0),
+      duration: Joi.number().positive(),
       isOpen: Joi.boolean()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({

@@ -9,11 +9,13 @@ const prepare = require('mocha-prepare')
 const config = require('config')
 const AWS = require('aws-sdk')
 
+let s3
+
 /*
  * Initialize an S3 bucket.
  */
 async function initBucket () {
-  const s3 = new AWS.S3()
+  s3 = new AWS.S3()
   try {
     await s3.headBucket({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET }).promise()
   } catch (err) {
@@ -31,8 +33,11 @@ prepare(function (done) {
     s3ForcePathStyle: true
   })
   initBucket()
-    .then(result => {
-      done()
+    .then(() => {
+      const params = { Bucket: 'bucket', Key: 'key1/key2', Body: 'Hello World!' }
+      s3.putObject(params, function () {
+        done()
+      })
     })
 }, function (done) {
   done()
