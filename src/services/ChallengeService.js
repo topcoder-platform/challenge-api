@@ -881,7 +881,7 @@ async function createChallenge (currentUser, challenge) {
   if (challenge.discussions && challenge.discussions.length > 0) {
     for (let i = 0; i < challenge.discussions.length; i += 1) {
       challenge.discussions[i].id = uuid()
-      challenge.discussions[i].name = challenge.discussions[i].name.slice(0, config.FORUM_TITLE_LENGTH_LIMIT - 1)
+      challenge.discussions[i].name = challenge.discussions[i].name.substring(0, config.FORUM_TITLE_LENGTH_LIMIT)
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -1757,7 +1757,7 @@ function sanitizeChallenge (challenge) {
   if (challenge.discussions) {
     sanitized.discussions = _.map(challenge.discussions, discussion => ({
       ..._.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']),
-      name: _.get(discussion, 'name', '').slice(0, config.FORUM_TITLE_LENGTH_LIMIT - 1)
+      name: _.get(discussion, 'name', '').substring(0, config.FORUM_TITLE_LENGTH_LIMIT)
     }))
   }
   if (challenge.terms) {
