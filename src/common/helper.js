@@ -757,7 +757,7 @@ async function getProjectDefaultTerms (projectId) {
  * @param {Number} projectId The id of the project for which to get the default terms of use
  * @returns {Promise<Number>} The billing account ID
  */
-async function getProjectBillingInformation (projectId) {
+async function getProjectBillingInformation (projectId) { 
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
@@ -773,7 +773,7 @@ async function getProjectBillingInformation (projectId) {
     }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+      return null
     } else {
       // re-throw other error
       throw err

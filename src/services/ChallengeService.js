@@ -861,10 +861,10 @@ async function createChallenge (currentUser, challenge) {
   }
   const { track, type } = await validateChallengeData(challenge)
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
-  if (_.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+  if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(challenge, 'billing.billingAccountId', billingAccountId)
   }
-  if (_.isUndefined(_.get(challenge, 'billing.markup'))) {
+  if (markup && _.isUndefined(_.get(challenge, 'billing.markup'))) {
     _.set(challenge, 'billing.markup', markup)
   }
   if (_.get(type, 'isTask')) {
@@ -1241,10 +1241,10 @@ async function update (currentUser, challengeId, data, isFull) {
 
   const challenge = await helper.getById('Challenge', challengeId)
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
-  if (_.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+  if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
   }
-  if (_.isUndefined(_.get(challenge, 'billing.markup'))) {
+  if (markup && _.isUndefined(_.get(challenge, 'billing.markup'))) {
     _.set(data, 'billing.markup', markup)
   }
   if (data.status) {
@@ -1253,7 +1253,7 @@ async function update (currentUser, challengeId, data, isFull) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
       // if activating a challenge, the challenge must have a billing account id
-      if ((!_.get(challenge, 'billing.billingAccountId') || _.get(challenge, 'billing.billingAccountId') === null) &&
+      if ((!billingAccountId || billingAccountId === null) &&
         challenge.status === constants.challengeStatuses.Draft) {
         throw new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
       }
