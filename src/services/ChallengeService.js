@@ -1288,6 +1288,8 @@ async function update (currentUser, challengeId, data, isFull) {
 
   if (!_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
     _.extend(challenge.billing, data.billing)
+  } else if (_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
+    challenge.billing = data.billing
   }
 
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
