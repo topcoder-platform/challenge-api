@@ -773,7 +773,10 @@ async function getProjectBillingInformation (projectId) {
     }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
-      return null
+      return {
+        billingAccountId: null,
+        markup: null
+      }
     } else {
       // re-throw other error
       throw err
