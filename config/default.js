@@ -77,5 +77,5 @@ module.exports = {
 
   M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'tcwebservice',
 
-  FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 110
+  FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90
 }
