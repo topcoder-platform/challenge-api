@@ -264,6 +264,17 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  if (criteria.totalPrizesFrom || criteria.totalPrizesTo) {
+    const prizeRangeQuery = {}
+    if (criteria.totalPrizesFrom) {
+      prizeRangeQuery.gte = criteria.totalPrizesFrom
+    }
+    if (criteria.totalPrizesTo) {
+      prizeRangeQuery.lte = criteria.totalPrizesTo
+    }
+    boolQuery.push({ range: { 'overview.totalPrizes': prizeRangeQuery } })
+  }
+
   if (criteria.useSchedulingAPI) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
@@ -557,8 +568,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  // logger.debug(`es Query ${JSON.stringify(esQuery)}`)
-
+  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
   // Search with constructed query
   let docs
   try {
@@ -580,6 +590,7 @@ async function searchChallenges (currentUser, criteria) {
   // Hide privateDescription for non-register challenges
   if (currentUser) {
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      result = _.each(result, (val) => _.unset(val, 'billing'))
       const ids = await helper.listChallengesByMember(currentUser.userId)
       result = _.each(result, (val) => {
         if (!_.includes(ids, val.id)) {
@@ -588,7 +599,11 @@ async function searchChallenges (currentUser, criteria) {
       })
     }
   } else {
-    result = _.each(result, val => _.unset(val, 'privateDescription'))
+    result = _.each(result, val => {
+      _.unset(val, 'billing')
+      _.unset(val, 'privateDescription')
+      return val
+    })
   }
 
   if (criteria.isLightweight === 'true') {
@@ -677,7 +692,9 @@ searchChallenges.schema = {
     taskMemberId: Joi.string(),
     events: Joi.array().items(Joi.string()),
     includeAllEvents: Joi.boolean().default(true),
-    useSchedulingAPI: Joi.boolean()
+    useSchedulingAPI: Joi.boolean(),
+    totalPrizesFrom: Joi.number().min(0),
+    totalPrizesTo: Joi.number().min(0)
   }).unknown(true)
 }
 
@@ -829,6 +846,12 @@ async function createChallenge (currentUser, challenge) {
   }
   challenge.name = xss(challenge.name)
   challenge.description = xss(challenge.description)
+  if (!challenge.status) {
+    challenge.status = constants.challengeStatuses.New
+  }
+  if (!challenge.startDate) {
+    challenge.startDate = new Date()
+  }
   if (challenge.status === constants.challengeStatuses.Active) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
@@ -837,6 +860,13 @@ async function createChallenge (currentUser, challenge) {
     _.set(challenge, 'legacy.directProjectId', directProjectId)
   }
   const { track, type } = await validateChallengeData(challenge)
+  const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
+  if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+    _.set(challenge, 'billing.billingAccountId', billingAccountId)
+  }
+  if (markup && _.isUndefined(_.get(challenge, 'billing.markup'))) {
+    _.set(challenge, 'billing.markup', markup)
+  }
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
     if (_.isUndefined(_.get(challenge, 'task.isAssigned'))) {
@@ -851,6 +881,7 @@ async function createChallenge (currentUser, challenge) {
   if (challenge.discussions && challenge.discussions.length > 0) {
     for (let i = 0; i < challenge.discussions.length; i += 1) {
       challenge.discussions[i].id = uuid()
+      challenge.discussions[i].name = challenge.discussions[i].name.substring(0, config.FORUM_TITLE_LENGTH_LIMIT)
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
@@ -982,6 +1013,10 @@ createChallenge.schema = {
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean()
     }),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
+    }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
       isAssigned: Joi.boolean().default(false),
@@ -1026,7 +1061,7 @@ createChallenge.schema = {
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
-    status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)),
     groups: Joi.array().items(Joi.optionalId()).unique(),
     // gitRepoURLs: Joi.array().items(Joi.string().uri()),
     terms: Joi.array().items(Joi.object().keys({
@@ -1097,12 +1132,14 @@ async function getChallenge (currentUser, id) {
   let memberChallengeIds
   if (currentUser) {
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+      _.unset(challenge, 'billing')
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
       if (!_.includes(memberChallengeIds, challenge.id)) {
         _.unset(challenge, 'privateDescription')
       }
     }
   } else {
+    _.unset(challenge, 'billing')
     _.unset(challenge, 'privateDescription')
   }
 
@@ -1203,25 +1240,28 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
-  // FIXME: Tech Debt
-  let billingAccountId
+  const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
+  if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+    _.set(data, 'billing.billingAccountId', billingAccountId)
+  }
+  if (markup && _.isUndefined(_.get(challenge, 'billing.markup'))) {
+    _.set(data, 'billing.markup', markup)
+  }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacy.directProjectId'))) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacyId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
-      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
       // if activating a challenge, the challenge must have a billing account id
       if ((!billingAccountId || billingAccountId === null) &&
         challenge.status === constants.challengeStatuses.Draft) {
-        throw new errors.BadRequestError('Cannot Activate this project, it has no active billing accounts.')
+        throw new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
       }
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
-      billingAccountId = await helper.getProjectBillingAccount(_.get(challenge, 'legacy.directProjectId'))
     }
   }
 
@@ -1244,6 +1284,12 @@ async function update (currentUser, challengeId, data, isFull) {
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
     _.extend(challenge.legacy, data.legacy)
+  }
+
+  if (!_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
+    _.extend(challenge.billing, data.billing)
+  } else if (_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
+    challenge.billing = data.billing
   }
 
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
@@ -1414,6 +1460,9 @@ async function update (currentUser, challengeId, data, isFull) {
         _.intersection(oldIds, newIds).length !== value.length) {
         op = '$PUT'
       }
+    } else if (key === 'billing' || key === 'legacy') {
+      // make sure that's always being udpated
+      op = '$PUT'
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
       op = '$PUT'
     }
@@ -1609,11 +1658,7 @@ async function update (currentUser, challengeId, data, isFull) {
 
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
-  const busEventPayload = { ...challenge }
-  if (billingAccountId) {
-    busEventPayload.billingAccountId = billingAccountId
-  }
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, busEventPayload)
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
   if (phasesHaveBeenModified === true && _.get(challenge, 'legacy.useSchedulingAPI')) {
     await helper.postBusEvent(config.SCHEDULING_TOPIC, { id: challengeId })
   }
@@ -1687,6 +1732,12 @@ function sanitizeChallenge (challenge) {
       'pureV5Task'
     ])
   }
+  if (challenge.billing) {
+    sanitized.billing = _.pick(challenge.billing, [
+      'billingAccountId',
+      'markup'
+    ])
+  }
   if (challenge.metadata) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
@@ -1706,7 +1757,10 @@ function sanitizeChallenge (challenge) {
     sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
   }
   if (challenge.discussions) {
-    sanitized.discussions = _.map(challenge.discussions, discussion => _.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']))
+    sanitized.discussions = _.map(challenge.discussions, discussion => ({
+      ..._.pick(discussion, ['id', 'provider', 'name', 'type', 'url', 'options']),
+      name: _.get(discussion, 'name', '').substring(0, config.FORUM_TITLE_LENGTH_LIMIT)
+    }))
   }
   if (challenge.terms) {
     sanitized.terms = _.map(challenge.terms, term => _.pick(term, ['id', 'roleId']))
@@ -1742,6 +1796,10 @@ fullyUpdateChallenge.schema = {
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean()
+    }).unknown(true),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
@@ -1845,6 +1903,10 @@ partiallyUpdateChallenge.schema = {
       isAssigned: Joi.boolean().default(false),
       memberId: Joi.string().allow(null)
     }),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
+    }).unknown(true),
     trackId: Joi.optionalId(),
     typeId: Joi.optionalId(),
     name: Joi.string(),

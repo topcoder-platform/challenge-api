@@ -757,15 +757,26 @@ async function getProjectDefaultTerms (projectId) {
  * @param {Number} projectId The id of the project for which to get the default terms of use
  * @returns {Promise<Number>} The billing account ID
  */
-async function getProjectBillingAccount (projectId) {
+async function getProjectBillingInformation (projectId) { 
   const token = await getM2MToken()
-  const projectUrl = `${config.V3_PROJECTS_API_URL}/${projectId}`
+  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
     const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-    return _.get(res, 'data.result.content.billingAccountIds[0]', null)
+    let markup = _.get(res, 'data.markup', null) ? _.toNumber(_.get(res, 'data.markup', null)) : null
+    if (markup && markup > 0) {
+      // TODO - Hack to change int returned from api to decimal
+      markup = markup / 100
+    }
+    return {
+      billingAccountId: _.get(res, 'data.tcBillingAccountId', null),
+      markup
+    }
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+      return {
+        billingAccountId: null,
+        markup: null
+      }
     } else {
       // re-throw other error
       throw err
@@ -978,7 +989,7 @@ module.exports = {
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
-  getProjectBillingAccount,
+  getProjectBillingInformation,
   expandWithSubGroups,
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,
