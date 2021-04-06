@@ -217,14 +217,48 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
+  const multiMatchQuery = []
   if (criteria.search) {
-    boolQuery.push({
-      bool: {
-        should: [
-          { match_phrase_prefix: { 'name': criteria.search } },
-          { match_phrase_prefix: { 'description': criteria.search } },
-          { match_phrase_prefix: { 'tags': criteria.search } }
-        ]
+    multiMatchQuery.push({
+      // exact match
+      multi_match: {
+        query: criteria.search,
+        fields: [
+          'name.text^7',
+          'tags^3',
+          'description^2'
+        ],
+        type: 'phrase_prefix',
+        boost: 5
+      }
+    })
+    multiMatchQuery.push({
+      // match 100% words
+      multi_match: {
+        query: criteria.search,
+        fields: [
+          'name.text^3.0',
+          'tags^2.5',
+          'description^1.0'
+        ],
+        type: 'most_fields',
+        minimum_should_match: '100%',
+        boost: 2.5
+      }
+    })
+    multiMatchQuery.push({
+      // fuzzy match
+      multi_match: {
+        query: criteria.search,
+        fields: [
+          'name.text^2.5',
+          'tags^1.5',
+          'description^1.0'
+        ],
+        type: 'most_fields',
+        minimum_should_match: '50%',
+        fuzziness: 'AUTO',
+        boost: 1
       }
     })
   } else {
@@ -525,6 +559,14 @@ async function searchChallenges (currentUser, criteria) {
     mustQuery.push({
       bool: {
         should: groupsQuery
+      }
+    })
+  }
+
+  if (multiMatchQuery) {
+    mustQuery.push({
+      bool: {
+        should: multiMatchQuery
       }
     })
   }
