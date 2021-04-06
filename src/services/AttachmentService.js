@@ -44,7 +44,7 @@ async function _getChallengeAttachment (challengeId, attachmentId) {
   const challenge = await helper.getById('Challenge', challengeId)
   const attachment = await models.Attachment.get(attachmentId)
   if (!attachment || attachment.challengeId !== challengeId) {
-    throw new errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
+    throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
   }
   return { challenge, attachment }
 }

@@ -19,6 +19,7 @@ async function searchAuditLogs (criteria) {
 
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
+
   const AuditTable = models['AuditLog']
   let results = []
   let query = null

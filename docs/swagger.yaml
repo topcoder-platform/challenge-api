@@ -190,6 +190,18 @@ paths:
           required: false
           default: true
           type: boolean
+        - name: totalPrizesFrom
+          in: query
+          description: >-
+            Filter by the lowest amount of total prizes on the challenge
+          type: number
+          required: false
+        - name: totalPrizesTo
+          in: query
+          description: >-
+            Filter by the highest amount of total prizes on the challenge
+          type: number
+          required: false
         - name: events
           in: query
           description: >-
@@ -2555,6 +2567,10 @@ definitions:
           reviewType:
             type: string
             description: the review type
+            enum:
+              - 'INTERNAL'
+              - 'COMMUNITY'
+            default: 'INTERNAL'
           forumId:
             type: integer
             description: the forum id
@@ -2723,7 +2739,6 @@ definitions:
       - prizeSets
       - created
       - createdBy
-      - reviewType
       - tags
       - status
   Attachment:
@@ -2967,13 +2982,16 @@ definitions:
             type: string
           reviewType:
             type: string
+            enum:
+              - 'INTERNAL'
+              - 'COMMUNITY'
+            default: 'INTERNAL'
           confidentialityType:
             type: string
           forumId:
             type: number
         required:
           - track
-          - reviewType
       name:
         type: string
       description:
@@ -3251,7 +3269,6 @@ definitions:
       - prizeSets
       - created
       - createdBy
-      - reviewType
       - tags
       - projectId
       - forumId

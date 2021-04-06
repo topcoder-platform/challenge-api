@@ -34,6 +34,11 @@ const initES = async () => {
         id: { type: 'keyword' },
         name: {
           type: 'keyword',
+          fields: {
+            text: {
+              type: 'text'
+            }
+          },
           normalizer: 'custom_sort_normalizer'
         },
         prizeSets: {
