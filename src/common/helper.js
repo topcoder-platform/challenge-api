@@ -477,6 +477,7 @@ async function getUserGroups (userId) {
       headers: { Authorization: `Bearer ${token}` },
       params: {
         page,
+        perPage: 1000,
         memberId: userId,
         membershipType: 'user'
       }
