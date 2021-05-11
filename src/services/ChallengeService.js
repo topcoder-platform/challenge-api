@@ -88,7 +88,11 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
 async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
   const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge])
   if (filtered.length === 0) {
-    throw new errors.ForbiddenError(`You don't have access to this group!`)
+    throw new errors.ForbiddenError(`ensureAccessibleByGroupsAccess :: You don't have access to this group!
+      Current User: ${JSON.stringify(currentUser)}
+      Challenge: ${JSON.stringify(challenge)}
+      Filtered: ${JSON.stringify(filtered)}
+    `)
   }
 }
 
@@ -108,7 +112,12 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
   const updatedGroups = _.difference(_.union(challenge.groups, data.groups), _.intersection(challenge.groups, data.groups))
   const filtered = updatedGroups.filter(g => !userGroupsIds.includes(g))
   if (filtered.length > 0) {
-    throw new errors.ForbiddenError(`You don't have access to this group!`)
+    throw new errors.ForbiddenError(`ensureAcessibilityToModifiedGroups :: You don't have access to this group!
+      Current User: ${JSON.stringify(currentUser)}
+      Data: ${JSON.stringify(data)}
+      Challenge: ${JSON.stringify(challenge)}
+      Filtered: ${JSON.stringify(filtered)}
+    `)
   }
 }
 
@@ -2012,4 +2021,4 @@ module.exports = {
   deleteChallenge
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)
