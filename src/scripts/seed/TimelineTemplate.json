@@ -48,11 +48,10 @@
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 259200
+        "defaultDuration": 172800
       }
     ]
   },
-
   {
     "id": "6969125a-a12f-4b89-8de6-e66b0056f36b",
     "name": "Marathon Match",
