@@ -914,9 +914,7 @@ async function createChallenge (currentUser, challenge) {
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(challenge, 'billing.billingAccountId', billingAccountId)
-  }
-  if (markup && _.isUndefined(_.get(challenge, 'billing.markup'))) {
-    _.set(challenge, 'billing.markup', markup)
+    _.set(challenge, 'billing.markup', markup || 0)
   }
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
@@ -1108,7 +1106,7 @@ createChallenge.schema = {
         value: Joi.number().min(0).required()
       })).min(1).required()
     })),
-    tags: Joi.array().items(Joi.string().required()), // tag names
+    tags: Joi.array().items(Joi.string()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
@@ -1294,9 +1292,7 @@ async function update (currentUser, challengeId, data, isFull) {
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
-  }
-  if (markup && _.isUndefined(_.get(challenge, 'billing.markup'))) {
-    _.set(data, 'billing.markup', markup)
+    _.set(data, 'billing.markup', markup || 0)
   }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
@@ -1895,7 +1891,7 @@ fullyUpdateChallenge.schema = {
       url: Joi.string(),
       options: Joi.array().items(Joi.object())
     })),
-    tags: Joi.array().items(Joi.string().required()), // tag names
+    tags: Joi.array().items(Joi.string()), // tag names
     projectId: Joi.number().integer().positive().required(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
