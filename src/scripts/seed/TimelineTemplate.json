@@ -48,36 +48,10 @@
       {
         "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
         "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 259200
-      },
-      {
-        "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
-        "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 86400
-      },
-      {
-        "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
-        "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
-        "defaultDuration": 57600
-      },
-      {
-        "phaseId": "3e2afca6-9542-4763-a135-96b33f12c082",
-        "predecessor": "797a6af7-cd3f-4436-9fca-9679f773bee9",
-        "defaultDuration": 86400
-      },
-      {
-        "phaseId": "f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59",
-        "predecessor": "3e2afca6-9542-4763-a135-96b33f12c082",
-        "defaultDuration": 86400
-      },
-      {
-        "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
-        "predecessor": "f3acaf26-1dd5-42ae-9f0d-8eb0fd24ae59",
         "defaultDuration": 172800
       }
     ]
   },
-
   {
     "id": "6969125a-a12f-4b89-8de6-e66b0056f36b",
     "name": "Marathon Match",

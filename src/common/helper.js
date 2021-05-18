@@ -758,7 +758,7 @@ async function getProjectDefaultTerms (projectId) {
  * @param {Number} projectId The id of the project for which to get the default terms of use
  * @returns {Promise<Number>} The billing account ID
  */
-async function getProjectBillingInformation (projectId) { 
+async function getProjectBillingInformation (projectId) {
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
@@ -865,7 +865,11 @@ async function _filterChallengesByGroupsAccess (currentUser, challenges) {
 async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
   const filtered = await _filterChallengesByGroupsAccess(currentUser, [challenge])
   if (filtered.length === 0) {
-    throw new errors.ForbiddenError(`You don't have access to this group!`)
+    throw new errors.ForbiddenError(`helper ensureAcessibilityToModifiedGroups :: You don't have access to this group!
+      Current user: ${JSON.stringify(currentUser)}
+      Challenge: ${JSON.stringify(challenge)}
+      Filtered: ${JSON.stringify(filtered)}
+    `)
   }
 }
 
