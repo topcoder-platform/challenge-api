@@ -1306,7 +1306,7 @@ async function update (currentUser, challengeId, data, isFull) {
       }
     }
     if (data.status === constants.challengeStatuses.Completed) {
-      if (challenge.status !== constants.challengeStatuses.Active) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
     }
