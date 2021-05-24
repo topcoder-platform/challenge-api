@@ -865,11 +865,7 @@ async function _filterChallengesByGroupsAccess (currentUser, challenges) {
 async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
   const filtered = await _filterChallengesByGroupsAccess(currentUser, [challenge])
   if (filtered.length === 0) {
-    throw new errors.ForbiddenError(`helper ensureAcessibilityToModifiedGroups :: You don't have access to this group!
-      Current user: ${JSON.stringify(currentUser)}
-      Challenge: ${JSON.stringify(challenge)}
-      Filtered: ${JSON.stringify(filtered)}
-    `)
+    throw new errors.ForbiddenError("helper ensureAcessibilityToModifiedGroups :: You don't have access to this group!")
   }
 }
 
