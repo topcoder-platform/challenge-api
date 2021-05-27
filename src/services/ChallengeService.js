@@ -1055,7 +1055,8 @@ createChallenge.schema = {
       reviewScorecardId: Joi.number().integer(),
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
-      pureV5Task: Joi.boolean()
+      pureV5Task: Joi.boolean(),
+      pureV5: Joi.boolean(),
     }),
     billing: Joi.object().keys({
       billingAccountId: Joi.string(),
@@ -1322,6 +1323,9 @@ async function update (currentUser, challengeId, data, isFull) {
   }
   if (_.get(challenge, 'legacy.pureV5Task') && _.get(data, 'legacy.pureV5Task') && _.get(challenge, 'legacy.pureV5Task') !== _.get(data, 'legacy.pureV5Task')) {
     throw new errors.ForbiddenError('Cannot change legacy.pureV5Task')
+  }
+  if (_.get(challenge, 'legacy.pureV5') && _.get(data, 'legacy.pureV5') && _.get(challenge, 'legacy.pureV5') !== _.get(data, 'legacy.pureV5')) {
+    throw new errors.ForbiddenError('Cannot change legacy.pureV5')
   }
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
@@ -1771,7 +1775,8 @@ function sanitizeChallenge (challenge) {
       'reviewScorecardId',
       'isTask',
       'useSchedulingAPI',
-      'pureV5Task'
+      'pureV5Task',
+      'pureV5'
     ])
   }
   if (challenge.billing) {
@@ -1837,7 +1842,8 @@ fullyUpdateChallenge.schema = {
       reviewScorecardId: Joi.number().integer(),
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
-      pureV5Task: Joi.boolean()
+      pureV5Task: Joi.boolean(),
+      pureV5: Joi.boolean()
     }).unknown(true),
     billing: Joi.object().keys({
       billingAccountId: Joi.string(),
@@ -1938,7 +1944,8 @@ partiallyUpdateChallenge.schema = {
       forumId: Joi.number().integer(),
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
-      pureV5Task: Joi.boolean()
+      pureV5Task: Joi.boolean(),
+      pureV5: Joi.boolean()
     }).unknown(true),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
