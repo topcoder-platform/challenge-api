@@ -902,7 +902,7 @@ async function createChallenge (currentUser, challenge) {
     throw new errors.BadRequestError('You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active.')
   }
   const { directProjectId } = await helper.ensureProjectExist(challenge.projectId, currentUser)
-  if (_.get(challenge, 'legacy.pureV5Task')) {
+  if (_.get(challenge, 'legacy.pureV5Task') || _.get(challenge, 'legacy.pureV5')) {
     _.set(challenge, 'legacy.directProjectId', directProjectId)
   }
   const { track, type } = await validateChallengeData(challenge)
@@ -1292,7 +1292,7 @@ async function update (currentUser, challengeId, data, isFull) {
   }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (!_.get(challenge, 'legacy.pureV5Task') && _.isUndefined(_.get(challenge, 'legacyId'))) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && _.isUndefined(_.get(challenge, 'legacyId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }
       // if activating a challenge, the challenge must have a billing account id
@@ -1302,7 +1302,7 @@ async function update (currentUser, challengeId, data, isFull) {
       }
     }
     if (data.status === constants.challengeStatuses.Completed) {
-      if (!_.get(challenge, 'legacy.pureV5Task') && challenge.status !== constants.challengeStatuses.Active) {
+      if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
     }
