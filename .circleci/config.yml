@@ -130,6 +130,7 @@ workflows:
           filters:
             branches:
               only: master
+
   Performance Testing:
    when: << pipeline.parameters.run_performancetesting >>
    jobs:
