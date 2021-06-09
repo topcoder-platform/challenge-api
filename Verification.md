@@ -1,10 +1,13 @@
 # TopCoder Challenge API Verification
 
-## Postman tests
-- clear the environment, run command `npm run init-db` and `npm run init-es force`
-- import Postman collection and environment in the docs folder to Postman
-- run tests from up to down in order
-- You need to run command `npm run sync-es` before you run `Challenges/get challenge` and `Challenges/search challenge` test case.
+## E2E Postman tests
+- Import Postman collection and environment in the docs folder to Postman
+- Set `token` variable in environment variables folder
+- Open Runner
+- Put E2E Test Folder inside Runner
+- Set `Delay` to 2000ms
+- Check `Save Responses`
+- Start Run
 
 ## DynamoDB Verification
 Run command `npm run view-data <ModelName>` to view table data, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`, `Attachment` or `ChallengeTimelineTemplate`
