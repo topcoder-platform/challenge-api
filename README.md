@@ -81,50 +81,82 @@ You can find sample `.env` files inside the `/docs` directory.
 5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
 6. Create Elasticsearch index: `npm run init-es`, or to re-create index: `npm run init-es force`
 7. Synchronize ES data and DynamoDB data: `npm run sync-es`
+8. Start all the depending services for local deployment: `npm run services:up`
+9. Stop all the depending services for local deployment: `npm run services:down`
+10. Check the logs of all the depending services for local deployment: `npm run services:logs`
+11. Initialize the local environments: `npm run local:init`
+12. Reset the local environments: `npm run local:reset`
+
 
 ### Notes
 - The seed data are located in `src/scripts/seed`
 
 ## Local Deployment
+0. Make sure to use Node v10+ by command `node -v`. We recommend using [NVM](https://github.com/nvm-sh/nvm) to quickly switch to the right version:
 
-### AWS S3 Setup
-Go to https://console.aws.amazon.com/ and login. Choose S3 from Service folder and click `Create bucket`. Following the instruction to create S3 bucket.
+   ```bash
+   nvm use
+   ```
 
-### Local services setup
-In the `local` folder, run `docker-compose up` to start Elasticsearch, DynamoDB, S3 compatible server and Mock API.
+1. 📦 Install npm dependencies
 
-### Create Tables
-1. Make sure DynamoDB are running as per instructions above.
-2. Make sure you have configured all config parameters. Refer [Configuration](#configuration)
-3. Run `npm run create-tables` to create tables.
+   ```bash
+   npm install
+   ```
 
-### Mock API
-The provided mock API provides mock endpoint to fetch challenge resources and groups so you don't have to deploy the related services locally.
-You need to ensure DynamoDB configuration in `mock-api/config/default.js` is consistent with `config/default.js`
-Mock API starts after running `docker-compose up` and expose port 4000.
+2. ⚙ Local config   
+  In the `challenge-api` root directory create `.env` file with the next environment variables. Values for **Auth0 config** should be shared with you on the forum.<br>
+     ```bash
+     # Auth0 config
+     AUTH0_URL=
+     AUTH0_PROXY_SERVER_URL=
+     AUTH0_AUDIENCE=
+     AUTH0_CLIENT_ID=
+     AUTH0_CLIENT_SECRET=
 
-### Notes
-There are two parts need to be updated for local development
-- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116 
-`throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
+     # Locally deployed services (via docker-compose)
+     IS_LOCAL_DB=true
+     DYNAMODB_URL=http://localhost:8000
+     ```
+
+    - Values from this file would be automatically used by many `npm` commands.
+    - ⚠️ Never commit this file or its copy to the repository!
+
+3. 🚢 Start docker-compose with services which are required to start Topcoder Challenges API locally
+
+   ```bash
+   npm run services:up
+   ```
+   
+4. ♻ Update following two parts:
+- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116
+  `throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
 - https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
-Two aws config should be uncommented
 
-and AUTH0 related configuration must be set at config file or in env variables.
+5. ♻ Create tables.
 
-### Deploy the app
+   ```bash
+   npm run create-tables
+   # Use `npm run drop-tables` to drop tables.
+   ```
 
-- Follow the Notes section above
-- Install dependencies `npm install`
-- Run lint `npm run lint`
-- Run lint fix `npm run lint:fix`
-- initialize Elasticsearch, create configured Elasticsearch index if not present: `npm run init-es`,
-  or re-create the index: `npm run init-es force`
-- Create tables `npm run create-tables`
-- Clear and init db `npm run init-db`
-- Seed tables: `npm run seed-tables`
-- Start app `npm start`
-- App is running at `http://localhost:3000`
+6. ♻ Init DB, ES
+
+   ```bash
+   npm run local:init
+   ```
+
+   This command will do 3 things:
+  - create Elasticsearch indexes (drop if exists)
+  - Initialize the database by cleaning all the records.
+  - Import the data to the local database and index it to ElasticSearch
+
+7. 🚀 Start Topcoder Challenge API
+
+   ```bash
+   npm start
+   ```
+   The Topcoder Challenge API will be served on `http://localhost:3000`
 
 ## Production deployment
 

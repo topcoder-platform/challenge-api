@@ -1,7 +1,7 @@
 /**
  * The configuration file.
  */
-
+require('dotenv').config()
 module.exports = {
   READONLY: process.env.READONLY === 'true' || false,
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
