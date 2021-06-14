@@ -1257,7 +1257,7 @@ async function validateWinners (winners, challengeId) {
     }
 
     // find another placement for a member
-    const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId })
+    const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId && w.type === winner.type })
     if (memberExists && memberExists.placement !== winner.placement) {
       throw new errors.BadRequestError(`The same member ${winner.userId} cannot have multiple placements`)
     }
@@ -1801,7 +1801,7 @@ function sanitizeChallenge (challenge) {
     sanitized.events = _.map(challenge.events, event => _.pick(event, ['id', 'name', 'key']))
   }
   if (challenge.winners) {
-    sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement']))
+    sanitized.winners = _.map(challenge.winners, winner => _.pick(winner, ['userId', 'handle', 'placement', 'type']))
   }
   if (challenge.discussions) {
     sanitized.discussions = _.map(challenge.discussions, discussion => ({
@@ -1910,7 +1910,8 @@ fullyUpdateChallenge.schema = {
     winners: Joi.array().items(Joi.object().keys({
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
-      placement: Joi.number().integer().positive().required()
+      placement: Joi.number().integer().positive().required(),
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).default(constants.prizeSetTypes.ChallengePrizes)
     }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.object().keys({
       id: Joi.id(),
@@ -2012,7 +2013,8 @@ partiallyUpdateChallenge.schema = {
     winners: Joi.array().items(Joi.object().keys({
       userId: Joi.number().integer().positive().required(),
       handle: Joi.string().required(),
-      placement: Joi.number().integer().positive().required()
+      placement: Joi.number().integer().positive().required(),
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).default(constants.prizeSetTypes.ChallengePrizes)
     }).unknown(true)).min(1),
     terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
     overview: Joi.any().forbidden()
