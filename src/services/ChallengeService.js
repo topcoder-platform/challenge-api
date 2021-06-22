@@ -855,7 +855,6 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
           phase.scheduledStartDate = startDate
           phase.scheduledEndDate = moment(startDate).add(phase.duration || 0, 'seconds').toDate()
           phase.actualStartDate = phase.scheduledStartDate
-          phase.actualEndDate = phase.scheduledEndDate
           done[i] = true
           doing = true
         } else {
@@ -870,7 +869,6 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
             phase.scheduledStartDate = phases[preIndex].scheduledEndDate
             phase.scheduledEndDate = moment(phase.scheduledStartDate).add(phase.duration || 0, 'seconds').toDate()
             phase.actualStartDate = phase.scheduledStartDate
-            phase.actualEndDate = phase.scheduledEndDate
             done[i] = true
             doing = true
           }
@@ -1063,7 +1061,7 @@ createChallenge.schema = {
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean(),
-      pureV5: Joi.boolean(),
+      pureV5: Joi.boolean()
     }),
     billing: Joi.object().keys({
       billingAccountId: Joi.string(),
@@ -1796,7 +1794,7 @@ function sanitizeChallenge (challenge) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
   if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen']))
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate']))
   }
   if (challenge.prizeSets) {
     sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
@@ -1875,7 +1873,8 @@ fullyUpdateChallenge.schema = {
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().integer().min(0),
-      isOpen: Joi.boolean()
+      isOpen: Joi.boolean(),
+      actualEndDate: Joi.date()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1978,7 +1977,8 @@ partiallyUpdateChallenge.schema = {
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
       duration: Joi.number().integer().min(0),
-      isOpen: Joi.boolean()
+      isOpen: Joi.boolean(),
+      actualEndDate: Joi.date()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
