@@ -1410,8 +1410,10 @@ async function update (currentUser, challengeId, data, isFull) {
   // TODO: Fix this Tech Debt once legacy is turned off
   const finalStatus = data.status || challenge.status
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId
-  if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
-    throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
+  if (!_.get(data, 'legacy.pureV5') && !_.get(challenge, 'legacy.pureV5')) {
+    if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
+      throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
+    }
   }
 
   if (data.prizeSets) {
