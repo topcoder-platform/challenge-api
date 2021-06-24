@@ -1442,6 +1442,9 @@ async function update (currentUser, challengeId, data, isFull) {
           _.extend(challenge.phases[i], updatedPhaseInfo)
         }
       }
+      if (challenge.phases.length === 0) {
+        challenge.phases = data.phases
+      }
     }
 
     const newPhases = _.cloneDeep(challenge.phases) || []
@@ -1452,6 +1455,7 @@ async function update (currentUser, challengeId, data, isFull) {
 
     await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.phases = newPhases
+    challenge.phases = newPhases
     data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
