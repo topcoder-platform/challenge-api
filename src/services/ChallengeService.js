@@ -1414,6 +1414,9 @@ async function update (currentUser, challengeId, data, isFull) {
     if (finalStatus !== constants.challengeStatuses.New && finalTimelineTemplateId !== challenge.timelineTemplateId) {
       throw new errors.BadRequestError(`Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`)
     }
+  } else {
+    // make sure there are no previous phases if the timeline template has changed
+    challenge.phases = []
   }
 
   if (data.prizeSets) {
