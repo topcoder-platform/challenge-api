@@ -1442,7 +1442,7 @@ async function update (currentUser, challengeId, data, isFull) {
           _.extend(challenge.phases[i], updatedPhaseInfo)
         }
       }
-      if (challenge.phases.length === 0) {
+      if (challenge.phases.length === 0 && data.phases && data.phases.length > 0) {
         challenge.phases = data.phases
       }
     }
