@@ -265,6 +265,13 @@ async function searchChallenges (currentUser, criteria) {
         boost: 1
       }
     })
+    boolQuery.push({ bool: {
+      should: [
+        { wildcard: { name: `*${criteria.search}*` } },
+        { wildcard: { name: `${criteria.search}*` } },
+        { wildcard: { name: `*${criteria.search}` } }
+      ]
+    } })
   } else {
     if (criteria.name) {
       boolQuery.push({ bool: {
