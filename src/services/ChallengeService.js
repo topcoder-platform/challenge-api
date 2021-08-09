@@ -1477,11 +1477,10 @@ async function update (currentUser, challengeId, data, isFull) {
         op = '$PUT'
       }
     } else if (key === 'phases') {
-      if (isDifferentPhases(challenge[key], value)) {
-        phasesHaveBeenModified = true
-        logger.info('update phases')
-        op = '$PUT'
-      }
+      // always consider a modification if the property exists
+      phasesHaveBeenModified = true
+      logger.info('update phases')
+      op = '$PUT'
     } else if (key === 'prizeSets') {
       if (isDifferentPrizeSets(challenge[key], value)) {
         logger.info('update prize sets')
