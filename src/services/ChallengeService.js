@@ -1246,7 +1246,7 @@ function isDifferentPrizeSets (prizeSets = [], otherPrizeSets = []) {
 async function validateWinners (winners, challengeId) {
   const challengeResources = await helper.getChallengeResources(challengeId)
   const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
-  for (const prizeType of constants.prizeSetTypes) {
+  for (const prizeType of _.values(constants.prizeSetTypes)) {
     const filteredWinners = _.filter(winners, w => w.type === prizeType)
     for (const winner of filteredWinners) {
       if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(winner.userId))) {
