@@ -1246,25 +1246,28 @@ function isDifferentPrizeSets (prizeSets = [], otherPrizeSets = []) {
 async function validateWinners (winners, challengeId) {
   const challengeResources = await helper.getChallengeResources(challengeId)
   const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
-  for (const winner of winners) {
-    if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(winner.userId))) {
-      throw new errors.BadRequestError(`Member with userId: ${winner.userId} is not registered on the challenge`)
-    }
-    const diffWinners = _.differenceWith(winners, [winner], _.isEqual)
-    if (diffWinners.length + 1 !== winners.length) {
-      throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
-    }
-
-    // find another member with the placement
-    const placementExists = _.find(diffWinners, function (w) { return w.placement === winner.placement })
-    if (placementExists && (placementExists.userId !== winner.userId || placementExists.handle !== winner.handle)) {
-      throw new errors.BadRequestError(`Only one member can have a placement: ${winner.placement}`)
-    }
-
-    // find another placement for a member
-    const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId && w.type === winner.type })
-    if (memberExists && memberExists.placement !== winner.placement) {
-      throw new errors.BadRequestError(`The same member ${winner.userId} cannot have multiple placements`)
+  for (const prizeType of constants.prizeSetTypes) {
+    const filteredWinners = _.filter(winners, w => w.type === prizeType)
+    for (const winner of filteredWinners) {
+      if (!_.find(registrants, r => _.toString(r.memberId) === _.toString(winner.userId))) {
+        throw new errors.BadRequestError(`Member with userId: ${winner.userId} is not registered on the challenge`)
+      }
+      const diffWinners = _.differenceWith(filteredWinners, [winner], _.isEqual)
+      if (diffWinners.length + 1 !== filteredWinners.length) {
+        throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
+      }
+  
+      // find another member with the placement
+      const placementExists = _.find(diffWinners, function (w) { return w.placement === winner.placement })
+      if (placementExists && (placementExists.userId !== winner.userId || placementExists.handle !== winner.handle)) {
+        throw new errors.BadRequestError(`Only one member can have a placement: ${winner.placement}`)
+      }
+  
+      // find another placement for a member
+      const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId && w.type === winner.type })
+      if (memberExists && memberExists.placement !== winner.placement) {
+        throw new errors.BadRequestError(`The same member ${winner.userId} cannot have multiple placements`)
+      }
     }
   }
 }
