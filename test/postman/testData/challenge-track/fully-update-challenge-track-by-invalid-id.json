@@ -1,0 +1,22 @@
+[
+    {
+        "testId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "isActive": false,
+        "abbreviation": "DS",
+        "description": "data science",
+        "name": "POSTMANE2E-Data",
+        "legacyId": 15,
+        "httpCode": 404,
+        "message": "ChallengeTrack with id: cfd7ef80-f982-4484-83ba-ad819becab8a doesn't exist"
+    },
+    {
+        "testId": "cf",
+        "isActive": false,
+        "abbreviation": "DS",
+        "description": "data science",
+        "name": "POSTMANE2E-Data",
+        "legacyId": 15,
+        "httpCode": 400,
+        "message": "\"id\" must be a valid GUID"
+    }
+]

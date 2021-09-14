@@ -1,0 +1,62 @@
+[
+    {
+        "paramKey": "page",
+        "paramValue": "0",
+        "httpCode": 400,
+        "message": "\"page\" must be larger than or equal to 1"
+    },
+    {
+        "paramKey": "page",
+        "paramValue": "one",
+        "httpCode": 400,
+        "message": "\"page\" must be a number"
+    },
+    {
+        "paramKey": "perPage",
+        "paramValue": "0",
+        "httpCode": 400,
+        "message": "\"perPage\" must be larger than or equal to 1"
+    },
+    {
+        "paramKey": "perPage",
+        "paramValue": "200",
+        "httpCode": 400,
+        "message": "\"perPage\" must be less than or equal to 100"
+    },
+    {
+        "paramKey": "perPage",
+        "paramValue": "one",
+        "httpCode": 400,
+        "message": "\"perPage\" must be a number"
+    },
+    {
+        "paramKey": "name",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"name\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "description",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "abbreviation",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"abbreviation\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "isActive",
+        "paramValue": "1",
+        "httpCode": 400,
+        "message": "\"isActive\" must be a boolean"
+    },
+    {
+        "paramKey": "other",
+        "paramValue": "other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

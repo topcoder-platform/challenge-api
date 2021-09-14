@@ -1,0 +1,74 @@
+[
+    {
+        "paramKey": "abbreviation",
+        "paramValue": "TSK",
+        "isActive": true,
+        "abbreviation": "TSK",
+        "description": "develop task",
+        "name": "POSTMANE2E-develop",
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "abbreviation",
+        "paramValue": "T",
+        "isActive": true,
+        "abbreviation": "TSK",
+        "description": "develop task",
+        "name": "POSTMANE2E-develop",
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "description",
+        "paramValue": "design challenge",
+        "isActive": true,
+        "abbreviation": "CH",
+        "description": "design challenge",
+        "name": "POSTMANE2E-design",
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "description",
+        "paramValue": "design",
+        "isActive": true,
+        "abbreviation": "CH",
+        "description": "design challenge",
+        "name": "POSTMANE2E-design",
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "name",
+        "paramValue": "First2Finish",
+        "isActive": true,
+        "abbreviation": "F2F",
+        "description": "qa test",
+        "name": "POSTMANE2E-First2Finish",
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "name",
+        "paramValue": "First",
+        "isActive": true,
+        "abbreviation": "F2F",
+        "description": "qa test",
+        "name": "POSTMANE2E-First2Finish",
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    }
+]

@@ -1,0 +1,10 @@
+[
+    {
+        "typeId": "33ba038e-48da-487b-96e8-8d3b99b6d181",
+        "trackId": "33ba038e-48da-487b-96e8-8d3b99b6d181",
+        "name": "POSTMANE2E-name",
+        "projectId": 1,
+        "httpCode": 400,
+        "message": "\"status\" is required"
+    }
+]

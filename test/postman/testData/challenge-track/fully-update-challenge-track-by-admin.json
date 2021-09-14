@@ -1,10 +1,10 @@
 [
     {
-        "isActive": true,
-        "abbreviation": "F2F",
-        "description": "qa test",
-        "name": "First2Finish22222",
-        "legacyId": 14,
+        "isActive": false,
+        "abbreviation": "DS",
+        "description": "data science",
+        "name": "POSTMANE2E-Data",
+        "legacyId": 15,
         "httpCode": 200
     }
 ]

@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 
@@ -20,7 +20,7 @@ async function searchChallengeTimelineTemplates (criteria) {
   if (criteria.typeId) records = _.filter(records, e => (criteria.typeId === e.typeId))
   if (criteria.trackId) records = _.filter(records, e => (criteria.trackId === e.trackId))
   if (criteria.timelineTemplateId) records = _.filter(records, e => (criteria.timelineTemplateId === e.timelineTemplateId))
-  if (!_.isUndefined(criteria.isDefault)) records = _.filter(records, e => (e.isDefault === (criteria.isDefault === 'true')))
+  if (!_.isUndefined(criteria.isDefault)) records = _.filter(records, e => (e.isDefault === criteria.isDefault))
   return {
     total: records.length,
     page: 1,
@@ -45,7 +45,7 @@ searchChallengeTimelineTemplates.schema = {
  */
 async function unsetDefaultTimelineTemplate (typeId, trackId) {
   const records = await searchChallengeTimelineTemplates({ typeId, trackId, isDefault: true })
-  if (records.length === 0) {
+  if (records.result.length === 0) {
     return
   }
   for (const record of records) {
@@ -61,7 +61,8 @@ async function unsetDefaultTimelineTemplate (typeId, trackId) {
 async function createChallengeTimelineTemplate (data) {
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
-  if (records.length > 0) {
+  console.log(records.length)
+  if (records.result.length > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
@@ -120,7 +121,7 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
 
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
-  if (records.length > 0) {
+  if (records.result.length > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
@@ -168,4 +169,4 @@ module.exports = {
   deleteChallengeTimelineTemplate
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

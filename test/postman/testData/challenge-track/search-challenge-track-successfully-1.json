@@ -1,0 +1,42 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "TSK",
+        "description": "develop task",
+        "name": "POSTMANE2E-develop",
+        "page": "1",
+        "perPage": "5",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "isActive": true,
+        "abbreviation": "CH",
+        "description": "design challenge",
+        "name": "POSTMANE2E-design",
+        "page": "1",
+        "perPage": "3",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "isActive": true,
+        "abbreviation": "F2F",
+        "description": "qa test",
+        "name": "POSTMANE2E-First2Finish",
+        "page": "1",
+        "perPage": "50",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "isActive": true,
+        "abbreviation": "DS",
+        "description": "data science",
+        "name": "POSTMANE2E-Data",
+        "page": "1",
+        "perPage": "15",
+        "total": "1",
+        "httpCode": 200
+    }
+]

@@ -27,6 +27,15 @@ module.exports = {
       scopes: [CREATE, ALL]
     }
   },
+  '/challenges/internal/jobs/clean': {
+    post: {
+      controller: 'CleanUpController',
+      method: 'cleanUpTestData',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin],
+      scopes: [ALL]
+    }
+  },
   '/challenges/health': {
     get: {
       controller: 'HealthController',

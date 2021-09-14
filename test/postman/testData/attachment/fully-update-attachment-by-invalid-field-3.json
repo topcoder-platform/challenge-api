@@ -1,0 +1,10 @@
+[
+    {
+        "name": "POSTMANE2E-attachment 1",
+        "fileSize": 10,
+        "url": null,
+        "description": "attachment 1",
+        "httpCode": 400,
+        "message": "\"url\" must be a string"
+    }
+]

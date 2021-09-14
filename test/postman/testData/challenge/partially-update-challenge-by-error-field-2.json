@@ -1,0 +1,7 @@
+[
+    {
+        "projectId": 1,
+        "httpCode": 400,
+        "message": "Project with id: 1 doesn't exist"
+    }
+]

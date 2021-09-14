@@ -1,14 +1,44 @@
 [
     {
         "isOpen": true,
-        "description": "first phase",
+        "description": "POSTMANE2E-first phase",
         "name": "start phase",
-        "duration": 1
+        "duration": 1,
+        "httpCode": 201
     },
     {
         "isOpen": true,
-        "description": "second phase",
+        "description": "POSTMANE2E-Registration",
+        "name": "Registration",
+        "duration": 100,
+        "httpCode": 201
+    },
+    {
+        "isOpen": false,
+        "description": "POSTMANE2E-Submission",
+        "name": "Submission",
+        "duration": 100,
+        "httpCode": 201
+    },
+    {
+        "isOpen": false,
+        "description": "POSTMANE2E-Review",
+        "name": "Review",
+        "duration": 100,
+        "httpCode": 201
+    },
+    {
+        "isOpen": false,
+        "description": "POSTMANE2E-Final",
+        "name": "Final",
+        "duration": 100,
+        "httpCode": 201
+    },
+    {
+        "isOpen": true,
+        "description": "POSTMANE2E-second phase",
         "name": "end phase",
-        "duration": 100
+        "duration": 100,
+        "httpCode": 201
     }
 ]

@@ -1,0 +1,7 @@
+[
+    {
+        "isDefault": false,
+        "httpCode": 409,
+        "message": "The challenge type timeline template is already defined."
+    }
+]

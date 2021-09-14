@@ -1,0 +1,11 @@
+[
+    {
+        "isOpen": true,
+        "description": "POSTMANE2E-new phase",
+        "name": "new phase",
+        "duration": 1,
+        "other": "other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

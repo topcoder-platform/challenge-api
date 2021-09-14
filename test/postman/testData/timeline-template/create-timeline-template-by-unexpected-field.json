@@ -1,0 +1,11 @@
+[
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 100,
+        "other": "other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

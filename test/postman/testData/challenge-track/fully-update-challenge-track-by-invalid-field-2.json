@@ -1,0 +1,11 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "New description",
+        "name": null,
+        "track": "DEVELOP",
+        "httpCode": 400,
+        "message": "\"name\" must be a string"
+    }
+]

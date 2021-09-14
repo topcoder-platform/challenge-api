@@ -1,0 +1,26 @@
+[
+    {
+        "paramKey": "name",
+        "paramValue": "start phase",
+        "name": "start phase",
+        "duration": 1,
+        "description": "POSTMANE2E-first phase",
+        "isOpen": true,
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "name",
+        "paramValue": "end",
+        "name": "end phase",
+        "duration": 100,
+        "description": "POSTMANE2E-second phase",
+        "isOpen": true,
+        "page": "1",
+        "perPage": "100",
+        "total": "1",
+        "httpCode": 200
+    }
+]

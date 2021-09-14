@@ -1,0 +1,34 @@
+[
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": 1,
+        "defaultDuration": 100,
+        "httpCode": 400,
+        "message": "\"isActive\" must be a boolean"
+    },
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": -1,
+        "httpCode": 400,
+        "message": "\"defaultDuration\" must be a positive number"
+    },
+    {
+        "name": "",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 400,
+        "message": "\"name\" is not allowed to be empty"
+    },
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    }
+]

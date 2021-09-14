@@ -1,0 +1,7 @@
+[
+    {
+        "other": "Other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

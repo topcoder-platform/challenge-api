@@ -1,0 +1,10 @@
+[
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "phases": 100,
+        "httpCode": 400,
+        "message": "\"phases\" must be an array"
+    }
+]

@@ -1,0 +1,22 @@
+[
+    {
+        "paramKey": "page",
+        "paramVal": "2",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "perPage",
+        "paramVal": "10",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "fieldName",
+        "paramVal": "attachments",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "createdBy",
+        "paramVal": "TonyJ",
+        "httpCode": 200
+    }
+]

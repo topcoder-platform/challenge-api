@@ -3,18 +3,18 @@
         "isActive": false,
         "abbreviation": "F2F",
         "description": "A challenge where the first submission that satisfies the spec wins",
-        "name": "Challenge",
+        "name": "POSTMANE2E-Challenge",
         "isTask": true,
         "httpCode": 409,
-        "message":  "ChallengeType with name: Challenge already exist"
+        "message": "ChallengeType with name: POSTMANE2E-Challenge already exist"
     },
     {
         "isActive": false,
         "abbreviation": "CH",
         "description": "A challenge where the first submission that satisfies the spec wins",
-        "name": "First2Finish",
+        "name": "POSTMANE2E-First2Finish",
         "isTask": true,
         "httpCode": 409,
-        "message":  "ChallengeType with abbreviation: CH already exist"
+        "message": "ChallengeType with abbreviation: CH already exist"
     }
 ]

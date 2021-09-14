@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
 const constants = require('../../app-constants')
 
 /**
@@ -24,7 +24,7 @@ async function searchChallengeTracks (criteria) {
   if (criteria.description) records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
   if (criteria.track) records = _.filter(records, e => _.toLower(criteria.track) === _.toLower(e.track))
   if (criteria.abbreviation) records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
-  if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive === 'true')))
+  if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive)))
   // if (criteria.legacyId) records = _.filter(records, e => (e.legacyId === criteria.legacyId))
 
   const total = records.length
@@ -175,4 +175,4 @@ module.exports = {
   partiallyUpdateChallengeTrack
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

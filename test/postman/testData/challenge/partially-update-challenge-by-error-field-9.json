@@ -1,0 +1,6 @@
+[
+    {
+        "httpCode": 400,
+        "message": "The timeline template with id: #ID is inactive"
+    }
+]

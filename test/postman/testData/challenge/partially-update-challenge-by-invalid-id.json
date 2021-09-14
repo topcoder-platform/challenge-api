@@ -1,0 +1,22 @@
+[
+    {
+        "testId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "name": "POSTMANE2E-Challenge",
+        "typeId": "33ba038e-48da-487b-96e8-8d3b99b6d181",
+        "trackId": "33ba038e-48da-487b-96e8-8d3b99b6d181",
+        "projectId": 111,
+        "status": "New",
+        "httpCode": 404,
+        "message": "Challenge with id: cfd7ef80-f982-4484-83ba-ad819becab8a doesn't exist"
+    },
+    {
+        "testId": "cf",
+        "name": "POSTMANE2E-Challenge",
+        "typeId": "33ba038e-48da-487b-96e8-8d3b99b6d181",
+        "trackId": "33ba038e-48da-487b-96e8-8d3b99b6d181",
+        "projectId": 1,
+        "status": "New",
+        "httpCode": 400,
+        "message": "\"challengeId\" must be a valid GUID"
+    }
+]

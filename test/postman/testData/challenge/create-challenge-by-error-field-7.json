@@ -1,0 +1,15 @@
+[
+    {
+        "projectId": 111,
+        "name": "POSTMANE2E-Challenge 3",
+        "status": "New",
+        "startDate": "01.01.2020",
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "tags": "[\"tag1\",\"tag2\",\"tag3\"]",
+        "terms": "[{\"id\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\",\"roleId\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\"}]",
+        "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]",
+        "phaseId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "httpCode": 400,
+        "message": "The following phases are invalid: [ { phaseId: 'cfd7ef80-f982-4484-83ba-ad819becab8a' } ]"
+    }
+]

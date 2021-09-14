@@ -61,6 +61,18 @@ app.get('/v5/resources', (req, res) => {
   res.json(resources)
 })
 
+// post challenge resources
+app.post('/v5/resources', (req, res) => {
+  winston.debug(`query: ${JSON.stringify(req.body, null, 2)}`)
+  res.status(204).send()
+})
+
+// post bus event
+app.post('/v5/bus/events', (req, res) => {
+  winston.debug(`query: ${JSON.stringify(req.body, null, 2)}`)
+  res.status(204).send()
+})
+
 // get challenges member can access to
 app.get('/v5/resources/:memberId/challenges', (req, res) => {
   const memberId = req.params.memberId

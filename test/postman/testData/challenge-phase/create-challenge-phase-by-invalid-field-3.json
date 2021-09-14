@@ -1,0 +1,10 @@
+[
+    {
+        "isOpen": true,
+        "description": null,
+        "name": "new phase",
+        "duration": 1,
+        "httpCode": 400,
+        "message": "\"description\" must be a string"
+    }
+]

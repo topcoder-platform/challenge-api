@@ -16066,7 +16066,7 @@
 							"response": []
 						},
 						{
-							"name": "failure update challenge with winners array - same member with multiple placements",
+							"name": "failure update challenge with winners array - same member with multiple placements"
 						}
 					],
 					"event": [

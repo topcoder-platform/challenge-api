@@ -21,16 +21,18 @@
 - start app
   ```bash
   $ cd challenge-api 
-  $ source env.sh            # set env variables
+  $ source env.sh            # set env variables (or set .env file)
   $ NODE_ENV=test npm start
   ```
 
 ## newman test
   ```bash
-  $ npm run test:newman
+  $ npm run test:newman       # runs newman test and automatically deletes the test data at the end
   ```
 
+  ```bash
+  $ npm run test:newman:clear  # clear the newman test data
+  ```
 
-## Postman mock server
-E2E tests use nock to mock `BUSAPI_URL`, where postman mock server could be used to replace nock.
-Please refer to: https://drive.google.com/file/d/1GXMzyqpzwix-LDBwieiRFfpJlJxrTIgI/view?usp=sharing
+## Mock Api
+  Current mock api inside docker compose mocks BUS_API, GROUPS_API, PROJECTS_API and TERMS_API

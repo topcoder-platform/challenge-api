@@ -1,0 +1,32 @@
+[
+    {
+        "paramKey": "page",
+        "paramVal": "-1",
+        "httpCode": 400,
+        "message": "\"page\" must be larger than or equal to 1"
+    },
+    {
+        "paramKey": "perPage",
+        "paramVal": "asd",
+        "httpCode": 400,
+        "message": "\"perPage\" must be a number"
+    },
+    {
+        "paramKey": "createdDateStart",
+        "paramVal": "asd",
+        "httpCode": 400,
+        "message": "\"createdDateStart\" must be a number of milliseconds or valid date string"
+    },
+    {
+        "paramKey": "createdDateEnd",
+        "paramVal": "asd",
+        "httpCode": 400,
+        "message": "\"createdDateEnd\" must be a number of milliseconds or valid date string"
+    },
+    {
+        "paramKey": "other",
+        "paramVal": "other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

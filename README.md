@@ -146,6 +146,7 @@ The following test parameters can be set in config file or in env variables:
 - M2M_READ_ACCESS_TOKEN: M2M read access token
 - M2M_UPDATE_ACCESS_TOKEN: M2M update (including 'delete') access token
 - S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
+- BUSAPI_URL: url of bus api, test only, default is `http://localhost:4000/v5` combined with mock api.
 
 ### Prepare
 - Start Local services in docker.
@@ -168,18 +169,7 @@ To run unit tests with coverage report
 npm run test:cov
 ```
 
-### Running integration tests
-To run integration tests alone
 
-```bash
-npm run e2e
-```
-
-To run integration tests with coverage report
-
-```bash
-npm run e2e:cov
-```
 ### Running Postman PoC test
 Refer to the PoC test document [**PoC-test.md**](PoC-test.md)
 

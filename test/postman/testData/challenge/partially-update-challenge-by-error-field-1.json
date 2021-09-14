@@ -1,0 +1,7 @@
+[
+    {
+        "status": "Active",
+        "httpCode": 400,
+        "message": "You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support."
+    }
+]

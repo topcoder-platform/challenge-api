@@ -1,9 +1,0 @@
-[
-    {
-        "isDefault": false,
-        "httpCode": 409,
-        "message": "TimelineTemplate with name: first timeline already exist"
-    }
-]
-
-

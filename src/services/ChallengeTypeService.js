@@ -7,6 +7,7 @@ const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const constants = require('../../app-constants')
+const logger = require('../common/logger')
 
 /**
  * Search challenge types
@@ -22,8 +23,8 @@ async function searchChallengeTypes (criteria) {
   if (criteria.name) records = _.filter(records, e => helper.partialMatch(criteria.name, e.name))
   if (criteria.description) records = _.filter(records, e => helper.partialMatch(criteria.description, e.description))
   if (criteria.abbreviation) records = _.filter(records, e => helper.partialMatch(criteria.abbreviation, e.abbreviation))
-  if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive === 'true')))
-  if (!_.isUndefined(criteria.isTask)) records = _.filter(records, e => (e.isTask === (criteria.isTask === 'true')))
+  if (!_.isUndefined(criteria.isActive)) records = _.filter(records, e => (e.isActive === (criteria.isActive)))
+  if (!_.isUndefined(criteria.isTask)) records = _.filter(records, e => (e.isTask === (criteria.isTask)))
 
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
@@ -154,4 +155,4 @@ module.exports = {
   partiallyUpdateChallengeType
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

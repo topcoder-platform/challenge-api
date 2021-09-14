@@ -1,0 +1,9 @@
+[
+    {
+        "isOpen": true,
+        "description": "POSTMANE2E-new phase",
+        "duration": 1,
+        "httpCode": 400,
+        "message": "\"name\" is required"
+    }
+]

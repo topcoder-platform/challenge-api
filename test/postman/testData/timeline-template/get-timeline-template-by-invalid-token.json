@@ -1,0 +1,22 @@
+[
+  {
+    "jwtToken": "",
+    "httpCode": 401,
+    "message": "No token provided."
+  },
+  {
+    "jwtToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJjb3BpbG90IiwiQ29ubmVjdCBTdXBwb3J0Il0sImlzcyI6Imh0dHBzOi8vYXBpLnRvcGNvZGVyLWRldi5jb20iLCJoYW5kbGUiOiJHaG9zdGFyIiwiZXhwIjoxNTQ5ODAwMDc3LCJ1c2VySWQiOiIxNTE3NDMiLCJpYXQiOjE1NDk3OTk0NzcsImVtYWlsIjoiZW1haWxAZG9tYWluLmNvbS56IiwianRpIjoiMTJjMWMxMGItOTNlZi00NTMxLTgzMDUtYmE2NjVmYzRlMWI0In0.2n8k9pb16sE7LOLF_7mjAvEVKgggzS-wS3_8n2-R4RU",
+    "httpCode": 401,
+    "message": "Failed to authenticate token."
+  },
+  {
+    "jwtToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJBZG1pbmlzdHJhdG9yIl0sImlzcyI6Imh0dHBzOi8vYXBpLnRvcGNvZGVyLmNvbSIsImhhbmRsZSI6IlRvbnlKIiwiZXhwIjo1NTUzMDE5OTI1OSwidXNlcklkIjoiNDA0MzMyODgiLCJpYXQiOjE1MzAxOTg2NTksImVtYWlsIjoiYWRtaW5AdG9wY29kZXIuY29tIiwianRpIjoiYzNhYzYwOGEtNTZiZS00NWQwLThmNmEtMzFmZTk0Yjk1NjFjIn0.ePREgnJrBixP4URf1dd8FHISN2_6eRM5gjCReS0ZMK4",
+    "httpCode": 401,
+    "message": "Failed to authenticate token."
+  },
+  {
+    "jwtToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJUb3Bjb2RlciBVc2VyIl0sImlzcyI6Imh0dHBzOi8vYXBpLnRvcGNvZGVyLWRldi5jb20iLCJoYW5kbGUiOiJkZW5pcyIsImV4cCI6MTg4MjgwMDE2OSwidXNlcklkIjoiMjUxMjgwIiwiaWF0IjoxNTQ5Nzk5NTY5LCJlbWFpbCI6ImVtYWlsQGRvbWFpbi5jb20ueiIsImp0aSI6IjljNDUxMWM1LWMxNjUtNGExYi04OTllLWI2NWFkMGUwMmI1NSJ9.xyigIHHU9MbPfpFjIvoR6fnoR-ryjbK9QKFeEmL-EFo",
+    "httpCode": 403,
+    "message": "You are not allowed to perform this action!"
+  }
+]

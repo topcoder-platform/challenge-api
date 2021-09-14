@@ -4,15 +4,15 @@
         "abbreviation": "TSK",
         "description": "A piece of work assigned to one person1",
         "isTask": true,
-        "name": "Task",
+        "name": "POSTMANE2E-Task",
         "httpCode": 409,
-        "message": "ChallengeType with name: Task already exist"
+        "message": "ChallengeType with name: POSTMANE2E-Task already exist"
     },
     {
         "isActive": true,
         "description": "A Multi-person Competition with Reviews and Winners",
         "abbreviation": "CH",
-        "name": "Challenge2",
+        "name": "POSTMANE2E-Challenge2",
         "isTask": false,
         "httpCode": 409,
         "message": "ChallengeType with abbreviation: CH already exist"

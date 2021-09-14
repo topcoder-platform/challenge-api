@@ -1,0 +1,20 @@
+[
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 200,
+        "phaseId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "httpCode": 400,
+        "message": "The following phases are invalid: [ { phaseId: 'cfd7ef80-f982-4484-83ba-ad819becab8a', defaultDuration: 200 } ]"
+    },
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 200,
+        "phaseId": "cf",
+        "httpCode": 400,
+        "message": "\"phaseId\" must be a valid GUID"
+    }
+]

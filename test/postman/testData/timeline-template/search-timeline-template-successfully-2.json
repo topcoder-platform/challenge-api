@@ -1,0 +1,26 @@
+[
+    {
+        "paramKey": "name",
+        "paramValue": "first timeline",
+        "name": "POSTMANE2E-first timeline",
+        "description": "first timeline",
+        "isActive": false,
+        "defaultDuration": 100,
+        "page": "1",
+        "perPage": "20",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "name",
+        "paramValue": "second",
+        "name": "POSTMANE2E-second timeline",
+        "description": "second timeline",
+        "isActive": true,
+        "defaultDuration": 200,
+        "page": "1",
+        "perPage": "20",
+        "total": "1",
+        "httpCode": 200
+    }
+]

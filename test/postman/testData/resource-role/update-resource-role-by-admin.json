@@ -1,6 +1,6 @@
 [
   {
-    "name": "UPDATE_CO-PILOT-admin",
+    "name": "POSTMANE2E-UPDATE_CO-PILOT-admin",
     "fullReadAccess": true,
     "fullWriteAccess": true,
     "isActive": true,
@@ -8,7 +8,7 @@
     "httpCode": 200
   },
   {
-    "name": "UPDATE_OBSERVER-admin",
+    "name": "POSTMANE2E-UPDATE_OBSERVER-admin",
     "fullReadAccess": true,
     "fullWriteAccess": true,
     "isActive": false,
@@ -16,7 +16,7 @@
     "httpCode": 200
   },
   {
-    "name": "UPDATE_SUBMITTER-admin",
+    "name": "POSTMANE2E-UPDATE_SUBMITTER-admin",
     "fullReadAccess": true,
     "fullWriteAccess": true,
     "isActive": true,
@@ -24,7 +24,7 @@
     "httpCode": 200
   },
   {
-    "name": "UPDATE_REVIEWER-admin",
+    "name": "POSTMANE2E-UPDATE_REVIEWER-admin",
     "fullReadAccess": false,
     "fullWriteAccess": false,
     "isActive": true,
@@ -32,13 +32,13 @@
     "httpCode": 200
   },
   {
-    "name": "UPDATE_REVIEWER-admin1",
+    "name": "POSTMANE2E-UPDATE_REVIEWER-admin1",
     "isActive": true,
     "selfObtainable": false,
     "httpCode": 400
   },
   {
-    "name": "SUBMITTER",
+    "name": "POSTMANE2E-SUBMITTER",
     "fullReadAccess": true,
     "fullWriteAccess": false,
     "isActive": true,

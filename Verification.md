@@ -1,5 +1,16 @@
 # TopCoder Challenge API Verification
 
+## Newman tests
+- set config/test environments,
+- run command `npm install`
+- run command `eslint test/postman`
+- run command `docker-compose up` inside local folder. Wait for services to start
+- if tables are already created then run command `npm run drop-tables` to clear data
+- run command `npm run create-tables`
+- run command `npm run init-es force` to clear challenge data. Don't mind if it throws error, we just need it to clear indexes.
+- run command `NODE_ENV=test npm start`
+- run command `npm run test:newman`
+
 ## Postman tests
 - clear the environment, run command `npm run init-db` and `npm run init-es force`
 - import Postman collection and environment in the docs folder to Postman

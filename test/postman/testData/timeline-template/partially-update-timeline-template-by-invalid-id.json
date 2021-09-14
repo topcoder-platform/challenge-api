@@ -1,0 +1,20 @@
+[
+    {
+        "testId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 404,
+        "message": "TimelineTemplate with id: cfd7ef80-f982-4484-83ba-ad819becab8a doesn't exist"
+    },
+    {
+        "testId": "cf",
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 400,
+        "message": "\"timelineTemplateId\" must be a valid GUID"
+    }
+]

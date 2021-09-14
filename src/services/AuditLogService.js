@@ -5,7 +5,7 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
 
 /**
  * Search audit logs
@@ -45,4 +45,4 @@ module.exports = {
   searchAuditLogs
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)
