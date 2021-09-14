@@ -1,0 +1,22 @@
+[
+    {
+        "name": "POSTMANE2E-first timeline",
+        "description": "first timeline",
+        "isActive": false,
+        "defaultDuration": 100,
+        "page": "1",
+        "perPage": "5",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "name": "POSTMANE2E-second timeline",
+        "description": "second timeline",
+        "isActive": true,
+        "defaultDuration": 200,
+        "page": "1",
+        "perPage": "10",
+        "total": "1",
+        "httpCode": 200
+    }
+]

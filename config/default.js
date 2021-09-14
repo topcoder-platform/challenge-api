@@ -1,7 +1,7 @@
 /**
  * The configuration file.
  */
-
+require('dotenv').config()
 module.exports = {
   READONLY: process.env.READONLY === 'true' || false,
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
@@ -76,5 +76,7 @@ module.exports = {
 
   DEFAULT_CONFIDENTIALITY_TYPE: process.env.DEFAULT_CONFIDENTIALITY_TYPE || 'public',
 
-  M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'tcwebservice'
+  M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'tcwebservice',
+
+  AUTOMATED_TESTING_NAME_PREFIX: process.env.AUTOMATED_TESTING_NAME_PREFIX || 'POSTMANE2E-'
 }

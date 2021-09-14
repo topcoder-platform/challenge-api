@@ -1,0 +1,7 @@
+[
+    {
+        "tags": "[\"tag1\",\"tag1\",\"tag3\"]",
+        "httpCode": 400,
+        "message": "There are duplicate elements (tag1) for tags."
+    }
+]

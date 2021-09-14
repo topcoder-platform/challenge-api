@@ -1,0 +1,46 @@
+[
+  {
+    "projectId": 111,
+    "name": "POSTMANE2E-Challenge 3",
+    "status": "New",
+    "startDate": "01.02.2020",
+    "httpCode": 200,
+    "createdBy": "TonyJ",
+    "updatedBy": "TonyJ",
+    "description": "description 3",
+    "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+    "groupsArray": [
+      "33ba038e-48da-487b-96e8-8d3b99b6d181"
+    ],
+    "tags": "[\"tag1\",\"tag2\",\"tag3\"]",
+    "tagsArray": [
+      "tag1",
+      "tag2",
+      "tag3"
+    ],
+    "phases": [
+      {
+        "duration": 100,
+        "name": "Registration",
+        "isOpen": false
+      },
+      {
+        "duration": 100,
+        "name": "Submission",
+        "isOpen": false
+      },
+      {
+        "duration": 100,
+        "name": "Review",
+        "isOpen": false
+      },
+      {
+        "duration": 100,
+        "name": "Final",
+        "isOpen": false
+      }
+    ],
+    "descriptionFormat": "markdown",
+    "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]"
+  }
+]

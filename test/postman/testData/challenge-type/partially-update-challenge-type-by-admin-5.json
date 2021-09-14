@@ -1,0 +1,10 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "F2F Edit",
+        "description": "A challenge where the first submission that satisfies the spec wins Edit",
+        "name": "POSTMANE2E-First2Finish Edit",
+        "isTask": true,
+        "httpCode": 200
+    }
+]

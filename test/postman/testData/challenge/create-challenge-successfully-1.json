@@ -1,0 +1,44 @@
+[
+    {
+        "projectId": 111,
+        "name": "POSTMANE2E-Challenge 1",
+        "status": "New",
+        "startDate": "01.01.2020",
+        "httpCode": 201,
+        "createdBy": "TonyJ",
+        "updatedBy": "TonyJ",
+        "description": "",
+        "groups": [],
+        "isTask": true,
+        "isAssigned": false,
+        "phases": [
+            {
+                "duration": 100,
+                "name": "Registration",
+                "isOpen": false
+            },
+            {
+                "duration": 100,
+                "name": "Submission",
+                "isOpen": false
+            },
+            {
+                "duration": 100,
+                "name": "Review",
+                "isOpen": false
+            },
+            {
+                "duration": 100,
+                "name": "Final",
+                "isOpen": false
+            }
+        ],
+        "terms": [],
+        "descriptionFormat": "markdown",
+        "numOfSubmissions": 0,
+        "numOfRegistrants": 0,
+        "currentPhaseNames": [],
+        "track": "POSTMANE2E-develop",
+        "type": "POSTMANE2E-Task"
+    }
+]

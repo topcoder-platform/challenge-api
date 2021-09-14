@@ -1,7 +1,7 @@
 [
     {
         "isOpen": true,
-        "description": "second phase",
+        "description": "POSTMANE2E-second phase",
         "name": "start phase",
         "duration": 100,
         "httpCode": 409,

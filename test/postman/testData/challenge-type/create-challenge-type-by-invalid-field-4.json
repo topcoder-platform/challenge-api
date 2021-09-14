@@ -1,0 +1,11 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": null,
+        "isTask": true,
+        "name": "POSTMANE2E-New Type",
+        "httpCode": 400,
+        "message": "\"description\" must be a string"
+    }
+]

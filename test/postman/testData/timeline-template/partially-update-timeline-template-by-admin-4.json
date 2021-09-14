@@ -1,0 +1,9 @@
+[
+    {
+        "name": "POSTMANE2E-second timeline Edit",
+        "description": "second timeline Edit",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 200
+    }
+]

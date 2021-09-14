@@ -1,0 +1,8 @@
+[
+    {
+        "isDefault": false,
+        "typeId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "httpCode": 404,
+        "message": "ChallengeType with id: cfd7ef80-f982-4484-83ba-ad819becab8a doesn't exist"
+    }
+]

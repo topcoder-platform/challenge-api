@@ -1,0 +1,10 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "description",
+        "isTask": true,
+        "httpCode": 400,
+        "message": "\"name\" is required"
+    }
+]

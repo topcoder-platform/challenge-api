@@ -1,0 +1,52 @@
+[
+    {
+        "paramKey": "createdBy",
+        "paramValue": "TonyJ",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "updatedBy",
+        "paramValue": "TonyJ",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "projectId",
+        "paramValue": 111,
+        "httpCode": 200
+    },
+    {
+        "paramKey": "status",
+        "paramValue": "New",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "description",
+        "paramValue": "description",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "isTask",
+        "paramValue": true,
+        "httpCode": 200
+    },
+    {
+        "paramKey": "terms",
+        "paramValue": "0fcb41d1-ec7c-44bb-8f3b-f017a61cd708",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "track",
+        "paramValue": "design",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "type",
+        "paramValue": "First2Finish",
+        "httpCode": 200
+    },
+    {
+        "paramKey": "taskIsAssigned",
+        "paramValue": false,
+        "httpCode": 200
+    }
+]

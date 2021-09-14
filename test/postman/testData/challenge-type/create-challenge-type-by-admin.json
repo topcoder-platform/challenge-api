@@ -3,7 +3,7 @@
         "isActive": true,
         "abbreviation": "TSK",
         "description": "A piece of work assigned to one person",
-        "name": "Task",
+        "name": "POSTMANE2E-Task",
         "isTask": true,
         "httpCode": 201
     },
@@ -11,7 +11,7 @@
         "isActive": true,
         "abbreviation": "CH",
         "description": "A Multi-person Competition with Reviews and Winners",
-        "name": "Challenge",
+        "name": "POSTMANE2E-Challenge",
         "isTask": false,
         "httpCode": 201
     },
@@ -19,7 +19,7 @@
         "isActive": true,
         "abbreviation": "F2F",
         "description": "A challenge where the first submission that satisfies the spec wins",
-        "name": "First2Finish",
+        "name": "POSTMANE2E-First2Finish",
         "isTask": false,
         "httpCode": 201
     }

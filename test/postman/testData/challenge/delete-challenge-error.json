@@ -1,0 +1,6 @@
+[
+  {
+    "httpCode": 400,
+    "message": "Challenge with status other than \"New\" cannot be removed"
+  }
+]

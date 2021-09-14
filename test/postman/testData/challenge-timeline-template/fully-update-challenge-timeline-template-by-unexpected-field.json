@@ -1,0 +1,11 @@
+[
+    {
+        "isDefault": false,
+        "typeId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "trackId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "timelineTemplateId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "other": "other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

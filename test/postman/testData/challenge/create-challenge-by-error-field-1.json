@@ -1,0 +1,62 @@
+[
+    {
+        "projectId": 111,
+        "name": "POSTMANE2E-Challenge 3",
+        "status": "Active",
+        "startDate": "01.01.2020",
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "tags": "[\"tag1\",\"tag2\",\"tag3\"]",
+        "terms": "[{\"id\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\",\"roleId\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\"}]",
+        "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]",
+        "httpCode": 400,
+        "message": "You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active."
+    },
+    {
+        "projectId": 1,
+        "name": "POSTMANE2E-Challenge 3",
+        "status": "New",
+        "startDate": "01.01.2020",
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "tags": "[\"tag1\",\"tag2\",\"tag3\"]",
+        "terms": "[{\"id\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\",\"roleId\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\"}]",
+        "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]",
+        "httpCode": 400,
+        "message": "Project with id: 1 doesn't exist"
+    },
+    {
+        "projectId": 111,
+        "name": "POSTMANE2E-Challenge 3",
+        "status": "New",
+        "startDate": "01.01.2020",
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "tags": "[\"tag1\",\"tag1\",\"tag3\"]",
+        "terms": "[{\"id\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\",\"roleId\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\"}]",
+        "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]",
+        "httpCode": 400,
+        "message": "There are duplicate elements (tag1) for tags."
+    },
+    {
+        "projectId": 111,
+        "name": "POSTMANE2E-Challenge 3",
+        "status": "New",
+        "startDate": "01.01.2020",
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\",\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "tags": "[\"tag1\",\"tag2\",\"tag3\"]",
+        "terms": "[{\"id\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\",\"roleId\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\"}]",
+        "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]",
+        "httpCode": 400,
+        "message": "\"groups\" position 1 contains a duplicate value"
+    },
+    {
+        "projectId": 111,
+        "name": "POSTMANE2E-Challenge 3",
+        "status": "New",
+        "startDate": "01.01.2020",
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "tags": "[\"tag1\",\"tag2\",\"tag3\"]",
+        "terms": "[{\"id\":\"cfd7ef80-f982-4484-83ba-ad819becab8a\",\"roleId\":\"0fcb41d1-ec7c-44bb-8f3b-f017a61cd708\"}]",
+        "prizeSets": "[{\"type\": \"placement\",\"description\": \"Challenge Prize\",\"prizes\": [{\"type\": \"placement\",\"value\": 10},{\"type\": \"placement\",\"value\": 10}]}]",
+        "httpCode": 400,
+        "message": "Terms of use identified by the id cfd7ef80-f982-4484-83ba-ad819becab8a does not exist"
+    }
+]

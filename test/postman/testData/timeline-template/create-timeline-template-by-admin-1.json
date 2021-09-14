@@ -1,0 +1,16 @@
+[
+    {
+        "name": "POSTMANE2E-first timeline",
+        "description": "first timeline",
+        "isActive": false,
+        "defaultDuration": 100,
+        "httpCode": 201
+    },
+    {
+        "name": "POSTMANE2E-second timeline",
+        "description": "second timeline",
+        "isActive": true,
+        "defaultDuration": 200,
+        "httpCode": 201
+    }
+]

@@ -1,0 +1,7 @@
+[
+    {
+        "groups": "[\"33ba038e-48da-487b-96e8-8d3b99b6d181\",\"33ba038e-48da-487b-96e8-8d3b99b6d181\"]",
+        "httpCode": 400,
+        "message": "There are duplicate elements (33ba038e-48da-487b-96e8-8d3b99b6d181) for groups."
+    }
+]

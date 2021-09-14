@@ -1,0 +1,47 @@
+[
+    {
+        "isActive": 1,
+        "abbreviation": "AA",
+        "description": "New description",
+        "name": "POSTMANE2E-New Track",
+        "track": "DEVELOP",
+        "httpCode": 400,
+        "message": "\"isActive\" must be a boolean"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "New description",
+        "name": "POSTMANE2E-New Track",
+        "track": "DEV",
+        "httpCode": 400,
+        "message": "\"track\" must be one of [DEVELOP, DESIGN, DATA_SCIENCE, QA]"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "",
+        "description": "New description",
+        "name": "POSTMANE2E-New Track",
+        "track": "DEVELOP",
+        "httpCode": 400,
+        "message": "\"abbreviation\" is not allowed to be empty"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "",
+        "name": "POSTMANE2E-New Track",
+        "track": "DEVELOP",
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "New description",
+        "name": "",
+        "track": "DEVELOP",
+        "httpCode": 400,
+        "message": "\"name\" is not allowed to be empty"
+    }
+]

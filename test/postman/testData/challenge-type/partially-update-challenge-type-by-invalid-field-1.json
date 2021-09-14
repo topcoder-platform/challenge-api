@@ -1,0 +1,47 @@
+[
+    {
+        "isActive": 1,
+        "abbreviation": "AA",
+        "description": "New description",
+        "isTask": true,
+        "name": "POSTMANE2E-New Type",
+        "httpCode": 400,
+        "message": "\"isActive\" must be a boolean"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "New description",
+        "isTask": 1,
+        "name": "POSTMANE2E-New Type",
+        "httpCode": 400,
+        "message": "\"isTask\" must be a boolean"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "",
+        "description": "New description",
+        "isTask": true,
+        "name": "POSTMANE2E-New Type",
+        "httpCode": 400,
+        "message": "\"abbreviation\" is not allowed to be empty"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "",
+        "isTask": true,
+        "name": "POSTMANE2E-New Type",
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    },
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "New description",
+        "isTask": true,
+        "name": "",
+        "httpCode": 400,
+        "message": "\"name\" is not allowed to be empty"
+    }
+]

@@ -3,24 +3,32 @@
         "isActive": true,
         "abbreviation": "TSK",
         "description": "develop task",
-        "name": "develop",
-        "legacyId": 12,
-        "track": "DEVELOP"
+        "name": "POSTMANE2E-develop",
+        "track": "DEVELOP",
+        "httpCode": 201
     },
     {
         "isActive": true,
         "abbreviation": "CH",
         "description": "design challenge",
-        "name": "design",
-        "legacyId": 13,
-        "track": "DESIGN"
+        "name": "POSTMANE2E-design",
+        "track": "DESIGN",
+        "httpCode": 201
     },
     {
         "isActive": true,
         "abbreviation": "F2F",
         "description": "qa test",
-        "name": "First2Finish",
-        "legacyId": 14,
-        "track": "QA"
+        "name": "POSTMANE2E-First2Finish",
+        "track": "QA",
+        "httpCode": 201
+    },
+    {
+        "isActive": true,
+        "abbreviation": "DS",
+        "description": "data science",
+        "name": "POSTMANE2E-Data",
+        "track": "DATA_SCIENCE",
+        "httpCode": 201
     }
 ]

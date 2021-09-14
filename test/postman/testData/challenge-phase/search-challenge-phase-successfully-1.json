@@ -1,0 +1,22 @@
+[
+    {
+        "name": "start phase",
+        "duration": 1,
+        "description": "POSTMANE2E-first phase",
+        "isOpen": true,
+        "page": "1",
+        "perPage": "5",
+        "total": "1",
+        "httpCode": 200
+    },
+    {
+        "name": "end phase",
+        "duration": 100,
+        "description": "POSTMANE2E-second phase",
+        "isOpen": true,
+        "page": "1",
+        "perPage": "10",
+        "total": "1",
+        "httpCode": 200
+    }
+]

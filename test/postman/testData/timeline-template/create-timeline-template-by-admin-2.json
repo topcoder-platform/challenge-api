@@ -1,0 +1,9 @@
+[
+    {
+        "name": "POSTMANE2E-template for challenge",
+        "description": "template for challenge",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 201
+    }
+]

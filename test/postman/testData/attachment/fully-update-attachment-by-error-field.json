@@ -1,0 +1,10 @@
+[
+    {
+        "name": "POSTMANE2E-attachment 1",
+        "fileSize": 10,
+        "url": "http://s3.amazonaws.com/bucket/key1/key2",
+        "description": "attachment 1",
+        "httpCode": 400,
+        "message": "The bucket bucket is not in the whitelist"
+    }
+]

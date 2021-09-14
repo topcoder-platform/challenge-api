@@ -1,0 +1,12 @@
+[
+    {
+        "testId": "cfd7ef80-f982-4484-83ba-ad819becab8a",
+        "httpCode": 404,
+        "message": "The requested resource cannot be found."
+    },
+    {
+        "testId": "cf",
+        "httpCode": 400,
+        "message": "\"attachmentId\" must be a valid GUID"
+    }
+]

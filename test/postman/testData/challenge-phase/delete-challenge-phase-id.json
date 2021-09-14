@@ -1,0 +1,9 @@
+[
+  {
+    "isOpen": false,
+    "description": "POSTMANE2E-second phase",
+    "name": "end phase",
+    "duration": 200,
+    "httpCode": 200
+  }
+]

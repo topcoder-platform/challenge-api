@@ -1,0 +1,12 @@
+[
+    {
+        "isActive": true,
+        "abbreviation": "AA",
+        "description": "New description",
+        "name": "POSTMANE2E-New Track",
+        "track": "DEVELOP",
+        "other": "Other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

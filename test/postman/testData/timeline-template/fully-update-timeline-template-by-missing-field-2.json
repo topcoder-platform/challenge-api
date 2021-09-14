@@ -1,0 +1,9 @@
+[
+    {
+        "name": "POSTMANE2E-new timeline",
+        "description": "new timeline",
+        "defaultDuration": 100,
+        "httpCode": 400,
+        "message": "\"isActive\" is required"
+    }
+]

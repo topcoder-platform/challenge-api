@@ -1,0 +1,56 @@
+[
+    {
+        "paramKey": "typeId",
+        "paramValue": "0",
+        "httpCode": 400,
+        "message": "\"typeId\" must be a valid GUID"
+    },
+    {
+        "paramKey": "typeId",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"typeId\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "trackId",
+        "paramValue": "0",
+        "httpCode": 400,
+        "message": "\"trackId\" must be a valid GUID"
+    },
+    {
+        "paramKey": "trackId",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"trackId\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "timelineTemplateId",
+        "paramValue": "0",
+        "httpCode": 400,
+        "message": "\"timelineTemplateId\" must be a valid GUID"
+    },
+    {
+        "paramKey": "timelineTemplateId",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"timelineTemplateId\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "isDefault",
+        "paramValue": 1,
+        "httpCode": 400,
+        "message": "\"isDefault\" must be a boolean"
+    },
+    {
+        "paramKey": "isDefault",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"isDefault\" must be a boolean"
+    },
+    {
+        "paramKey": "other",
+        "paramValue": "other",
+        "httpCode": 400,
+        "message": "\"other\" is not allowed"
+    }
+]

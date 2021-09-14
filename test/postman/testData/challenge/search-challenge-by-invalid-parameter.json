@@ -1,0 +1,56 @@
+[
+    {
+        "paramKey": "createdBy",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"createdBy\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "updatedBy",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"updatedBy\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "projectId",
+        "paramValue": -1,
+        "httpCode": 400,
+        "message": "\"projectId\" must be a positive number"
+    },
+    {
+        "paramKey": "status",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"status\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "description",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "isTask",
+        "paramValue": 1,
+        "httpCode": 400,
+        "message": "\"isTask\" must be a boolean"
+    },
+    {
+        "paramKey": "track",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"track\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "type",
+        "paramValue": "",
+        "httpCode": 400,
+        "message": "\"type\" is not allowed to be empty"
+    },
+    {
+        "paramKey": "taskIsAssigned",
+        "paramValue": 1,
+        "httpCode": 400,
+        "message": "\"taskIsAssigned\" must be a boolean"
+    }
+]

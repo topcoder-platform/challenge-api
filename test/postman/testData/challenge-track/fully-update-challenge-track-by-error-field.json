@@ -3,22 +3,18 @@
         "isActive": true,
         "abbreviation": "TSK2",
         "description": "A piece of work assigned to one person1",
-        "isTask": true,
-        "name": "develop",
+        "name": "POSTMANE2E-develop",
         "legacyId": 102,
         "httpCode": 409,
-        "message": "ChallengeTrack with name: develop already exist"
+        "message": "ChallengeTrack with name: POSTMANE2E-develop already exist"
     },
     {
         "isActive": true,
         "description": "A Multi-person Competition with Reviews and Winners",
         "abbreviation": "CH",
-        "name": "Challenge2",
-        "isTask": false,
+        "name": "POSTMANE2E-Challenge2",
         "legacyId": 103,
         "httpCode": 409,
         "message": "ChallengeTrack with abbreviation: CH already exist"
     }
 ]
-
-

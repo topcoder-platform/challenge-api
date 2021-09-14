@@ -1,0 +1,9 @@
+[
+    {
+        "name": "POSTMANE2E-Data",
+        "description": "data science",
+        "isActive": true,
+        "abbreviation": "DS",
+        "httpCode": 200
+    }
+]

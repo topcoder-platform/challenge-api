@@ -867,7 +867,7 @@ async function createChallenge (currentUser, challenge) {
   // populate phases
   if (!challenge.timelineTemplateId) {
     if (challenge.typeId && challenge.trackId) {
-      const [challengeTimelineTemplate] = await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
+      const { result: [challengeTimelineTemplate] } = await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
         typeId: challenge.typeId,
         trackId: challenge.trackId,
         isDefault: true
@@ -1950,4 +1950,4 @@ module.exports = {
   deleteChallenge
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

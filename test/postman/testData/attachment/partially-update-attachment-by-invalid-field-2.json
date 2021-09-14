@@ -1,0 +1,10 @@
+[
+    {
+        "name": null,
+        "fileSize": 10,
+        "url": "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew",
+        "description": "attachment 1",
+        "httpCode": 400,
+        "message": "\"name\" must be a string"
+    }
+]

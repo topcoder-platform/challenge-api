@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
 const constants = require('../../app-constants')
 
 /**
@@ -160,4 +160,4 @@ module.exports = {
   deletePhase
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

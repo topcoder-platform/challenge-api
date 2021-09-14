@@ -1,0 +1,34 @@
+[
+    {
+        "name": "POSTMANE2E-attachment 1",
+        "fileSize": -10,
+        "url": "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew",
+        "description": "attachment 1",
+        "httpCode": 400,
+        "message": "\"fileSize\" must be larger than or equal to 0"
+    },
+    {
+        "name": "",
+        "fileSize": 10,
+        "url": "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew",
+        "description": "attachment 1",
+        "httpCode": 400,
+        "message": "\"name\" is not allowed to be empty"
+    },
+    {
+        "name": "POSTMANE2E-attachment 1",
+        "fileSize": 10,
+        "url": "",
+        "description": "attachment 1",
+        "httpCode": 400,
+        "message": "\"url\" is not allowed to be empty"
+    },
+    {
+        "name": "POSTMANE2E-attachment 1",
+        "fileSize": 10,
+        "url": "https://cdn.filestackcontent.com/6NQ4A9nRUWLYY1Z4raew",
+        "description": "",
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    }
+]

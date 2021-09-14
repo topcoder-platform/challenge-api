@@ -1,0 +1,34 @@
+[
+    {
+        "isOpen": 1,
+        "description": "POSTMANE2E-new phase",
+        "name": "new phase",
+        "duration": 1,
+        "httpCode": 400,
+        "message": "\"isOpen\" must be a boolean"
+    },
+    {
+        "isOpen": true,
+        "description": "POSTMANE2E-new phase",
+        "name": "new phase",
+        "duration": -1,
+        "httpCode": 400,
+        "message": "\"duration\" must be a positive number"
+    },
+    {
+        "isOpen": true,
+        "description": "POSTMANE2E-new phase",
+        "name": "",
+        "duration": 1,
+        "httpCode": 400,
+        "message": "\"name\" is not allowed to be empty"
+    },
+    {
+        "isOpen": true,
+        "description": "",
+        "name": "new phase",
+        "duration": 1,
+        "httpCode": 400,
+        "message": "\"description\" is not allowed to be empty"
+    }
+]

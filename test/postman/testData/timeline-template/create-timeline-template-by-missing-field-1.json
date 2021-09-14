@@ -1,0 +1,9 @@
+[
+    {
+        "description": "new timeline",
+        "isActive": true,
+        "defaultDuration": 100,
+        "httpCode": 400,
+        "message": "\"name\" is required"
+    }
+]
