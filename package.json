@@ -38,7 +38,7 @@
     "standard": "^12.0.1"
   },
   "dependencies": {
-    "aws-sdk": "^2.466.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.19.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.15.1",
