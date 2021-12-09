@@ -1000,7 +1000,8 @@ async function getMemberById (userId) {
   const res = await axios.get(`${config.MEMBERS_API_URL}?userId=${userId}`, {
     headers: { Authorization: `Bearer ${token}` }
   })
-  return res.data || {}
+  if (res.data.length > 0) return res.data[0]
+  return {}
 }
 
 module.exports = {
