@@ -39,6 +39,16 @@ async function getChallenge (req, res) {
 }
 
 /**
+ * Get challenge statistics
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function getChallengeStatistics (req, res) {
+  const result = await service.getChallengeStatistics(req.authUser, req.params.challengeId)
+  res.send(result)
+}
+
+/**
  * Fully update challenge
  * @param {Object} req the request
  * @param {Object} res the response
@@ -77,5 +87,6 @@ module.exports = {
   getChallenge,
   fullyUpdateChallenge,
   partiallyUpdateChallenge,
-  deleteChallenge
+  deleteChallenge,
+  getChallengeStatistics
 }

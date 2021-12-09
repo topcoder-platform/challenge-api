@@ -48,6 +48,9 @@ module.exports = {
   // in bytes
   FILE_UPLOAD_SIZE_LIMIT: process.env.FILE_UPLOAD_SIZE_LIMIT
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT) : 50 * 1024 * 1024, // 50M
+  // TODO: change this to localhost
+  SUBMISSIONS_API_URL: process.env.SUBMISSIONS_API_URL || 'https://api.topcoder-dev.com/v5/submissions',
+  MEMBERS_API_URL: process.env.MEMBERS_API_URL || 'https://api.topcoder-dev.com/v5/members',
   RESOURCES_API_URL: process.env.RESOURCES_API_URL || 'http://localhost:4000/v5/resources',
   // TODO: change this to localhost
   RESOURCE_ROLES_API_URL: process.env.RESOURCE_ROLES_API_URL || 'http://api.topcoder-dev.com/v5/resource-roles',

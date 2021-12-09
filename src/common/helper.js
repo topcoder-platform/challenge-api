@@ -959,6 +959,50 @@ async function getGroupById (groupId) {
   }
 }
 
+/**
+ * Get challenge submissions
+ * @param {String} challengeId the challenge id
+ * @returns {Array} the submission
+ */
+async function getChallengeSubmissions (challengeId) {
+  const token = await getM2MToken()
+  let allSubmissions = []
+  // get search is paginated, we need to get all pages' data
+  let page = 1
+  while (true) {
+    const result = await axios.get(`${config.SUBMISSIONS_API_URL}?challengeId=${challengeId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page,
+        perPage: 100
+      }
+    })
+    const ids = result.data || []
+    if (ids.length === 0) {
+      break
+    }
+    allSubmissions = allSubmissions.concat(ids)
+    page += 1
+    if (result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
+      break
+    }
+  }
+  return allSubmissions
+}
+
+/**
+ * Get member by ID
+ * @param {String} userId the user ID
+ * @returns {Object}
+ */
+async function getMemberById (userId) {
+  const token = await getM2MToken()
+  const res = await axios.get(`${config.MEMBERS_API_URL}?userId=${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return res.data || {}
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1000,5 +1044,7 @@ module.exports = {
   ensureUserCanModifyChallenge,
   userHasFullAccess,
   sumOfPrizes,
-  getGroupById
+  getGroupById,
+  getChallengeSubmissions,
+  getMemberById
 }
