@@ -1232,7 +1232,7 @@ async function getChallengeStatistics (currentUser, id) {
       map[submission.memberId] = {
         photoUrl: member.photoURL,
         rating: _.get(member, 'maxRating.rating', 0),
-        ratingColor: _.get(member, 'maxRating.rating', '#9D9FA0'),
+        ratingColor: _.get(member, 'maxRating.ratingColor', '#9D9FA0'),
         homeCountryCode: member.homeCountryCode,
         handle: member.handle,
         submissions: []
