@@ -1271,6 +1271,49 @@ async function validateWinners (winners, challengeId) {
 }
 
 /**
+ * Get challenge statistics
+ * @param {Object} currentUser the user who perform operation
+ * @param {String} id the challenge id
+ * @returns {Object} the challenge with given id
+ */
+ async function getChallengeStatistics (currentUser, id) {
+  const challenge = await getChallenge(currentUser, id)
+  // for now, only Data Science challenges are supported
+  if (challenge.type !== 'Challenge' && challenge.track !== 'Data Science') {
+    throw new errors.BadRequestError(`Challenge of type ${challenge.type} and track ${challenge.track} does not support statistics`)
+  }
+  // get submissions
+  const submissions = await helper.getChallengeSubmissions(challenge.id)
+  // for each submission, load member profile
+  const map = {}
+  for (const submission of submissions) {
+    if (!map[submission.memberId]) {
+      // Load member profile and cache
+      const member = await helper.getMemberById(submission.memberId)
+      map[submission.memberId] = {
+        photoUrl: member.photoURL,
+        rating: _.get(member, 'maxRating.rating', 0),
+        ratingColor: _.get(member, 'maxRating.ratingColor', '#9D9FA0'),
+        homeCountryCode: member.homeCountryCode,
+        handle: member.handle,
+        submissions: []
+      }
+    }
+    // add submission
+    map[submission.memberId].submissions.push({
+      created: submission.created,
+      score: _.get(_.find(submission.review || [], r => r.metadata), 'score', 0)
+    })
+  }
+  return _.map(_.keys(map), (userId) => map[userId])
+}
+
+getChallengeStatistics.schema = {
+  currentUser: Joi.any(),
+  id: Joi.id()
+}
+
+/**
  * Update challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -2058,7 +2101,8 @@ module.exports = {
   getChallenge,
   fullyUpdateChallenge,
   partiallyUpdateChallenge,
-  deleteChallenge
+  deleteChallenge,
+  getChallengeStatistics
 }
 
 logger.buildService(module.exports)

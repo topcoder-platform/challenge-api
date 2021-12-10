@@ -61,6 +61,12 @@ module.exports = {
       scopes: [DELETE, ALL]
     }
   },
+  '/challenges/:challengeId/statistics': {
+    get: {
+      controller: 'ChallengeController',
+      method: 'getChallengeStatistics',
+    }
+  },
   '/challenge-types': {
     get: {
       controller: 'ChallengeTypeController',
