@@ -1277,7 +1277,10 @@ async function validateWinners (winners, challengeId) {
  * @returns {Object} the challenge with given id
  */
  async function getChallengeStatistics (currentUser, id) {
-  const challenge = await getChallenge(currentUser, id)
+   console.log('*****************')
+   console.log(currentUser)
+   console.log('*****************')
+   const challenge = await getChallenge(currentUser, id)
   // for now, only Data Science challenges are supported
   if (challenge.type !== 'Challenge' && challenge.track !== 'Data Science') {
     throw new errors.BadRequestError(`Challenge of type ${challenge.type} and track ${challenge.track} does not support statistics`)
