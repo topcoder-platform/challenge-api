@@ -820,36 +820,21 @@ async function validateChallengeTerms (terms = []) {
  */
 async function _filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
-  let userGroups
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !hasAdminRole(currentUser)
-  const subGroupsMap = {}
+  if(!needToCheckForGroupAccess) return challenges
+
+  let userGroups
+
   for (const challenge of challenges) {
     challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
-    let expandedGroups = []
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
     } else if (currentUser) {
-      // get user groups if not yet
       if (_.isNil(userGroups)) {
-        userGroups = await getUserGroups(currentUser.userId)
+        userGroups = await getCompleteUserGroupTreeIds(currentUser.userId)
       }
-      // Expand challenge groups by subGroups
-      // results are being saved on a hashmap for efficiency
-      for (const group of challenge.groups) {
-        let subGroups
-        if (subGroupsMap[group]) {
-          subGroups = subGroupsMap[group]
-        } else {
-          subGroups = await expandWithSubGroups(group)
-          subGroupsMap[group] = subGroups
-        }
-        expandedGroups = [
-          ..._.concat(expandedGroups, subGroups)
-        ]
-      }
-      // check if there is matched group
-      // logger.debug('Groups', challenge.groups, userGroups)
-      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+      // get user groups if not yet
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
         res.push(challenge)
       }
     }
