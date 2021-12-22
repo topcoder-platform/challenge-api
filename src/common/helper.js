@@ -834,7 +834,7 @@ async function _filterChallengesByGroupsAccess (currentUser, challenges) {
         userGroups = await getCompleteUserGroupTreeIds(currentUser.userId)
       }
       // get user groups if not yet
-      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug === group))) {
         res.push(challenge)
       }
     }
