@@ -111,6 +111,31 @@ function setResHeaders (req, res, result) {
 }
 
 /**
+ * Activate project
+ * @param {String} projectId The project id
+ */
+function activateProject (projectId) {
+  // TODO: Get financial information
+  // TODO charge credit card
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  await axios.patch(url, { status: 'Active'}, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
+ * Cancel project
+ * @param {String} projectId The project id
+ * @param {String} cancelReason The cancel reasonn
+ */
+ function canceledProject (projectId, cancelReason) {
+  // TODO: Get financial information
+  // TODO release hold
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  await axios.patch(url, { cancelReason, status: 'Canceled'}, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
  * Check if the user has admin role
  * @param {Object} authUser the user
  */
@@ -1053,5 +1078,7 @@ module.exports = {
   getGroupById,
   getChallengeSubmissions,
   getMemberById,
-  prepareSelfServiceProject
+  prepareSelfServiceProject,
+  activateProject,
+  canceledProject
 }
