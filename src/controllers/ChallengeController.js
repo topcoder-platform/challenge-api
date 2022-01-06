@@ -24,7 +24,7 @@ async function searchChallenges (req, res) {
  */
 async function createChallenge (req, res) {
   logger.debug(`createChallenge User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`)
-  const result = await service.createChallenge(req.authUser, req.body)
+  const result = await service.createChallenge(req.authUser, req.body, req.userToken)
   res.status(HttpStatus.CREATED).send(result)
 }
 

@@ -441,6 +441,26 @@ async function createResource (challengeId, memberHandle, roleId) {
 }
 
 /**
+ * Create Project
+ * @param {String} name The name
+ * @param {String} description The description
+ * @param {String} type The type
+ * @param {String} token The token
+ * @returns 
+ */
+async function prepareSelfServiceProject (name, description, type, token) {
+
+  const projectObj = {
+    name,
+    description,
+    type
+  }
+  const url = `${config.PROJECTS_API_URL}`
+  const res = await axios.post(url, projectObj, {headers: {Authorization: `Bearer ${token}`}})
+  return res.data.id
+}
+
+/**
  * Get resource roles
  * @returns {Promise<Array>} the challenge resources
  */
@@ -1032,5 +1052,6 @@ module.exports = {
   sumOfPrizes,
   getGroupById,
   getChallengeSubmissions,
-  getMemberById
+  getMemberById,
+  prepareSelfServiceProject
 }
