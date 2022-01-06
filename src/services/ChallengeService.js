@@ -1378,7 +1378,7 @@ async function update (currentUser, challengeId, data, isFull) {
       }
     }
     if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible) {
-      await helper.canceledProject(challenge.projectId, cancelReason)
+      await helper.cancelProject(challenge.projectId, cancelReason)
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && challenge.status !== constants.challengeStatuses.Active) {

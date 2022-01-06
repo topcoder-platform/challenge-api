@@ -111,28 +111,74 @@ function setResHeaders (req, res, result) {
 }
 
 /**
- * Activate project
- * @param {String} projectId The project id
+ * Get project payment
+ * @param {String} projectId the project id
  */
-function activateProject (projectId) {
-  // TODO: Get financial information
-  // TODO charge credit card
+ async function getProjectPayment (projectId) {
   const token = await getM2MToken()
-  const url = `${config.PROJECTS_API_URL}/${projectId}`
-  await axios.patch(url, { status: 'Active'}, { headers: { Authorization: `Bearer ${token}` } })
+  const url = `${config.CUSTOMER_PAYMENTS_URL}`
+  const res = axios.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      referenceId: projectId
+    }
+ })
+  const [payment] = res.data
+  return payment
+}
+
+/**
+ * Charge payment
+ * @param {String} paymentId the payment ID
+ */
+async function capturePayment (paymentId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`
+  await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
+ * Cancel payment
+ * @param {String} paymentId the payment ID
+ */
+async function cancelPayment (paymentId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`
+  await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
 }
 
 /**
  * Cancel project
- * @param {String} projectId The project id
- * @param {String} cancelReason The cancel reasonn
+ * @param {String} projectId the project id
+ * @param {String} cancelReason the cancel reasonn
  */
- function canceledProject (projectId, cancelReason) {
-  // TODO: Get financial information
-  // TODO release hold
+ async function cancelProject (projectId, cancelReason) {
+  const payment = await getProjectPayment()
+  try {
+    await cancelPayment(payment.id)
+  } catch (e) {
+    throw e
+  }
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  await axios.patch(url, { cancelReason, status: 'Canceled'}, { headers: { Authorization: `Bearer ${token}` } })
+  await axios.patch(url, { cancelReason, status: 'Cancelled'}, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
+ * Activate project
+ * @param {String} projectId the project id
+ */
+async function activateProject (projectId) {
+  const payment = await getProjectPayment(projectId)
+  try {
+    await capturePayment(payment.id)
+  } catch (e) {
+    await cancelProject(projectId, cancelReason)
+    throw e
+  }
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  await axios.patch(url, { status: 'Active'}, { headers: { Authorization: `Bearer ${token}` } })
 }
 
 /**
@@ -474,7 +520,6 @@ async function createResource (challengeId, memberHandle, roleId) {
  * @returns 
  */
 async function prepareSelfServiceProject (name, description, type, token) {
-
   const projectObj = {
     name,
     description,
@@ -1080,5 +1125,8 @@ module.exports = {
   getMemberById,
   prepareSelfServiceProject,
   activateProject,
-  canceledProject
+  cancelProject,
+  getProjectPayment,
+  capturePayment,
+  cancelPayment
 }
