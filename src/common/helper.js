@@ -484,7 +484,10 @@ async function createSelfServiceProject (name, description, type, token) {
 async function capturePayment (paymentId) {
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`
-  await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+  const res = await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (res.data.status !== 'succeeded') {
+    throw new Error(`Failed to charge payment. Current status: ${res.data.status}`)
+  }
 }
 
 /**
@@ -494,7 +497,10 @@ async function capturePayment (paymentId) {
 async function cancelPayment (paymentId) {
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`
-  await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+  const res = await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (res.data.status !== 'canceled') {
+    throw new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
+  }
 }
 
 /**
