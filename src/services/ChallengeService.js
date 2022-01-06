@@ -324,7 +324,7 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
   if (criteria.selfService) {
-    boolQuery.push({ match_phrase: { 'legacy.selfservice': criteria.selfService}})
+    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
@@ -901,13 +901,13 @@ async function createChallenge (currentUser, challenge, userToken) {
     if(challenge.legacy.selfService) {
       if(!challenge.projectId) {
         const selfServiceProjectName = `Self service - ${currentUser.userId} - ${challenge.name}`
-        challenge.projectId = await helper.prepareSelfServiceProject(selfServiceProjectName, selfServiceProjectName, config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
+        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, challenge.description, config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
       }
     } else if (!challenge.projectId) {
       throw new errors.BadRequestError('The projectId is required')
     }
   } catch (e) {
-    throw new errors.ServiceUnavailableError('Fail to create the project')
+    throw new errors.ServiceUnavailableError('Fail to create a self-service project')
   }
 
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
@@ -1344,7 +1344,7 @@ async function validateWinners (winners, challengeId) {
  * @returns {Object} the updated challenge
  */
 async function update (currentUser, challengeId, data, isFull) {
-  const cancelReason = data.cancelReason
+  const cancelReason = _.cloneDeep(data.cancelReason)
   delete data.cancelReason
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
@@ -1358,6 +1358,24 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  // check if it's a self service challenge and project needs to be activated first
+  if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Active && challenge.status !== constants.challengeStatuses.Active) {
+    try {
+      await helper.activateProject(challenge.projectId)
+    } catch (e) {
+      await update(
+        currentUser,
+        challengeId,
+        {
+          ...data,
+          status: constants.challengeStatuses.CancelledPaymentFailed,
+          cancelReason: e.message
+        },
+        false
+      )
+      throw new errors.BadRequestError('Failed to activate the challenge! The challenge has been canceled!')
+    }
+  }
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
@@ -1365,9 +1383,6 @@ async function update (currentUser, challengeId, data, isFull) {
   }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (challenge.legacy.selfService && challenge.status !== constants.challengeStatuses.Active) {
-        await helper.activateProject(challenge.projectId)
-      }
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && _.isUndefined(_.get(challenge, 'legacyId'))) {
         throw new errors.BadRequestError('You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support.')
       }

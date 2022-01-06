@@ -83,5 +83,5 @@ module.exports = {
 
   FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90,
 
-  NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'website'
+  NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'self-service'
 }
