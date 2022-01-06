@@ -501,9 +501,11 @@ async function cancelPayment (paymentId) {
  * Cancel project
  * @param {String} projectId the project id
  * @param {String} cancelReason the cancel reasonn
+ * @param {Object} currentUser the current user
  */
- async function cancelProject (projectId, cancelReason) {
+ async function cancelProject (projectId, cancelReason, currentUser) {
   const payment = await getProjectPayment(projectId)
+  const project = await ensureProjectExist(projectId, currentUser)
   try {
     await cancelPayment(payment.id)
   } catch (e) {
@@ -511,15 +513,29 @@ async function cancelPayment (paymentId) {
   }
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  await axios.patch(url, { cancelReason, status: 'cancelled'}, { headers: { Authorization: `Bearer ${token}` } })
+  await axios.patch(url, {
+    cancelReason,
+    status: 'cancelled',
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
 }
 
 /**
  * Activate project
  * @param {String} projectId the project id
+ * @param {Object} currentUser the current user
  */
-async function activateProject (projectId) {
+async function activateProject (projectId, currentUser) {
   const payment = await getProjectPayment(projectId)
+  const project = await ensureProjectExist(projectId, currentUser)
   try {
     await capturePayment(payment.id)
   } catch (e) {
@@ -529,7 +545,18 @@ async function activateProject (projectId) {
   }
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  await axios.patch(url, { status: 'active'}, { headers: { Authorization: `Bearer ${token}` } })
+  await axios.patch(url, {
+    status: 'active',
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
 }
 
 /**
