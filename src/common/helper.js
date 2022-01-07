@@ -470,7 +470,8 @@ async function createSelfServiceProject (name, description, type, token) {
   const res = axios.get(url, {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      referenceId: projectId
+      referenceId: projectId,
+      reference: 'project'
     }
  })
   const [payment] = res.data
