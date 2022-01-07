@@ -57,6 +57,7 @@ module.exports = {
   GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://localhost:4000/v5/groups',
   PROJECTS_API_URL: process.env.PROJECTS_API_URL || 'http://localhost:4000/v5/projects',
   TERMS_API_URL: process.env.TERMS_API_URL || 'http://localhost:4000/v5/terms',
+  CUSTOMER_PAYMENTS_URL: process.env.CUSTOMER_PAYMENTS_URL || 'http://localhost:4000/v5/customer-payments',
   // copilot resource role ids allowed to upload attachment
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],
@@ -80,5 +81,7 @@ module.exports = {
 
   M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'tcwebservice',
 
-  FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90
+  FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90,
+
+  NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'self-service'
 }

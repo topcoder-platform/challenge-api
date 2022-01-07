@@ -28,7 +28,8 @@ const challengeStatuses = {
   CancelledWinnerUnresponsive: 'Cancelled - Winner Unresponsive',
   CancelledClientRequest: 'Cancelled - Client Request',
   CancelledRequirementsInfeasible: 'Cancelled - Requirements Infeasible',
-  CancelledZeroRegistrations: 'Cancelled - Zero Registrations'
+  CancelledZeroRegistrations: 'Cancelled - Zero Registrations',
+  CancelledPaymentFailed: 'Cancelled - Payment Failed'
 }
 
 const validChallengeParams = {

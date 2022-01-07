@@ -18,6 +18,7 @@ const elasticsearch = require('elasticsearch')
 const moment = require('moment')
 const HttpStatus = require('http-status-codes')
 const xss = require('xss')
+const logger = require('./logger')
 
 // Bus API Client
 let busApiClient
@@ -438,6 +439,131 @@ async function createResource (challengeId, memberHandle, roleId) {
   const url = `${config.RESOURCES_API_URL}`
   const res = await axios.post(url, userObj, { headers: { Authorization: `Bearer ${token}` } })
   return res || false
+}
+
+/**
+ * Create Project
+ * @param {String} name The name
+ * @param {String} description The description
+ * @param {String} type The type
+ * @param {String} token The token
+ * @returns 
+ */
+async function createSelfServiceProject (name, description, type, token) {
+  const projectObj = {
+    name,
+    description,
+    type
+  }
+  const url = `${config.PROJECTS_API_URL}`
+  const res = await axios.post(url, projectObj, {headers: {Authorization: `Bearer ${token}`}})
+  return _.get(res, 'data.id')
+}
+
+/**
+ * Get project payment
+ * @param {String} projectId the project id
+ */
+ async function getProjectPayment (projectId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}`
+  const res = axios.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      referenceId: projectId,
+      reference: 'project'
+    }
+ })
+  const [payment] = res.data
+  return payment
+}
+
+/**
+ * Charge payment
+ * @param {String} paymentId the payment ID
+ */
+async function capturePayment (paymentId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`
+  const res = await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (res.data.status !== 'succeeded') {
+    throw new Error(`Failed to charge payment. Current status: ${res.data.status}`)
+  }
+}
+
+/**
+ * Cancel payment
+ * @param {String} paymentId the payment ID
+ */
+async function cancelPayment (paymentId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`
+  const res = await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (res.data.status !== 'canceled') {
+    throw new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
+  }
+}
+
+/**
+ * Cancel project
+ * @param {String} projectId the project id
+ * @param {String} cancelReason the cancel reasonn
+ * @param {Object} currentUser the current user
+ */
+ async function cancelProject (projectId, cancelReason, currentUser) {
+  const payment = await getProjectPayment(projectId)
+  const project = await ensureProjectExist(projectId, currentUser)
+  try {
+    await cancelPayment(payment.id)
+  } catch (e) {
+    logger.debug(`Failed to cancel payment with error: ${e.message}`)
+  }
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  await axios.patch(url, {
+    cancelReason,
+    status: 'cancelled',
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
+ * Activate project
+ * @param {String} projectId the project id
+ * @param {Object} currentUser the current user
+ */
+async function activateProject (projectId, currentUser) {
+  const payment = await getProjectPayment(projectId)
+  const project = await ensureProjectExist(projectId, currentUser)
+  try {
+    await capturePayment(payment.id)
+  } catch (e) {
+    logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`)
+    await cancelProject(projectId, cancelReason)
+    throw new Error(`Failed to charge payment ${payment.id} with error: ${e.message}`)
+  }
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  await axios.patch(url, {
+    status: 'active',
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
 }
 
 /**
@@ -1032,5 +1158,11 @@ module.exports = {
   sumOfPrizes,
   getGroupById,
   getChallengeSubmissions,
-  getMemberById
+  getMemberById,
+  createSelfServiceProject,
+  activateProject,
+  cancelProject,
+  getProjectPayment,
+  capturePayment,
+  cancelPayment
 }

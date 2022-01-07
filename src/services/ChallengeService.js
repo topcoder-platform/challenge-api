@@ -323,6 +323,9 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.useSchedulingAPI) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
+  if (criteria.selfService) {
+    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -692,6 +695,7 @@ searchChallenges.schema = {
     page: Joi.page(),
     perPage: Joi.perPage(),
     id: Joi.optionalId(),
+    selfService: Joi.boolean(),
     confidentialityType: Joi.string(),
     directProjectId: Joi.number(),
     typeIds: Joi.array().items(Joi.optionalId()),
@@ -889,9 +893,23 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
+ * @param {String} userToken the user token
  * @returns {Object} the created challenge
  */
-async function createChallenge (currentUser, challenge) {
+async function createChallenge (currentUser, challenge, userToken) {
+  try {
+    if(challenge.legacy.selfService) {
+      if(!challenge.projectId) {
+        const selfServiceProjectName = `Self service - ${currentUser.userId} - ${challenge.name}`
+        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, challenge.description, config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
+      }
+    } else if (!challenge.projectId) {
+      throw new errors.BadRequestError('The projectId is required')
+    }
+  } catch (e) {
+    throw new errors.ServiceUnavailableError('Fail to create a self-service project')
+  }
+
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
     _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
   }
@@ -1061,7 +1079,8 @@ createChallenge.schema = {
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean(),
-      pureV5: Joi.boolean()
+      pureV5: Joi.boolean(),
+      selfService: Joi.boolean()
     }),
     billing: Joi.object().keys({
       billingAccountId: Joi.string(),
@@ -1118,7 +1137,8 @@ createChallenge.schema = {
       id: Joi.id(),
       roleId: Joi.id()
     }))
-  }).required()
+  }).required(),
+    userToken: Joi.string().required()
 }
 
 /**
@@ -1324,6 +1344,8 @@ async function validateWinners (winners, challengeId) {
  * @returns {Object} the updated challenge
  */
 async function update (currentUser, challengeId, data, isFull) {
+  const cancelReason = _.cloneDeep(data.cancelReason)
+  delete data.cancelReason
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
   }
@@ -1336,6 +1358,24 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  // check if it's a self service challenge and project needs to be activated first
+  if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Active && challenge.status !== constants.challengeStatuses.Active) {
+    try {
+      await helper.activateProject(challenge.projectId, currentUser)
+    } catch (e) {
+      await update(
+        currentUser,
+        challengeId,
+        {
+          ...data,
+          status: constants.challengeStatuses.CancelledPaymentFailed,
+          cancelReason: e.message
+        },
+        false
+      )
+      throw new errors.BadRequestError('Failed to activate the challenge! The challenge has been canceled!')
+    }
+  }
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
@@ -1351,6 +1391,9 @@ async function update (currentUser, challengeId, data, isFull) {
         challenge.status === constants.challengeStatuses.Draft) {
         throw new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
       }
+    }
+    if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible) {
+      await helper.cancelProject(challenge.projectId, cancelReason, currentUser)
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && challenge.status !== constants.challengeStatuses.Active) {
@@ -1377,6 +1420,9 @@ async function update (currentUser, challengeId, data, isFull) {
   }
   if (_.get(challenge, 'legacy.pureV5') && _.get(data, 'legacy.pureV5') && _.get(challenge, 'legacy.pureV5') !== _.get(data, 'legacy.pureV5')) {
     throw new errors.ForbiddenError('Cannot change legacy.pureV5')
+  }
+  if (_.get(challenge, 'legacy.selfService') && _.get(data, 'legacy.selfService') && _.get(challenge, 'legacy.selfService') !== _.get(data, 'legacy.selfService')) {
+    throw new errors.ForbiddenError('Cannot change legacy.selfService')
   }
 
   if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
@@ -1814,7 +1860,8 @@ function sanitizeChallenge (challenge) {
     'startDate',
     'status',
     'task',
-    'groups'
+    'groups',
+    'cancelReason'
   ])
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name)
@@ -1835,7 +1882,8 @@ function sanitizeChallenge (challenge) {
       'isTask',
       'useSchedulingAPI',
       'pureV5Task',
-      'pureV5'
+      'pureV5',
+      'selfService'
     ])
   }
   if (challenge.billing) {
@@ -1902,8 +1950,10 @@ fullyUpdateChallenge.schema = {
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean(),
-      pureV5: Joi.boolean()
+      pureV5: Joi.boolean(),
+      selfService: Joi.boolean(),
     }).unknown(true),
+    cancelReason: Joi.string(),
     billing: Joi.object().keys({
       billingAccountId: Joi.string(),
       markup: Joi.number().min(0).max(100)
@@ -2006,8 +2056,10 @@ partiallyUpdateChallenge.schema = {
       isTask: Joi.boolean(),
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean(),
-      pureV5: Joi.boolean()
+      pureV5: Joi.boolean(),
+      selfService: Joi.boolean()
     }).unknown(true),
+    cancelReason: Joi.string(),
     task: Joi.object().keys({
       isTask: Joi.boolean().default(false),
       isAssigned: Joi.boolean().default(false),

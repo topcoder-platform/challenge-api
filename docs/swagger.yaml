@@ -65,7 +65,12 @@ paths:
           description: Filter by id, exact match
           required: false
           type: string
-          format: UUID
+          format: UUI
+        - name: selfService
+          in: query
+          description: Filter by selfService flag
+          required: false
+          type: boolean
         - name: confidentialityType
           in: query
           description: Filter by confidentialityType
@@ -2352,6 +2357,8 @@ definitions:
             type: boolean
           pureV5Task:
             type: boolean
+          selfService:
+            type: boolean
       billing:
         type: object
         properties:
@@ -2577,6 +2584,8 @@ definitions:
             type: boolean
           pureV5Task:
             type: boolean
+          selfService:
+            type: boolean
       billing:
         type: object
         properties:
@@ -2716,6 +2725,10 @@ definitions:
             type: boolean
           pureV5Task:
             type: boolean
+          selfService:
+            type: boolean
+      cancelReason:
+            type: string
       billing:
         type: object
         properties:
@@ -2894,6 +2907,10 @@ definitions:
             type: boolean
           pureV5Task:
             type: boolean
+          selfService:
+            type: boolean
+      cancelReason: 
+        type: string
       billing:
         type: object
         properties:
