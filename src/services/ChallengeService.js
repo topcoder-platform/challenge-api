@@ -1138,7 +1138,7 @@ createChallenge.schema = {
       roleId: Joi.id()
     }))
   }).required(),
-    userToken: Joi.string().required()
+  userToken: Joi.string().required()
 }
 
 /**
