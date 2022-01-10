@@ -20,7 +20,7 @@ async function searchChallengeTimelineTemplates (criteria) {
   if (criteria.typeId) records = _.filter(records, e => (criteria.typeId === e.typeId))
   if (criteria.trackId) records = _.filter(records, e => (criteria.trackId === e.trackId))
   if (criteria.timelineTemplateId) records = _.filter(records, e => (criteria.timelineTemplateId === e.timelineTemplateId))
-  if (!_.isUndefined(criteria.isDefault)) records = _.filter(records, e => (e.isDefault === (criteria.isDefault === 'true')))
+  if (!_.isUndefined(criteria.isDefault)) records = _.filter(records, e => (e.isDefault === (_.toLower(_.toString(criteria.isDefault)) === 'true')))
   return {
     total: records.length,
     page: 1,

@@ -970,7 +970,6 @@ async function createChallenge (currentUser, challenge, userToken) {
         trackId: challenge.trackId,
         isDefault: true
       })
-      console.log(JSON.stringify(supportedTemplates, null, 2))
       const challengeTimelineTemplate = supportedTemplates.result[0]
       if (!challengeTimelineTemplate) {
         throw new errors.BadRequestError(`The selected trackId ${challenge.trackId} and typeId: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`)
