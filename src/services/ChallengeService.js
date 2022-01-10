@@ -1127,7 +1127,7 @@ createChallenge.schema = {
       })).min(1).required()
     })),
     tags: Joi.array().items(Joi.string()), // tag names
-    projectId: Joi.number().integer().positive().required(),
+    projectId: Joi.number().integer().positive(),
     legacyId: Joi.number().integer().positive(),
     startDate: Joi.date(),
     status: Joi.string().valid(_.values(constants.challengeStatuses)),
