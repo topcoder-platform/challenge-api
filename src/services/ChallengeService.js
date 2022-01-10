@@ -965,11 +965,12 @@ async function createChallenge (currentUser, challenge, userToken) {
   // populate phases
   if (!challenge.timelineTemplateId) {
     if (challenge.typeId && challenge.trackId) {
-      const [challengeTimelineTemplate] = await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
+      const supportedTemplates = await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
         typeId: challenge.typeId,
         trackId: challenge.trackId,
         isDefault: true
       })
+      const challengeTimelineTemplate = supportedTemplates.result[0]
       if (!challengeTimelineTemplate) {
         throw new errors.BadRequestError(`The selected trackId ${challenge.trackId} and typeId: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`)
       }
