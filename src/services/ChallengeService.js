@@ -909,7 +909,11 @@ async function createChallenge (currentUser, challenge, userToken) {
   } catch (e) {
     throw new errors.ServiceUnavailableError('Fail to create a self-service project')
   }
-
+  if(challenge.legacy.selfService && challenge.metadata && challenge.metadata.length > 0) {
+    for(const entry of challenge.metadata) {
+       challenge.description = challenge.description.replaceAll(`{{${entry.name}}}`, entry.value )
+    }
+  }
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
     _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
   }
