@@ -1366,7 +1366,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // check if it's a self service challenge and project needs to be activated first
   if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Active && challenge.status !== constants.challengeStatuses.Active) {
     try {
-      await helper.activateProject(challenge.projectId, currentUser)
+      await helper.activateProject(challenge.projectId, currentUser, challenge.id) // TODO: do not use challenge ID
     } catch (e) {
       await update(
         currentUser,
@@ -1398,7 +1398,7 @@ async function update (currentUser, challengeId, data, isFull) {
       }
     }
     if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible) {
-      await helper.cancelProject(challenge.projectId, cancelReason, currentUser)
+      await helper.cancelProject(challenge.projectId, cancelReason, currentUser, challenge.id)
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && challenge.status !== constants.challengeStatuses.Active) {
