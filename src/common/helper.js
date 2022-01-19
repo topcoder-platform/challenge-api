@@ -542,9 +542,11 @@ async function cancelPayment (paymentId) {
  * @param {Object} currentUser the current user
  */
 async function activateProject (projectId, currentUser, challengeId) {
-  const payment = await getProjectPayment(challengeId)
-  const project = await ensureProjectExist(projectId, currentUser)
+  let payment
+  let project
   try {
+    payment = await getProjectPayment(challengeId)
+    project = await ensureProjectExist(projectId, currentUser)
     await capturePayment(payment.id)
   } catch (e) {
     logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`)
