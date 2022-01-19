@@ -467,7 +467,7 @@ async function createSelfServiceProject (name, description, type, token) {
  async function getProjectPayment (projectId) {
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}`
-  const res = axios.get(url, {
+  const res = await axios.get(url, {
     headers: { Authorization: `Bearer ${token}` },
     params: {
       referenceId: projectId,
