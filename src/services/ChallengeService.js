@@ -326,6 +326,9 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.selfService) {
     boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
   }
+  if (criteria.selfServiceCopilot) {
+    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
+  }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
   }
@@ -696,6 +699,7 @@ searchChallenges.schema = {
     perPage: Joi.perPage(),
     id: Joi.optionalId(),
     selfService: Joi.boolean(),
+    selfServiceCopilot: Joi.string(),
     confidentialityType: Joi.string(),
     directProjectId: Joi.number(),
     typeIds: Joi.array().items(Joi.optionalId()),
@@ -1085,7 +1089,8 @@ createChallenge.schema = {
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
-      selfService: Joi.boolean()
+      selfService: Joi.boolean(),
+      selfServiceCopilot: Joi.string()
     }),
     billing: Joi.object().keys({
       billingAccountId: Joi.string(),
@@ -1888,7 +1893,8 @@ function sanitizeChallenge (challenge) {
       'useSchedulingAPI',
       'pureV5Task',
       'pureV5',
-      'selfService'
+      'selfService',
+      'selfServiceCopilot'
     ])
   }
   if (challenge.billing) {
@@ -1957,6 +1963,7 @@ fullyUpdateChallenge.schema = {
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
       selfService: Joi.boolean(),
+      selfServiceCopilot: Joi.string(),
     }).unknown(true),
     cancelReason: Joi.string(),
     billing: Joi.object().keys({
@@ -2062,7 +2069,8 @@ partiallyUpdateChallenge.schema = {
       useSchedulingAPI: Joi.boolean(),
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
-      selfService: Joi.boolean()
+      selfService: Joi.boolean(),
+      selfServiceCopilot: Joi.string()
     }).unknown(true),
     cancelReason: Joi.string(),
     task: Joi.object().keys({

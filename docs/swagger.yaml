@@ -71,6 +71,11 @@ paths:
           description: Filter by selfService flag
           required: false
           type: boolean
+        - name: selfServiceCopilot
+          in: query
+          description: Filter by selfServiceCopilot
+          required: false
+          type: string
         - name: confidentialityType
           in: query
           description: Filter by confidentialityType
@@ -2359,6 +2364,8 @@ definitions:
             type: boolean
           selfService:
             type: boolean
+          selfServiceCopilot:
+            type: string
       billing:
         type: object
         properties:
@@ -2586,6 +2593,8 @@ definitions:
             type: boolean
           selfService:
             type: boolean
+          selfServiceCopilot:
+            type: string
       billing:
         type: object
         properties:
@@ -2727,6 +2736,8 @@ definitions:
             type: boolean
           selfService:
             type: boolean
+          selfServiceCopilot:
+            type: string
       cancelReason:
             type: string
       billing:
@@ -2909,6 +2920,8 @@ definitions:
             type: boolean
           selfService:
             type: boolean
+          selfServiceCopilot:
+            type: string
       cancelReason: 
         type: string
       billing:
