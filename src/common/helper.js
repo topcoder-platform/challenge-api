@@ -485,6 +485,7 @@ async function createSelfServiceProject (name, description, type, token) {
 async function capturePayment (paymentId) {
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`
+  logger.info(`Calling: ${url} to capture payment`)
   const res = await axios.patch(url, { headers: { Authorization: `Bearer ${token}` } })
   logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`)
   if (res.data.status !== 'succeeded') {
