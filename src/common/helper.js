@@ -511,8 +511,8 @@ async function cancelPayment (paymentId) {
  * @param {String} cancelReason the cancel reasonn
  * @param {Object} currentUser the current user
  */
- async function cancelProject (projectId, cancelReason, currentUser, challengeId) {
-  const payment = await getProjectPayment(challengeId)
+ async function cancelProject (projectId, cancelReason, currentUser) {
+  const payment = await getProjectPayment(projectId)
   const project = await ensureProjectExist(projectId, currentUser)
   try {
     await cancelPayment(payment.id)
@@ -541,17 +541,17 @@ async function cancelPayment (paymentId) {
  * @param {String} projectId the project id
  * @param {Object} currentUser the current user
  */
-async function activateProject (projectId, currentUser, challengeId) {
+async function activateProject (projectId, currentUser) {
   let payment
   let project
   try {
-    payment = await getProjectPayment(challengeId)
+    payment = await getProjectPayment(projectId)
     project = await ensureProjectExist(projectId, currentUser)
     await capturePayment(payment.id)
   } catch (e) {
     logger.debug(e)
     logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`)
-    await cancelProject(projectId, `Failed to charge payment ${payment.id} with error: ${e.message}`, currentUser, challengeId)
+    await cancelProject(projectId, `Failed to charge payment ${payment.id} with error: ${e.message}`, currentUser)
     throw new Error(`Failed to charge payment ${payment.id} with error: ${e.message}`)
   }
   const token = await getM2MToken()
