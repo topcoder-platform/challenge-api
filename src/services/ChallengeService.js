@@ -1368,6 +1368,18 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+
+  if (challenge.legacy.selfService && !data.description) {
+    data.description = challenge.description
+  }
+  if (challenge.legacy.selfService && !data.metadata) {
+    data.metadata = challenge.metadata
+  }
+  if(challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
+    for(const entry of data.metadata) {
+      data.description = data.description.replaceAll(`{{${entry.name}}}`, entry.value )
+    }
+  }
   // check if it's a self service challenge and project needs to be activated first
   if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Active && challenge.status !== constants.challengeStatuses.Active) {
     try {
@@ -1387,6 +1399,7 @@ async function update (currentUser, challengeId, data, isFull) {
       throw new errors.BadRequestError('Failed to activate the challenge! The challenge has been canceled!')
     }
   }
+
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
