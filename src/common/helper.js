@@ -543,7 +543,7 @@ async function cancelPayment (paymentId) {
  * @param {String} projectId the project id
  * @param {Object} currentUser the current user
  */
-async function activateProject (projectId, currentUser) {
+async function activateProject (projectId, currentUser, name, description) {
   let payment
   let project
   try {
@@ -559,6 +559,8 @@ async function activateProject (projectId, currentUser) {
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   await axios.patch(url, {
+    name,
+    description,
     status: 'active',
     details: {
       ...project.details,

@@ -1371,7 +1371,8 @@ async function update (currentUser, challengeId, data, isFull) {
   // check if it's a self service challenge and project needs to be activated first
   if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Active && challenge.status !== constants.challengeStatuses.Active) {
     try {
-      await helper.activateProject(challenge.projectId, currentUser)
+      const selfServiceProjectName = `Self service - ${currentUser.userId} - ${challenge.name}`
+      await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, challenge.description)
     } catch (e) {
       await update(
         currentUser,
