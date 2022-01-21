@@ -1371,7 +1371,8 @@ async function update (currentUser, challengeId, data, isFull) {
   let dynamicDescription = _.cloneDeep(challenge.description)
   if(challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for(const entry of data.metadata) {
-      dynamicDescription = dynamicDescription.replaceAll(`{{${entry.name}}}`, entry.value )
+      const regexp = new RegExp(`{{${entry.name}}}`, 'g')
+      dynamicDescription = dynamicDescription.replace(regexp, entry.value)
     }
     data.description = dynamicDescription
   }
