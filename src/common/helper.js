@@ -550,7 +550,9 @@ async function activateProject (projectId, currentUser, name, description) {
   try {
     payment = await getProjectPayment(projectId)
     project = await ensureProjectExist(projectId, currentUser)
-    payment = await capturePayment(payment.id)
+    if (payment.status !== 'succeeded') {
+      payment = await capturePayment(payment.id)
+    }
   } catch (e) {
     logger.debug(e)
     logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`)
