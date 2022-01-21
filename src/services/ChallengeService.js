@@ -904,7 +904,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   try {
     if(challenge.legacy.selfService) {
       if(!challenge.projectId) {
-        const selfServiceProjectName = `Self service - ${currentUser.userId} - ${challenge.name}`
+        const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`
         challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, challenge.description, config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
       }
     } else if (!challenge.projectId) {
@@ -1371,7 +1371,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // check if it's a self service challenge and project needs to be activated first
   if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Active && challenge.status !== constants.challengeStatuses.Active) {
     try {
-      const selfServiceProjectName = `Self service - ${currentUser.userId} - ${challenge.name}`
+      const selfServiceProjectName = `Self service - ${currentUser.createdBy} - ${challenge.name}`
       await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, challenge.description)
     } catch (e) {
       await update(
