@@ -491,6 +491,7 @@ async function capturePayment (paymentId) {
   if (res.data.status !== 'succeeded') {
     throw new Error(`Failed to charge payment. Current status: ${res.data.status}`)
   }
+  return res.data
 }
 
 /**
@@ -504,6 +505,7 @@ async function cancelPayment (paymentId) {
   if (res.data.status !== 'canceled') {
     throw new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
   }
+  return res.data
 }
 
 /**
@@ -513,10 +515,10 @@ async function cancelPayment (paymentId) {
  * @param {Object} currentUser the current user
  */
  async function cancelProject (projectId, cancelReason, currentUser) {
-  const payment = await getProjectPayment(projectId)
+  let payment = await getProjectPayment(projectId)
   const project = await ensureProjectExist(projectId, currentUser)
   try {
-    await cancelPayment(payment.id)
+    payment = await cancelPayment(payment.id)
   } catch (e) {
     logger.debug(`Failed to cancel payment with error: ${e.message}`)
   }
@@ -548,7 +550,7 @@ async function activateProject (projectId, currentUser, name, description) {
   try {
     payment = await getProjectPayment(projectId)
     project = await ensureProjectExist(projectId, currentUser)
-    await capturePayment(payment.id)
+    payment = await capturePayment(payment.id)
   } catch (e) {
     logger.debug(e)
     logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`)
