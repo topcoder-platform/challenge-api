@@ -325,13 +325,11 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.useSchedulingAPI) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
-  if (includeSelfService) {
-    if (criteria.selfService) {
-      boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
-    }
-    if (criteria.selfServiceCopilot) {
-      boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
-    }
+  if (criteria.selfService) {
+    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
+  }
+  if (criteria.selfServiceCopilot) {
+    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
