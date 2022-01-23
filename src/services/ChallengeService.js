@@ -139,6 +139,8 @@ async function searchChallenges (currentUser, criteria) {
     'updatedBy'
   ]
 
+  const includeSelfService = currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser) || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle))
+
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
   const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : []
@@ -323,11 +325,13 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.useSchedulingAPI) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
-  if (criteria.selfService) {
-    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
-  }
-  if (criteria.selfServiceCopilot) {
-    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
+  if (includeSelfService) {
+    if (criteria.selfService) {
+      boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
+    }
+    if (criteria.selfServiceCopilot) {
+      boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
+    }
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
@@ -567,6 +571,22 @@ async function searchChallenges (currentUser, criteria) {
               ? [{ match_phrase: { 'task.memberId': currentUser.userId } }]
               : []
           )
+        ]
+      }
+    })
+  }
+
+  if (!includeSelfService) {
+    mustQuery.push({
+      bool: {
+        should: [
+          { bool: { must_not: { exists: { field: 'legacy.selfService' } } } },
+          ...(currentUser ? [
+            { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.New } } } },
+            { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Draft } } } },
+            { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } },
+            { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } },
+          ] : [])
         ]
       }
     })
