@@ -1507,7 +1507,7 @@ async function update (currentUser, challengeId, data, isFull) {
         }
       }
     } else {
-      for (let i = 0; i < challenge.discussions.length; i += 1) {
+      for (let i = 0; i < data.discussions.length; i += 1) {
         data.discussions[i].id = uuid()
         data.discussions[i].name = data.discussions[i].name.substring(0, config.FORUM_TITLE_LENGTH_LIMIT)
       }
