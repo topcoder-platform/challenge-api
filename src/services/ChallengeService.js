@@ -1488,21 +1488,28 @@ async function update (currentUser, challengeId, data, isFull) {
 
   // Only M2M can update url and options of discussions
   if (data.discussions && data.discussions.length > 0) {
-    for (let i = 0; i < data.discussions.length; i += 1) {
-      if (_.isUndefined(data.discussions[i].id)) {
+    if (challenge.discussions && challenge.discussions.length > 0) {
+      for (let i = 0; i < data.discussions.length; i += 1) {
+        if (_.isUndefined(data.discussions[i].id)) {
+          data.discussions[i].id = uuid()
+          if (!currentUser.isMachine) {
+            _.unset(data.discussions, 'url')
+            _.unset(data.discussions, 'options')
+          }
+        } else if (!currentUser.isMachine) {
+          const existingDiscussion = _.find(_.get(challenge, 'discussions', []), d => d.id === data.discussions[i].id)
+          if (existingDiscussion) {
+            _.assign(data.discussions[i], _.pick(existingDiscussion, ['url', 'options']))
+          } else {
+            _.unset(data.discussions, 'url')
+            _.unset(data.discussions, 'options')
+          }
+        }
+      }
+    } else {
+      for (let i = 0; i < challenge.discussions.length; i += 1) {
         data.discussions[i].id = uuid()
-        if (!currentUser.isMachine) {
-          _.unset(data.discussions, 'url')
-          _.unset(data.discussions, 'options')
-        }
-      } else if (!currentUser.isMachine) {
-        const existingDiscussion = _.find(_.get(challenge, 'discussions', []), d => d.id === data.discussions[i].id)
-        if (existingDiscussion) {
-          _.assign(data.discussions[i], _.pick(existingDiscussion, ['url', 'options']))
-        } else {
-          _.unset(data.discussions, 'url')
-          _.unset(data.discussions, 'options')
-        }
+        data.discussions[i].name = data.discussions[i].name.substring(0, config.FORUM_TITLE_LENGTH_LIMIT)
       }
     }
   }
