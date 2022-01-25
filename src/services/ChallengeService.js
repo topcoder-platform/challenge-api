@@ -1077,12 +1077,21 @@ async function createChallenge (currentUser, challenge, userToken) {
     body: ret
   })
 
-  // if created by a user, add user as a manager
-  if (currentUser.handle) {
-    // logger.debug(`Adding user as manager ${currentUser.handle}`)
-    await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
-  } else {
-    // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+  //If the challenge is self-service, add the creating user as the "client manager", *not* the manager
+  //This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
+  if(challenge.legacy.selfService) {
+      if (currentUser.handle) {
+        await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID)
+      }
+  }
+  else{
+    // if created by a user, add user as a manager, but only if *not* a self-service challenge
+    if (currentUser.handle) {
+      // logger.debug(`Adding user as manager ${currentUser.handle}`)
+      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID)
+    } else {
+      // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
+    }
   }
 
   // post bus event
