@@ -1383,6 +1383,8 @@ async function update (currentUser, challengeId, data, isFull) {
   const cancelReason = _.cloneDeep(data.cancelReason)
   let sendActivationEmail = false
   let sendSubmittedEmail = false
+  let sendCompletedEmail = false
+  let sendRejectedEmail = false
   delete data.cancelReason
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
@@ -1444,13 +1446,15 @@ async function update (currentUser, challengeId, data, isFull) {
         throw new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
       }
     }
-    if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible) {
+    if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible || constants.challengeStatuses.CancelledPaymentFailed) {
       await helper.cancelProject(challenge.projectId, cancelReason, currentUser)
+      sendRejectedEmail = true
     }
     if (data.status === constants.challengeStatuses.Completed) {
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && challenge.status !== constants.challengeStatuses.Active) {
         throw new errors.BadRequestError('You cannot mark a Draft challenge as Completed')
       }
+      sendCompletedEmail = true
     }
   }
 
@@ -1903,6 +1907,38 @@ async function update (currentUser, challengeId, data, isFull) {
     if (sendSubmittedEmail) {
       await helper.sendSelfServiceNotification(
         constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
+        [{ email: creator.email }],
+        {
+          handle: creator.handle,
+          workItemName: challenge.name
+        }
+      )
+    }
+    if (sendActivationEmail) {
+      await helper.sendSelfServiceNotification(
+        constants.SelfServiceNotificationTypes.WORK_REQUEST_STARTED,
+        [{ email: creator.email }],
+        {
+          handle: creator.handle,
+          workItemName: challenge.name,
+          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}`
+        }
+      )
+    }
+    if (sendCompletedEmail) {
+      await helper.sendSelfServiceNotification(
+        constants.SelfServiceNotificationTypes.WORK_COMPLETED,
+        [{ email: creator.email }],
+        {
+          handle: creator.handle,
+          workItemName: challenge.name,
+          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}?tab=solutions`
+        }
+      )
+    }
+    if (sendRejectedEmail) {
+      await helper.sendSelfServiceNotification(
+        constants.SelfServiceNotificationTypes.WORK_REQUEST_REDIRECTED,
         [{ email: creator.email }],
         {
           handle: creator.handle,
