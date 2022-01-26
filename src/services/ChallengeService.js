@@ -1096,16 +1096,6 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
-  // send email notification
-  if (challenge.legacy.selfService && currentUser.handle) {
-    await helper.sendSelfServiceNotification(
-      constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
-      [{ userId: currentUser.userId }],
-      {
-        handle: currentUser.handle,
-        workItemName: ret.name
-      })
-  }
   return ret
 }
 
@@ -1391,6 +1381,7 @@ async function validateWinners (winners, challengeId) {
  */
 async function update (currentUser, challengeId, data, isFull) {
   const cancelReason = _.cloneDeep(data.cancelReason)
+  let sendActivationEmail = false
   delete data.cancelReason
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
@@ -1417,6 +1408,7 @@ async function update (currentUser, challengeId, data, isFull) {
     try {
       const selfServiceProjectName = `Self service - ${currentUser.createdBy} - ${challenge.name}`
       await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, challenge.description)
+      sendActivationEmail = true
     } catch (e) {
       await update(
         currentUser,
@@ -1901,6 +1893,15 @@ async function update (currentUser, challengeId, data, isFull) {
       doc: challenge
     }
   })
+  if (challenge.legacy.selfService && currentUser.handle) {
+    await helper.sendSelfServiceNotification(
+      constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
+      [{ email: currentUser.email }],
+      {
+        handle: currentUser.handle,
+        workItemName: challenge.name
+      })
+  }
   return challenge
 }
 
