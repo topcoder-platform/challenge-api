@@ -1382,6 +1382,7 @@ async function validateWinners (winners, challengeId) {
 async function update (currentUser, challengeId, data, isFull) {
   const cancelReason = _.cloneDeep(data.cancelReason)
   let sendActivationEmail = false
+  let sendSubmittedEmail = false
   delete data.cancelReason
   if (!_.isUndefined(_.get(data, 'legacy.reviewType'))) {
     _.set(data, 'legacy.reviewType', _.toUpper(_.get(data, 'legacy.reviewType')))
@@ -1402,6 +1403,9 @@ async function update (currentUser, challengeId, data, isFull) {
       dynamicDescription = dynamicDescription.replace(regexp, entry.value)
     }
     data.description = dynamicDescription
+  }
+  if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Draft && challenge.status !== constants.challengeStatuses.Draft) {
+    sendSubmittedEmail = true
   }
   // check if it's a self service challenge and project needs to be activated first
   if (challenge.legacy.selfService && (data.status === constants.challengeStatuses.Approved || data.status === constants.challengeStatuses.Active) && challenge.status !== constants.challengeStatuses.Active) {
@@ -1893,14 +1897,17 @@ async function update (currentUser, challengeId, data, isFull) {
       doc: challenge
     }
   })
-  if (sendActivationEmail && challenge.legacy.selfService && currentUser.handle) {
-    await helper.sendSelfServiceNotification(
-      constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
-      [{ email: currentUser.email }],
-      {
-        handle: currentUser.handle,
-        workItemName: challenge.name
-      })
+  if (challenge.legacy.selfService && currentUser.handle) {
+    if (sendSubmittedEmail) {
+      await helper.sendSelfServiceNotification(
+        constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
+        [{ email: currentUser.email }],
+        {
+          handle: currentUser.handle,
+          workItemName: challenge.name
+        }
+      )
+    }
   }
   return challenge
 }
