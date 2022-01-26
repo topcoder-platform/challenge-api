@@ -1446,7 +1446,7 @@ async function update (currentUser, challengeId, data, isFull) {
         throw new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
       }
     }
-    if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible || constants.challengeStatuses.CancelledPaymentFailed) {
+    if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible || data.status === constants.challengeStatuses.CancelledPaymentFailed) {
       await helper.cancelProject(challenge.projectId, cancelReason, currentUser)
       sendRejectedEmail = true
     }
