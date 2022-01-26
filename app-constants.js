@@ -7,7 +7,8 @@ const UserRoles = {
   Admin: 'administrator',
   Copilot: 'copilot',
   Manager: 'Connect Manager',
-  User: 'Topcoder User'
+  User: 'Topcoder User',
+  SelfServiceCustomer: 'Self-Service Customer'
 }
 
 const prizeSetTypes = {
