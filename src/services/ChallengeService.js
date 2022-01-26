@@ -1897,13 +1897,15 @@ async function update (currentUser, challengeId, data, isFull) {
       doc: challenge
     }
   })
-  if (challenge.legacy.selfService && currentUser.handle) {
+
+  if (challenge.legacy.selfService) {
+    const creator = await helper.getMemberByHandle(challenge.createdBy)
     if (sendSubmittedEmail) {
       await helper.sendSelfServiceNotification(
         constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
-        [{ email: currentUser.email }],
+        [{ email: creator.email }],
         {
-          handle: currentUser.handle,
+          handle: creator.handle,
           workItemName: challenge.name
         }
       )

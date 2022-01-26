@@ -1127,6 +1127,19 @@ async function getMemberById (userId) {
 }
 
 /**
+ * Get member by handle
+ * @param {String} handle the user handle
+ * @returns {Object}
+ */
+async function getMemberByHandle (handle) {
+  const token = await getM2MToken()
+  const res = await axios.get(`${config.MEMBERS_API_URL}/${handle}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return res.data || {}
+}
+
+/**
  * Send self service notification
  * @param {String} type the notification type
  * @param {Array} recipients the array of recipients in { userId || email || handle } format
@@ -1205,5 +1218,6 @@ module.exports = {
   getProjectPayment,
   capturePayment,
   cancelPayment,
-  sendSelfServiceNotification
+  sendSelfServiceNotification,
+  getMemberByHandle
 }
