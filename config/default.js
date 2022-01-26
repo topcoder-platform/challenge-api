@@ -66,6 +66,7 @@ module.exports = {
 
   MANAGER_ROLE_ID: process.env.MANAGER_ROLE_ID || '0e9c6879-39e4-4eb6-b8df-92407890faf1',
   OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || '2a4dc376-a31c-4d00-b173-13934d89e286',
+  CLIENT_MANAGER_ROLE_ID: process.env.OBSERVER_ROLE_ID || '9b2f1905-8128-42da-85df-ed64410f4781',
 
   // health check timeout in milliseconds
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
@@ -96,5 +97,6 @@ module.exports = {
   },
 
   EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@topcoder.com',
-  SELF_SERVICE_EMAIL_CC_ACCOUNTS: process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS ? _.map(process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS.split(','), email => ({ email })) : []
+  SELF_SERVICE_EMAIL_CC_ACCOUNTS: process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS ? _.map(process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS.split(','), email => ({ email })) : [],
+  SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES || ['TCConnCopilot', 'sstestcopilot']
 }
