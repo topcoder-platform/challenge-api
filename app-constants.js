@@ -1,3 +1,5 @@
+const config = require('config')
+
 /**
  * App constants
  */
@@ -72,7 +74,9 @@ const Topics = {
   ChallengeTypeTimelineTemplateDeleted: 'test.new.bus.events', // 'challenge.action.type.timeline.template.deleted'
   ChallengeAttachmentCreated: 'test.new.bus.events', // 'challenge.action.attachment.created',
   ChallengeAttachmentUpdated: 'test.new.bus.events', // 'challenge.action.attachment.updated',
-  ChallengeAttachmentDeleted: 'test.new.bus.events' // 'challenge.action.attachment.deleted',
+  ChallengeAttachmentDeleted: 'test.new.bus.events', // 'challenge.action.attachment.deleted',
+  // Self Service topics
+  Notifications: 'notifications.action.create'
 }
 
 const challengeTracks = {
@@ -92,6 +96,32 @@ const reviewTypes = {
   Internal: 'INTERNAL'
 }
 
+const SelfServiceNotificationTypes = {
+  WORK_REQUEST_SUBMITTED: 'self-service.notifications.work-request-submitted',
+  WORK_REQUEST_STARTED: 'self-service.notifications.work-request-started',
+  WORK_REQUEST_REDIRECTED: 'self-service.notifications.work-request-redirected',
+  WORK_COMPLETED: 'self-service.notifications.work-completed'
+}
+
+const SelfServiceNotificationSettings = {
+  [SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED]: {
+    sendgridTemplateId: config.SENDGRID_TEMPLATES.WORK_REQUEST_SUBMITTED,
+    cc: []
+  },
+  [SelfServiceNotificationTypes.WORK_REQUEST_STARTED]: {
+    sendgridTemplateId: config.SENDGRID_TEMPLATES.WORK_REQUEST_STARTED,
+    cc: []
+  },
+  [SelfServiceNotificationTypes.WORK_REQUEST_REDIRECTED]: {
+    sendgridTemplateId: config.SENDGRID_TEMPLATES.WORK_REQUEST_REDIRECTED,
+    cc: [...config.SELF_SERVICE_EMAIL_CC_ACCOUNTS]
+  },
+  [SelfServiceNotificationTypes.WORK_COMPLETED]: {
+    sendgridTemplateId: config.SENDGRID_TEMPLATES.WORK_COMPLETED,
+    cc: []
+  }
+}
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -103,5 +133,7 @@ module.exports = {
   challengeTracks,
   challengeTextSortField,
   DiscussionTypes,
-  reviewTypes
+  reviewTypes,
+  SelfServiceNotificationTypes,
+  SelfServiceNotificationSettings
 }
