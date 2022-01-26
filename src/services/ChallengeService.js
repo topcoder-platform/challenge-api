@@ -1412,7 +1412,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // check if it's a self service challenge and project needs to be activated first
   if (challenge.legacy.selfService && (data.status === constants.challengeStatuses.Approved || data.status === constants.challengeStatuses.Active) && challenge.status !== constants.challengeStatuses.Active) {
     try {
-      const selfServiceProjectName = `Self service - ${currentUser.createdBy} - ${challenge.name}`
+      const selfServiceProjectName = `Self service - ${challenge.createdBy} - ${challenge.name}`
       await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, challenge.description)
       sendActivationEmail = true
     } catch (e) {
