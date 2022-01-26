@@ -86,5 +86,5 @@ module.exports = {
 
   NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'self-service',
 
-  SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES || []
+  SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES || ['TCConnCopilot', 'sstestcopilot']
 }
