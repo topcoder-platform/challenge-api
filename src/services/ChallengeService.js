@@ -1422,7 +1422,7 @@ async function update (currentUser, challengeId, data, isFull) {
         {
           ...data,
           status: constants.challengeStatuses.CancelledPaymentFailed,
-          cancelReason: e.message
+          cancelReason: `Failed to activate project. Error: ${e.message}. JSON: ${JSON.stringify(e)}`
         },
         false
       )
