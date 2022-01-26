@@ -1893,7 +1893,7 @@ async function update (currentUser, challengeId, data, isFull) {
       doc: challenge
     }
   })
-  if (challenge.legacy.selfService && currentUser.handle) {
+  if (sendActivationEmail && challenge.legacy.selfService && currentUser.handle) {
     await helper.sendSelfServiceNotification(
       constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
       [{ email: currentUser.email }],
