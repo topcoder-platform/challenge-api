@@ -1087,7 +1087,16 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
-
+  // send email notification
+  if (challenge.legacy.selfService && currentUser.handle) {
+    await helper.sendSelfServiceNotification(
+      constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
+      [{ userId: currentUser.userId }],
+      {
+        handle: currentUser.handle,
+        workItemName: ret.name
+      })
+  }
   return ret
 }
 

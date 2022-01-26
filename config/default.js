@@ -1,6 +1,7 @@
 /**
  * The configuration file.
  */
+const _ = require('lodash')
 require('dotenv').config()
 module.exports = {
   READONLY: process.env.READONLY === 'true' || false,
@@ -85,5 +86,15 @@ module.exports = {
 
   NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'self-service',
 
-  SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES || []
+  SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES || [],
+
+  SENDGRID_TEMPLATES: {
+    WORK_REQUEST_SUBMITTED: process.env.WORK_REQUEST_SUBMITTED || '',
+    WORK_REQUEST_STARTED: process.env.WORK_REQUEST_STARTED || '',
+    WORK_REQUEST_REDIRECTED: process.env.WORK_REQUEST_REDIRECTED || '',
+    WORK_COMPLETED: process.env.WORK_COMPLETED || ''
+  },
+
+  EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@topcoder.com',
+  SELF_SERVICE_EMAIL_CC_ACCOUNTS: process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS ? _.map(process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS.split(','), email => ({ email })) : []
 }

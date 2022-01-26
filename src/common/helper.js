@@ -1126,6 +1126,35 @@ async function getMemberById (userId) {
   return {}
 }
 
+/**
+ * Send self service notification
+ * @param {String} type the notification type
+ * @param {Array} recipients the array of recipients in { userId || email || handle } format
+ * @param {Object} data the data
+ */
+async function sendSelfServiceNotification (type, recipients, data) {
+  try {
+    await postBusEvent(constants.Topics.Notifications, {
+      notifications: [
+        {
+          serviceId: 'email',
+          type,
+          details: {
+            from: config.EMAIL_FROM,
+            recipients: [...recipients],
+            cc: [...constants.SelfServiceNotificationSettings[type].cc],
+            data,
+            sendgridTemplateId: constants.SelfServiceNotificationSettings[type].sendgridTemplateId,
+            version: 'v3'
+          }
+        }
+      ]
+    })
+  } catch (e) {
+    logger.debug(`Failed to post notification ${type}: ${e.message}`)
+  }
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1175,5 +1204,6 @@ module.exports = {
   cancelProject,
   getProjectPayment,
   capturePayment,
-  cancelPayment
+  cancelPayment,
+  sendSelfServiceNotification
 }
