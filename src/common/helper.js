@@ -576,7 +576,7 @@ async function activateProject (projectId, currentUser, name, description) {
     }
   }, { headers: { Authorization: `Bearer ${token}` } })
 
-  if (res.data && res.data.status !== 'active') {
+  if (res.data && res.data.status === 'reviewed') {
     // auto activate if the project goes in reviewed state
     await activateProject(projectId, currentUser, name, description)
   }
