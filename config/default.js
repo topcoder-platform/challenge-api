@@ -99,5 +99,8 @@ module.exports = {
   EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@topcoder.com',
   SELF_SERVICE_EMAIL_CC_ACCOUNTS: process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS ? _.map(process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS.split(','), email => ({ email })) : [],
   SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES || ['TCConnCopilot', 'sstestcopilot'],
-  SELF_SERVICE_APP_URL: process.env.SELF_SERVICE_APP_URL || 'https://platform.topcoder-dev.com/self-service'
+  SELF_SERVICE_APP_URL: process.env.SELF_SERVICE_APP_URL || 'https://platform.topcoder-dev.com/self-service',
+
+  ZENDESK_API_TOKEN: process.env.ZENDESK_API_TOKEN || '',
+  ZENDESK_API_URL: process.env.ZENDESK_API_URL || ''
 }

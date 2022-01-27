@@ -1168,6 +1168,30 @@ async function sendSelfServiceNotification (type, recipients, data) {
   }
 }
 
+/**
+ * Submit a request to zendesk
+ * @param {Object} request the request
+ */
+async function submitZendeskRequest (request) {
+  try {
+    const res = await axios.post(`${ZENDESK_API_URL}/api/v2/requests`, {
+      request: {
+        ...request,
+        collaborators: [..._.map(config.SELF_SERVICE_EMAIL_CC_ACCOUNTS, 'email')]
+      }
+    }, {
+      auth: {
+        username: `${request.requester.email}/token`,
+        password: config.ZENDESK_API_TOKEN
+      }
+    })
+    return res.data || {}
+  } catch (e) {
+    logger.debug(`Failed to submit request: ${e.message}`)
+    logger.debug(e)
+  }
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1219,5 +1243,6 @@ module.exports = {
   capturePayment,
   cancelPayment,
   sendSelfServiceNotification,
-  getMemberByHandle
+  getMemberByHandle,
+  submitZendeskRequest
 }
