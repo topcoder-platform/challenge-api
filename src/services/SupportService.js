@@ -4,6 +4,7 @@
 
 const _ = require('lodash')
 const Joi = require('joi')
+const config = require('config')
 const helper = require('../common/helper')
 const logger = require('../common/logger')
 
@@ -22,7 +23,15 @@ async function createRequest (currentUser, request) {
     subject: `${request.isSelfService ? 'Self-Service customer request for' : ''} Challenge ID: ${request.challengeId}`,
     comment: {
       body: request.question
-    }
+    },
+    ...(request.isSelfService && config.ZENDESK_CUSTOM_FIELD_TAG_ID ? {
+      custom_fields: [
+        {
+          id: _.toNumber(config.ZENDESK_CUSTOM_FIELD_TAG_ID),
+          value: 'self_service'
+        }
+      ]
+    } : {})
   })
 }
 

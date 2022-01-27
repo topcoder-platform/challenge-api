@@ -102,5 +102,6 @@ module.exports = {
   SELF_SERVICE_APP_URL: process.env.SELF_SERVICE_APP_URL || 'https://platform.topcoder-dev.com/self-service',
 
   ZENDESK_API_TOKEN: process.env.ZENDESK_API_TOKEN || '',
-  ZENDESK_API_URL: process.env.ZENDESK_API_URL || ''
+  ZENDESK_API_URL: process.env.ZENDESK_API_URL || '',
+  ZENDESK_CUSTOM_FIELD_TAG_ID: process.env.ZENDESK_CUSTOM_FIELD_TAG_ID
 }
