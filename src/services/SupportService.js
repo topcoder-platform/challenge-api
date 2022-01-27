@@ -20,7 +20,9 @@ async function createRequest (currentUser, request) {
       email: request.email
     },
     subject: `${request.isSelfService ? 'Self-Service customer request for' : ''} Challenge ID: ${request.challengeId}`,
-    comment: request.question
+    comment: {
+      body: request.question
+    }
   })
 }
 
