@@ -561,7 +561,7 @@ async function activateProject (projectId, currentUser, name, description) {
   }
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  await axios.patch(url, {
+  const res = await axios.patch(url, {
     name,
     description,
     status: 'active',
@@ -575,6 +575,11 @@ async function activateProject (projectId, currentUser, name, description) {
       paymentStatus: payment.status
     }
   }, { headers: { Authorization: `Bearer ${token}` } })
+
+  if (res.data && res.data.status !== 'active') {
+    // auto activate if the project goes in reviewed state
+    await activateProject(projectId, currentUser, name, description)
+  }
 }
 
 /**
