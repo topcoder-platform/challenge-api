@@ -1161,7 +1161,10 @@ async function sendSelfServiceNotification (type, recipients, data) {
             from: config.EMAIL_FROM,
             recipients: [...recipients],
             cc: [...constants.SelfServiceNotificationSettings[type].cc],
-            data,
+            data: {
+              ...data,
+              supportUrl: `${config.SELF_SERVICE_APP_URL}/support`
+            },
             sendgridTemplateId: constants.SelfServiceNotificationSettings[type].sendgridTemplateId,
             version: 'v3'
           }
