@@ -30,10 +30,7 @@ module.exports = {
   '/challenges/support-requests': {
     post: {
       controller: 'SupportController',
-      method: 'createRequest',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.SelfServiceCustomer, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
-      scopes: [CREATE, ALL]
+      method: 'createRequest'
     }
   },
   '/challenges/health': {
