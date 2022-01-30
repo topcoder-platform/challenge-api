@@ -2062,7 +2062,7 @@ fullyUpdateChallenge.schema = {
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
       selfService: Joi.boolean(),
-      selfServiceCopilot: Joi.string(),
+      selfServiceCopilot: Joi.string().allow(null),
     }).unknown(true),
     cancelReason: Joi.string(),
     billing: Joi.object().keys({
@@ -2169,7 +2169,7 @@ partiallyUpdateChallenge.schema = {
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
       selfService: Joi.boolean(),
-      selfServiceCopilot: Joi.string()
+      selfServiceCopilot: Joi.string().allow(null)
     }).unknown(true),
     cancelReason: Joi.string(),
     task: Joi.object().keys({
