@@ -580,9 +580,15 @@ async function searchChallenges (currentUser, criteria) {
         should: [
           { bool: { must_not: { exists: { field: 'legacy.selfService' } } } },
           ...(currentUser ? [
-            { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.New } } } },
-            { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Draft } } } },
-            { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } },
+            {
+              bool: {
+                must: [
+                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.New } } } },
+                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Draft } } } },
+                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } },
+                ]
+              }
+            },
             { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } },
           ] : [])
         ]
