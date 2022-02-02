@@ -792,6 +792,9 @@ async function ensureProjectExist (projectId, currentUser) {
     if (currentUser.isMachine || hasAdminRole(currentUser)) {
       return res.data
     }
+    if (_.get(res, 'data.type') === 'self-service' && _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase())) {
+      return res.data
+    }
     if (!_.find(_.get(res, 'data.members', []), m => _.toString(m.userId) === _.toString(currentUser.userId))) {
       throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`)
     }

@@ -139,7 +139,7 @@ async function searchChallenges (currentUser, criteria) {
     'updatedBy'
   ]
 
-  const includeSelfService = currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser) || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle))
+  const includeSelfService = currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser) || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()))
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
@@ -929,7 +929,7 @@ async function createChallenge (currentUser, challenge, userToken) {
     if(challenge.legacy.selfService) {
       if(!challenge.projectId) {
         const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`
-        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, challenge.description, config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
+        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, "N/A", config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
       }
     } else if (!challenge.projectId) {
       throw new errors.BadRequestError('The projectId is required')
@@ -1419,8 +1419,11 @@ async function update (currentUser, challengeId, data, isFull) {
   if (challenge.legacy.selfService && (data.status === constants.challengeStatuses.Approved || data.status === constants.challengeStatuses.Active) && challenge.status !== constants.challengeStatuses.Active) {
     try {
       const selfServiceProjectName = `Self service - ${challenge.createdBy} - ${challenge.name}`
-      await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, challenge.description)
-      sendActivationEmail = true
+      const workItemSummary = _.get(_.find(_.get(challenge, 'metadata', []), m => m.name === 'websitePurpose.description'), 'value', 'N/A')
+      await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, workItemSummary)
+      if (data.status === constants.challengeStatuses.Active) {
+        sendActivationEmail = true      
+      }
     } catch (e) {
       await update(
         currentUser,
