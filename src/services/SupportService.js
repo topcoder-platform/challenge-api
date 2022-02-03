@@ -24,6 +24,7 @@ async function createRequest (currentUser, request) {
     comment: {
       body: request.question
     },
+    priority: config.ZENDESK_DEFAULT_PRIORITY,
     ...(request.isSelfService && config.ZENDESK_CUSTOM_FIELD_TAG_ID ? {
       custom_fields: [
         {
