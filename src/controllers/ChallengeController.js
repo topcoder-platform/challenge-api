@@ -29,6 +29,16 @@ async function createChallenge (req, res) {
 }
 
 /**
+ * send notifications
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function sendNotifications (req, res) {
+  const result = await service.sendNotifications(req.authUser, req.params.challengeId)
+  res.status(HttpStatus.CREATED).send(result)
+}
+
+/**
  * Get challenge
  * @param {Object} req the request
  * @param {Object} res the response
@@ -88,5 +98,6 @@ module.exports = {
   fullyUpdateChallenge,
   partiallyUpdateChallenge,
   deleteChallenge,
-  getChallengeStatistics
+  getChallengeStatistics,
+  sendNotifications
 }

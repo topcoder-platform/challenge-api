@@ -73,6 +73,15 @@ module.exports = {
       method: 'getChallengeStatistics',
     }
   },
+  '/challenges/:challengeId/notifications': {
+    post: {
+      controller: 'ChallengeController',
+      method: 'sendNotifications',
+      auth: 'jwt',
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
+      scopes: [CREATE, ALL]
+    }
+  },
   '/challenge-types': {
     get: {
       controller: 'ChallengeTypeController',

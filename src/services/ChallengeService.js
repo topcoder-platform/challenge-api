@@ -1960,6 +1960,33 @@ async function update (currentUser, challengeId, data, isFull) {
 }
 
 /**
+ * Send notifications
+ * @param {Object} currentUser the current use
+ * @param {String} challengeId the challenge id
+ */
+async function sendNotifications (currentUser, challengeId) {
+  const challenge = await getChallenge(currentUser, challengeId)
+  const creator = await helper.getMemberByHandle(challenge.createdBy)
+  if (challenge.status === constants.challengeStatuses.Completed) {
+    await helper.sendSelfServiceNotification(
+      constants.SelfServiceNotificationTypes.WORK_COMPLETED,
+      [{ email: creator.email }],
+      {
+        handle: creator.handle,
+        workItemName: challenge.name,
+        workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}?tab=solutions`
+      }
+    )
+    return { type: constants.SelfServiceNotificationTypes.WORK_COMPLETED }
+  }
+}
+
+sendNotifications.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id()
+}
+
+/**
  * Remove unwanted properties from the challenge object
  * @param {Object} challenge the challenge object
  */
@@ -2295,7 +2322,8 @@ module.exports = {
   fullyUpdateChallenge,
   partiallyUpdateChallenge,
   deleteChallenge,
-  getChallengeStatistics
+  getChallengeStatistics,
+  sendNotifications
 }
 
 logger.buildService(module.exports)
