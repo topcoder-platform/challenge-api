@@ -1255,5 +1255,6 @@ module.exports = {
   cancelPayment,
   sendSelfServiceNotification,
   getMemberByHandle,
-  submitZendeskRequest
+  submitZendeskRequest,
+  getMemberById
 }
