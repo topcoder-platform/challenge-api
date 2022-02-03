@@ -939,7 +939,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   }
   if(challenge.legacy.selfService && challenge.metadata && challenge.metadata.length > 0) {
     for(const entry of challenge.metadata) {
-       challenge.description = challenge.description.replaceAll(`{{${entry.name}}}`, entry.value )
+      if (challenge.description.includes(`{{${entry.name}}}`)) {
+        challenge.description = challenge.description.split(`{{${entry.name}}}`).join(entry.value)
+      }
     }
   }
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
