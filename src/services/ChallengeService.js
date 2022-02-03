@@ -1449,7 +1449,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
-  let dynamicDescription = _.cloneDeep(challenge.description)
+  let dynamicDescription = _.cloneDeep(data.description || challenge.description)
   if(challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for(const entry of data.metadata) {
       const regexp = new RegExp(`{{${entry.name}}}`, 'g')
