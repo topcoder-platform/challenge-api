@@ -19,7 +19,12 @@
     "test": "mocha --require test/prepare.js -t 20000 test/unit/*.test.js --exit",
     "e2e": "mocha --require test/prepare.js -t 20000 test/e2e/*.test.js --exit",
     "test:cov": "nyc --reporter=html --reporter=text npm test",
-    "e2e:cov": "nyc --reporter=html --reporter=text npm run e2e"
+    "e2e:cov": "nyc --reporter=html --reporter=text npm run e2e",
+    "services:up": "docker-compose -f ./local/docker-compose.yml up -d",
+    "services:down": "docker-compose -f ./local/docker-compose.yml down",
+    "services:logs": "docker-compose -f ./local/docker-compose.yml logs",
+    "local:init": "npm run local:reset && npm run seed-tables && npm run sync-es",
+    "local:reset": "npm run init-es force && npm run init-db force"
   },
   "author": "TCSCODER",
   "license": "none",
@@ -39,6 +44,7 @@
     "body-parser": "^1.15.1",
     "config": "^3.0.1",
     "cors": "^2.7.1",
+    "dotenv": "^8.2.0",
     "dynamoose": "^1.8.0",
     "elasticsearch": "^16.1.1",
     "express": "^4.15.4",

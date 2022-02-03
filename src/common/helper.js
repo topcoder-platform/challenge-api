@@ -18,6 +18,7 @@ const elasticsearch = require('elasticsearch')
 const moment = require('moment')
 const HttpStatus = require('http-status-codes')
 const xss = require('xss')
+const logger = require('./logger')
 
 // Bus API Client
 let busApiClient
@@ -441,6 +442,147 @@ async function createResource (challengeId, memberHandle, roleId) {
 }
 
 /**
+ * Create Project
+ * @param {String} name The name
+ * @param {String} description The description
+ * @param {String} type The type
+ * @param {String} token The token
+ * @returns 
+ */
+async function createSelfServiceProject (name, description, type, token) {
+  const projectObj = {
+    name,
+    description,
+    type
+  }
+  const url = `${config.PROJECTS_API_URL}`
+  const res = await axios.post(url, projectObj, {headers: {Authorization: `Bearer ${token}`}})
+  return _.get(res, 'data.id')
+}
+
+/**
+ * Get project payment
+ * @param {String} projectId the project id
+ */
+ async function getProjectPayment (projectId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}`
+  const res = await axios.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      referenceId: projectId,
+      reference: 'project'
+    }
+ })
+  const [payment] = res.data
+  return payment
+}
+
+/**
+ * Charge payment
+ * @param {String} paymentId the payment ID
+ */
+async function capturePayment (paymentId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`
+  logger.info(`Calling: ${url} to capture payment`)
+  const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } })
+  logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`)
+  if (res.data.status !== 'succeeded') {
+    throw new Error(`Failed to charge payment. Current status: ${res.data.status}`)
+  }
+  return res.data
+}
+
+/**
+ * Cancel payment
+ * @param {String} paymentId the payment ID
+ */
+async function cancelPayment (paymentId) {
+  const token = await getM2MToken()
+  const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`
+  const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } })
+  if (res.data.status !== 'canceled') {
+    throw new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
+  }
+  return res.data
+}
+
+/**
+ * Cancel project
+ * @param {String} projectId the project id
+ * @param {String} cancelReason the cancel reasonn
+ * @param {Object} currentUser the current user
+ */
+ async function cancelProject (projectId, cancelReason, currentUser) {
+  let payment = await getProjectPayment(projectId)
+  const project = await ensureProjectExist(projectId, currentUser)
+  try {
+    payment = await cancelPayment(payment.id)
+  } catch (e) {
+    logger.debug(`Failed to cancel payment with error: ${e.message}`)
+  }
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  await axios.patch(url, {
+    cancelReason,
+    status: 'cancelled',
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
+ * Activate project
+ * @param {String} projectId the project id
+ * @param {Object} currentUser the current user
+ */
+async function activateProject (projectId, currentUser, name, description) {
+  let payment
+  let project
+  try {
+    payment = await getProjectPayment(projectId)
+    project = await ensureProjectExist(projectId, currentUser)
+    if (payment.status !== 'succeeded') {
+      payment = await capturePayment(payment.id)
+    }
+  } catch (e) {
+    logger.debug(e)
+    logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`)
+    await cancelProject(projectId, `Failed to charge payment ${payment.id} with error: ${e.message}`, currentUser)
+    throw new Error(`Failed to charge payment ${payment.id} with error: ${e.message}`)
+  }
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  const res = await axios.patch(url, {
+    name,
+    description,
+    status: 'active',
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
+
+  if (res.data && res.data.status === 'reviewed') {
+    // auto activate if the project goes in reviewed state
+    await activateProject(projectId, currentUser, name, description)
+  }
+}
+
+/**
  * Get resource roles
  * @returns {Promise<Array>} the challenge resources
  */
@@ -650,6 +792,9 @@ async function ensureProjectExist (projectId, currentUser) {
     if (currentUser.isMachine || hasAdminRole(currentUser)) {
       return res.data
     }
+    if (_.get(res, 'data.type') === 'self-service' && _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase())) {
+      return res.data
+    }
     if (!_.find(_.get(res, 'data.members', []), m => _.toString(m.userId) === _.toString(currentUser.userId))) {
       throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`)
     }
@@ -820,36 +965,21 @@ async function validateChallengeTerms (terms = []) {
  */
 async function _filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
-  let userGroups
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !hasAdminRole(currentUser)
-  const subGroupsMap = {}
+  if(!needToCheckForGroupAccess) return challenges
+
+  let userGroups
+
   for (const challenge of challenges) {
     challenge.groups = _.filter(challenge.groups, g => !_.includes(['null', 'undefined'], _.toString(g).toLowerCase()))
-    let expandedGroups = []
     if (!challenge.groups || _.get(challenge, 'groups.length', 0) === 0 || !needToCheckForGroupAccess) {
       res.push(challenge)
     } else if (currentUser) {
-      // get user groups if not yet
       if (_.isNil(userGroups)) {
-        userGroups = await getUserGroups(currentUser.userId)
+        userGroups = await getCompleteUserGroupTreeIds(currentUser.userId)
       }
-      // Expand challenge groups by subGroups
-      // results are being saved on a hashmap for efficiency
-      for (const group of challenge.groups) {
-        let subGroups
-        if (subGroupsMap[group]) {
-          subGroups = subGroupsMap[group]
-        } else {
-          subGroups = await expandWithSubGroups(group)
-          subGroupsMap[group] = subGroups
-        }
-        expandedGroups = [
-          ..._.concat(expandedGroups, subGroups)
-        ]
-      }
-      // check if there is matched group
-      // logger.debug('Groups', challenge.groups, userGroups)
-      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
+      // get user groups if not yet
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug === group))) {
         res.push(challenge)
       }
     }
@@ -877,14 +1007,14 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  */
 async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
   let challengeResourceIds
-  if (currentUser) {
-    if (!currentUser.isMachine) {
-      const challengeResources = await getChallengeResources(challenge.id)
-      challengeResourceIds = _.map(challengeResources, r => _.toString(r.memberId))
-    }
-  }
   // Check if challenge is task and apply security rules
   if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
+    if (currentUser) {
+      if (!currentUser.isMachine) {
+        const challengeResources = await getChallengeResources(challenge.id)
+        challengeResourceIds = _.map(challengeResources, r => _.toString(r.memberId))
+      }
+    }
     const canAccesChallenge = _.isUndefined(currentUser) ? false : currentUser.isMachine || hasAdminRole(currentUser) || _.includes((challengeResourceIds || []), _.toString(currentUser.userId))
     if (!canAccesChallenge) {
       throw new errors.ForbiddenError(`You don't have access to view this challenge`)
@@ -964,7 +1094,7 @@ async function getGroupById (groupId) {
  * @param {String} challengeId the challenge id
  * @returns {Array} the submission
  */
- async function getChallengeSubmissions (challengeId) {
+async function getChallengeSubmissions (challengeId) {
   const token = await getM2MToken()
   let allSubmissions = []
   // get search is paginated, we need to get all pages' data
@@ -1002,6 +1132,75 @@ async function getMemberById (userId) {
   })
   if (res.data.length > 0) return res.data[0]
   return {}
+}
+
+/**
+ * Get member by handle
+ * @param {String} handle the user handle
+ * @returns {Object}
+ */
+async function getMemberByHandle (handle) {
+  const token = await getM2MToken()
+  const res = await axios.get(`${config.MEMBERS_API_URL}/${handle}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return res.data || {}
+}
+
+/**
+ * Send self service notification
+ * @param {String} type the notification type
+ * @param {Array} recipients the array of recipients in { userId || email || handle } format
+ * @param {Object} data the data
+ */
+async function sendSelfServiceNotification (type, recipients, data) {
+  try {
+    await postBusEvent(constants.Topics.Notifications, {
+      notifications: [
+        {
+          serviceId: 'email',
+          type,
+          details: {
+            from: config.EMAIL_FROM,
+            recipients: [...recipients],
+            cc: [...constants.SelfServiceNotificationSettings[type].cc],
+            data: {
+              ...data,
+              supportUrl: `${config.SELF_SERVICE_APP_URL}/support`
+            },
+            sendgridTemplateId: constants.SelfServiceNotificationSettings[type].sendgridTemplateId,
+            version: 'v3'
+          }
+        }
+      ]
+    })
+  } catch (e) {
+    logger.debug(`Failed to post notification ${type}: ${e.message}`)
+  }
+}
+
+/**
+ * Submit a request to zendesk
+ * @param {Object} request the request
+ */
+async function submitZendeskRequest (request) {
+  try {
+    const res = await axios.post(`${ZENDESK_API_URL}/api/v2/requests`, {
+      request: {
+        ...request,
+        collaborators: [..._.map(config.SELF_SERVICE_EMAIL_CC_ACCOUNTS, 'email')]
+      }
+    }, {
+      auth: {
+        username: `${request.requester.email}/token`,
+        password: config.ZENDESK_API_TOKEN
+      }
+    })
+    return res.data || {}
+  } catch (e) {
+    logger.debug(`Failed to submit request: ${e.message}`)
+    logger.debug(e)
+  }
 }
 
 module.exports = {
@@ -1047,5 +1246,15 @@ module.exports = {
   sumOfPrizes,
   getGroupById,
   getChallengeSubmissions,
+  getMemberById,
+  createSelfServiceProject,
+  activateProject,
+  cancelProject,
+  getProjectPayment,
+  capturePayment,
+  cancelPayment,
+  sendSelfServiceNotification,
+  getMemberByHandle,
+  submitZendeskRequest,
   getMemberById
 }

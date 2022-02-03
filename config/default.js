@@ -1,7 +1,8 @@
 /**
  * The configuration file.
  */
-
+const _ = require('lodash')
+require('dotenv').config()
 module.exports = {
   READONLY: process.env.READONLY === 'true' || false,
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
@@ -57,6 +58,7 @@ module.exports = {
   GROUPS_API_URL: process.env.GROUPS_API_URL || 'http://localhost:4000/v5/groups',
   PROJECTS_API_URL: process.env.PROJECTS_API_URL || 'http://localhost:4000/v5/projects',
   TERMS_API_URL: process.env.TERMS_API_URL || 'http://localhost:4000/v5/terms',
+  CUSTOMER_PAYMENTS_URL: process.env.CUSTOMER_PAYMENTS_URL || 'https://api.topcoder-dev.com/v5/customer-payments',
   // copilot resource role ids allowed to upload attachment
   COPILOT_RESOURCE_ROLE_IDS: process.env.COPILOT_RESOURCE_ROLE_IDS
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(',') : ['10ba038e-48da-487b-96e8-8d3b99b6d18b'],
@@ -64,6 +66,7 @@ module.exports = {
 
   MANAGER_ROLE_ID: process.env.MANAGER_ROLE_ID || '0e9c6879-39e4-4eb6-b8df-92407890faf1',
   OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || '2a4dc376-a31c-4d00-b173-13934d89e286',
+  CLIENT_MANAGER_ROLE_ID: process.env.OBSERVER_ROLE_ID || '9b2f1905-8128-42da-85df-ed64410f4781',
 
   // health check timeout in milliseconds
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
@@ -80,5 +83,24 @@ module.exports = {
 
   M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || 'tcwebservice',
 
-  FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90
+  FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90,
+
+  NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'self-service',
+
+  SENDGRID_TEMPLATES: {
+    WORK_REQUEST_SUBMITTED: process.env.WORK_REQUEST_SUBMITTED || '',
+    WORK_REQUEST_STARTED: process.env.WORK_REQUEST_STARTED || '',
+    WORK_REQUEST_REDIRECTED: process.env.WORK_REQUEST_REDIRECTED || '',
+    WORK_COMPLETED: process.env.WORK_COMPLETED || ''
+  },
+
+  EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@topcoder.com',
+  SELF_SERVICE_EMAIL_CC_ACCOUNTS: process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS ? _.map(process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS.split(','), email => ({ email })) : ['sathya.jayabal@gmail.com'],
+  SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES ? process.env.SELF_SERVICE_WHITELIST_HANDLES.split(',') : ['TCConnCopilot', 'sstestcopilot'],
+  SELF_SERVICE_APP_URL: process.env.SELF_SERVICE_APP_URL || 'https://platform.topcoder-dev.com/self-service',
+
+  ZENDESK_API_TOKEN: process.env.ZENDESK_API_TOKEN || '',
+  ZENDESK_API_URL: process.env.ZENDESK_API_URL || '',
+  ZENDESK_CUSTOM_FIELD_TAG_ID: process.env.ZENDESK_CUSTOM_FIELD_TAG_ID,
+  ZENDESK_DEFAULT_PRIORITY: process.env.ZENDESK_DEFAULT_PRIORITY || 'high'
 }

@@ -24,7 +24,17 @@ async function searchChallenges (req, res) {
  */
 async function createChallenge (req, res) {
   logger.debug(`createChallenge User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`)
-  const result = await service.createChallenge(req.authUser, req.body)
+  const result = await service.createChallenge(req.authUser, req.body, req.userToken)
+  res.status(HttpStatus.CREATED).send(result)
+}
+
+/**
+ * send notifications
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function sendNotifications (req, res) {
+  const result = await service.sendNotifications(req.authUser, req.params.challengeId)
   res.status(HttpStatus.CREATED).send(result)
 }
 
@@ -43,7 +53,7 @@ async function getChallenge (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
- async function getChallengeStatistics (req, res) {
+async function getChallengeStatistics (req, res) {
   const result = await service.getChallengeStatistics(req.authUser, req.params.challengeId)
   res.send(result)
 }
@@ -88,5 +98,7 @@ module.exports = {
   fullyUpdateChallenge,
   partiallyUpdateChallenge,
   deleteChallenge,
+  getChallengeStatistics,
+  sendNotifications,
   getChallengeStatistics
 }
