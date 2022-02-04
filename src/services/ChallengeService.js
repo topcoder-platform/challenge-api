@@ -1990,7 +1990,8 @@ async function update (currentUser, challengeId, data, isFull) {
         }
       )
     }
-    if (sendRejectedEmail) {
+    if (sendRejectedEmail || cancelReason) {
+      logger.debug('Should send redirected email')
       await helper.sendSelfServiceNotification(
         constants.SelfServiceNotificationTypes.WORK_REQUEST_REDIRECTED,
         [{ email: creator.email }],
