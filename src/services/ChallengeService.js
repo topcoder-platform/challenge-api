@@ -1501,7 +1501,11 @@ async function update (currentUser, challengeId, data, isFull) {
       }
     }
     if (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible || data.status === constants.challengeStatuses.CancelledPaymentFailed) {
-      await helper.cancelProject(challenge.projectId, cancelReason, currentUser)
+      try {
+        await helper.cancelProject(challenge.projectId, cancelReason, currentUser)
+      } catch (e) {
+        logger.debug(`There was an error trying to cancel the project: ${e.message}`)
+      }
       sendRejectedEmail = true
     }
     if (data.status === constants.challengeStatuses.Completed) {

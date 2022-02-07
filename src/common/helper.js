@@ -517,6 +517,7 @@ async function cancelPayment (paymentId) {
  async function cancelProject (projectId, cancelReason, currentUser) {
   let payment = await getProjectPayment(projectId)
   const project = await ensureProjectExist(projectId, currentUser)
+  if (project.status === 'cancelled') return // already canceled
   try {
     payment = await cancelPayment(payment.id)
   } catch (e) {
