@@ -1185,6 +1185,14 @@ async function sendSelfServiceNotification (type, recipients, data) {
  * @param {Object} request the request
  */
 async function submitZendeskRequest (request) {
+  console.log('*************************')
+  console.log(JSON.stringify({
+    request: {
+      ...request,
+      collaborators: [..._.map(config.SELF_SERVICE_EMAIL_CC_ACCOUNTS, 'email')]
+    }
+  }))
+  console.log('*************************')
   try {
     const res = await axios.post(`${ZENDESK_API_URL}/api/v2/requests`, {
       request: {
