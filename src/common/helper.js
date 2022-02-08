@@ -1200,7 +1200,7 @@ async function submitZendeskRequest (request) {
     return res.data || {}
   } catch (e) {
     logger.debug(`Failed to submit request: ${e.message}`)
-    logger.debug(e)
+    throw e
   }
 }
 
