@@ -584,6 +584,31 @@ async function activateProject (projectId, currentUser, name, description) {
 }
 
 /**
+ * Update self service project info
+ * @param {*} projectId the project id
+ * @param {*} workItemPlannedEndDate the planned end date of the work item
+ * @param {*} currentUser the current user
+ */
+async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, currentUser) {
+  const project = await ensureProjectExist(projectId, currentUser)
+  const payment = await getProjectPayment(projectId)
+  const token = await getM2MToken()
+  const url = `${config.PROJECTS_API_URL}/${projectId}`
+  const res = await axios.patch(url, {
+    details: {
+      ...project.details,
+      paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
+      paymentId: payment.id,
+      paymentIntentId: payment.paymentIntentId,
+      paymentAmount: payment.amount,
+      paymentCurrency: payment.currency,
+      paymentStatus: payment.status,
+      workItemPlannedEndDate
+    }
+  }, { headers: { Authorization: `Bearer ${token}` } })
+}
+
+/**
  * Get resource roles
  * @returns {Promise<Array>} the challenge resources
  */
@@ -1257,5 +1282,6 @@ module.exports = {
   sendSelfServiceNotification,
   getMemberByHandle,
   submitZendeskRequest,
-  getMemberById
+  getMemberById,
+  updateSelfServiceProjectInfo
 }
