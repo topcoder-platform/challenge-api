@@ -1678,6 +1678,7 @@ async function update (currentUser, challengeId, data, isFull) {
   if (data.status) {
     if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Draft) {
       try {
+        logger.info('will try to update the project information')
         await helper.updateSelfServiceProjectInfo(challenge.projectId, data.endDate || challenge.endDate. currentUser)
       } catch (e) {
         logger.debug(`There was an error trying to update the project: ${e.message}`)
