@@ -843,7 +843,7 @@ function calculateChallengeEndDate (challenge, data) {
   if (!data) {
     data = challenge
   }
-  let phase = data.phases.slice(-1)[0]
+  let phase = data.phases[data.phases.length - 1]
   if (!phase || (!data.startDate && !challenge.startDate)) {
     return data.startDate || challenge.startDate
   }
@@ -854,7 +854,7 @@ function calculateChallengeEndDate (challenge, data) {
   let result = moment(data.startDate || challenge.startDate)
   while (phase) {
     result.add(phase.duration || 0, 'seconds')
-    phase = phase.predecessor && phases[phase.predecessor]
+    phase = phase.predecessor ? phases[phase.predecessor] : null
   }
   return result.toDate()
 }
