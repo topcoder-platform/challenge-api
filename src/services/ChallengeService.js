@@ -590,7 +590,16 @@ async function searchChallenges (currentUser, criteria) {
               }
             },
             { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } },
-          ] : [])
+          ] : [
+            {
+              bool: {
+                should: [
+                  { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Active } } } },
+                  { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Completed } } } },
+                ]
+              }
+            }
+          ])
         ]
       }
     })
