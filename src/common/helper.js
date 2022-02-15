@@ -843,20 +843,22 @@ function calculateChallengeEndDate (challenge, data) {
   if (!data) {
     data = challenge
   }
-  let phase = data.phases.slice(-1)[0]
-  if (!phase || (!data.startDate && !challenge.startDate)) {
-    return data.startDate || challenge.startDate
-  }
-  const phases = (challenge.phases || []).reduce((obj, elem) => {
-    obj[elem.id] = elem
-    return obj
-  }, {})
-  let result = moment(data.startDate || challenge.startDate)
-  while (phase) {
-    result.add(phase.duration || 0, 'seconds')
-    phase = phase.predecessor && phases[phase.predecessor]
-  }
-  return result.toDate()
+  let lastPhase = data.phases[data.phases.length - 1]
+  return lastPhase.actualEndDate || lastPhase.scheduledEndDate
+  // let phase = data.phases[data.phases.length - 1]
+  // if (!phase || (!data.startDate && !challenge.startDate)) {
+  //   return data.startDate || challenge.startDate
+  // }
+  // const phases = (challenge.phases || []).reduce((obj, elem) => {
+  //   obj[elem.id] = elem
+  //   return obj
+  // }, {})
+  // let result = moment(data.startDate || challenge.startDate)
+  // while (phase) {
+  //   result.add(phase.duration || 0, 'seconds')
+  //   phase = phase.predecessor ? phases[phase.predecessor] : null
+  // }
+  // return result.toDate()
 }
 
 /**
