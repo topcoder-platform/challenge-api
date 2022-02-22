@@ -18,6 +18,8 @@ async function createRequest (currentUser, request) {
   let subject
   if (request.isSelfService) {
     subject += 'Self-Service customer support request'
+  } else {
+    subject = 'General support request'
   }
   if (request.challengeId) {
     subject += ` for Challenge ID: ${request.challengeId}`
