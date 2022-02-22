@@ -1215,8 +1215,7 @@ async function submitZendeskRequest (request) {
   try {
     const res = await axios.post(`${config.ZENDESK_API_URL}/api/v2/requests`, {
       request: {
-        ...request,
-        collaborators: [..._.map(config.SELF_SERVICE_EMAIL_CC_ACCOUNTS, 'email')]
+        ...request
       }
     }, {
       auth: {
