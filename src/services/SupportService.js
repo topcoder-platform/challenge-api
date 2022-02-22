@@ -15,12 +15,19 @@ const logger = require('../common/logger')
  * @returns {Object} the search result
  */
 async function createRequest (currentUser, request) {
+  let subject
+  if (request.isSelfService) {
+    subject += 'Self-Service customer support request'
+  }
+  if (request.challengeId) {
+    subject += ` for Challenge ID: ${request.challengeId}`
+  }
   return await helper.submitZendeskRequest({
     requester: {
       name: `${request.firstName} ${request.lastName}`,
       email: request.email
     },
-    subject: `${request.isSelfService ? 'Self-Service customer request for' : ''} Challenge ID: ${request.challengeId}`,
+    subject,
     comment: {
       body: request.question
     },
