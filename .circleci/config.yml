@@ -69,7 +69,7 @@ workflows:
           filters:
             branches:
               only:
-                - issue_dup
+                - develop
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
