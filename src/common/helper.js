@@ -764,21 +764,16 @@ function getBusApiClient () {
  * Post bus event.
  * @param {String} topic the event topic
  * @param {Object} payload the event payload
- * @param {Object} options the extra options to the message
  */
-async function postBusEvent (topic, payload, options = {}) {
+async function postBusEvent (topic, payload) {
   const client = getBusApiClient()
-  const message = {
+  await client.postEvent({
     topic,
     originator: constants.EVENT_ORIGINATOR,
     timestamp: new Date().toISOString(),
     'mime-type': constants.EVENT_MIME_TYPE,
     payload
-  }
-  if (options.key) {
-    message.key = options.key
-  }
-  await client.postEvent(message)
+  })
 }
 
 /**
