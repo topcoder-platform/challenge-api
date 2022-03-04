@@ -1951,7 +1951,11 @@ async function update (currentUser, challengeId, data, isFull) {
 
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge)
+  const options = {}
+  if (challenge.status == 'Completed') {
+    options.key = `${challenge.id}:${challenge.status}`
+  }
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, options)
   if (phasesHaveBeenModified === true && _.get(challenge, 'legacy.useSchedulingAPI')) {
     await helper.postBusEvent(config.SCHEDULING_TOPIC, { id: challengeId })
   }
