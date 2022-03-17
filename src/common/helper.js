@@ -645,7 +645,7 @@ async function getUserGroups (userId) {
       headers: { Authorization: `Bearer ${token}` },
       params: {
         page,
-        perPage: 1000,
+        perPage: 5000,
         memberId: userId,
         membershipType: 'user'
       }
@@ -669,16 +669,15 @@ async function getUserGroups (userId) {
  * @returns {Promise<Array>} the user groups
  */
 async function getCompleteUserGroupTreeIds (userId) {
-  const childGroups = await getUserGroups(userId)
-  const childGroupIds = _.map(childGroups, 'id')
-  let result = []
-  for (const id of childGroupIds) {
-    if (!result.includes(id)) {
-      const expanded = await expandWithParentGroups(id)
-      result = _.concat(result, expanded)
+  const token = await getM2MToken()
+  const result = await axios.get(`${config.GROUPS_API_URL}/memberGroups/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      uuid: true
     }
-  }
-  return _.uniq(result)
+  })
+
+  return result.data || []
 }
 
 /**
