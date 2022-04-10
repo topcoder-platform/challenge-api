@@ -45,11 +45,10 @@ searchChallengeTimelineTemplates.schema = {
  */
 async function unsetDefaultTimelineTemplate (typeId, trackId) {
   const records = await searchChallengeTimelineTemplates({ typeId, trackId, isDefault: true })
-  console.log('records to unset', records);
-  if (records.length === 0) {
+  if (records.total === 0) {
     return
   }
-  for (const record of records) {
+  for (const record of records.result) {
     await fullyUpdateChallengeTimelineTemplate(record.id, { ...record, isDefault: false })
   }
 }
