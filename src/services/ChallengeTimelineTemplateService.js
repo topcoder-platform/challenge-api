@@ -108,8 +108,9 @@ getChallengeTimelineTemplate.schema = {
  * @returns {Object} the updated challenge type timeline template
  */
 async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId, data) {
+  console.log('getting template by id', challengeTimelineTemplateId)
   const record = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
-
+  console.log('template', record)
   if (record.typeId === data.typeId &&
     record.trackId === data.trackId &&
     record.timelineTemplateId === data.timelineTemplateId &&
