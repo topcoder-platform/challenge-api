@@ -61,7 +61,7 @@ async function unsetDefaultTimelineTemplate (typeId, trackId) {
 async function createChallengeTimelineTemplate (data) {
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
-  if (records.length > 0) {
+  if (records.total > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
@@ -121,7 +121,7 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
 
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
-  if (records.length > 0) {
+  if (records.total > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
