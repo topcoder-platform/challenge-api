@@ -193,12 +193,9 @@ function checkIfExists (source, term) {
  * @returns {Promise<void>}
  */
 async function getById (modelName, id) {
-  console.log('model name', modelName)
-  console.log('id', id)
   return new Promise((resolve, reject) => {
     models[modelName].query('id').eq(id).exec((err, result) => {
       if (err) {
-        console.log('failed', err)
         return reject(err)
       }
       if (result.length > 0) {
