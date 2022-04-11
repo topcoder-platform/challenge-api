@@ -45,10 +45,10 @@ searchChallengeTimelineTemplates.schema = {
  */
 async function unsetDefaultTimelineTemplate (typeId, trackId) {
   const records = await searchChallengeTimelineTemplates({ typeId, trackId, isDefault: true })
-  if (records.length === 0) {
+  if (records.total === 0) {
     return
   }
-  for (const record of records) {
+  for (const record of records.result) {
     await fullyUpdateChallengeTimelineTemplate(record.id, { ...record, isDefault: false })
   }
 }
@@ -61,7 +61,7 @@ async function unsetDefaultTimelineTemplate (typeId, trackId) {
 async function createChallengeTimelineTemplate (data) {
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
-  if (records.length > 0) {
+  if (records.total > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
@@ -109,7 +109,6 @@ getChallengeTimelineTemplate.schema = {
  */
 async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId, data) {
   const record = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
-
   if (record.typeId === data.typeId &&
     record.trackId === data.trackId &&
     record.timelineTemplateId === data.timelineTemplateId &&
@@ -120,7 +119,7 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
 
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
-  if (records.length > 0) {
+  if (records.total > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
