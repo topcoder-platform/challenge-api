@@ -1287,6 +1287,5 @@ module.exports = {
   sendSelfServiceNotification,
   getMemberByHandle,
   submitZendeskRequest,
-  getMemberById,
   updateSelfServiceProjectInfo
 }
