@@ -456,15 +456,25 @@ async function createSelfServiceProject (name, description, type, token) {
     type
   }
   const url = `${config.PROJECTS_API_URL}`
-  const res = await axios.post(url, projectObj, {headers: {Authorization: `Bearer ${token}`}})
+  const res = await axios.post(url, projectObj, { headers: { Authorization: `Bearer ${token}` } })
   return _.get(res, 'data.id')
+}
+
+/**
+ * Get project id by roundId
+ * @param {String} roundId the round id
+ */
+async function getProjectIdByRoundId (roundId) {
+  const url = `${config.CHALLENGE_MIGRATION_APP_URL}/getChallengeProjectId/${roundId}`
+  const res = await axios.get(url)
+  return _.get(res, 'data.projectId')
 }
 
 /**
  * Get project payment
  * @param {String} projectId the project id
  */
- async function getProjectPayment (projectId) {
+async function getProjectPayment (projectId) {
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}`
   const res = await axios.get(url, {
@@ -1275,6 +1285,7 @@ module.exports = {
   ensureUserCanModifyChallenge,
   userHasFullAccess,
   sumOfPrizes,
+  getProjectIdByRoundId,
   getGroupById,
   getChallengeSubmissions,
   getMemberById,
