@@ -326,10 +326,10 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
   if (criteria.selfService) {
-    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
+    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService } })
   }
   if (criteria.selfServiceCopilot) {
-    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
+    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot } })
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
@@ -585,17 +585,17 @@ async function searchChallenges (currentUser, criteria) {
                 must: [
                   { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.New } } } },
                   { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Draft } } } },
-                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } },
+                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } }
                 ]
               }
             },
-            { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } },
+            { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } }
           ] : [
             {
               bool: {
                 should: [
                   { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Active } } } },
-                  { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Completed } } } },
+                  { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Completed } } } }
                 ]
               }
             }
@@ -935,10 +935,10 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  */
 async function createChallenge (currentUser, challenge, userToken) {
   try {
-    if(challenge.legacy.selfService) {
-      if(!challenge.projectId) {
+    if (challenge.legacy.selfService) {
+      if (!challenge.projectId) {
         const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`
-        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, "N/A", config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
+        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, 'N/A', config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
       }
     } else if (!challenge.projectId) {
       throw new errors.BadRequestError('The projectId is required')
@@ -946,8 +946,8 @@ async function createChallenge (currentUser, challenge, userToken) {
   } catch (e) {
     throw new errors.ServiceUnavailableError('Fail to create a self-service project')
   }
-  if(challenge.legacy.selfService && challenge.metadata && challenge.metadata.length > 0) {
-    for(const entry of challenge.metadata) {
+  if (challenge.legacy.selfService && challenge.metadata && challenge.metadata.length > 0) {
+    for (const entry of challenge.metadata) {
       if (challenge.description.includes(`{{${entry.name}}}`)) {
         challenge.description = challenge.description.split(`{{${entry.name}}}`).join(entry.value)
       }
@@ -1094,14 +1094,14 @@ async function createChallenge (currentUser, challenge, userToken) {
     body: ret
   })
 
-  //If the challenge is self-service, add the creating user as the "client manager", *not* the manager
-  //This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
-  if(challenge.legacy.selfService) {
-      if (currentUser.handle) {
-        await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID)
-      }
-  }
-  else{
+  // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
+  // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
+
+  if (challenge.legacy.selfService) {
+    if (currentUser.handle) {
+      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID)
+    }
+  } else {
     // if created by a user, add user as a manager, but only if *not* a self-service challenge
     if (currentUser.handle) {
       // logger.debug(`Adding user as manager ${currentUser.handle}`)
@@ -1326,25 +1326,6 @@ getChallengeStatistics.schema = {
 }
 
 /**
- * Check whether given two phases array are different.
- * @param {Array} phases the first phases array
- * @param {Array} otherPhases the second phases array
- * @returns {Boolean} true if different, false otherwise
- */
-function isDifferentPhases (phases = [], otherPhases) {
-  if (phases.length !== otherPhases.length) {
-    return true
-  } else {
-    for (let i = 0; i < phases.length; i++) {
-      if (!_.isEqual(phases[i], otherPhases[i])) {
-        return true
-      }
-    }
-    return false
-  }
-}
-
-/**
  * Check whether given two PrizeSet Array are different.
  * @param {Array} prizeSets the first PrizeSet Array
  * @param {Array} otherPrizeSets the second PrizeSet Array
@@ -1372,13 +1353,13 @@ async function validateWinners (winners, challengeId) {
       if (diffWinners.length + 1 !== filteredWinners.length) {
         throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
       }
-  
+
       // find another member with the placement
       const placementExists = _.find(diffWinners, function (w) { return w.placement === winner.placement })
       if (placementExists && (placementExists.userId !== winner.userId || placementExists.handle !== winner.handle)) {
         throw new errors.BadRequestError(`Only one member can have a placement: ${winner.placement}`)
       }
-  
+
       // find another placement for a member
       const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId && w.type === winner.type })
       if (memberExists && memberExists.placement !== winner.placement) {
@@ -1386,49 +1367,6 @@ async function validateWinners (winners, challengeId) {
       }
     }
   }
-}
-
-/**
- * Get challenge statistics
- * @param {Object} currentUser the user who perform operation
- * @param {String} id the challenge id
- * @returns {Object} the challenge with given id
- */
- async function getChallengeStatistics (currentUser, id) {
-   const challenge = await getChallenge(currentUser, id)
-  // for now, only Data Science challenges are supported
-  if (challenge.type !== 'Challenge' && challenge.track !== 'Data Science') {
-    throw new errors.BadRequestError(`Challenge of type ${challenge.type} and track ${challenge.track} does not support statistics`)
-  }
-  // get submissions
-  const submissions = await helper.getChallengeSubmissions(challenge.id)
-  // for each submission, load member profile
-  const map = {}
-  for (const submission of submissions) {
-    if (!map[submission.memberId]) {
-      // Load member profile and cache
-      const member = await helper.getMemberById(submission.memberId)
-      map[submission.memberId] = {
-        photoUrl: member.photoURL,
-        rating: _.get(member, 'maxRating.rating', 0),
-        ratingColor: _.get(member, 'maxRating.ratingColor', '#9D9FA0'),
-        homeCountryCode: member.homeCountryCode,
-        handle: member.handle,
-        submissions: []
-      }
-    }
-    // add submission
-    map[submission.memberId].submissions.push({
-      created: submission.created,
-      score: _.get(_.find(submission.review || [], r => r.metadata), 'score', 0)
-    })
-  }
-  return _.map(_.keys(map), (userId) => map[userId])
-}
-
-getChallengeStatistics.schema = {
-  currentUser: Joi.any(),
-  id: Joi.id()
 }
 
 /**
@@ -1459,8 +1397,8 @@ async function update (currentUser, challengeId, data, isFull) {
 
   const challenge = await helper.getById('Challenge', challengeId)
   let dynamicDescription = _.cloneDeep(data.description || challenge.description)
-  if(challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
-    for(const entry of data.metadata) {
+  if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
+    for (const entry of data.metadata) {
       const regexp = new RegExp(`{{${entry.name}}}`, 'g')
       dynamicDescription = dynamicDescription.replace(regexp, entry.value)
     }
@@ -1476,7 +1414,7 @@ async function update (currentUser, challengeId, data, isFull) {
       const workItemSummary = _.get(_.find(_.get(challenge, 'metadata', []), m => m.name === 'websitePurpose.description'), 'value', 'N/A')
       await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, workItemSummary)
       if (data.status === constants.challengeStatuses.Active) {
-        sendActivationEmail = true      
+        sendActivationEmail = true
       }
     } catch (e) {
       await update(
@@ -1681,7 +1619,6 @@ async function update (currentUser, challengeId, data, isFull) {
     data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
-
 
   // PUT HERE
   if (data.status) {
@@ -1952,7 +1889,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
   const options = {}
-  if (challenge.status == 'Completed') {
+  if (challenge.status === 'Completed') {
     options.key = `${challenge.id}:${challenge.status}`
   }
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, options)
@@ -2173,7 +2110,7 @@ fullyUpdateChallenge.schema = {
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
       selfService: Joi.boolean(),
-      selfServiceCopilot: Joi.string().allow(null),
+      selfServiceCopilot: Joi.string().allow(null)
     }).unknown(true),
     cancelReason: Joi.string(),
     billing: Joi.object().keys({
@@ -2398,8 +2335,7 @@ module.exports = {
   partiallyUpdateChallenge,
   deleteChallenge,
   getChallengeStatistics,
-  sendNotifications,
-  getChallengeStatistics
+  sendNotifications
 }
 
 logger.buildService(module.exports)
