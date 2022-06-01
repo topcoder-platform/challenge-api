@@ -139,7 +139,9 @@ async function searchChallenges (currentUser, criteria) {
     'updatedBy'
   ]
 
-  const includeSelfService = currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser) || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()))
+  const hasAdminRole = helper.hasAdminRole(currentUser)
+
+  const includeSelfService = currentUser && (currentUser.isMachine || hasAdminRole || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()))
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
@@ -415,7 +417,7 @@ async function searchChallenges (currentUser, criteria) {
   let groupsToFilter = []
   let accessibleGroups = []
 
-  if (currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+  if (currentUser && !currentUser.isMachine && !hasAdminRole) {
     accessibleGroups = await helper.getCompleteUserGroupTreeIds(currentUser.userId)
   }
 
@@ -443,7 +445,7 @@ async function searchChallenges (currentUser, criteria) {
         })
         await Promise.all(promises)
       }
-    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    } else if (!currentUser.isMachine && !hasAdminRole) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
       }
@@ -476,7 +478,7 @@ async function searchChallenges (currentUser, criteria) {
     if (_.isUndefined(currentUser)) {
       // If the user is not authenticated, only query challenges that don't have a group
       mustNotQuery.push({ exists: { field: 'groups' } })
-    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    } else if (!currentUser.isMachine && !hasAdminRole) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
       _.each(accessibleGroups, (g) => {
         groupsQuery.push({ match_phrase: { groups: g } })
@@ -511,7 +513,7 @@ async function searchChallenges (currentUser, criteria) {
     memberChallengeIds = await helper.listChallengesByMember(criteria.memberId)
     // logger.error(`response ${JSON.stringify(ids)}`)
     accessQuery.push({ terms: { _id: memberChallengeIds } })
-  } else if (currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)) {
+  } else if (currentUser && !hasAdminRole && !_.get(currentUser, 'isMachine', false)) {
     memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
   }
 
@@ -526,7 +528,7 @@ async function searchChallenges (currentUser, criteria) {
   // FIXME: Tech Debt
   let excludeTasks = true
   // if you're an admin or m2m, security rules wont be applied
-  if (currentUser && (helper.hasAdminRole(currentUser) || _.get(currentUser, 'isMachine', false))) {
+  if (currentUser && (hasAdminRole || _.get(currentUser, 'isMachine', false))) {
     excludeTasks = false
   }
 
@@ -538,7 +540,7 @@ async function searchChallenges (currentUser, criteria) {
    * For admins/m2m:
    * - All tasks will be returned
    */
-  if (currentUser && (helper.hasAdminRole(currentUser) || _.get(currentUser, 'isMachine', false))) {
+  if (currentUser && (hasAdminRole || _.get(currentUser, 'isMachine', false))) {
     // For admins/m2m, allow filtering based on task properties
     if (criteria.isTask) {
       boolQuery.push({ match_phrase: { 'task.isTask': criteria.isTask } })
@@ -565,7 +567,7 @@ async function searchChallenges (currentUser, criteria) {
             }
           },
           ...(
-            currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)
+            currentUser && !hasAdminRole && !_.get(currentUser, 'isMachine', false)
               ? [{ match_phrase: { 'task.memberId': currentUser.userId } }]
               : []
           )
@@ -681,7 +683,7 @@ async function searchChallenges (currentUser, criteria) {
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    if (!currentUser.isMachine && !hasAdminRole) {
       result = _.each(result, (val) => _.unset(val, 'billing'))
       const ids = await helper.listChallengesByMember(currentUser.userId)
       result = _.each(result, (val) => {
@@ -707,11 +709,12 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  const typeList = await helper.scan('ChallengeType')
+  const challengeTypeList = await ChallengeTypeService.searchChallengeTypes({})
   const typeMap = new Map()
-  _.each(typeList, e => {
+  _.each(challengeTypeList.result, e => {
     typeMap.set(e.id, e.name)
   })
+
   _.each(result, element => {
     element.type = typeMap.get(element.typeId) || 'Code'
   })
