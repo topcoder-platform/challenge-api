@@ -4,7 +4,7 @@
   "description": "TopCoder Challenges V5 API",
   "main": "app.js",
   "scripts": {
-    "start": "node --prof app.js",
+    "start": "node app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "init-es": "node src/init-es.js",
