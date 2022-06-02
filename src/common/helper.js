@@ -15,7 +15,7 @@ const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_
 const axios = require('axios')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
-const moment = require('moment')
+const NodeCache = require('node-cache')
 const HttpStatus = require('http-status-codes')
 const xss = require('xss')
 const logger = require('./logger')
@@ -47,6 +47,9 @@ function wrapExpress (fn) {
     fn(req, res, next).catch(next)
   }
 }
+
+// Internal cache
+const internalCache = new NodeCache({ stdTTL: config.INTERNAL_CACHE_TTL })
 
 /**
  * Wrap all functions from object
@@ -447,7 +450,7 @@ async function createResource (challengeId, memberHandle, roleId) {
  * @param {String} description The description
  * @param {String} type The type
  * @param {String} token The token
- * @returns 
+ * @returns
  */
 async function createSelfServiceProject (name, description, type, token) {
   const projectObj = {
@@ -456,7 +459,7 @@ async function createSelfServiceProject (name, description, type, token) {
     type
   }
   const url = `${config.PROJECTS_API_URL}`
-  const res = await axios.post(url, projectObj, {headers: {Authorization: `Bearer ${token}`}})
+  const res = await axios.post(url, projectObj, { headers: { Authorization: `Bearer ${token}` } })
   return _.get(res, 'data.id')
 }
 
@@ -464,7 +467,7 @@ async function createSelfServiceProject (name, description, type, token) {
  * Get project payment
  * @param {String} projectId the project id
  */
- async function getProjectPayment (projectId) {
+async function getProjectPayment (projectId) {
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}`
   const res = await axios.get(url, {
@@ -473,7 +476,7 @@ async function createSelfServiceProject (name, description, type, token) {
       referenceId: projectId,
       reference: 'project'
     }
- })
+  })
   const [payment] = res.data
   return payment
 }
@@ -514,7 +517,7 @@ async function cancelPayment (paymentId) {
  * @param {String} cancelReason the cancel reasonn
  * @param {Object} currentUser the current user
  */
- async function cancelProject (projectId, cancelReason, currentUser) {
+async function cancelProject (projectId, cancelReason, currentUser) {
   let payment = await getProjectPayment(projectId)
   const project = await ensureProjectExist(projectId, currentUser)
   if (project.status === 'cancelled') return // already canceled
@@ -998,7 +1001,7 @@ async function validateChallengeTerms (terms = []) {
 async function _filterChallengesByGroupsAccess (currentUser, challenges) {
   const res = []
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !hasAdminRole(currentUser)
-  if(!needToCheckForGroupAccess) return challenges
+  if (!needToCheckForGroupAccess) return challenges
 
   let userGroups
 
@@ -1234,6 +1237,14 @@ async function submitZendeskRequest (request) {
   }
 }
 
+function getFromInternalCache (key) {
+  return internalCache.get(key)
+}
+
+function setToInternalCache (key, value) {
+  internalCache.set(key, value)
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1287,5 +1298,7 @@ module.exports = {
   sendSelfServiceNotification,
   getMemberByHandle,
   submitZendeskRequest,
-  updateSelfServiceProjectInfo
+  updateSelfServiceProjectInfo,
+  getFromInternalCache,
+  setToInternalCache
 }
