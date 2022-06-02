@@ -139,7 +139,9 @@ async function searchChallenges (currentUser, criteria) {
     'updatedBy'
   ]
 
-  const includeSelfService = currentUser && (currentUser.isMachine || helper.hasAdminRole(currentUser) || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()))
+  const hasAdminRole = helper.hasAdminRole(currentUser)
+
+  const includeSelfService = currentUser && (currentUser.isMachine || hasAdminRole || _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()))
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : []
 
@@ -326,10 +328,10 @@ async function searchChallenges (currentUser, criteria) {
     boolQuery.push({ match_phrase: { 'legacy.useSchedulingAPI': criteria.useSchedulingAPI } })
   }
   if (criteria.selfService) {
-    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService}})
+    boolQuery.push({ match_phrase: { 'legacy.selfService': criteria.selfService } })
   }
   if (criteria.selfServiceCopilot) {
-    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot}})
+    boolQuery.push({ match_phrase: { 'legacy.selfServiceCopilot': criteria.selfServiceCopilot } })
   }
   if (criteria.forumId) {
     boolQuery.push({ match_phrase: { 'legacy.forumId': criteria.forumId } })
@@ -415,7 +417,7 @@ async function searchChallenges (currentUser, criteria) {
   let groupsToFilter = []
   let accessibleGroups = []
 
-  if (currentUser && !currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+  if (currentUser && !currentUser.isMachine && !hasAdminRole) {
     accessibleGroups = await helper.getCompleteUserGroupTreeIds(currentUser.userId)
   }
 
@@ -443,7 +445,7 @@ async function searchChallenges (currentUser, criteria) {
         })
         await Promise.all(promises)
       }
-    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    } else if (!currentUser.isMachine && !hasAdminRole) {
       if (accessibleGroups.includes(criteria.group)) {
         groupsToFilter.push(criteria.group)
       }
@@ -476,7 +478,7 @@ async function searchChallenges (currentUser, criteria) {
     if (_.isUndefined(currentUser)) {
       // If the user is not authenticated, only query challenges that don't have a group
       mustNotQuery.push({ exists: { field: 'groups' } })
-    } else if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    } else if (!currentUser.isMachine && !hasAdminRole) {
       // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
       _.each(accessibleGroups, (g) => {
         groupsQuery.push({ match_phrase: { groups: g } })
@@ -511,7 +513,7 @@ async function searchChallenges (currentUser, criteria) {
     memberChallengeIds = await helper.listChallengesByMember(criteria.memberId)
     // logger.error(`response ${JSON.stringify(ids)}`)
     accessQuery.push({ terms: { _id: memberChallengeIds } })
-  } else if (currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)) {
+  } else if (currentUser && !hasAdminRole && !_.get(currentUser, 'isMachine', false)) {
     memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
   }
 
@@ -526,7 +528,7 @@ async function searchChallenges (currentUser, criteria) {
   // FIXME: Tech Debt
   let excludeTasks = true
   // if you're an admin or m2m, security rules wont be applied
-  if (currentUser && (helper.hasAdminRole(currentUser) || _.get(currentUser, 'isMachine', false))) {
+  if (currentUser && (hasAdminRole || _.get(currentUser, 'isMachine', false))) {
     excludeTasks = false
   }
 
@@ -538,7 +540,7 @@ async function searchChallenges (currentUser, criteria) {
    * For admins/m2m:
    * - All tasks will be returned
    */
-  if (currentUser && (helper.hasAdminRole(currentUser) || _.get(currentUser, 'isMachine', false))) {
+  if (currentUser && (hasAdminRole || _.get(currentUser, 'isMachine', false))) {
     // For admins/m2m, allow filtering based on task properties
     if (criteria.isTask) {
       boolQuery.push({ match_phrase: { 'task.isTask': criteria.isTask } })
@@ -565,7 +567,7 @@ async function searchChallenges (currentUser, criteria) {
             }
           },
           ...(
-            currentUser && !helper.hasAdminRole(currentUser) && !_.get(currentUser, 'isMachine', false)
+            currentUser && !hasAdminRole && !_.get(currentUser, 'isMachine', false)
               ? [{ match_phrase: { 'task.memberId': currentUser.userId } }]
               : []
           )
@@ -585,17 +587,17 @@ async function searchChallenges (currentUser, criteria) {
                 must: [
                   { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.New } } } },
                   { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Draft } } } },
-                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } },
+                  { bool: { must_not: { match_phrase: { 'status': constants.challengeStatuses.Approved } } } }
                 ]
               }
             },
-            { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } },
+            { bool: { must: { match_phrase: { 'createdBy': currentUser.handle } } } }
           ] : [
             {
               bool: {
                 should: [
                   { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Active } } } },
-                  { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Completed } } } },
+                  { bool: { must: { match_phrase: { 'status': constants.challengeStatuses.Completed } } } }
                 ]
               }
             }
@@ -681,7 +683,7 @@ async function searchChallenges (currentUser, criteria) {
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    if (!currentUser.isMachine && !hasAdminRole) {
       result = _.each(result, (val) => _.unset(val, 'billing'))
       const ids = await helper.listChallengesByMember(currentUser.userId)
       result = _.each(result, (val) => {
@@ -707,11 +709,12 @@ async function searchChallenges (currentUser, criteria) {
     })
   }
 
-  const typeList = await helper.scan('ChallengeType')
+  const challengeTypeList = await ChallengeTypeService.searchChallengeTypes({})
   const typeMap = new Map()
-  _.each(typeList, e => {
+  _.each(challengeTypeList.result, e => {
     typeMap.set(e.id, e.name)
   })
+
   _.each(result, element => {
     element.type = typeMap.get(element.typeId) || 'Code'
   })
@@ -935,10 +938,10 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  */
 async function createChallenge (currentUser, challenge, userToken) {
   try {
-    if(challenge.legacy.selfService) {
-      if(!challenge.projectId) {
+    if (challenge.legacy.selfService) {
+      if (!challenge.projectId) {
         const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`
-        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, "N/A", config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
+        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, 'N/A', config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
       }
     } else if (!challenge.projectId) {
       throw new errors.BadRequestError('The projectId is required')
@@ -946,8 +949,8 @@ async function createChallenge (currentUser, challenge, userToken) {
   } catch (e) {
     throw new errors.ServiceUnavailableError('Fail to create a self-service project')
   }
-  if(challenge.legacy.selfService && challenge.metadata && challenge.metadata.length > 0) {
-    for(const entry of challenge.metadata) {
+  if (challenge.legacy.selfService && challenge.metadata && challenge.metadata.length > 0) {
+    for (const entry of challenge.metadata) {
       if (challenge.description.includes(`{{${entry.name}}}`)) {
         challenge.description = challenge.description.split(`{{${entry.name}}}`).join(entry.value)
       }
@@ -1094,14 +1097,14 @@ async function createChallenge (currentUser, challenge, userToken) {
     body: ret
   })
 
-  //If the challenge is self-service, add the creating user as the "client manager", *not* the manager
-  //This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
-  if(challenge.legacy.selfService) {
-      if (currentUser.handle) {
-        await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID)
-      }
-  }
-  else{
+  // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
+  // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
+
+  if (challenge.legacy.selfService) {
+    if (currentUser.handle) {
+      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID)
+    }
+  } else {
     // if created by a user, add user as a manager, but only if *not* a self-service challenge
     if (currentUser.handle) {
       // logger.debug(`Adding user as manager ${currentUser.handle}`)
@@ -1326,25 +1329,6 @@ getChallengeStatistics.schema = {
 }
 
 /**
- * Check whether given two phases array are different.
- * @param {Array} phases the first phases array
- * @param {Array} otherPhases the second phases array
- * @returns {Boolean} true if different, false otherwise
- */
-function isDifferentPhases (phases = [], otherPhases) {
-  if (phases.length !== otherPhases.length) {
-    return true
-  } else {
-    for (let i = 0; i < phases.length; i++) {
-      if (!_.isEqual(phases[i], otherPhases[i])) {
-        return true
-      }
-    }
-    return false
-  }
-}
-
-/**
  * Check whether given two PrizeSet Array are different.
  * @param {Array} prizeSets the first PrizeSet Array
  * @param {Array} otherPrizeSets the second PrizeSet Array
@@ -1372,13 +1356,13 @@ async function validateWinners (winners, challengeId) {
       if (diffWinners.length + 1 !== filteredWinners.length) {
         throw new errors.BadRequestError(`Duplicate member with placement: ${helper.toString(winner)}`)
       }
-  
+
       // find another member with the placement
       const placementExists = _.find(diffWinners, function (w) { return w.placement === winner.placement })
       if (placementExists && (placementExists.userId !== winner.userId || placementExists.handle !== winner.handle)) {
         throw new errors.BadRequestError(`Only one member can have a placement: ${winner.placement}`)
       }
-  
+
       // find another placement for a member
       const memberExists = _.find(diffWinners, function (w) { return w.userId === winner.userId && w.type === winner.type })
       if (memberExists && memberExists.placement !== winner.placement) {
@@ -1386,49 +1370,6 @@ async function validateWinners (winners, challengeId) {
       }
     }
   }
-}
-
-/**
- * Get challenge statistics
- * @param {Object} currentUser the user who perform operation
- * @param {String} id the challenge id
- * @returns {Object} the challenge with given id
- */
- async function getChallengeStatistics (currentUser, id) {
-   const challenge = await getChallenge(currentUser, id)
-  // for now, only Data Science challenges are supported
-  if (challenge.type !== 'Challenge' && challenge.track !== 'Data Science') {
-    throw new errors.BadRequestError(`Challenge of type ${challenge.type} and track ${challenge.track} does not support statistics`)
-  }
-  // get submissions
-  const submissions = await helper.getChallengeSubmissions(challenge.id)
-  // for each submission, load member profile
-  const map = {}
-  for (const submission of submissions) {
-    if (!map[submission.memberId]) {
-      // Load member profile and cache
-      const member = await helper.getMemberById(submission.memberId)
-      map[submission.memberId] = {
-        photoUrl: member.photoURL,
-        rating: _.get(member, 'maxRating.rating', 0),
-        ratingColor: _.get(member, 'maxRating.ratingColor', '#9D9FA0'),
-        homeCountryCode: member.homeCountryCode,
-        handle: member.handle,
-        submissions: []
-      }
-    }
-    // add submission
-    map[submission.memberId].submissions.push({
-      created: submission.created,
-      score: _.get(_.find(submission.review || [], r => r.metadata), 'score', 0)
-    })
-  }
-  return _.map(_.keys(map), (userId) => map[userId])
-}
-
-getChallengeStatistics.schema = {
-  currentUser: Joi.any(),
-  id: Joi.id()
 }
 
 /**
@@ -1459,8 +1400,8 @@ async function update (currentUser, challengeId, data, isFull) {
 
   const challenge = await helper.getById('Challenge', challengeId)
   let dynamicDescription = _.cloneDeep(data.description || challenge.description)
-  if(challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
-    for(const entry of data.metadata) {
+  if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
+    for (const entry of data.metadata) {
       const regexp = new RegExp(`{{${entry.name}}}`, 'g')
       dynamicDescription = dynamicDescription.replace(regexp, entry.value)
     }
@@ -1476,7 +1417,7 @@ async function update (currentUser, challengeId, data, isFull) {
       const workItemSummary = _.get(_.find(_.get(challenge, 'metadata', []), m => m.name === 'websitePurpose.description'), 'value', 'N/A')
       await helper.activateProject(challenge.projectId, currentUser, selfServiceProjectName, workItemSummary)
       if (data.status === constants.challengeStatuses.Active) {
-        sendActivationEmail = true      
+        sendActivationEmail = true
       }
     } catch (e) {
       await update(
@@ -1621,7 +1562,7 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   await validateChallengeData(data)
-  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Cancelled) && data.status && data.status !== challenge.status) {
+  if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Cancelled) && data.status && (data.status !== challenge.status && data.status !== constants.challengeStatuses.CancelledClientRequest)) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
 
@@ -1681,7 +1622,6 @@ async function update (currentUser, challengeId, data, isFull) {
     data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
   }
-
 
   // PUT HERE
   if (data.status) {
@@ -1952,7 +1892,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`)
   const options = {}
-  if (challenge.status == 'Completed') {
+  if (challenge.status === 'Completed') {
     options.key = `${challenge.id}:${challenge.status}`
   }
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, options)
@@ -2173,7 +2113,7 @@ fullyUpdateChallenge.schema = {
       pureV5Task: Joi.boolean(),
       pureV5: Joi.boolean(),
       selfService: Joi.boolean(),
-      selfServiceCopilot: Joi.string().allow(null),
+      selfServiceCopilot: Joi.string().allow(null)
     }).unknown(true),
     cancelReason: Joi.string(),
     billing: Joi.object().keys({
@@ -2398,8 +2338,7 @@ module.exports = {
   partiallyUpdateChallenge,
   deleteChallenge,
   getChallengeStatistics,
-  sendNotifications,
-  getChallengeStatistics
+  sendNotifications
 }
 
 logger.buildService(module.exports)
