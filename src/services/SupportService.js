@@ -24,7 +24,7 @@ async function createRequest (currentUser, request) {
   if (request.challengeId) {
     subject += ` for Challenge ID: ${request.challengeId}`
   }
-  return await helper.submitZendeskRequest({
+  return helper.submitZendeskRequest({
     requester: {
       name: `${request.firstName} ${request.lastName}`,
       email: request.email

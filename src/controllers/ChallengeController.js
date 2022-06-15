@@ -109,6 +109,5 @@ module.exports = {
   partiallyUpdateChallenge,
   deleteChallenge,
   getChallengeStatistics,
-  sendNotifications,
-  getChallengeStatistics
+  sendNotifications
 }

@@ -1,15 +1,19 @@
-const config = require('config')
-const logger = require('../common/logger')
-const helper = require('../common/helper')
+// const config = require('config')
+// const logger = require('../common/logger')
+// const helper = require('../common/helper')
 
-const esClient = helper.getESClient()
+// const esClient = helper.getESClient()
 
+// TODO are these used anywhere like globals?
+/*
 function sleep (ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms)
   })
 }
+*/
 
+/*
 function createIndex (indexName) {
   const body = { mappings: {} }
   body.mappings[config.get('ES.ES_TYPE')] = {
@@ -57,12 +61,14 @@ function createIndex (indexName) {
     body
   })
 }
+*/
 
+/*
 async function updateMappings () {
-  const tempReindexing = config.get('ES.TEMP_REINDEXING')
-  let indexName = config.get('ES.ES_INDEX')
-  let backupIndex = 'challenge_tmp_dont_use_for_querying_backup'
-  let newIndexName = 'challenge_tmp_dont_use_for_querying'
+  // const tempReindexing = config.get('ES.TEMP_REINDEXING')
+  // let indexName = config.get('ES.ES_INDEX')
+  // let backupIndex = 'challenge_tmp_dont_use_for_querying_backup'
+  // let newIndexName = 'challenge_tmp_dont_use_for_querying'
 
   // if (tempReindexing) {
   //   try {
@@ -129,13 +135,16 @@ async function updateMappings () {
   //   index: newIndexName
   // })
 }
+*/
 
+/*
 updateMappings()
   .then(() => {
-    logger.info('Done')
+    // logger.info('Done')
     process.exit()
   })
   .catch((err) => {
-    logger.logFullError(err)
+    // logger.logFullError(err)
     process.exit(1)
   })
+*/

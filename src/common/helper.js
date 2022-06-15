@@ -607,7 +607,7 @@ async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, 
   const payment = await getProjectPayment(projectId)
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  const res = await axios.patch(url, {
+  await axios.patch(url, {
     details: {
       ...project.details,
       paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,

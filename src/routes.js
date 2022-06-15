@@ -70,7 +70,7 @@ module.exports = {
   '/challenges/:challengeId/statistics': {
     get: {
       controller: 'ChallengeController',
-      method: 'getChallengeStatistics',
+      method: 'getChallengeStatistics'
     }
   },
   '/challenges/:challengeId/notifications': {
