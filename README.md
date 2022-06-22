@@ -218,7 +218,6 @@ npm run e2e:cov
 Refer to the verification document `Verification.md`
 
 ## Notes
-
 - after uploading attachments, the returned attachment ids should be used to update challenge;
   finally, attachments have challengeId field linking to their challenge,
   challenge also have attachments field linking to its attachments,
