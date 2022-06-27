@@ -889,13 +889,19 @@ async function listChallengesByMember (memberId) {
   // get search is paginated, we need to get all pages' data
   let page = 1
   while (true) {
-    const result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params: {
-        page,
-        perPage: 10000
-      }
-    })
+    let result = [];
+    try {
+      result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          page,
+          perPage: 10000
+        }
+      })
+    } catch (e) {
+      // only log the error but don't throw it, so the following logic can still be executed.
+      logger.debug(`Failed to get challenges that accessible to the memberId ${memberId}`, e)
+    }
     const ids = result.data || []
     if (ids.length === 0) {
       break
