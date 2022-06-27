@@ -908,7 +908,7 @@ async function listChallengesByMember (memberId) {
     }
     allIds = allIds.concat(ids)
     page += 1
-    if (result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
+    if (result.headers && result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
       break
     }
   }
