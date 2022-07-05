@@ -64,7 +64,6 @@ The following parameters can be set in config files or in env variables:
 - RESOURCES_API_URL: TC resources API base URL
 - GROUPS_API_URL: TC groups API base URL
 - PROJECTS_API_URL: TC projects API base URL
-- CHALLENGE_MIGRATION_APP_URL: migration app URL
 - TERMS_API_URL: TC Terms API Base URL
 - COPILOT_RESOURCE_ROLE_IDS: copilot resource role ids allowed to upload attachment
 - HEALTH_CHECK_TIMEOUT: health check timeout in milliseconds
