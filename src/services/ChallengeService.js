@@ -956,6 +956,15 @@ async function createChallenge (currentUser, challenge, userToken) {
       }
     }
   }
+  if (challenge.legacy.selfService) {
+    if (!challenge.metadata) {
+      challenge.metadata = {}
+    }
+    // TODO: test this add of skip_OR_payment_calc to challenge metadata, both in dynamodb and then when the
+    // processor runs, check Informix. Combine with end-to-end of autopilot ignoring payment calcs for
+    // challenges with this flag.
+    challenge.metadata.items().push({ name: 'skip_OR_payment_calcs', value: 'true' })
+  }
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
     _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
   }
