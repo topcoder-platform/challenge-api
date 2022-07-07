@@ -9,6 +9,8 @@ const helper = require('../common/helper')
 // const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 
 /**
  * Search challenge type timeline templates.
@@ -38,6 +40,8 @@ searchChallengeTimelineTemplates.schema = {
   })
 }
 
+searchChallengeTimelineTemplates.apm = true
+
 /**
  * Unset existing default timeline template in order to create a new one
  * @param {String} typeId the type ID
@@ -52,6 +56,8 @@ async function unsetDefaultTimelineTemplate (typeId, trackId) {
     await fullyUpdateChallengeTimelineTemplate(record.id, { ...record, isDefault: false })
   }
 }
+
+unsetDefaultTimelineTemplate.apm = true
 
 /**
  * Create challenge type timeline template.
@@ -88,6 +94,8 @@ createChallengeTimelineTemplate.schema = {
   }).required()
 }
 
+createChallengeTimelineTemplate.apm = true
+
 /**
  * Get challenge type timeline template.
  * @param {String} challengeTimelineTemplateId the challenge type timeline template id
@@ -100,6 +108,8 @@ async function getChallengeTimelineTemplate (challengeTimelineTemplateId) {
 getChallengeTimelineTemplate.schema = {
   challengeTimelineTemplateId: Joi.id()
 }
+
+getChallengeTimelineTemplate.apm = true
 
 /**
  * Fully update challenge type timeline template.
@@ -142,6 +152,8 @@ fullyUpdateChallengeTimelineTemplate.schema = {
   data: createChallengeTimelineTemplate.schema.data
 }
 
+fullyUpdateChallengeTimelineTemplate.apm = true
+
 /**
  * Delete challenge type timeline template.
  * @param {String} challengeTimelineTemplateId the challenge type timeline template id
@@ -159,6 +171,8 @@ deleteChallengeTimelineTemplate.schema = {
   challengeTimelineTemplateId: Joi.id()
 }
 
+deleteChallengeTimelineTemplate.apm = true
+
 module.exports = {
   searchChallengeTimelineTemplates,
   createChallengeTimelineTemplate,
@@ -167,4 +181,4 @@ module.exports = {
   deleteChallengeTimelineTemplate
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

@@ -11,7 +11,7 @@ const errors = require('../common/errors')
 const helper = require('../common/helper')
 const s3ParseUrl = require('../common/s3ParseUrl')
 const models = require('../models')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 const challengeService = require('./ChallengeService')
 
@@ -48,6 +48,8 @@ async function _getChallengeAttachment (challengeId, attachmentId) {
   }
   return { challenge, attachment }
 }
+
+_getChallengeAttachment.apm = true
 
 /**
  * Create attachment.
@@ -88,6 +90,8 @@ createAttachment.schema = {
   })).required().min(1)
 }
 
+createAttachment.apm = true
+
 /**
  * Get attachment
  * @param {String} challengeId the challenge id
@@ -105,6 +109,8 @@ getAttachment.schema = {
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }
+
+getAttachment.apm = true
 
 /**
  * Update attachment.
@@ -142,6 +148,8 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
   return ret
 }
 
+update.apm = true
+
 /**
  * Fully update attachment.
  * @param {String} challengeId the challenge id
@@ -165,6 +173,8 @@ fullyUpdateAttachment.schema = {
   }).required()
 }
 
+fullyUpdateAttachment.apm = true
+
 /**
  * Partially update attachment.
  * @param {String} challengeId the challenge id
@@ -187,6 +197,8 @@ partiallyUpdateAttachment.schema = {
     description: Joi.string()
   }).required()
 }
+
+partiallyUpdateAttachment.apm = true
 
 /**
  * Delete attachment.
@@ -222,6 +234,8 @@ deleteAttachment.schema = {
   attachmentId: Joi.id()
 }
 
+deleteAttachment.apm = true
+
 /**
  * Download attachment.
  * @param {String} challengeId the challenge id
@@ -248,6 +262,8 @@ downloadAttachment.schema = {
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }
+
+downloadAttachment.apm = true
 
 module.exports = {
   createAttachment,

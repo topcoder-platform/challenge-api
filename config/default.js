@@ -26,6 +26,11 @@ module.exports = {
   KAFKA_ERROR_TOPIC: process.env.KAFKA_ERROR_TOPIC || 'common.error.reporting',
   SCHEDULING_TOPIC: process.env.SCHEDULING_TOPIC || 'challenge.notification.schedule.update',
 
+  // apm config
+  APM_OTLP_TRACE_EXPORTER_URL: process.env.APM_OTLP_TRACE_EXPORTER_URL || '',
+  APM_SERVICE_NAME: process.env.APM_SERVICE_NAME || '',
+  APM_TRACER_NAME: process.env.APM_TRACER_NAME || '',
+
   AMAZON: {
     // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
     // AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY || 'FAKE_SECRET_ACCESS_KEY',
