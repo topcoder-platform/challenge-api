@@ -958,9 +958,9 @@ async function createChallenge (currentUser, challenge, userToken) {
   }
   if (challenge.legacy.selfService) {
     if (!challenge.metadata) {
-      challenge.metadata = {}
+      challenge.metadata = []
     }
-    challenge.metadata.items().push({ name: 'skip_OR_payment_calcs', value: 'true' })
+    challenge.metadata.push({ name: 'skip_OR_payment_calcs', value: 'true' })
   }
   if (!_.isUndefined(_.get(challenge, 'legacy.reviewType'))) {
     _.set(challenge, 'legacy.reviewType', _.toUpper(_.get(challenge, 'legacy.reviewType')))
