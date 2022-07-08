@@ -18,7 +18,7 @@ const elasticsearch = require('elasticsearch')
 const NodeCache = require('node-cache')
 const HttpStatus = require('http-status-codes')
 const xss = require('xss')
-const logger = require('./logger')
+const logger = require('tc-framework').logger(config)
 
 // Bus API Client
 let busApiClient
@@ -210,6 +210,8 @@ async function getById (modelName, id) {
   })
 }
 
+getById.apm = true
+
 /**
  * Get Data by model ids
  * @param {String} modelName The dynamoose model name
@@ -224,6 +226,7 @@ async function getByIds (modelName, ids) {
   }
   return entities
 }
+getByIds.apm = true
 
 /**
  * Validate the data to ensure no duplication
@@ -260,6 +263,8 @@ async function create (modelName, data) {
   })
 }
 
+create.apm = true
+
 /**
  * Update item in database
  * @param {Object} dbItem The Dynamo database item
@@ -280,6 +285,8 @@ async function update (dbItem, data) {
     })
   })
 }
+
+update.apm = true
 
 /**
  * Get data collection by scan parameters
@@ -368,6 +375,8 @@ async function downloadFromFileStack (url) {
   }
 }
 
+downloadFromFileStack.apm = true
+
 /**
  * Download file from S3
  * @param {String} bucket the bucket name
@@ -382,6 +391,8 @@ async function downloadFromS3 (bucket, key) {
   }
 }
 
+downloadFromS3.apm = true
+
 /**
  * Delete file from S3
  * @param {String} bucket the bucket name
@@ -391,6 +402,8 @@ async function downloadFromS3 (bucket, key) {
 async function deleteFromS3 (bucket, key) {
   return s3.deleteObject({ Bucket: bucket, Key: key }).promise()
 }
+
+deleteFromS3.apm = true
 
 /**
  * Get M2M token.
@@ -425,6 +438,8 @@ async function getChallengeResources (challengeId) {
   return result
 }
 
+getChallengeResources.apm = true
+
 /**
  * Create challenge resources
  * @param {String} challengeId the challenge id
@@ -443,6 +458,8 @@ async function createResource (challengeId, memberHandle, roleId) {
   const res = await axios.post(url, userObj, { headers: { Authorization: `Bearer ${token}` } })
   return res || false
 }
+
+createResource.apm = true
 
 /**
  * Create Project
@@ -463,6 +480,8 @@ async function createSelfServiceProject (name, description, type, token) {
   return _.get(res, 'data.id')
 }
 
+createSelfServiceProject.apm = true
+
 /**
  * Get project id by roundId
  * @param {String} roundId the round id
@@ -472,6 +491,8 @@ async function getProjectIdByRoundId (roundId) {
   const res = await axios.get(url)
   return _.get(res, 'data.projectId')
 }
+
+getProjectIdByRoundId.apm = true
 
 /**
  * Get project payment
@@ -491,6 +512,8 @@ async function getProjectPayment (projectId) {
   return payment
 }
 
+getProjectPayment.apm = true
+
 /**
  * Charge payment
  * @param {String} paymentId the payment ID
@@ -507,6 +530,8 @@ async function capturePayment (paymentId) {
   return res.data
 }
 
+capturePayment.apm = true
+
 /**
  * Cancel payment
  * @param {String} paymentId the payment ID
@@ -520,6 +545,8 @@ async function cancelPayment (paymentId) {
   }
   return res.data
 }
+
+cancelPayment.apm = true
 
 /**
  * Cancel project
@@ -552,6 +579,8 @@ async function cancelProject (projectId, cancelReason, currentUser) {
     }
   }, { headers: { Authorization: `Bearer ${token}` } })
 }
+
+cancelProject.apm = true
 
 /**
  * Activate project
@@ -596,6 +625,8 @@ async function activateProject (projectId, currentUser, name, description) {
   }
 }
 
+activateProject.apm = true
+
 /**
  * Update self service project info
  * @param {*} projectId the project id
@@ -621,6 +652,8 @@ async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, 
   }, { headers: { Authorization: `Bearer ${token}` } })
 }
 
+updateSelfServiceProjectInfo.apm = true
+
 /**
  * Get resource roles
  * @returns {Promise<Array>} the challenge resources
@@ -630,6 +663,8 @@ async function getResourceRoles () {
   const res = await axios.get(config.RESOURCE_ROLES_API_URL, { headers: { Authorization: `Bearer ${token}` } })
   return res.data || []
 }
+
+getResourceRoles.apm = true
 
 /**
  * Check if a user has full access on a challenge
@@ -676,6 +711,8 @@ async function getUserGroups (userId) {
   return allGroups
 }
 
+getUserGroups.apm = true
+
 /**
  * Get all user groups including all parent groups for each child group
  * @param {String} userId the user id
@@ -692,6 +729,8 @@ async function getCompleteUserGroupTreeIds (userId) {
 
   return result.data || []
 }
+
+getCompleteUserGroupTreeIds.apm = true
 
 /**
  * Get all subgroups for the given group ID
@@ -710,6 +749,8 @@ async function expandWithSubGroups (groupId) {
   return [groupId, ..._.map(_.get(groups, 'subGroups', []), 'id')]
 }
 
+expandWithSubGroups.apm = true
+
 /**
  * Get the "up the chain" group tree for the given group ID
  * @param {String} groupId the group ID
@@ -724,6 +765,8 @@ async function expandWithParentGroups (groupId) {
       oneLevel: false
     }
   })
+
+  expandWithParentGroups.apm = true
 
   const ids = []
   const extractIds = (group) => {
@@ -772,6 +815,8 @@ function getBusApiClient () {
   return busApiClient
 }
 
+getBusApiClient.apm = true
+
 /**
  * Post bus event.
  * @param {String} topic the event topic
@@ -792,6 +837,8 @@ async function postBusEvent (topic, payload, options = {}) {
   }
   await client.postEvent(message)
 }
+
+postBusEvent.apm = true
 
 /**
  * Get ES Client
@@ -821,6 +868,8 @@ function getESClient () {
   }
   return esClient
 }
+
+getESClient.apm = true
 
 /**
  * Ensure project exist
@@ -909,6 +958,8 @@ async function listChallengesByMember (memberId) {
   return allIds
 }
 
+listChallengesByMember.apm = true
+
 /**
  * Check if ES refresh method is valid.
  *
@@ -941,6 +992,8 @@ async function getProjectDefaultTerms (projectId) {
     }
   }
 }
+
+getProjectDefaultTerms.apm = true
 
 /**
  * This functions gets the default billing account for a given project id
@@ -975,6 +1028,8 @@ async function getProjectBillingInformation (projectId) {
   }
 }
 
+getProjectBillingInformation.apm = true
+
 /**
  * This function gets the challenge terms array with the terms data
  * The terms data is retrieved from the terms API using the specified terms ids
@@ -998,6 +1053,8 @@ async function validateChallengeTerms (terms = []) {
       }
     }
   }
+
+  validateChallengeTerms.apm = true
 
   return listOfTerms
 }
@@ -1134,6 +1191,8 @@ async function getGroupById (groupId) {
   }
 }
 
+getGroupById.apm = true
+
 /**
  * Get challenge submissions
  * @param {String} challengeId the challenge id
@@ -1165,6 +1224,8 @@ async function getChallengeSubmissions (challengeId) {
   return allSubmissions
 }
 
+getChallengeSubmissions.apm = true
+
 /**
  * Get member by ID
  * @param {String} userId the user ID
@@ -1179,6 +1240,8 @@ async function getMemberById (userId) {
   return {}
 }
 
+getMemberById.apm = true
+
 /**
  * Get member by handle
  * @param {String} handle the user handle
@@ -1191,6 +1254,8 @@ async function getMemberByHandle (handle) {
   })
   return res.data || {}
 }
+
+getMemberByHandle.apm = true
 
 /**
  * Send self service notification
@@ -1224,6 +1289,8 @@ async function sendSelfServiceNotification (type, recipients, data) {
   }
 }
 
+sendSelfServiceNotification.apm = true
+
 /**
  * Submit a request to zendesk
  * @param {Object} request the request
@@ -1247,13 +1314,19 @@ async function submitZendeskRequest (request) {
   }
 }
 
+submitZendeskRequest.apm = true
+
 function getFromInternalCache (key) {
   return internalCache.get(key)
 }
 
+getFromInternalCache.apm = true
+
 function setToInternalCache (key, value) {
   internalCache.set(key, value)
 }
+
+setToInternalCache.apm = true
 
 module.exports = {
   wrapExpress,
@@ -1313,3 +1386,5 @@ module.exports = {
   getFromInternalCache,
   setToInternalCache
 }
+
+logger.buildService(module.exports)

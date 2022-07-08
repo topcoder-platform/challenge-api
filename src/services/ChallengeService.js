@@ -8,7 +8,7 @@ const uuid = require('uuid/v4')
 const config = require('config')
 const xss = require('xss')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 const models = require('../models')
@@ -34,6 +34,8 @@ async function ensureAccessibleForChallenge (user, challenge) {
     throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
   }
 }
+
+ensureAccessibleForChallenge.apm = true
 
 /**
  * Filter challenges by groups access
@@ -96,6 +98,8 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
   }
 }
 
+ensureAccessibleByGroupsAccess.apm = true
+
 /**
  * Ensure the user can access the groups being updated to
  * @param {Object} currentUser the user who perform operation
@@ -115,6 +119,8 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
     throw new errors.ForbiddenError("ensureAcessibilityToModifiedGroups :: You don't have access to this group!")
   }
 }
+
+ensureAcessibilityToModifiedGroups.apm = true
 
 /**
  * Search challenges
@@ -795,6 +801,8 @@ searchChallenges.schema = {
   }).unknown(true)
 }
 
+searchChallenges.apm = true
+
 /**
  * Validate the challenge data.
  * @param {Object} challenge the challenge data
@@ -832,6 +840,8 @@ async function validateChallengeData (challenge) {
   }
   return { type, track }
 }
+
+validateChallengeData.apm = true
 
 /**
  * Populate challenge phases.
@@ -928,6 +938,8 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
   }
   phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
 }
+
+populatePhases.apm = true
 
 /**
  * Create challenge.
@@ -1197,6 +1209,8 @@ createChallenge.schema = {
   userToken: Joi.string().required()
 }
 
+createChallenge.apm = true
+
 /**
  * Populate phase data from phase API.
  * @param {Object} the challenge entity
@@ -1210,6 +1224,8 @@ async function getPhasesAndPopulate (data) {
     }
   })
 }
+
+getPhasesAndPopulate.apm = true
 
 /**
  * Get challenge.
@@ -1285,6 +1301,8 @@ getChallenge.schema = {
   id: Joi.id()
 }
 
+getChallenge.apm = true
+
 /**
  * Get challenge statistics
  * @param {Object} currentUser the user who perform operation
@@ -1327,6 +1345,8 @@ getChallengeStatistics.schema = {
   currentUser: Joi.any(),
   id: Joi.id()
 }
+
+getChallengeStatistics.apm = true
 
 /**
  * Check whether given two PrizeSet Array are different.
@@ -1371,6 +1391,8 @@ async function validateWinners (winners, challengeId) {
     }
   }
 }
+
+validateWinners.apm = true
 
 /**
  * Update challenge.
@@ -1974,6 +1996,8 @@ async function update (currentUser, challengeId, data, isFull) {
   return challenge
 }
 
+update.apm = true
+
 /**
  * Send notifications
  * @param {Object} currentUser the current use
@@ -2000,6 +2024,8 @@ sendNotifications.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id()
 }
+
+sendNotifications.apm = true
 
 /**
  * Remove unwanted properties from the challenge object
@@ -2085,6 +2111,8 @@ function sanitizeChallenge (challenge) {
   }
   return sanitized
 }
+
+sanitizeChallenge.apm = true
 
 /**
  * Fully update challenge.
@@ -2193,6 +2221,8 @@ fullyUpdateChallenge.schema = {
   }).unknown(true).required()
 }
 
+fullyUpdateChallenge.apm = true
+
 /**
  * Partially update challenge.
  * @param {Object} currentUser the user who perform operation
@@ -2297,6 +2327,8 @@ partiallyUpdateChallenge.schema = {
   }).unknown(true).required()
 }
 
+partiallyUpdateChallenge.apm = true
+
 /**
  * Delete challenge.
  * @param {Object} currentUser the user who perform operation
@@ -2329,6 +2361,8 @@ deleteChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id()
 }
+
+deleteChallenge.apm = true
 
 module.exports = {
   searchChallenges,

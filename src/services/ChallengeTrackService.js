@@ -6,7 +6,8 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 
 /**
@@ -51,6 +52,8 @@ searchChallengeTracks.schema = {
   })
 }
 
+searchChallengeTracks.apm = true
+
 /**
  * Create challenge type.
  * @param {Object} type the challenge type to created
@@ -79,6 +82,8 @@ createChallengeTrack.schema = {
   }).required()
 }
 
+createChallengeTrack.apm = true
+
 /**
  * Get challenge type.
  * @param {String} id the challenge type id
@@ -92,6 +97,8 @@ async function getChallengeTrack (id) {
 getChallengeTrack.schema = {
   id: Joi.id()
 }
+
+getChallengeTrack.apm = true
 
 /**
  * Fully update challenge type.
@@ -137,6 +144,8 @@ fullyUpdateChallengeTrack.schema = {
   }).required()
 }
 
+fullyUpdateChallengeTrack.apm = true
+
 /**
  * Partially update challenge type.
  * @param {String} id the challenge type id
@@ -172,6 +181,8 @@ partiallyUpdateChallengeTrack.schema = {
   }).required()
 }
 
+partiallyUpdateChallengeTrack.apm = true
+
 module.exports = {
   searchChallengeTracks,
   createChallengeTrack,
@@ -180,4 +191,4 @@ module.exports = {
   partiallyUpdateChallengeTrack
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)

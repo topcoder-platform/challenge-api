@@ -6,7 +6,8 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 
 /**
@@ -32,6 +33,8 @@ searchTimelineTemplates.schema = {
     name: Joi.string()
   })
 }
+
+searchTimelineTemplates.apm = true
 
 /**
  * Create timeline template.
@@ -60,6 +63,8 @@ createTimelineTemplate.schema = {
     })).min(1).required()
   }).required()
 }
+
+createTimelineTemplate.apm = true
 
 /**
  * Get timeline template.
@@ -104,6 +109,8 @@ async function update (timelineTemplateId, data, isFull) {
   return ret
 }
 
+update.apm = true
+
 /**
  * Fully update timeline template.
  * @param {String} timelineTemplateId the timeline template id
@@ -127,6 +134,8 @@ fullyUpdateTimelineTemplate.schema = {
     })).min(1).required()
   }).required()
 }
+
+fullyUpdateTimelineTemplate.apm = true
 
 /**
  * Partially update timeline template.
@@ -152,6 +161,8 @@ partiallyUpdateTimelineTemplate.schema = {
   }).required()
 }
 
+partiallyUpdateTimelineTemplate.apm = true
+
 /**
  * Delete timeline template.
  * @param {String} timelineTemplateId the timeline template id
@@ -169,6 +180,8 @@ deleteTimelineTemplate.schema = {
   timelineTemplateId: Joi.id()
 }
 
+deleteTimelineTemplate.apm = true
+
 module.exports = {
   searchTimelineTemplates,
   createTimelineTemplate,
@@ -178,4 +191,4 @@ module.exports = {
   deleteTimelineTemplate
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports)
