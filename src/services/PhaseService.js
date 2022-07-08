@@ -6,8 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 const constants = require('../../app-constants')
 
 /**
@@ -34,8 +33,6 @@ searchPhases.schema = {
   })
 }
 
-searchPhases.apm = true
-
 /**
  * Create phase.
  * @param {Object} phase the phase to created
@@ -58,8 +55,6 @@ createPhase.schema = {
   }).required()
 }
 
-createPhase.apm = true
-
 /**
  * Get phase
  * @param {String} phaseId the phase id
@@ -72,8 +67,6 @@ async function getPhase (phaseId) {
 getPhase.schema = {
   phaseId: Joi.id()
 }
-
-getPhase.apm = true
 
 /**
  * Update phase.
@@ -101,8 +94,6 @@ async function update (phaseId, data, isFull) {
   return ret
 }
 
-update.apm = true
-
 /**
  * Fully update phase.
  * @param {String} phaseId the phase id
@@ -122,8 +113,6 @@ fullyUpdatePhase.schema = {
     duration: Joi.number().positive().required()
   }).required()
 }
-
-fullyUpdatePhase.apm = true
 
 /**
  * Partially update phase.
@@ -145,8 +134,6 @@ partiallyUpdatePhase.schema = {
   }).required()
 }
 
-partiallyUpdatePhase.apm = true
-
 /**
  * Delete phase.
  * @param {String} phaseId the phase id
@@ -164,8 +151,6 @@ deletePhase.schema = {
   phaseId: Joi.id()
 }
 
-deletePhase.apm = true
-
 module.exports = {
   searchPhases,
   createPhase,
@@ -175,4 +160,4 @@ module.exports = {
   deletePhase
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)

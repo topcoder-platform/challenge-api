@@ -7,8 +7,6 @@ const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
 const constants = require('../../app-constants')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
 
 /**
  * Search challenge types
@@ -49,8 +47,6 @@ searchChallengeTypes.schema = {
   })
 }
 
-searchChallengeTypes.apm = true
-
 /**
  * Create challenge type.
  * @param {Object} type the challenge type to created
@@ -75,8 +71,6 @@ createChallengeType.schema = {
   }).required()
 }
 
-createChallengeType.apm = true
-
 /**
  * Get challenge type.
  * @param {String} id the challenge type id
@@ -90,8 +84,6 @@ async function getChallengeType (id) {
 getChallengeType.schema = {
   id: Joi.id()
 }
-
-getChallengeType.apm = true
 
 /**
  * Fully update challenge type.
@@ -127,8 +119,6 @@ fullyUpdateChallengeType.schema = {
   }).required()
 }
 
-fullyUpdateChallengeType.apm = true
-
 /**
  * Partially update challenge type.
  * @param {String} id the challenge type id
@@ -160,8 +150,6 @@ partiallyUpdateChallengeType.schema = {
   }).required()
 }
 
-partiallyUpdateChallengeType.apm = true
-
 module.exports = {
   searchChallengeTypes,
   createChallengeType,
@@ -170,4 +158,4 @@ module.exports = {
   partiallyUpdateChallengeType
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)
