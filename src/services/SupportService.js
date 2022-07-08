@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const config = require('config')
 const helper = require('../common/helper')
-const logger = require('tc-framework').logger(config)
+const logger = require('../common/logger')
 
 /**
  * Create a request in zendesk
@@ -56,8 +56,6 @@ createRequest.schema = {
     question: Joi.string().required()
   })
 }
-
-createRequest.apm = true
 
 module.exports = {
   createRequest

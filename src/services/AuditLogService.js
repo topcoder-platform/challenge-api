@@ -5,8 +5,7 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const helper = require('../common/helper')
-const config = require('conig')
-const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 
 /**
  * Search audit logs
@@ -42,10 +41,8 @@ searchAuditLogs.schema = {
   })
 }
 
-searchAuditLogs.apm = true
-
 module.exports = {
   searchAuditLogs
 }
 
-logger.buildService(module.exports)
+// logger.buildService(module.exports)
