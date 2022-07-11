@@ -579,6 +579,14 @@ describe('challenge service unit tests', () => {
       should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
+    it('search challenges successfully 5 - with tco eligible events', async () => {
+      const result = await service.searchChallenges({ isMachine: true }, { tco: true })
+      should.equal(result.total, 0)
+      should.equal(result.page, 1)
+      should.equal(result.perPage, 20)
+      should.equal(result.result.length, 0)
+    })
+
     it('search challenges - invalid name', async () => {
       try {
         await service.searchChallenges({ isMachine: true }, { name: ['invalid'] })
