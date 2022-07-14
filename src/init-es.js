@@ -7,7 +7,7 @@
  * node src/init-es force
  */
 const config = require('config')
-const logger = require('./common/logger')
+const logger = require('tc-framework').logger(config)
 const helper = require('./common/helper')
 
 const client = helper.getESClient()

@@ -6,15 +6,18 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
+
+const withApm = {}
 
 /**
  * Search challenge types
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchChallengeTracks (criteria) {
+withApm.searchChallengeTracks = async function (criteria) {
   // TODO - move this to ES
   let records = helper.getFromInternalCache('ChallengeTrack')
   if (records == null) {
@@ -38,7 +41,7 @@ async function searchChallengeTracks (criteria) {
   return { total, page, perPage, result }
 }
 
-searchChallengeTracks.schema = {
+withApm.searchChallengeTracks.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.number().integer().min(1).max(100).default(100),
@@ -56,7 +59,7 @@ searchChallengeTracks.schema = {
  * @param {Object} type the challenge type to created
  * @returns {Object} the created challenge type
  */
-async function createChallengeTrack (type) {
+withApm.createChallengeTrack = async function (type) {
   await helper.validateDuplicate('ChallengeTrack', 'name', type.name)
   await helper.validateDuplicate('ChallengeTrack', 'abbreviation', type.abbreviation)
   if (type.legacyId) {
@@ -68,7 +71,7 @@ async function createChallengeTrack (type) {
   return ret
 }
 
-createChallengeTrack.schema = {
+withApm.createChallengeTrack.schema = {
   type: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
@@ -84,12 +87,12 @@ createChallengeTrack.schema = {
  * @param {String} id the challenge type id
  * @returns {Object} the challenge type with given id
  */
-async function getChallengeTrack (id) {
+withApm.getChallengeTrack = async function (id) {
   const ret = await helper.getById('ChallengeTrack', id)
   return ret
 }
 
-getChallengeTrack.schema = {
+withApm.getChallengeTrack.schema = {
   id: Joi.id()
 }
 
@@ -99,7 +102,7 @@ getChallengeTrack.schema = {
  * @param {Object} data the challenge type data to be updated
  * @returns {Object} the updated challenge type
  */
-async function fullyUpdateChallengeTrack (id, data) {
+withApm.fullyUpdateChallengeTrack = async function (id, data) {
   const type = await helper.getById('ChallengeTrack', id)
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeTrack', 'name', data.name)
@@ -125,7 +128,7 @@ async function fullyUpdateChallengeTrack (id, data) {
   return ret
 }
 
-fullyUpdateChallengeTrack.schema = {
+withApm.fullyUpdateChallengeTrack.schema = {
   id: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string().required(),
@@ -143,7 +146,7 @@ fullyUpdateChallengeTrack.schema = {
  * @param {Object} data the challenge type data to be updated
  * @returns {Object} the updated challenge type
  */
-async function partiallyUpdateChallengeTrack (id, data) {
+withApm.partiallyUpdateChallengeTrack = async function (id, data) {
   const type = await helper.getById('ChallengeTrack', id)
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeTrack', 'name', data.name)
@@ -160,7 +163,7 @@ async function partiallyUpdateChallengeTrack (id, data) {
   return ret
 }
 
-partiallyUpdateChallengeTrack.schema = {
+withApm.partiallyUpdateChallengeTrack.schema = {
   id: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string(),
@@ -172,12 +175,10 @@ partiallyUpdateChallengeTrack.schema = {
   }).required()
 }
 
-module.exports = {
-  searchChallengeTracks,
-  createChallengeTrack,
-  getChallengeTrack,
-  fullyUpdateChallengeTrack,
-  partiallyUpdateChallengeTrack
-}
+_.each(withApm, (method) => {
+  method.apm = true
+})
 
-// logger.buildService(module.exports)
+logger.buildService(withApm)
+
+module.exports = withApm

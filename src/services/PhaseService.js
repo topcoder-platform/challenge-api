@@ -6,15 +6,18 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
+
+const withApm = {}
 
 /**
  * Search phases
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchPhases (criteria) {
+withApm.searchPhases = async function (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   const list = await helper.scanAll('Phase')
@@ -25,7 +28,7 @@ async function searchPhases (criteria) {
   return { total, page, perPage, result }
 }
 
-searchPhases.schema = {
+withApm.searchPhases.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage().default(100),
@@ -38,7 +41,7 @@ searchPhases.schema = {
  * @param {Object} phase the phase to created
  * @returns {Object} the created phase
  */
-async function createPhase (phase) {
+withApm.createPhase = async function (phase) {
   await helper.validateDuplicate('Phase', 'name', phase.name)
   const ret = await helper.create('Phase', _.assign({ id: uuid() }, phase))
   // post bus event
@@ -46,7 +49,7 @@ async function createPhase (phase) {
   return ret
 }
 
-createPhase.schema = {
+withApm.createPhase.schema = {
   phase: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
@@ -60,11 +63,11 @@ createPhase.schema = {
  * @param {String} phaseId the phase id
  * @returns {Object} the phase with given id
  */
-async function getPhase (phaseId) {
+withApm.getPhase = async function (phaseId) {
   return helper.getById('Phase', phaseId)
 }
 
-getPhase.schema = {
+withApm.getPhase.schema = {
   phaseId: Joi.id()
 }
 
@@ -75,7 +78,7 @@ getPhase.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated phase
  */
-async function update (phaseId, data, isFull) {
+withApm.update = async function (phaseId, data, isFull) {
   const phase = await helper.getById('Phase', phaseId)
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
@@ -100,11 +103,11 @@ async function update (phaseId, data, isFull) {
  * @param {Object} data the phase data to be updated
  * @returns {Object} the updated phase
  */
-async function fullyUpdatePhase (phaseId, data) {
-  return update(phaseId, data, true)
+withApm.fullyUpdatePhase = async function (phaseId, data) {
+  return withApm.update(phaseId, data, true)
 }
 
-fullyUpdatePhase.schema = {
+withApm.fullyUpdatePhase.schema = {
   phaseId: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string().required(),
@@ -120,11 +123,11 @@ fullyUpdatePhase.schema = {
  * @param {Object} data the phase data to be updated
  * @returns {Object} the updated phase
  */
-async function partiallyUpdatePhase (phaseId, data) {
-  return update(phaseId, data)
+withApm.partiallyUpdatePhase = async function (phaseId, data) {
+  return withApm.update(phaseId, data)
 }
 
-partiallyUpdatePhase.schema = {
+withApm.partiallyUpdatePhase.schema = {
   phaseId: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string(),
@@ -139,7 +142,7 @@ partiallyUpdatePhase.schema = {
  * @param {String} phaseId the phase id
  * @returns {Object} the deleted phase
  */
-async function deletePhase (phaseId) {
+withApm.deletePhase = async function (phaseId) {
   const ret = await helper.getById('Phase', phaseId)
   await ret.delete()
   // post bus event
@@ -147,17 +150,14 @@ async function deletePhase (phaseId) {
   return ret
 }
 
-deletePhase.schema = {
+withApm.deletePhase.schema = {
   phaseId: Joi.id()
 }
 
-module.exports = {
-  searchPhases,
-  createPhase,
-  getPhase,
-  fullyUpdatePhase,
-  partiallyUpdatePhase,
-  deletePhase
-}
+_.each(withApm, (method) => {
+  method.apm = true
+})
 
-// logger.buildService(module.exports)
+logger.buildService(withApm)
+
+module.exports = withApm

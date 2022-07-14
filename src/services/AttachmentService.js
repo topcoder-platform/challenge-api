@@ -11,11 +11,13 @@ const errors = require('../common/errors')
 const helper = require('../common/helper')
 const s3ParseUrl = require('../common/s3ParseUrl')
 const models = require('../models')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 const challengeService = require('./ChallengeService')
 
 const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(',').map((bucketName) => bucketName.trim())
+
+const withApm = {}
 
 /**
  * Check if a url is acceptable.
@@ -40,7 +42,7 @@ function validateUrl (url) {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the challenge and the attachment
  */
-async function _getChallengeAttachment (challengeId, attachmentId) {
+withApm._getChallengeAttachment = async function (challengeId, attachmentId) {
   const challenge = await helper.getById('Challenge', challengeId)
   const attachment = await models.Attachment.get(attachmentId)
   if (!attachment || attachment.challengeId !== challengeId) {
@@ -55,7 +57,7 @@ async function _getChallengeAttachment (challengeId, attachmentId) {
  * @param {Array} attachments the attachments to be created
  * @returns {Object} the created attachment
  */
-async function createAttachment (currentUser, challengeId, attachments) {
+withApm.createAttachment = async function (currentUser, challengeId, attachments) {
   const challenge = await helper.getById('Challenge', challengeId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   const newAttachments = []
@@ -77,7 +79,7 @@ async function createAttachment (currentUser, challengeId, attachments) {
   return newAttachments
 }
 
-createAttachment.schema = {
+withApm.createAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachments: Joi.array().items(Joi.object().keys({
@@ -94,13 +96,13 @@ createAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the attachment with given id
  */
-async function getAttachment (currentUser, challengeId, attachmentId) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+withApm.getAttachment = async function (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await withApm._getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
   return attachment
 }
 
-getAttachment.schema = {
+withApm.getAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
@@ -114,8 +116,8 @@ getAttachment.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated attachment
  */
-async function update (currentUser, challengeId, attachmentId, data, isFull) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+withApm.update = async function (currentUser, challengeId, attachmentId, data, isFull) {
+  const { challenge, attachment } = await withApm._getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   validateUrl(data.url)
 
@@ -149,11 +151,11 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
  * @param {Object} data the attachment data to be updated
  * @returns {Object} the updated attachment
  */
-async function fullyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
-  return update(currentUser, challengeId, attachmentId, data, true)
+withApm.fullyUpdateAttachment = async function (currentUser, challengeId, attachmentId, data) {
+  return withApm.update(currentUser, challengeId, attachmentId, data, true)
 }
 
-fullyUpdateAttachment.schema = {
+withApm.fullyUpdateAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id(),
@@ -172,11 +174,11 @@ fullyUpdateAttachment.schema = {
  * @param {Object} data the attachment data to be updated
  * @returns {Object} the updated attachment
  */
-async function partiallyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
-  return update(currentUser, challengeId, attachmentId, data)
+withApm.partiallyUpdateAttachment = async function (currentUser, challengeId, attachmentId, data) {
+  return withApm.update(currentUser, challengeId, attachmentId, data)
 }
 
-partiallyUpdateAttachment.schema = {
+withApm.partiallyUpdateAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id(),
@@ -193,8 +195,8 @@ partiallyUpdateAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the deleted attachment
  */
-async function deleteAttachment (currentUser, challengeId, attachmentId) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+withApm.deleteAttachment = async function (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await withApm._getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   const s3UrlObject = s3ParseUrl(attachment.url)
   if (s3UrlObject) {
@@ -216,7 +218,7 @@ async function deleteAttachment (currentUser, challengeId, attachmentId) {
   return attachment
 }
 
-deleteAttachment.schema = {
+withApm.deleteAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
@@ -228,8 +230,8 @@ deleteAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Promise<Object>} the downloaded attachment data
  */
-async function downloadAttachment (currentUser, challengeId, attachmentId) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
+withApm.downloadAttachment = async function (currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await withApm._getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
   const s3UrlObject = s3ParseUrl(attachment.url)
   if (s3UrlObject) {
@@ -243,19 +245,16 @@ async function downloadAttachment (currentUser, challengeId, attachmentId) {
   return data
 }
 
-downloadAttachment.schema = {
+withApm.downloadAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id()
 }
 
-module.exports = {
-  createAttachment,
-  getAttachment,
-  fullyUpdateAttachment,
-  partiallyUpdateAttachment,
-  deleteAttachment,
-  downloadAttachment
-}
+_.each(withApm, (method) => {
+  method.apm = true
+})
 
-logger.buildService(module.exports)
+logger.buildService(withApm)
+
+module.exports = withApm

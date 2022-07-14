@@ -4,7 +4,7 @@
 
 const helper = require('../common/helper')
 const config = require('config')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 
 const esClient = helper.getESClient()
 

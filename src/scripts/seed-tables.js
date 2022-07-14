@@ -4,7 +4,8 @@
 
 const { get, includes } = require('lodash')
 const models = require('../models')
-const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 
 logger.info('Requesting to insert seed data to the tables...')
 

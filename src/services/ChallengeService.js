@@ -8,7 +8,7 @@ const uuid = require('uuid/v4')
 const config = require('config')
 const xss = require('xss')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 const models = require('../models')
@@ -20,6 +20,7 @@ const ChallengeTrackService = require('./ChallengeTrackService')
 const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateService')
 
 const esClient = helper.getESClient()
+const withApm = {}
 
 /**
  * Check if user can perform modification/deletion to a challenge
@@ -28,7 +29,7 @@ const esClient = helper.getESClient()
  * @param {Object} challenge the challenge object
  * @returns {undefined}
  */
-async function ensureAccessibleForChallenge (user, challenge) {
+withApm.ensureAccessibleForChallenge = async function (user, challenge) {
   const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId)
   if (!user.isMachine && !helper.hasAdminRole(user) && challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() && !userHasFullAccess) {
     throw new errors.ForbiddenError(`Only M2M, admin, challenge's copilot or users with full access can perform modification.`)
@@ -41,7 +42,7 @@ async function ensureAccessibleForChallenge (user, challenge) {
  * @param {Array} challenges the challenges to filter
  * @returns {Array} the challenges that can be accessed by current user
  */
-async function filterChallengesByGroupsAccess (currentUser, challenges) {
+withApm.filterChallengesByGroupsAccess = async function (currentUser, challenges) {
   const res = []
   let userGroups
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
@@ -85,8 +86,8 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to check
  */
-async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
-  const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge])
+withApm.ensureAccessibleByGroupsAccess = async function (currentUser, challenge) {
+  const filtered = await withApm.filterChallengesByGroupsAccess(currentUser, [challenge])
   if (filtered.length === 0) {
     throw new errors.ForbiddenError(`ensureAccessibleByGroupsAccess :: You don't have access to this group!
       Current User: ${JSON.stringify(currentUser)}
@@ -102,7 +103,7 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  * @param {Object} data the challenge data to be updated
  * @param {String} challenge the original challenge data
  */
-async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge) {
+withApm.ensureAcessibilityToModifiedGroups = async function (currentUser, data, challenge) {
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
   if (!needToCheckForGroupAccess) {
     return
@@ -122,7 +123,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchChallenges (currentUser, criteria) {
+withApm.searchChallenges = async function (currentUser, criteria) {
   // construct ES query
 
   const page = criteria.page || 1
@@ -723,7 +724,7 @@ async function searchChallenges (currentUser, criteria) {
     element.type = typeMap.get(element.typeId) || 'Code'
   })
   _.each(result, async element => {
-    await getPhasesAndPopulate(element)
+    await withApm.getPhasesAndPopulate(element)
     if (element.status !== constants.challengeStatuses.Completed) {
       _.unset(element, 'winners')
     }
@@ -732,7 +733,7 @@ async function searchChallenges (currentUser, criteria) {
   return { total, page, perPage, result }
 }
 
-searchChallenges.schema = {
+withApm.searchChallenges.schema = {
   currentUser: Joi.any(),
   criteria: Joi.object().keys({
     page: Joi.page(),
@@ -804,7 +805,7 @@ searchChallenges.schema = {
  * Validate the challenge data.
  * @param {Object} challenge the challenge data
  */
-async function validateChallengeData (challenge) {
+withApm.validateChallengeData = async function (challenge) {
   let type
   let track
   if (challenge.typeId) {
@@ -844,7 +845,7 @@ async function validateChallengeData (challenge) {
  * @param {Date} startDate the challenge start date
  * @param {String} timelineTemplateId the timeline template id
  */
-async function populatePhases (phases, startDate, timelineTemplateId) {
+withApm.populatePhases = async function (phases, startDate, timelineTemplateId) {
   if (_.isUndefined(timelineTemplateId)) {
     throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
   }
@@ -941,7 +942,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * @param {String} userToken the user token
  * @returns {Object} the created challenge
  */
-async function createChallenge (currentUser, challenge, userToken) {
+withApm.createChallenge = async function (currentUser, challenge, userToken) {
   try {
     if (challenge.legacy.selfService) {
       if (!challenge.projectId) {
@@ -979,7 +980,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   if (_.get(challenge, 'legacy.pureV5Task') || _.get(challenge, 'legacy.pureV5')) {
     _.set(challenge, 'legacy.directProjectId', directProjectId)
   }
-  const { track, type } = await validateChallengeData(challenge)
+  const { track, type } = await withApm.validateChallengeData(challenge)
   const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(challenge, 'billing.billingAccountId', billingAccountId)
@@ -1035,7 +1036,7 @@ async function createChallenge (currentUser, challenge, userToken) {
     if (!challenge.phases) {
       challenge.phases = []
     }
-    await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
+    await withApm.populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
   }
 
   // populate challenge terms
@@ -1124,7 +1125,7 @@ async function createChallenge (currentUser, challenge, userToken) {
   return ret
 }
 
-createChallenge.schema = {
+withApm.createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object().keys({
     typeId: Joi.id(),
@@ -1206,7 +1207,7 @@ createChallenge.schema = {
  * Populate phase data from phase API.
  * @param {Object} the challenge entity
  */
-async function getPhasesAndPopulate (data) {
+withApm.getPhasesAndPopulate = async function (data) {
   _.each(data.phases, async p => {
     const phase = await PhaseService.getPhase(p.phaseId)
     p.name = phase.name
@@ -1222,7 +1223,7 @@ async function getPhasesAndPopulate (data) {
  * @param {String} id the challenge id
  * @returns {Object} the challenge with given id
  */
-async function getChallenge (currentUser, id) {
+withApm.getChallenge = async function (currentUser, id) {
   // get challenge from Elasticsearch
   let challenge
   // logger.warn(JSON.stringify({
@@ -1275,7 +1276,7 @@ async function getChallenge (currentUser, id) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    await getPhasesAndPopulate(challenge)
+    await withApm.getPhasesAndPopulate(challenge)
   }
 
   if (challenge.status !== constants.challengeStatuses.Completed) {
@@ -1285,7 +1286,7 @@ async function getChallenge (currentUser, id) {
   return challenge
 }
 
-getChallenge.schema = {
+withApm.getChallenge.schema = {
   currentUser: Joi.any(),
   id: Joi.id()
 }
@@ -1296,8 +1297,8 @@ getChallenge.schema = {
  * @param {String} id the challenge id
  * @returns {Object} the challenge with given id
  */
-async function getChallengeStatistics (currentUser, id) {
-  const challenge = await getChallenge(currentUser, id)
+withApm.getChallengeStatistics = async function (currentUser, id) {
+  const challenge = await withApm.getChallenge(currentUser, id)
   // for now, only Data Science challenges are supported
   if (challenge.type !== 'Challenge' && challenge.track !== 'Data Science') {
     throw new errors.BadRequestError(`Challenge of type ${challenge.type} and track ${challenge.track} does not support statistics`)
@@ -1328,7 +1329,7 @@ async function getChallengeStatistics (currentUser, id) {
   return _.map(_.keys(map), (userId) => map[userId])
 }
 
-getChallengeStatistics.schema = {
+withApm.getChallengeStatistics.schema = {
   currentUser: Joi.any(),
   id: Joi.id()
 }
@@ -1339,7 +1340,7 @@ getChallengeStatistics.schema = {
  * @param {Array} otherPrizeSets the second PrizeSet Array
  * @returns {Boolean} true if different, false otherwise
  */
-function isDifferentPrizeSets (prizeSets = [], otherPrizeSets = []) {
+withApm.isDifferentPrizeSets = function (prizeSets = [], otherPrizeSets = []) {
   return !_.isEqual(_.sortBy(prizeSets, 'type'), _.sortBy(otherPrizeSets, 'type'))
 }
 
@@ -1348,7 +1349,7 @@ function isDifferentPrizeSets (prizeSets = [], otherPrizeSets = []) {
  * @param {Array} winners the Winner Array
  * @param {String} winchallengeIdners the challenge ID
  */
-async function validateWinners (winners, challengeId) {
+withApm.validateWinners = async function (winners, challengeId) {
   const challengeResources = await helper.getChallengeResources(challengeId)
   const registrants = _.filter(challengeResources, r => r.roleId === config.SUBMITTER_ROLE_ID)
   for (const prizeType of _.values(constants.prizeSetTypes)) {
@@ -1385,7 +1386,7 @@ async function validateWinners (winners, challengeId) {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update (currentUser, challengeId, data, isFull) {
+withApm.update = async function (currentUser, challengeId, data, isFull) {
   const cancelReason = _.cloneDeep(data.cancelReason)
   let sendActivationEmail = false
   let sendSubmittedEmail = false
@@ -1425,7 +1426,7 @@ async function update (currentUser, challengeId, data, isFull) {
         sendActivationEmail = true
       }
     } catch (e) {
-      await update(
+      await withApm.update(
         currentUser,
         challengeId,
         {
@@ -1508,14 +1509,14 @@ async function update (currentUser, challengeId, data, isFull) {
 
   // check groups access to be updated group values
   if (data.groups) {
-    await ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
+    await withApm.ensureAcessibilityToModifiedGroups(currentUser, data, challenge)
   }
   let newAttachments
   if (isFull || !_.isUndefined(data.attachments)) {
     newAttachments = data.attachments
   }
 
-  await ensureAccessibleForChallenge(currentUser, challenge)
+  await withApm.ensureAccessibleForChallenge(currentUser, challenge)
 
   // Only M2M can update url and options of discussions
   if (data.discussions && data.discussions.length > 0) {
@@ -1566,7 +1567,7 @@ async function update (currentUser, challengeId, data, isFull) {
     newTermsOfUse = await helper.validateChallengeTerms(data.terms)
   }
 
-  await validateChallengeData(data)
+  await withApm.validateChallengeData(data)
   if ((challenge.status === constants.challengeStatuses.Completed || challenge.status === constants.challengeStatuses.Cancelled) && data.status && (data.status !== challenge.status && data.status !== constants.challengeStatuses.CancelledClientRequest)) {
     throw new errors.BadRequestError(`Cannot change ${challenge.status} challenge status to ${data.status} status`)
   }
@@ -1588,7 +1589,7 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   if (data.prizeSets) {
-    if (isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) && finalStatus === constants.challengeStatuses.Completed) {
+    if (withApm.isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) && finalStatus === constants.challengeStatuses.Completed) {
       throw new errors.BadRequestError(`Cannot update prizeSets for challenges with status: ${finalStatus}!`)
     }
     const prizeSetsGroup = _.groupBy(data.prizeSets, 'type')
@@ -1621,7 +1622,7 @@ async function update (currentUser, challengeId, data, isFull) {
     await helper.validatePhases(newPhases)
     // populate phases
 
-    await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    await withApm.populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.phases = newPhases
     challenge.phases = newPhases
     data.startDate = newStartDate
@@ -1640,7 +1641,7 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
-    await validateWinners(data.winners, challengeId)
+    await withApm.validateWinners(data.winners, challengeId)
   }
 
   data.updated = moment().utc()
@@ -1661,7 +1662,7 @@ async function update (currentUser, challengeId, data, isFull) {
       logger.info('update phases')
       op = '$PUT'
     } else if (key === 'prizeSets') {
-      if (isDifferentPrizeSets(challenge[key], value)) {
+      if (withApm.isDifferentPrizeSets(challenge[key], value)) {
         logger.info('update prize sets')
         op = '$PUT'
       }
@@ -1840,7 +1841,7 @@ async function update (currentUser, challengeId, data, isFull) {
     data.winners = null
   }
 
-  const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
+  const { track, type } = await withApm.validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
   if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
@@ -1882,7 +1883,7 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    await getPhasesAndPopulate(challenge)
+    await withApm.getPhasesAndPopulate(challenge)
   }
 
   // Populate challenge.track and challenge.type based on the track/type IDs
@@ -1984,8 +1985,8 @@ async function update (currentUser, challengeId, data, isFull) {
  * @param {Object} currentUser the current use
  * @param {String} challengeId the challenge id
  */
-async function sendNotifications (currentUser, challengeId) {
-  const challenge = await getChallenge(currentUser, challengeId)
+withApm.sendNotifications = async function (currentUser, challengeId) {
+  const challenge = await withApm.getChallenge(currentUser, challengeId)
   const creator = await helper.getMemberByHandle(challenge.createdBy)
   if (challenge.status === constants.challengeStatuses.Completed) {
     await helper.sendSelfServiceNotification(
@@ -2001,7 +2002,7 @@ async function sendNotifications (currentUser, challengeId) {
   }
 }
 
-sendNotifications.schema = {
+withApm.sendNotifications.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id()
 }
@@ -2010,7 +2011,7 @@ sendNotifications.schema = {
  * Remove unwanted properties from the challenge object
  * @param {Object} challenge the challenge object
  */
-function sanitizeChallenge (challenge) {
+withApm.sanitizeChallenge = function (challenge) {
   const sanitized = _.pick(challenge, [
     'trackId',
     'typeId',
@@ -2098,11 +2099,11 @@ function sanitizeChallenge (challenge) {
  * @param {Object} data the challenge data to be updated
  * @returns {Object} the updated challenge
  */
-async function fullyUpdateChallenge (currentUser, challengeId, data) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), true)
+withApm.fullyUpdateChallenge = async function (currentUser, challengeId, data) {
+  return withApm.update(currentUser, challengeId, withApm.sanitizeChallenge(data), true)
 }
 
-fullyUpdateChallenge.schema = {
+withApm.fullyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   data: Joi.object().keys({
@@ -2205,11 +2206,11 @@ fullyUpdateChallenge.schema = {
  * @param {Object} data the challenge data to be updated
  * @returns {Object} the updated challenge
  */
-async function partiallyUpdateChallenge (currentUser, challengeId, data) {
-  return update(currentUser, challengeId, sanitizeChallenge(data))
+withApm.partiallyUpdateChallenge = async function (currentUser, challengeId, data) {
+  return withApm.update(currentUser, challengeId, withApm.sanitizeChallenge(data))
 }
 
-partiallyUpdateChallenge.schema = {
+withApm.partiallyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   data: Joi.object().keys({
@@ -2308,15 +2309,15 @@ partiallyUpdateChallenge.schema = {
  * @param {String} challengeId the challenge id
  * @returns {Object} the deleted challenge
  */
-async function deleteChallenge (currentUser, challengeId) {
+withApm.deleteChallenge = async function (currentUser, challengeId) {
   const challenge = await helper.getById('Challenge', challengeId)
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(`Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`)
   }
   // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge)
+  await withApm.ensureAccessibleByGroupsAccess(currentUser, challenge)
   // check if user are allowed to delete the challenge
-  await ensureAccessibleForChallenge(currentUser, challenge)
+  await withApm.ensureAccessibleForChallenge(currentUser, challenge)
   // delete DB record
   await models.Challenge.delete(challenge)
   // delete ES document
@@ -2330,20 +2331,15 @@ async function deleteChallenge (currentUser, challengeId) {
   return challenge
 }
 
-deleteChallenge.schema = {
+withApm.deleteChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id()
 }
 
-module.exports = {
-  searchChallenges,
-  createChallenge,
-  getChallenge,
-  fullyUpdateChallenge,
-  partiallyUpdateChallenge,
-  deleteChallenge,
-  getChallengeStatistics,
-  sendNotifications
-}
+_.each(withApm, (method) => {
+  method.apm = true
+})
 
-logger.buildService(module.exports)
+logger.buildService(withApm)
+
+module.exports = withApm

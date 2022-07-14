@@ -4,7 +4,8 @@
 
 const models = require('../models')
 const { includes } = require('lodash')
-const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 
 logger.info('Requesting to create tables...')
 

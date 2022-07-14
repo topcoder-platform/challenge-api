@@ -3,7 +3,8 @@
  */
 const HttpStatus = require('http-status-codes')
 const service = require('../services/SupportService')
-const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 
 /**
  * Create challenge
