@@ -2341,6 +2341,6 @@ _.each(withApm, (method) => {
   delete method.schema
 })
 
-logger.buildService(withApm)
-
 module.exports = withApm
+
+logger.buildService(withApm)

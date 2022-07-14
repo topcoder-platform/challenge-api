@@ -1261,8 +1261,6 @@ _.each(withApm, (method) => {
   method.apm = true
 })
 
-logger.buildService(withApm)
-
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1281,3 +1279,5 @@ module.exports = {
   // Methods with APM
   ...withApm
 }
+
+logger.buildService(withApm)
