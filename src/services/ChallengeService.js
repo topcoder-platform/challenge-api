@@ -8,7 +8,7 @@ const uuid = require('uuid/v4')
 const config = require('config')
 const xss = require('xss')
 const helper = require('../common/helper')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 const models = require('../models')
@@ -1223,6 +1223,7 @@ async function getPhasesAndPopulate (data) {
  * @returns {Object} the challenge with given id
  */
 async function getChallenge (currentUser, id) {
+  const span = await logger.startSpan('ChallengeService.getChallenge')
   // get challenge from Elasticsearch
   let challenge
   // logger.warn(JSON.stringify({
@@ -1238,7 +1239,9 @@ async function getChallenge (currentUser, id) {
     })
   } catch (e) {
     if (e.statusCode === HttpStatus.NOT_FOUND) {
-      throw new errors.NotFoundError(`Challenge of id ${id} is not found.`)
+      const error = new errors.NotFoundError(`Challenge of id ${id} is not found.`)
+      await logger.endSpanWithError(span, error)
+      throw error
     } else {
       throw e
     }
@@ -1281,6 +1284,8 @@ async function getChallenge (currentUser, id) {
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, 'winners')
   }
+
+  await logger.endSpan(span)
 
   return challenge
 }

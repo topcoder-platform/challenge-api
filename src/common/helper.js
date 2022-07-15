@@ -18,7 +18,7 @@ const elasticsearch = require('elasticsearch')
 const NodeCache = require('node-cache')
 const HttpStatus = require('http-status-codes')
 const xss = require('xss')
-const logger = require('./logger')
+const logger = require('tc-framework').logger(config)
 
 // Bus API Client
 let busApiClient
@@ -884,6 +884,7 @@ function calculateChallengeEndDate (challenge, data) {
  * @returns {Promise<Array>} an array of challenge ids represents challenges that given member has access to.
  */
 async function listChallengesByMember (memberId) {
+  const span = await logger.startSpan('helper.listChallengesByMember')
   const token = await getM2MToken()
   let allIds = []
   // get search is paginated, we need to get all pages' data
@@ -906,6 +907,7 @@ async function listChallengesByMember (memberId) {
       break
     }
   }
+  await logger.endSpan(span)
   return allIds
 }
 
