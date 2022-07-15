@@ -225,4 +225,3 @@ Refer to the verification document `Verification.md`
 
 - In the app-constants.js Topics field, the used topics are using a test topic,
   the suggested ones are commented out, because these topics are not created in TC dev Kafka yet.
-
