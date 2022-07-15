@@ -2338,7 +2338,6 @@ withApm.deleteChallenge.schema = {
 
 _.each(withApm, (method) => {
   method.apm = true
-  delete method.schema
 })
 
 logger.buildService(withApm)

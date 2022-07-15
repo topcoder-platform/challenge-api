@@ -156,7 +156,6 @@ withApm.partiallyUpdateChallengeType.schema = {
 
 _.each(withApm, (method) => {
   method.apm = true
-  delete method.schema
 })
 
 logger.buildService(withApm)
