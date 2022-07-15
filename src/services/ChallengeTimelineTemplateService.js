@@ -6,19 +6,16 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
-
-const withApm = {}
 
 /**
  * Search challenge type timeline templates.
  * @param {Object} criteria the search criteria
  * @returns {Array} the search result
  */
-withApm.searchChallengeTimelineTemplates = async function (criteria) {
+async function searchChallengeTimelineTemplates (criteria) {
   let records = await helper.scanAll('ChallengeTimelineTemplate')
   if (criteria.typeId) records = _.filter(records, e => (criteria.typeId === e.typeId))
   if (criteria.trackId) records = _.filter(records, e => (criteria.trackId === e.trackId))
@@ -32,7 +29,7 @@ withApm.searchChallengeTimelineTemplates = async function (criteria) {
   }
 }
 
-withApm.searchChallengeTimelineTemplates.schema = {
+searchChallengeTimelineTemplates.schema = {
   criteria: Joi.object().keys({
     typeId: Joi.optionalId(),
     trackId: Joi.optionalId(),
@@ -46,13 +43,13 @@ withApm.searchChallengeTimelineTemplates.schema = {
  * @param {String} typeId the type ID
  * @param {String} trackId the track ID
  */
-withApm.unsetDefaultTimelineTemplate = async function (typeId, trackId) {
-  const records = await withApm.searchChallengeTimelineTemplates({ typeId, trackId, isDefault: true })
+async function unsetDefaultTimelineTemplate (typeId, trackId) {
+  const records = await searchChallengeTimelineTemplates({ typeId, trackId, isDefault: true })
   if (records.total === 0) {
     return
   }
   for (const record of records.result) {
-    await withApm.fullyUpdateChallengeTimelineTemplate(record.id, { ...record, isDefault: false })
+    await fullyUpdateChallengeTimelineTemplate(record.id, { ...record, isDefault: false })
   }
 }
 
@@ -61,9 +58,9 @@ withApm.unsetDefaultTimelineTemplate = async function (typeId, trackId) {
  * @param {Object} data the data to create challenge type timeline template
  * @returns {Object} the created challenge type timeline template
  */
-withApm.createChallengeTimelineTemplate = async function (data) {
+async function createChallengeTimelineTemplate (data) {
   // check duplicate
-  const records = await withApm.searchChallengeTimelineTemplates(data)
+  const records = await searchChallengeTimelineTemplates(data)
   if (records.total > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
@@ -73,7 +70,7 @@ withApm.createChallengeTimelineTemplate = async function (data) {
   await helper.getById('TimelineTemplate', data.timelineTemplateId)
 
   if (data.isDefault) {
-    await withApm.unsetDefaultTimelineTemplate(data.typeId, data.trackId)
+    await unsetDefaultTimelineTemplate(data.typeId, data.trackId)
   }
 
   const ret = await helper.create('ChallengeTimelineTemplate', _.assign({ id: uuid() }, data))
@@ -82,7 +79,7 @@ withApm.createChallengeTimelineTemplate = async function (data) {
   return ret
 }
 
-withApm.createChallengeTimelineTemplate.schema = {
+createChallengeTimelineTemplate.schema = {
   data: Joi.object().keys({
     typeId: Joi.id(),
     trackId: Joi.id(),
@@ -96,11 +93,11 @@ withApm.createChallengeTimelineTemplate.schema = {
  * @param {String} challengeTimelineTemplateId the challenge type timeline template id
  * @returns {Object} the challenge type timeline template with given id
  */
-withApm.getChallengeTimelineTemplate = async function (challengeTimelineTemplateId) {
+async function getChallengeTimelineTemplate (challengeTimelineTemplateId) {
   return helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
 }
 
-withApm.getChallengeTimelineTemplate.schema = {
+getChallengeTimelineTemplate.schema = {
   challengeTimelineTemplateId: Joi.id()
 }
 
@@ -110,7 +107,7 @@ withApm.getChallengeTimelineTemplate.schema = {
  * @param {Object} data the challenge type timeline template data to be updated
  * @returns {Object} the updated challenge type timeline template
  */
-withApm.fullyUpdateChallengeTimelineTemplate = async function (challengeTimelineTemplateId, data) {
+async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId, data) {
   const record = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
   if (record.typeId === data.typeId &&
     record.trackId === data.trackId &&
@@ -121,7 +118,7 @@ withApm.fullyUpdateChallengeTimelineTemplate = async function (challengeTimeline
   }
 
   // check duplicate
-  const records = await withApm.searchChallengeTimelineTemplates(data)
+  const records = await searchChallengeTimelineTemplates(data)
   if (records.total > 0) {
     throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
@@ -131,7 +128,7 @@ withApm.fullyUpdateChallengeTimelineTemplate = async function (challengeTimeline
   await helper.getById('TimelineTemplate', data.timelineTemplateId)
 
   if (data.isDefault) {
-    await withApm.unsetDefaultTimelineTemplate(data.typeId, data.trackId)
+    await unsetDefaultTimelineTemplate(data.typeId, data.trackId)
   }
 
   const ret = await helper.update(record, data)
@@ -140,9 +137,9 @@ withApm.fullyUpdateChallengeTimelineTemplate = async function (challengeTimeline
   return ret
 }
 
-withApm.fullyUpdateChallengeTimelineTemplate.schema = {
+fullyUpdateChallengeTimelineTemplate.schema = {
   challengeTimelineTemplateId: Joi.id(),
-  data: withApm.createChallengeTimelineTemplate.schema.data
+  data: createChallengeTimelineTemplate.schema.data
 }
 
 /**
@@ -150,7 +147,7 @@ withApm.fullyUpdateChallengeTimelineTemplate.schema = {
  * @param {String} challengeTimelineTemplateId the challenge type timeline template id
  * @returns {Object} the deleted challenge type timeline template
  */
-withApm.deleteChallengeTimelineTemplate = async function (challengeTimelineTemplateId) {
+async function deleteChallengeTimelineTemplate (challengeTimelineTemplateId) {
   const ret = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
   await ret.delete()
   // post bus event
@@ -158,14 +155,16 @@ withApm.deleteChallengeTimelineTemplate = async function (challengeTimelineTempl
   return ret
 }
 
-withApm.deleteChallengeTimelineTemplate.schema = {
+deleteChallengeTimelineTemplate.schema = {
   challengeTimelineTemplateId: Joi.id()
 }
 
-_.each(withApm, (method) => {
-  method.apm = true
-})
+module.exports = {
+  searchChallengeTimelineTemplates,
+  createChallengeTimelineTemplate,
+  getChallengeTimelineTemplate,
+  fullyUpdateChallengeTimelineTemplate,
+  deleteChallengeTimelineTemplate
+}
 
-logger.buildService(withApm)
-
-module.exports = withApm
+// logger.buildService(module.exports)

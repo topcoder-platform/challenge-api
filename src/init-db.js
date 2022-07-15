@@ -2,8 +2,7 @@
  * Initialize database tables. All data will be cleared.
  */
 require('../app-bootstrap')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+const logger = require('./common/logger')
 const helper = require('./common/helper')
 
 logger.info('Initialize database.')

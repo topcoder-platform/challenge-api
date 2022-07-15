@@ -5,17 +5,14 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
-
-const withApm = {}
+// const logger = require('../common/logger')
 
 /**
  * Search audit logs
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-withApm.searchAuditLogs = async function (criteria) {
+async function searchAuditLogs (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   let records = await helper.scanAll('AuditLog')
@@ -32,7 +29,7 @@ withApm.searchAuditLogs = async function (criteria) {
   return { total, page, perPage, result }
 }
 
-withApm.searchAuditLogs.schema = {
+searchAuditLogs.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage(),
@@ -44,10 +41,8 @@ withApm.searchAuditLogs.schema = {
   })
 }
 
-_.each(withApm, (method) => {
-  method.apm = true
-})
+module.exports = {
+  searchAuditLogs
+}
 
-logger.buildService(withApm)
-
-module.exports = withApm
+// logger.buildService(module.exports)

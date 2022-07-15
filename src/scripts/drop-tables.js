@@ -4,8 +4,7 @@
 
 const models = require('../models')
 const { includes } = require('lodash')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+const logger = require('../common/logger')
 
 logger.info('Requesting to delete tables...')
 

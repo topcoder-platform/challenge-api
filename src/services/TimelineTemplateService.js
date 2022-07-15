@@ -6,18 +6,15 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 const constants = require('../../app-constants')
-
-const withApm = {}
 
 /**
  * Search timeline templates.
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-withApm.searchTimelineTemplates = async function (criteria) {
+async function searchTimelineTemplates (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   const list = await helper.scanAll('TimelineTemplate')
@@ -28,7 +25,7 @@ withApm.searchTimelineTemplates = async function (criteria) {
   return { total, page, perPage, result }
 }
 
-withApm.searchTimelineTemplates.schema = {
+searchTimelineTemplates.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage(),
@@ -41,7 +38,7 @@ withApm.searchTimelineTemplates.schema = {
  * @param {Object} timelineTemplate the timeline template to created
  * @returns {Object} the created timeline template
  */
-withApm.createTimelineTemplate = async function (timelineTemplate) {
+async function createTimelineTemplate (timelineTemplate) {
   await helper.validateDuplicate('TimelineTemplate', 'name', timelineTemplate.name)
   await helper.validatePhases(timelineTemplate.phases)
 
@@ -51,7 +48,7 @@ withApm.createTimelineTemplate = async function (timelineTemplate) {
   return ret
 }
 
-withApm.createTimelineTemplate.schema = {
+createTimelineTemplate.schema = {
   timelineTemplate: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
@@ -69,11 +66,11 @@ withApm.createTimelineTemplate.schema = {
  * @param {String} timelineTemplateId the timeline template id
  * @returns {Object} the timeline template with given id
  */
-withApm.getTimelineTemplate = async function (timelineTemplateId) {
+async function getTimelineTemplate (timelineTemplateId) {
   return helper.getById('TimelineTemplate', timelineTemplateId)
 }
 
-withApm.getTimelineTemplate.schema = {
+getTimelineTemplate.schema = {
   timelineTemplateId: Joi.id()
 }
 
@@ -84,7 +81,7 @@ withApm.getTimelineTemplate.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated timeline template
  */
-withApm.update = async function (timelineTemplateId, data, isFull) {
+async function update (timelineTemplateId, data, isFull) {
   const timelineTemplate = await helper.getById('TimelineTemplate', timelineTemplateId)
 
   if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
@@ -113,11 +110,11 @@ withApm.update = async function (timelineTemplateId, data, isFull) {
  * @param {Object} data the timeline template data to be updated
  * @returns {Object} the updated timeline template
  */
-withApm.fullyUpdateTimelineTemplate = async function (timelineTemplateId, data) {
-  return withApm.update(timelineTemplateId, data, true)
+async function fullyUpdateTimelineTemplate (timelineTemplateId, data) {
+  return update(timelineTemplateId, data, true)
 }
 
-withApm.fullyUpdateTimelineTemplate.schema = {
+fullyUpdateTimelineTemplate.schema = {
   timelineTemplateId: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string().required(),
@@ -137,11 +134,11 @@ withApm.fullyUpdateTimelineTemplate.schema = {
  * @param {Object} data the timeline template data to be updated
  * @returns {Object} the updated timeline template
  */
-withApm.partiallyUpdateTimelineTemplate = async function (timelineTemplateId, data) {
-  return withApm.update(timelineTemplateId, data)
+async function partiallyUpdateTimelineTemplate (timelineTemplateId, data) {
+  return update(timelineTemplateId, data)
 }
 
-withApm.partiallyUpdateTimelineTemplate.schema = {
+partiallyUpdateTimelineTemplate.schema = {
   timelineTemplateId: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string(),
@@ -160,7 +157,7 @@ withApm.partiallyUpdateTimelineTemplate.schema = {
  * @param {String} timelineTemplateId the timeline template id
  * @returns {Object} the deleted timeline template
  */
-withApm.deleteTimelineTemplate = async function (timelineTemplateId) {
+async function deleteTimelineTemplate (timelineTemplateId) {
   const ret = await helper.getById('TimelineTemplate', timelineTemplateId)
   await ret.delete()
   // post bus event
@@ -168,14 +165,17 @@ withApm.deleteTimelineTemplate = async function (timelineTemplateId) {
   return ret
 }
 
-withApm.deleteTimelineTemplate.schema = {
+deleteTimelineTemplate.schema = {
   timelineTemplateId: Joi.id()
 }
 
-_.each(withApm, (method) => {
-  method.apm = true
-})
+module.exports = {
+  searchTimelineTemplates,
+  createTimelineTemplate,
+  getTimelineTemplate,
+  fullyUpdateTimelineTemplate,
+  partiallyUpdateTimelineTemplate,
+  deleteTimelineTemplate
+}
 
-logger.buildService(withApm)
-
-module.exports = withApm
+// logger.buildService(module.exports)

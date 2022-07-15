@@ -1,5 +1,5 @@
 // const config = require('config')
-// const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 // const helper = require('../common/helper')
 
 // const esClient = helper.getESClient()

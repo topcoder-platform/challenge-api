@@ -6,18 +6,14 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
-
-const withApm = {}
 
 /**
  * Search challenge types
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-withApm.searchChallengeTypes = async function (criteria) {
+async function searchChallengeTypes (criteria) {
   // TODO - move this to ES
   let records = helper.getFromInternalCache('ChallengeType')
   if (records == null) {
@@ -39,7 +35,7 @@ withApm.searchChallengeTypes = async function (criteria) {
   return { total, page, perPage, result }
 }
 
-withApm.searchChallengeTypes.schema = {
+searchChallengeTypes.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.number().integer().min(1).max(100).default(100),
@@ -56,7 +52,7 @@ withApm.searchChallengeTypes.schema = {
  * @param {Object} type the challenge type to created
  * @returns {Object} the created challenge type
  */
-withApm.createChallengeType = async function (type) {
+async function createChallengeType (type) {
   await helper.validateDuplicate('ChallengeType', 'name', type.name)
   await helper.validateDuplicate('ChallengeType', 'abbreviation', type.abbreviation)
   const ret = await helper.create('ChallengeType', _.assign({ id: uuid() }, type))
@@ -65,7 +61,7 @@ withApm.createChallengeType = async function (type) {
   return ret
 }
 
-withApm.createChallengeType.schema = {
+createChallengeType.schema = {
   type: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
@@ -80,12 +76,12 @@ withApm.createChallengeType.schema = {
  * @param {String} id the challenge type id
  * @returns {Object} the challenge type with given id
  */
-withApm.getChallengeType = async function (id) {
+async function getChallengeType (id) {
   const ret = await helper.getById('ChallengeType', id)
   return ret
 }
 
-withApm.getChallengeType.schema = {
+getChallengeType.schema = {
   id: Joi.id()
 }
 
@@ -95,7 +91,7 @@ withApm.getChallengeType.schema = {
  * @param {Object} data the challenge type data to be updated
  * @returns {Object} the updated challenge type
  */
-withApm.fullyUpdateChallengeType = async function (id, data) {
+async function fullyUpdateChallengeType (id, data) {
   const type = await helper.getById('ChallengeType', id)
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
@@ -112,7 +108,7 @@ withApm.fullyUpdateChallengeType = async function (id, data) {
   return ret
 }
 
-withApm.fullyUpdateChallengeType.schema = {
+fullyUpdateChallengeType.schema = {
   id: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string().required(),
@@ -129,7 +125,7 @@ withApm.fullyUpdateChallengeType.schema = {
  * @param {Object} data the challenge type data to be updated
  * @returns {Object} the updated challenge type
  */
-withApm.partiallyUpdateChallengeType = async function (id, data) {
+async function partiallyUpdateChallengeType (id, data) {
   const type = await helper.getById('ChallengeType', id)
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
@@ -143,7 +139,7 @@ withApm.partiallyUpdateChallengeType = async function (id, data) {
   return ret
 }
 
-withApm.partiallyUpdateChallengeType.schema = {
+partiallyUpdateChallengeType.schema = {
   id: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string(),
@@ -154,10 +150,12 @@ withApm.partiallyUpdateChallengeType.schema = {
   }).required()
 }
 
-_.each(withApm, (method) => {
-  method.apm = true
-})
+module.exports = {
+  searchChallengeTypes,
+  createChallengeType,
+  getChallengeType,
+  fullyUpdateChallengeType,
+  partiallyUpdateChallengeType
+}
 
-logger.buildService(withApm)
-
-module.exports = withApm
+// logger.buildService(module.exports)

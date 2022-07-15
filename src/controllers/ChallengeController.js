@@ -4,8 +4,7 @@
 const HttpStatus = require('http-status-codes')
 const service = require('../services/ChallengeService')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+const logger = require('../common/logger')
 
 /**
  * Search challenges

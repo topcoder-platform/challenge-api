@@ -6,18 +6,15 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 const constants = require('../../app-constants')
-
-const withApm = {}
 
 /**
  * Search phases
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-withApm.searchPhases = async function (criteria) {
+async function searchPhases (criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   const list = await helper.scanAll('Phase')
@@ -28,7 +25,7 @@ withApm.searchPhases = async function (criteria) {
   return { total, page, perPage, result }
 }
 
-withApm.searchPhases.schema = {
+searchPhases.schema = {
   criteria: Joi.object().keys({
     page: Joi.page(),
     perPage: Joi.perPage().default(100),
@@ -41,7 +38,7 @@ withApm.searchPhases.schema = {
  * @param {Object} phase the phase to created
  * @returns {Object} the created phase
  */
-withApm.createPhase = async function (phase) {
+async function createPhase (phase) {
   await helper.validateDuplicate('Phase', 'name', phase.name)
   const ret = await helper.create('Phase', _.assign({ id: uuid() }, phase))
   // post bus event
@@ -49,7 +46,7 @@ withApm.createPhase = async function (phase) {
   return ret
 }
 
-withApm.createPhase.schema = {
+createPhase.schema = {
   phase: Joi.object().keys({
     name: Joi.string().required(),
     description: Joi.string(),
@@ -63,11 +60,11 @@ withApm.createPhase.schema = {
  * @param {String} phaseId the phase id
  * @returns {Object} the phase with given id
  */
-withApm.getPhase = async function (phaseId) {
+async function getPhase (phaseId) {
   return helper.getById('Phase', phaseId)
 }
 
-withApm.getPhase.schema = {
+getPhase.schema = {
   phaseId: Joi.id()
 }
 
@@ -78,7 +75,7 @@ withApm.getPhase.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated phase
  */
-withApm.update = async function (phaseId, data, isFull) {
+async function update (phaseId, data, isFull) {
   const phase = await helper.getById('Phase', phaseId)
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
@@ -103,11 +100,11 @@ withApm.update = async function (phaseId, data, isFull) {
  * @param {Object} data the phase data to be updated
  * @returns {Object} the updated phase
  */
-withApm.fullyUpdatePhase = async function (phaseId, data) {
-  return withApm.update(phaseId, data, true)
+async function fullyUpdatePhase (phaseId, data) {
+  return update(phaseId, data, true)
 }
 
-withApm.fullyUpdatePhase.schema = {
+fullyUpdatePhase.schema = {
   phaseId: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string().required(),
@@ -123,11 +120,11 @@ withApm.fullyUpdatePhase.schema = {
  * @param {Object} data the phase data to be updated
  * @returns {Object} the updated phase
  */
-withApm.partiallyUpdatePhase = async function (phaseId, data) {
-  return withApm.update(phaseId, data)
+async function partiallyUpdatePhase (phaseId, data) {
+  return update(phaseId, data)
 }
 
-withApm.partiallyUpdatePhase.schema = {
+partiallyUpdatePhase.schema = {
   phaseId: Joi.id(),
   data: Joi.object().keys({
     name: Joi.string(),
@@ -142,7 +139,7 @@ withApm.partiallyUpdatePhase.schema = {
  * @param {String} phaseId the phase id
  * @returns {Object} the deleted phase
  */
-withApm.deletePhase = async function (phaseId) {
+async function deletePhase (phaseId) {
   const ret = await helper.getById('Phase', phaseId)
   await ret.delete()
   // post bus event
@@ -150,14 +147,17 @@ withApm.deletePhase = async function (phaseId) {
   return ret
 }
 
-withApm.deletePhase.schema = {
+deletePhase.schema = {
   phaseId: Joi.id()
 }
 
-_.each(withApm, (method) => {
-  method.apm = true
-})
+module.exports = {
+  searchPhases,
+  createPhase,
+  getPhase,
+  fullyUpdatePhase,
+  partiallyUpdatePhase,
+  deletePhase
+}
 
-logger.buildService(withApm)
-
-module.exports = withApm
+// logger.buildService(module.exports)

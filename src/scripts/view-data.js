@@ -5,8 +5,7 @@
 require('../../app-bootstrap')
 const _ = require('lodash')
 const models = require('../models')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
+const logger = require('../common/logger')
 const helper = require('../common/helper')
 
 const viewData = async (modelName) => {

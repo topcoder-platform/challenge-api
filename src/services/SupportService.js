@@ -6,9 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const config = require('config')
 const helper = require('../common/helper')
-const logger = require('tc-framework').logger(config)
-
-const withApm = {}
+const logger = require('../common/logger')
 
 /**
  * Create a request in zendesk
@@ -16,7 +14,7 @@ const withApm = {}
  * @param {Object} request the request
  * @returns {Object} the search result
  */
-withApm.createRequest = async function (currentUser, request) {
+async function createRequest (currentUser, request) {
   let subject
   if (request.isSelfService) {
     subject += 'Self-Service customer support request'
@@ -47,7 +45,7 @@ withApm.createRequest = async function (currentUser, request) {
   })
 }
 
-withApm.createRequest.schema = {
+createRequest.schema = {
   currentUser: Joi.any(),
   request: Joi.object().keys({
     challengeId: Joi.optionalId(),
@@ -59,10 +57,8 @@ withApm.createRequest.schema = {
   })
 }
 
-_.each(withApm, (method) => {
-  method.apm = true
-})
+module.exports = {
+  createRequest
+}
 
-logger.buildService(withApm)
-
-module.exports = withApm
+logger.buildService(module.exports)
