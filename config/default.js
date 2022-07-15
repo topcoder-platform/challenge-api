@@ -27,8 +27,8 @@ module.exports = {
   SCHEDULING_TOPIC: process.env.SCHEDULING_TOPIC || 'challenge.notification.schedule.update',
 
   APM_OTLP_TRACE_EXPORTER_URL: process.env.APM_OTLP_TRACE_EXPORTER_URL || '',
-  PM_SERVICE_NAME: 'V5 Challenge API DEV',
-  APM_TRACER_NAME: 'V5 Challenge API DEV',
+  APM_SERVICE_NAME: process.env.APM_SERVICE_NAME || 'V5 Challenge API DEV',
+  APM_TRACER_NAME: process.env.APM_TRACER_NAME || 'V5 Challenge API DEV',
 
   AMAZON: {
     // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
