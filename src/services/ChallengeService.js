@@ -273,7 +273,8 @@ async function searchChallenges (currentUser, criteria) {
       should: [
         { wildcard: { name: `*${criteria.search}*` } },
         { wildcard: { name: `${criteria.search}*` } },
-        { wildcard: { name: `*${criteria.search}` } }
+        { wildcard: { name: `*${criteria.search}` } },
+        { match_phrase: { tags: criteria.search } },
       ]
     } })
   } else {
