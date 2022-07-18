@@ -6,7 +6,8 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 
 /**
@@ -15,6 +16,7 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchPhases (criteria) {
+  const span = await logger.startSpan('PhaseService.searchPhases')
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   const list = await helper.scanAll('Phase')
@@ -22,6 +24,7 @@ async function searchPhases (criteria) {
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
 
+  await logger.endSpan(span)
   return { total, page, perPage, result }
 }
 
@@ -39,10 +42,12 @@ searchPhases.schema = {
  * @returns {Object} the created phase
  */
 async function createPhase (phase) {
+  const span = await logger.startSpan('PhaseService.createPhase')
   await helper.validateDuplicate('Phase', 'name', phase.name)
   const ret = await helper.create('Phase', _.assign({ id: uuid() }, phase))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret)
+  await logger.endSpan(span)
   return ret
 }
 
@@ -61,7 +66,10 @@ createPhase.schema = {
  * @returns {Object} the phase with given id
  */
 async function getPhase (phaseId) {
-  return helper.getById('Phase', phaseId)
+  const span = await logger.startSpan('PhaseService.getPhase')
+  const res = await helper.getById('Phase', phaseId)
+  await logger.endSpan(span)
+  return res
 }
 
 getPhase.schema = {
@@ -76,6 +84,7 @@ getPhase.schema = {
  * @returns {Object} the updated phase
  */
 async function update (phaseId, data, isFull) {
+  const span = await logger.startSpan('PhaseService.update')
   const phase = await helper.getById('Phase', phaseId)
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
@@ -91,6 +100,7 @@ async function update (phaseId, data, isFull) {
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseUpdated,
     isFull ? ret : _.assignIn({ id: phaseId }, data))
+  await logger.endSpan(span)
   return ret
 }
 
@@ -101,7 +111,10 @@ async function update (phaseId, data, isFull) {
  * @returns {Object} the updated phase
  */
 async function fullyUpdatePhase (phaseId, data) {
-  return update(phaseId, data, true)
+  const span = await logger.startSpan('PhaseService.update')
+  const res = await update(phaseId, data, true)
+  await logger.endSpan(span)
+  return res
 }
 
 fullyUpdatePhase.schema = {
@@ -121,7 +134,10 @@ fullyUpdatePhase.schema = {
  * @returns {Object} the updated phase
  */
 async function partiallyUpdatePhase (phaseId, data) {
-  return update(phaseId, data)
+  const span = await logger.startSpan('PhaseService.partiallyUpdatePhase')
+  const res = await update(phaseId, data)
+  await logger.endSpan(span)
+  return res
 }
 
 partiallyUpdatePhase.schema = {
@@ -140,10 +156,12 @@ partiallyUpdatePhase.schema = {
  * @returns {Object} the deleted phase
  */
 async function deletePhase (phaseId) {
+  const span = await logger.startSpan('PhaseService.deletePhase')
   const ret = await helper.getById('Phase', phaseId)
   await ret.delete()
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, ret)
+  await logger.endSpan(span)
   return ret
 }
 
