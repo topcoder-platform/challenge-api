@@ -273,7 +273,8 @@ async function searchChallenges (currentUser, criteria) {
       should: [
         { wildcard: { name: `*${criteria.search}*` } },
         { wildcard: { name: `${criteria.search}*` } },
-        { wildcard: { name: `*${criteria.search}` } }
+        { wildcard: { name: `*${criteria.search}` } },
+        { match_phrase: { tags: criteria.search } },
       ]
     } })
   } else {
@@ -403,6 +404,10 @@ async function searchChallenges (currentUser, criteria) {
   const mustQuery = []
 
   const groupsQuery = []
+
+  if (criteria.tco) {
+    boolQuery.push({ match_phrase_prefix: { 'events.key': 'tco' } })
+  }
 
   if (criteria.events) {
     boolQuery.push({
@@ -662,14 +667,14 @@ async function searchChallenges (currentUser, criteria) {
     }
   }
 
-  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  logger.debug(`es Query ${JSON.stringify(esQuery, null, 4)}`)
   // Search with constructed query
   let docs
   try {
     docs = await esClient.search(esQuery)
   } catch (e) {
     // Catch error when the ES is fresh and has no data
-    logger.error(`Query Error from ES ${JSON.stringify(e)}`)
+    logger.error(`Query Error from ES ${JSON.stringify(e, null, 4)}`)
     docs = {
       hits: {
         total: 0,
@@ -791,7 +796,8 @@ searchChallenges.schema = {
     includeAllEvents: Joi.boolean().default(true),
     useSchedulingAPI: Joi.boolean(),
     totalPrizesFrom: Joi.number().min(0),
-    totalPrizesTo: Joi.number().min(0)
+    totalPrizesTo: Joi.number().min(0),
+    tco: Joi.boolean().default(false)
   }).unknown(true)
 }
 
