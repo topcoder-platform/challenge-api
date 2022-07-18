@@ -5,9 +5,8 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
-const config = require('config')
 const helper = require('../common/helper')
-const logger = require('tc-framework').logger(config)
+// const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
 
@@ -17,13 +16,11 @@ const constants = require('../../app-constants')
  * @returns {Array} the search result
  */
 async function searchChallengeTimelineTemplates (criteria) {
-  const span = await logger.startSpan('ChallengeTimelineTemplateService.searchChallengeTimelineTemplates')
   let records = await helper.scanAll('ChallengeTimelineTemplate')
   if (criteria.typeId) records = _.filter(records, e => (criteria.typeId === e.typeId))
   if (criteria.trackId) records = _.filter(records, e => (criteria.trackId === e.trackId))
   if (criteria.timelineTemplateId) records = _.filter(records, e => (criteria.timelineTemplateId === e.timelineTemplateId))
   if (!_.isUndefined(criteria.isDefault)) records = _.filter(records, e => (e.isDefault === (_.toLower(_.toString(criteria.isDefault)) === 'true')))
-  await logger.endSpan(span)
   return {
     total: records.length,
     page: 1,
@@ -62,12 +59,10 @@ async function unsetDefaultTimelineTemplate (typeId, trackId) {
  * @returns {Object} the created challenge type timeline template
  */
 async function createChallengeTimelineTemplate (data) {
-  const span = await logger.startSpan('ChallengeTimelineTemplateService.createChallengeTimelineTemplate')
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
   if (records.total > 0) {
-    const error = new errors.ConflictError('The challenge type timeline template is already defined.')
-    await logger.endSpanWithError(span, error)
+    throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
   await helper.getById('ChallengeType', data.typeId)
@@ -81,7 +76,6 @@ async function createChallengeTimelineTemplate (data) {
   const ret = await helper.create('ChallengeTimelineTemplate', _.assign({ id: uuid() }, data))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateCreated, ret)
-  await logger.endSpan(span)
   return ret
 }
 
@@ -100,10 +94,7 @@ createChallengeTimelineTemplate.schema = {
  * @returns {Object} the challenge type timeline template with given id
  */
 async function getChallengeTimelineTemplate (challengeTimelineTemplateId) {
-  const span = await logger.startSpan('ChallengeTimelineTemplateService.getChallengeTimelineTemplate')
-  const res = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
-  await logger.endSpan(span)
-  return res
+  return helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
 }
 
 getChallengeTimelineTemplate.schema = {
@@ -117,7 +108,6 @@ getChallengeTimelineTemplate.schema = {
  * @returns {Object} the updated challenge type timeline template
  */
 async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId, data) {
-  const span = await logger.startSpan('ChallengeTimelineTemplateService.fullyUpdateChallengeTimelineTemplate')
   const record = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
   if (record.typeId === data.typeId &&
     record.trackId === data.trackId &&
@@ -130,8 +120,7 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
   if (records.total > 0) {
-    const error = new errors.ConflictError('The challenge type timeline template is already defined.')
-    await logger.endSpanWithError(span, error)
+    throw new errors.ConflictError('The challenge type timeline template is already defined.')
   }
   // check exists
   await helper.getById('ChallengeType', data.typeId)
@@ -145,7 +134,6 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
   const ret = await helper.update(record, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateUpdated, ret)
-  await logger.endSpan(span)
   return ret
 }
 
@@ -160,12 +148,10 @@ fullyUpdateChallengeTimelineTemplate.schema = {
  * @returns {Object} the deleted challenge type timeline template
  */
 async function deleteChallengeTimelineTemplate (challengeTimelineTemplateId) {
-  const span = await logger.startSpan('ChallengeTimelineTemplateService.deleteChallengeTimelineTemplate')
   const ret = await helper.getById('ChallengeTimelineTemplate', challengeTimelineTemplateId)
   await ret.delete()
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateDeleted, ret)
-  await logger.endSpan(span)
   return ret
 }
 
