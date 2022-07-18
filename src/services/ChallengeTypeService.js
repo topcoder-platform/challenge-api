@@ -6,8 +6,6 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-const config = require('config')
-const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 
 /**
@@ -16,7 +14,6 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchChallengeTypes (criteria) {
-  const span = await logger.startSpan('ChallengeTypeService.searchChallengeTracks')
   // TODO - move this to ES
   let records = helper.getFromInternalCache('ChallengeType')
   if (records == null) {
@@ -35,7 +32,6 @@ async function searchChallengeTypes (criteria) {
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
 
-  await logger.endSpan(span)
   return { total, page, perPage, result }
 }
 
@@ -57,13 +53,11 @@ searchChallengeTypes.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeType (type) {
-  const span = await logger.startSpan('ChallengeTypeService.createChallengeType')
   await helper.validateDuplicate('ChallengeType', 'name', type.name)
   await helper.validateDuplicate('ChallengeType', 'abbreviation', type.abbreviation)
   const ret = await helper.create('ChallengeType', _.assign({ id: uuid() }, type))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret)
-  await logger.endSpan(span)
   return ret
 }
 
@@ -83,9 +77,7 @@ createChallengeType.schema = {
  * @returns {Object} the challenge type with given id
  */
 async function getChallengeType (id) {
-  const span = await logger.startSpan('ChallengeTypeService.getChallengeType')
   const ret = await helper.getById('ChallengeType', id)
-  await logger.endSpan(span)
   return ret
 }
 
@@ -100,7 +92,6 @@ getChallengeType.schema = {
  * @returns {Object} the updated challenge type
  */
 async function fullyUpdateChallengeType (id, data) {
-  const span = await logger.startSpan('ChallengeTypeService.fullyUpdateChallengeType')
   const type = await helper.getById('ChallengeType', id)
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
@@ -114,7 +105,6 @@ async function fullyUpdateChallengeType (id, data) {
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, ret)
-  await logger.endSpan(span)
   return ret
 }
 
@@ -136,7 +126,6 @@ fullyUpdateChallengeType.schema = {
  * @returns {Object} the updated challenge type
  */
 async function partiallyUpdateChallengeType (id, data) {
-  const span = await logger.startSpan('ChallengeTypeService.partiallyUpdateChallengeType')
   const type = await helper.getById('ChallengeType', id)
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeType', 'name', data.name)
@@ -147,7 +136,6 @@ async function partiallyUpdateChallengeType (id, data) {
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data))
-  await logger.endSpan(span)
   return ret
 }
 
