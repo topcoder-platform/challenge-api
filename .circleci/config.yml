@@ -72,7 +72,6 @@ workflows:
                 - develop
                 - fix/challenge-timelines-edit-routes
                 - test/performance-profile
-                - fix-listmemberchallenges
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
