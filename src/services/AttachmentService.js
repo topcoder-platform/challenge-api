@@ -11,7 +11,7 @@ const errors = require('../common/errors')
 const helper = require('../common/helper')
 const s3ParseUrl = require('../common/s3ParseUrl')
 const models = require('../models')
-const logger = require('../common/logger')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 const challengeService = require('./ChallengeService')
 
@@ -41,11 +41,13 @@ function validateUrl (url) {
  * @returns {Object} the challenge and the attachment
  */
 async function _getChallengeAttachment (challengeId, attachmentId) {
+  const span = await logger.startSpan('AttachmentService._getChallengeAttachment')
   const challenge = await helper.getById('Challenge', challengeId)
   const attachment = await models.Attachment.get(attachmentId)
   if (!attachment || attachment.challengeId !== challengeId) {
     throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
   }
+  await logger.endSpan(span)
   return { challenge, attachment }
 }
 
@@ -56,6 +58,7 @@ async function _getChallengeAttachment (challengeId, attachmentId) {
  * @returns {Object} the created attachment
  */
 async function createAttachment (currentUser, challengeId, attachments) {
+  const span = await logger.startSpan('AttachmentService.createAttachment')
   const challenge = await helper.getById('Challenge', challengeId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   const newAttachments = []
@@ -73,6 +76,7 @@ async function createAttachment (currentUser, challengeId, attachments) {
       ...newAttachments
     ]
   })
+  await logger.endSpan(span)
   // post bus event
   return newAttachments
 }
@@ -95,8 +99,10 @@ createAttachment.schema = {
  * @returns {Object} the attachment with given id
  */
 async function getAttachment (currentUser, challengeId, attachmentId) {
+  const span = await logger.startSpan('AttachmentService.getAttachment')
   const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
+  await logger.endSpan(span)
   return attachment
 }
 
@@ -115,6 +121,7 @@ getAttachment.schema = {
  * @returns {Object} the updated attachment
  */
 async function update (currentUser, challengeId, attachmentId, data, isFull) {
+  const span = await logger.startSpan('AttachmentService.update')
   const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   validateUrl(data.url)
@@ -139,6 +146,7 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeAttachmentUpdated,
     isFull ? ret : _.assignIn({ id: attachmentId }, data))
+  await logger.endSpan(span)
   return ret
 }
 
@@ -150,7 +158,10 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
  * @returns {Object} the updated attachment
  */
 async function fullyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
-  return update(currentUser, challengeId, attachmentId, data, true)
+  const span = await logger.startSpan('AttachmentService.fullyUpdateAttachment')
+  const res = await update(currentUser, challengeId, attachmentId, data, true)
+  await logger.endSpan(span)
+  return res
 }
 
 fullyUpdateAttachment.schema = {
@@ -173,7 +184,10 @@ fullyUpdateAttachment.schema = {
  * @returns {Object} the updated attachment
  */
 async function partiallyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
-  return update(currentUser, challengeId, attachmentId, data)
+  const span = await logger.startSpan('AttachmentService.fullyUpdateAttachment')
+  const res = await update(currentUser, challengeId, attachmentId, data)
+  await logger.endSpan(span)
+  return res
 }
 
 partiallyUpdateAttachment.schema = {
@@ -194,6 +208,7 @@ partiallyUpdateAttachment.schema = {
  * @returns {Object} the deleted attachment
  */
 async function deleteAttachment (currentUser, challengeId, attachmentId) {
+  const span = await logger.startSpan('AttachmentService.deleteAttachment')
   const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanModifyChallenge(currentUser, challenge)
   const s3UrlObject = s3ParseUrl(attachment.url)
@@ -213,6 +228,7 @@ async function deleteAttachment (currentUser, challengeId, attachmentId) {
   }
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeAttachmentDeleted, attachment)
+  await logger.endSpan(span)
   return attachment
 }
 
@@ -229,6 +245,7 @@ deleteAttachment.schema = {
  * @returns {Promise<Object>} the downloaded attachment data
  */
 async function downloadAttachment (currentUser, challengeId, attachmentId) {
+  const span = await logger.startSpan('AttachmentService.downloadAttachment')
   const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
   const s3UrlObject = s3ParseUrl(attachment.url)
@@ -240,6 +257,7 @@ async function downloadAttachment (currentUser, challengeId, attachmentId) {
   }
   const data = await helper.downloadFromFileStack(attachment.url)
   data.fileName = attachment.name
+  await logger.endSpan(span)
   return data
 }
 

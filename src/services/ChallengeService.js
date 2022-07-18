@@ -42,6 +42,7 @@ async function ensureAccessibleForChallenge (user, challenge) {
  * @returns {Array} the challenges that can be accessed by current user
  */
 async function filterChallengesByGroupsAccess (currentUser, challenges) {
+  const span = await logger.startSpan('ChallengeService.filterChallengesByGroupsAccess')
   const res = []
   let userGroups
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !helper.hasAdminRole(currentUser)
@@ -77,6 +78,7 @@ async function filterChallengesByGroupsAccess (currentUser, challenges) {
       }
     }
   }
+  await logger.endSpan(span)
   return res
 }
 
@@ -124,6 +126,7 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
  */
 async function searchChallenges (currentUser, criteria) {
   // construct ES query
+  const span = await logger.startSpan('ChallengeService.searchChallenges')
 
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
@@ -730,6 +733,7 @@ async function searchChallenges (currentUser, criteria) {
     }
   })
 
+  await logger.endSpan(span)
   return { total, page, perPage, result }
 }
 
@@ -806,6 +810,7 @@ searchChallenges.schema = {
  * @param {Object} challenge the challenge data
  */
 async function validateChallengeData (challenge) {
+  const span = await logger.startSpan('ChallengeService.validateChallengeData')
   let type
   let track
   if (challenge.typeId) {
@@ -836,6 +841,7 @@ async function validateChallengeData (challenge) {
       throw new errors.BadRequestError(`The timeline template with id: ${challenge.timelineTemplateId} is inactive`)
     }
   }
+  await logger.endSpan(span)
   return { type, track }
 }
 
@@ -943,6 +949,7 @@ async function populatePhases (phases, startDate, timelineTemplateId) {
  * @returns {Object} the created challenge
  */
 async function createChallenge (currentUser, challenge, userToken) {
+  const span = await logger.startSpan('ChallengeService.createChallenge')
   try {
     if (challenge.legacy.selfService) {
       if (!challenge.projectId) {
@@ -1122,6 +1129,7 @@ async function createChallenge (currentUser, challenge, userToken) {
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret)
+  await logger.endSpan(span)
   return ret
 }
 
@@ -1303,6 +1311,7 @@ getChallenge.schema = {
  * @returns {Object} the challenge with given id
  */
 async function getChallengeStatistics (currentUser, id) {
+  const span = await logger.startSpan('ChallengeService.getChallengeStatistics')
   const challenge = await getChallenge(currentUser, id)
   // for now, only Data Science challenges are supported
   if (challenge.type !== 'Challenge' && challenge.track !== 'Data Science') {
@@ -1331,6 +1340,7 @@ async function getChallengeStatistics (currentUser, id) {
       score: _.get(_.find(submission.review || [], r => r.metadata), 'score', 0)
     })
   }
+  await logger.endSpan(span)
   return _.map(_.keys(map), (userId) => map[userId])
 }
 
@@ -1392,6 +1402,7 @@ async function validateWinners (winners, challengeId) {
  * @returns {Object} the updated challenge
  */
 async function update (currentUser, challengeId, data, isFull) {
+  const span = await logger.startSpan('ChallengeService.update')
   const cancelReason = _.cloneDeep(data.cancelReason)
   let sendActivationEmail = false
   let sendSubmittedEmail = false
@@ -1441,6 +1452,7 @@ async function update (currentUser, challengeId, data, isFull) {
         },
         false
       )
+      await logger.endSpanWithError(span, e)
       throw new errors.BadRequestError('Failed to activate the challenge! The challenge has been canceled!')
     }
   }
@@ -1982,6 +1994,7 @@ async function update (currentUser, challengeId, data, isFull) {
       )
     }
   }
+  await logger.endSpan(span)
   return challenge
 }
 
@@ -1991,6 +2004,7 @@ async function update (currentUser, challengeId, data, isFull) {
  * @param {String} challengeId the challenge id
  */
 async function sendNotifications (currentUser, challengeId) {
+  const span = await logger.startSpan('ChallengeService.sendNotifications')
   const challenge = await getChallenge(currentUser, challengeId)
   const creator = await helper.getMemberByHandle(challenge.createdBy)
   if (challenge.status === constants.challengeStatuses.Completed) {
@@ -2003,6 +2017,7 @@ async function sendNotifications (currentUser, challengeId) {
         workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}?tab=solutions`
       }
     )
+    await logger.endSpan(span)
     return { type: constants.SelfServiceNotificationTypes.WORK_COMPLETED }
   }
 }
@@ -2016,7 +2031,8 @@ sendNotifications.schema = {
  * Remove unwanted properties from the challenge object
  * @param {Object} challenge the challenge object
  */
-function sanitizeChallenge (challenge) {
+async function sanitizeChallenge (challenge) {
+  const span = await logger.startSpan('ChallengeService.sanitizeChallenge')
   const sanitized = _.pick(challenge, [
     'trackId',
     'typeId',
@@ -2094,6 +2110,7 @@ function sanitizeChallenge (challenge) {
   if (challenge.attachments) {
     sanitized.attachments = _.map(challenge.attachments, attachment => _.pick(attachment, ['id', 'name', 'url', 'fileSize', 'description', 'challengeId']))
   }
+  await logger.endSpan(span)
   return sanitized
 }
 
@@ -2105,7 +2122,10 @@ function sanitizeChallenge (challenge) {
  * @returns {Object} the updated challenge
  */
 async function fullyUpdateChallenge (currentUser, challengeId, data) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), true)
+  const span = await logger.startSpan('ChallengeService.fullyUpdateChallenge')
+  const res = await update(currentUser, challengeId, sanitizeChallenge(data), true)
+  await logger.endSpan(span)
+  return res
 }
 
 fullyUpdateChallenge.schema = {
@@ -2212,7 +2232,10 @@ fullyUpdateChallenge.schema = {
  * @returns {Object} the updated challenge
  */
 async function partiallyUpdateChallenge (currentUser, challengeId, data) {
-  return update(currentUser, challengeId, sanitizeChallenge(data))
+  const span = await logger.startSpan('ChallengeService.partiallyUpdateChallenge')
+  const res = await update(currentUser, challengeId, sanitizeChallenge(data))
+  await logger.endSpan(span)
+  return res
 }
 
 partiallyUpdateChallenge.schema = {
@@ -2315,6 +2338,7 @@ partiallyUpdateChallenge.schema = {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge (currentUser, challengeId) {
+  const span = await logger.startSpan('ChallengeService.deleteChallenge')
   const challenge = await helper.getById('Challenge', challengeId)
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(`Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`)
@@ -2333,6 +2357,7 @@ async function deleteChallenge (currentUser, challengeId) {
     id: challengeId
   })
   await helper.postBusEvent(constants.Topics.ChallengeDeleted, { id: challengeId })
+  await logger.endSpan(span)
   return challenge
 }
 

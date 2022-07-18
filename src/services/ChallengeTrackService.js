@@ -6,7 +6,8 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 
 /**
@@ -15,6 +16,7 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchChallengeTracks (criteria) {
+  const span = await logger.startSpan('ChallengeTrackService.searchChallengeTracks')
   // TODO - move this to ES
   let records = helper.getFromInternalCache('ChallengeTrack')
   if (records == null) {
@@ -35,6 +37,7 @@ async function searchChallengeTracks (criteria) {
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
 
+  await logger.endSpan(span)
   return { total, page, perPage, result }
 }
 
@@ -57,6 +60,7 @@ searchChallengeTracks.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeTrack (type) {
+  const span = await logger.startSpan('ChallengeTrackService.createChallengeTrack')
   await helper.validateDuplicate('ChallengeTrack', 'name', type.name)
   await helper.validateDuplicate('ChallengeTrack', 'abbreviation', type.abbreviation)
   if (type.legacyId) {
@@ -65,6 +69,7 @@ async function createChallengeTrack (type) {
   const ret = await helper.create('ChallengeTrack', _.assign({ id: uuid() }, type))
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackCreated, ret)
+  await logger.endSpan(span)
   return ret
 }
 
@@ -85,7 +90,9 @@ createChallengeTrack.schema = {
  * @returns {Object} the challenge type with given id
  */
 async function getChallengeTrack (id) {
+  const span = await logger.startSpan('ChallengeTrackService.getChallengeTrack')
   const ret = await helper.getById('ChallengeTrack', id)
+  await logger.endSpan(span)
   return ret
 }
 
@@ -100,6 +107,7 @@ getChallengeTrack.schema = {
  * @returns {Object} the updated challenge type
  */
 async function fullyUpdateChallengeTrack (id, data) {
+  const span = await logger.startSpan('ChallengeTrackService.fullyUpdateChallengeTrack')
   const type = await helper.getById('ChallengeTrack', id)
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeTrack', 'name', data.name)
@@ -122,6 +130,7 @@ async function fullyUpdateChallengeTrack (id, data) {
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackUpdated, ret)
+  await logger.endSpan(span)
   return ret
 }
 
@@ -144,6 +153,7 @@ fullyUpdateChallengeTrack.schema = {
  * @returns {Object} the updated challenge type
  */
 async function partiallyUpdateChallengeTrack (id, data) {
+  const span = await logger.startSpan('ChallengeTrackService.partiallyUpdateChallengeTrack')
   const type = await helper.getById('ChallengeTrack', id)
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate('ChallengeTrack', 'name', data.name)
@@ -157,6 +167,7 @@ async function partiallyUpdateChallengeTrack (id, data) {
   const ret = await helper.update(type, data)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackUpdated, _.assignIn({ id }, data))
+  await logger.endSpan(span)
   return ret
 }
 
