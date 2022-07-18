@@ -66,7 +66,8 @@ async function createChallengeTimelineTemplate (data) {
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
   if (records.total > 0) {
-    throw new errors.ConflictError('The challenge type timeline template is already defined.')
+    const error = new errors.ConflictError('The challenge type timeline template is already defined.')
+    await logger.endSpanWithError(span, error)
   }
   // check exists
   await helper.getById('ChallengeType', data.typeId)
@@ -129,7 +130,8 @@ async function fullyUpdateChallengeTimelineTemplate (challengeTimelineTemplateId
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data)
   if (records.total > 0) {
-    throw new errors.ConflictError('The challenge type timeline template is already defined.')
+    const error = new errors.ConflictError('The challenge type timeline template is already defined.')
+    await logger.endSpanWithError(span, error)
   }
   // check exists
   await helper.getById('ChallengeType', data.typeId)

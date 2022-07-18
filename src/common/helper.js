@@ -197,7 +197,7 @@ function checkIfExists (source, term) {
  */
 async function getById (modelName, id) {
   const span = await logger.startSpan('helper.getById')
-  const res = new Promise((resolve, reject) => {
+  const res = await new Promise((resolve, reject) => {
     models[modelName].query('id').eq(id).exec((err, result) => {
       if (err) {
         return reject(err)
@@ -540,7 +540,9 @@ async function capturePayment (paymentId) {
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } })
   logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`)
   if (res.data.status !== 'succeeded') {
-    throw new Error(`Failed to charge payment. Current status: ${res.data.status}`)
+    const error = new Error(`Failed to charge payment. Current status: ${res.data.status}`)
+    await logger.endSpanWithError(span, error)
+    throw error
   }
   await logger.endSpan(span)
   return res.data
@@ -556,7 +558,9 @@ async function cancelPayment (paymentId) {
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } })
   if (res.data.status !== 'canceled') {
-    throw new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
+    const error = new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
+    await logger.endSpanWithError(span, error)
+    throw error
   }
   await logger.endSpan(span)
   return res.data
@@ -909,9 +913,12 @@ async function ensureProjectExist (projectId, currentUser) {
     return res.data
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+      const error = new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+      await logger.endSpanWithError(span, error)
+      throw error
     } else {
       // re-throw other error
+      await logger.endSpanWithError(span)
       throw err
     }
   }
@@ -1009,9 +1016,12 @@ async function getProjectDefaultTerms (projectId) {
     return res.data.terms || []
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+      const error = new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
+      await logger.endSpanWithError(span, error)
+      throw error
     } else {
       // re-throw other error
+      await logger.endSpanWithError(span)
       throw err
     }
   }
@@ -1069,9 +1079,12 @@ async function validateChallengeTerms (terms = []) {
       listOfTerms.push(term)
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
-        throw new errors.BadRequestError(`Terms of use identified by the id ${term.id} does not exist`)
+        const error = new errors.BadRequestError(`Terms of use identified by the id ${term.id} does not exist`)
+        await logger.endSpanWithError(span, error)
+        throw error
       } else {
         // re-throw other error
+        await logger.endSpanWithError(span)
         throw e
       }
     }
@@ -1212,6 +1225,7 @@ async function getGroupById (groupId) {
     if (err.response.status === HttpStatus.NOT_FOUND) {
       return
     }
+    await logger.endSpanWithError(span, err)
     throw err
   }
 }
@@ -1311,7 +1325,6 @@ async function sendSelfServiceNotification (type, recipients, data) {
     await logger.endSpan(span)
     return res
   } catch (e) {
-    await logger.endSpanWithError(span, e)
     logger.debug(`Failed to post notification ${type}: ${e.message}`)
   }
 }
