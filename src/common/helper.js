@@ -822,8 +822,7 @@ function ensureNoDuplicateOrNullElements (arr, name) {
  * Get Bus API Client
  * @return {Object} Bus API Client Instance
  */
-async function getBusApiClient () {
-  // const span = await logger.startSpan('helper.getBusApiClient')
+function getBusApiClient () {
   // if there is no bus API client instance, then create a new instance
   if (!busApiClient) {
     busApiClient = busApi(_.pick(config,
@@ -831,7 +830,6 @@ async function getBusApiClient () {
         'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'BUSAPI_URL',
         'KAFKA_ERROR_TOPIC', 'AUTH0_PROXY_SERVER_URL']))
   }
-  // await logger.endSpan(span)
   return busApiClient
 }
 
