@@ -254,7 +254,7 @@ async function validateDuplicate (modelName, name, value) {
  */
 async function create (modelName, data) {
   const span = await logger.startSpan('helper.create')
-  const res = new Promise((resolve, reject) => {
+  const res = await new Promise((resolve, reject) => {
     const dbItem = new models[modelName](data)
     dbItem.save((err) => {
       if (err) {
@@ -279,7 +279,7 @@ async function update (dbItem, data) {
   Object.keys(data).forEach((key) => {
     dbItem[key] = data[key]
   })
-  const res = new Promise((resolve, reject) => {
+  const res = await new Promise((resolve, reject) => {
     dbItem.save((err) => {
       if (err) {
         return reject(err)
@@ -300,7 +300,7 @@ async function update (dbItem, data) {
  */
 async function scan (modelName, scanParams) {
   const span = await logger.startSpan('helper.scan')
-  const res = new Promise((resolve, reject) => {
+  const res = await new Promise((resolve, reject) => {
     models[modelName].scan(scanParams).exec((err, result) => {
       if (err) {
         return reject(err)
@@ -862,8 +862,7 @@ async function postBusEvent (topic, payload, options = {}) {
  * Get ES Client
  * @return {Object} Elasticsearch Client Instance
  */
-async function getESClient () {
-  const span = await logger.startSpan('helper.getESClient')
+function getESClient () {
   if (esClient) {
     return esClient
   }
@@ -885,7 +884,6 @@ async function getESClient () {
       hosts: esHost
     })
   }
-  await logger.endSpan(span)
   return esClient
 }
 
@@ -1223,6 +1221,7 @@ async function getGroupById (groupId) {
     return result.data
   } catch (err) {
     if (err.response.status === HttpStatus.NOT_FOUND) {
+      await logger.endSpanWithError(span, err)
       return
     }
     await logger.endSpanWithError(span, err)
