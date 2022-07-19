@@ -196,7 +196,7 @@ function checkIfExists (source, term) {
  * @returns {Promise<void>}
  */
 async function getById (modelName, id) {
-  const span = await logger.startSpan('helper.getById')
+  // const span = await logger.startSpan('helper.getById')
   const res = await new Promise((resolve, reject) => {
     models[modelName].query('id').eq(id).exec((err, result) => {
       if (err) {
@@ -209,7 +209,7 @@ async function getById (modelName, id) {
       }
     })
   })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -220,13 +220,13 @@ async function getById (modelName, id) {
  * @returns {Promise<Array>} the found entities
  */
 async function getByIds (modelName, ids) {
-  const span = await logger.startSpan('helper.getByIds')
+  // const span = await logger.startSpan('helper.getByIds')
   const entities = []
   const theIds = ids || []
   for (const id of theIds) {
     entities.push(await getById(modelName, id))
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return entities
 }
 
@@ -253,7 +253,7 @@ async function validateDuplicate (modelName, name, value) {
  * @returns {Promise<void>}
  */
 async function create (modelName, data) {
-  const span = await logger.startSpan('helper.create')
+  // const span = await logger.startSpan('helper.create')
   const res = await new Promise((resolve, reject) => {
     const dbItem = new models[modelName](data)
     dbItem.save((err) => {
@@ -264,7 +264,7 @@ async function create (modelName, data) {
       }
     })
   })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -275,7 +275,7 @@ async function create (modelName, data) {
  * @returns {Promise<void>}
  */
 async function update (dbItem, data) {
-  const span = await logger.startSpan('helper.update')
+  // const span = await logger.startSpan('helper.update')
   Object.keys(data).forEach((key) => {
     dbItem[key] = data[key]
   })
@@ -288,7 +288,7 @@ async function update (dbItem, data) {
       }
     })
   })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -299,7 +299,7 @@ async function update (dbItem, data) {
  * @returns {Promise<void>}
  */
 async function scan (modelName, scanParams) {
-  const span = await logger.startSpan('helper.scan')
+  // const span = await logger.startSpan('helper.scan')
   const res = await new Promise((resolve, reject) => {
     models[modelName].scan(scanParams).exec((err, result) => {
       if (err) {
@@ -309,7 +309,7 @@ async function scan (modelName, scanParams) {
       }
     })
   })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -320,7 +320,7 @@ async function scan (modelName, scanParams) {
  * @returns {Array}
  */
 async function scanAll (modelName, scanParams) {
-  const span = await logger.startSpan('helper.scanAll')
+  // const span = await logger.startSpan('helper.scanAll')
   let results = await models[modelName].scan(scanParams).exec()
   let lastKey = results.lastKey
   while (!_.isUndefined(results.lastKey)) {
@@ -328,7 +328,7 @@ async function scanAll (modelName, scanParams) {
     results = [...results, ...newResult]
     lastKey = newResult.lastKey
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return results
 }
 
@@ -377,9 +377,9 @@ async function validatePhases (phases) {
  * @return {Promise} promise resolved to downloaded data
  */
 async function downloadFromFileStack (url) {
-  const span = await logger.startSpan('helper.downloadFromFileStack')
+  // const span = await logger.startSpan('helper.downloadFromFileStack')
   const res = await axios.get(url)
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return {
     data: res.data,
     mimetype: _.get(res, `headers['content-type']`, 'application/json')
@@ -393,9 +393,9 @@ async function downloadFromFileStack (url) {
  * @return {Promise} promise resolved to downloaded data
  */
 async function downloadFromS3 (bucket, key) {
-  const span = await logger.startSpan('helper.downloadFromS3')
+  // const span = await logger.startSpan('helper.downloadFromS3')
   const file = await s3.getObject({ Bucket: bucket, Key: key }).promise()
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return {
     data: file.Body,
     mimetype: file.ContentType
@@ -409,9 +409,9 @@ async function downloadFromS3 (bucket, key) {
  * @return {Promise} promise resolved to deleted data
  */
 async function deleteFromS3 (bucket, key) {
-  const span = await logger.startSpan('helper.deleteFromS3')
+  // const span = await logger.startSpan('helper.deleteFromS3')
   const res = await s3.deleteObject({ Bucket: bucket, Key: key }).promise()
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -420,9 +420,9 @@ async function deleteFromS3 (bucket, key) {
  * @returns {Promise<String>} the M2M token
  */
 async function getM2MToken () {
-  const span = await logger.startSpan('helper.getM2MToken')
+  // const span = await logger.startSpan('helper.getM2MToken')
   const res = await m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET)
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -432,7 +432,7 @@ async function getM2MToken () {
  * @returns {Promise<Array>} the challenge resources
  */
 async function getChallengeResources (challengeId) {
-  const span = await logger.startSpan('helper.getChallengeResources')
+  // const span = await logger.startSpan('helper.getChallengeResources')
   const token = await getM2MToken()
   const perPage = 100
   let page = 1
@@ -449,7 +449,7 @@ async function getChallengeResources (challengeId) {
       break
     }
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return result
 }
 
@@ -460,7 +460,7 @@ async function getChallengeResources (challengeId) {
  * @param {String} roleId the resource role ID to assign
  */
 async function createResource (challengeId, memberHandle, roleId) {
-  const span = await logger.startSpan('helper.createResource')
+  // const span = await logger.startSpan('helper.createResource')
   const token = await getM2MToken()
 
   const userObj = {
@@ -470,7 +470,7 @@ async function createResource (challengeId, memberHandle, roleId) {
   }
   const url = `${config.RESOURCES_API_URL}`
   const res = await axios.post(url, userObj, { headers: { Authorization: `Bearer ${token}` } })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res || false
 }
 
@@ -483,7 +483,7 @@ async function createResource (challengeId, memberHandle, roleId) {
  * @returns
  */
 async function createSelfServiceProject (name, description, type, token) {
-  const span = await logger.startSpan('helper.createSelfServiceProject')
+  // const span = await logger.startSpan('helper.createSelfServiceProject')
 
   const projectObj = {
     name,
@@ -492,7 +492,7 @@ async function createSelfServiceProject (name, description, type, token) {
   }
   const url = `${config.PROJECTS_API_URL}`
   const res = await axios.post(url, projectObj, { headers: { Authorization: `Bearer ${token}` } })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return _.get(res, 'data.id')
 }
 
@@ -501,10 +501,10 @@ async function createSelfServiceProject (name, description, type, token) {
  * @param {String} roundId the round id
  */
 async function getProjectIdByRoundId (roundId) {
-  const span = await logger.startSpan('helper.getProjectIdByRoundId')
+  // const span = await logger.startSpan('helper.getProjectIdByRoundId')
   const url = `${config.CHALLENGE_MIGRATION_APP_URL}/getChallengeProjectId/${roundId}`
   const res = await axios.get(url)
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return _.get(res, 'data.projectId')
 }
 
@@ -513,7 +513,7 @@ async function getProjectIdByRoundId (roundId) {
  * @param {String} projectId the project id
  */
 async function getProjectPayment (projectId) {
-  const span = await logger.startSpan('helper.getProjectPayment')
+  // const span = await logger.startSpan('helper.getProjectPayment')
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}`
   const res = await axios.get(url, {
@@ -524,7 +524,7 @@ async function getProjectPayment (projectId) {
     }
   })
   const [payment] = res.data
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return payment
 }
 
@@ -533,7 +533,7 @@ async function getProjectPayment (projectId) {
  * @param {String} paymentId the payment ID
  */
 async function capturePayment (paymentId) {
-  const span = await logger.startSpan('helper.capturePayment')
+  // const span = await logger.startSpan('helper.capturePayment')
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`
   logger.info(`Calling: ${url} to capture payment`)
@@ -541,10 +541,10 @@ async function capturePayment (paymentId) {
   logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`)
   if (res.data.status !== 'succeeded') {
     const error = new Error(`Failed to charge payment. Current status: ${res.data.status}`)
-    await logger.endSpanWithError(span, error)
+    // await logger.endSpanWithError(span, error)
     throw error
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res.data
 }
 
@@ -553,16 +553,16 @@ async function capturePayment (paymentId) {
  * @param {String} paymentId the payment ID
  */
 async function cancelPayment (paymentId) {
-  const span = await logger.startSpan('helper.cancelPayment')
+  // const span = await logger.startSpan('helper.cancelPayment')
   const token = await getM2MToken()
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } })
   if (res.data.status !== 'canceled') {
     const error = new Error(`Failed to cancel payment. Current status: ${res.data.status}`)
-    await logger.endSpanWithError(span, error)
+    // await logger.endSpanWithError(span, error)
     throw error
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res.data
 }
 
@@ -573,7 +573,7 @@ async function cancelPayment (paymentId) {
  * @param {Object} currentUser the current user
  */
 async function cancelProject (projectId, cancelReason, currentUser) {
-  const span = await logger.startSpan('helper.cancelProject')
+  // const span = await logger.startSpan('helper.cancelProject')
   let payment = await getProjectPayment(projectId)
   const project = await ensureProjectExist(projectId, currentUser)
   if (project.status === 'cancelled') return // already canceled
@@ -597,7 +597,7 @@ async function cancelProject (projectId, cancelReason, currentUser) {
       paymentStatus: payment.status
     }
   }, { headers: { Authorization: `Bearer ${token}` } })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -607,7 +607,7 @@ async function cancelProject (projectId, cancelReason, currentUser) {
  * @param {Object} currentUser the current user
  */
 async function activateProject (projectId, currentUser, name, description) {
-  const span = await logger.startSpan('helper.activateProject')
+  // const span = await logger.startSpan('helper.activateProject')
   let payment
   let project
   try {
@@ -643,7 +643,7 @@ async function activateProject (projectId, currentUser, name, description) {
     // auto activate if the project goes in reviewed state
     await activateProject(projectId, currentUser, name, description)
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
 }
 
 /**
@@ -653,7 +653,7 @@ async function activateProject (projectId, currentUser, name, description) {
  * @param {*} currentUser the current user
  */
 async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, currentUser) {
-  const span = await logger.startSpan('helper.updateSelfServiceProjectInfo')
+  // const span = await logger.startSpan('helper.updateSelfServiceProjectInfo')
   const project = await ensureProjectExist(projectId, currentUser)
   const payment = await getProjectPayment(projectId)
   const token = await getM2MToken()
@@ -670,7 +670,7 @@ async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, 
       workItemPlannedEndDate
     }
   }, { headers: { Authorization: `Bearer ${token}` } })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -679,10 +679,10 @@ async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, 
  * @returns {Promise<Array>} the challenge resources
  */
 async function getResourceRoles () {
-  const span = await logger.startSpan('helper.getResourceRoles')
+  // const span = await logger.startSpan('helper.getResourceRoles')
   const token = await getM2MToken()
   const res = await axios.get(config.RESOURCE_ROLES_API_URL, { headers: { Authorization: `Bearer ${token}` } })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res.data || []
 }
 
@@ -704,7 +704,7 @@ async function userHasFullAccess (challengeId, userId) {
  * @returns {Promise<Array>} the user groups
  */
 async function getUserGroups (userId) {
-  const span = await logger.startSpan('helper.getUserGroups')
+  // const span = await logger.startSpan('helper.getUserGroups')
   const token = await getM2MToken()
   let allGroups = []
   // get search is paginated, we need to get all pages' data
@@ -729,7 +729,7 @@ async function getUserGroups (userId) {
       break
     }
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return allGroups
 }
 
@@ -739,7 +739,7 @@ async function getUserGroups (userId) {
  * @returns {Promise<Array>} the user groups
  */
 async function getCompleteUserGroupTreeIds (userId) {
-  const span = await logger.startSpan('helper.getCompleteUserGroupTreeIds')
+  // const span = await logger.startSpan('helper.getCompleteUserGroupTreeIds')
   const token = await getM2MToken()
   const result = await axios.get(`${config.GROUPS_API_URL}/memberGroups/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -747,7 +747,7 @@ async function getCompleteUserGroupTreeIds (userId) {
       uuid: true
     }
   })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return result.data || []
 }
 
@@ -757,7 +757,7 @@ async function getCompleteUserGroupTreeIds (userId) {
  * @returns {Array<String>} an array with the groups ID and the IDs of all subGroups
  */
 async function expandWithSubGroups (groupId) {
-  const span = await logger.startSpan('helper.expandWithSubGroups')
+  // const span = await logger.startSpan('helper.expandWithSubGroups')
   const token = await getM2MToken()
   const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -766,7 +766,7 @@ async function expandWithSubGroups (groupId) {
     }
   })
   const groups = result.data || {}
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return [groupId, ..._.map(_.get(groups, 'subGroups', []), 'id')]
 }
 
@@ -776,7 +776,7 @@ async function expandWithSubGroups (groupId) {
  * @returns {Array<String>} an array with the group ID and the IDs of all parent groups up the chain
  */
 async function expandWithParentGroups (groupId) {
-  const span = await logger.startSpan('helper.expandWithParentGroups')
+  // const span = await logger.startSpan('helper.expandWithParentGroups')
   const token = await getM2MToken()
   const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -795,7 +795,7 @@ async function expandWithParentGroups (groupId) {
   }
 
   extractIds(result.data || {})
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return ids
 }
 
@@ -823,7 +823,7 @@ function ensureNoDuplicateOrNullElements (arr, name) {
  * @return {Object} Bus API Client Instance
  */
 async function getBusApiClient () {
-  const span = await logger.startSpan('helper.getBusApiClient')
+  // const span = await logger.startSpan('helper.getBusApiClient')
   // if there is no bus API client instance, then create a new instance
   if (!busApiClient) {
     busApiClient = busApi(_.pick(config,
@@ -831,7 +831,7 @@ async function getBusApiClient () {
         'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'BUSAPI_URL',
         'KAFKA_ERROR_TOPIC', 'AUTH0_PROXY_SERVER_URL']))
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return busApiClient
 }
 
@@ -842,7 +842,7 @@ async function getBusApiClient () {
  * @param {Object} options the extra options to the message
  */
 async function postBusEvent (topic, payload, options = {}) {
-  const span = await logger.startSpan('helper.postBusEvent')
+  // const span = await logger.startSpan('helper.postBusEvent')
   const client = getBusApiClient()
   const message = {
     topic,
@@ -854,7 +854,7 @@ async function postBusEvent (topic, payload, options = {}) {
   if (options.key) {
     message.key = options.key
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   await client.postEvent(message)
 }
 
@@ -893,7 +893,7 @@ function getESClient () {
  * @param {String} currentUser the user
  */
 async function ensureProjectExist (projectId, currentUser) {
-  const span = await logger.startSpan('helper.ensureProjectExist')
+  // const span = await logger.startSpan('helper.ensureProjectExist')
   let token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
   try {
@@ -907,16 +907,16 @@ async function ensureProjectExist (projectId, currentUser) {
     if (!_.find(_.get(res, 'data.members', []), m => _.toString(m.userId) === _.toString(currentUser.userId))) {
       throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`)
     }
-    await logger.endSpan(span)
+    // await logger.endSpan(span)
     return res.data
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       const error = new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
-      await logger.endSpanWithError(span, error)
+      // await logger.endSpanWithError(span, error)
       throw error
     } else {
       // re-throw other error
-      await logger.endSpanWithError(span)
+      // await logger.endSpanWithError(span)
       throw err
     }
   }
@@ -954,7 +954,7 @@ function calculateChallengeEndDate (challenge, data) {
  * @returns {Promise<Array>} an array of challenge ids represents challenges that given member has access to.
  */
 async function listChallengesByMember (memberId) {
-  const span = await logger.startSpan('helper.listChallengesByMember')
+  // const span = await logger.startSpan('helper.listChallengesByMember')
   const token = await getM2MToken()
   let allIds = []
   // get search is paginated, we need to get all pages' data
@@ -983,7 +983,7 @@ async function listChallengesByMember (memberId) {
       break
     }
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return allIds
 }
 
@@ -1005,21 +1005,21 @@ async function validateESRefreshMethod (method) {
  * @returns {Promise<Array<Number>>} An array containing the ids of the default project terms of use
  */
 async function getProjectDefaultTerms (projectId) {
-  const span = await logger.startSpan('helper.getProjectDefaultTerms')
+  // const span = await logger.startSpan('helper.getProjectDefaultTerms')
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`
   try {
     const res = await axios.get(projectUrl, { headers: { Authorization: `Bearer ${token}` } })
-    await logger.endSpan(span)
+    // await logger.endSpan(span)
     return res.data.terms || []
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       const error = new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`)
-      await logger.endSpanWithError(span, error)
+      // await logger.endSpanWithError(span, error)
       throw error
     } else {
       // re-throw other error
-      await logger.endSpanWithError(span)
+      // await logger.endSpanWithError(span)
       throw err
     }
   }
@@ -1032,7 +1032,7 @@ async function getProjectDefaultTerms (projectId) {
  * @returns {Promise<Number>} The billing account ID
  */
 async function getProjectBillingInformation (projectId) {
-  const span = await logger.startSpan('helper.getProjectBillingInformation')
+  // const span = await logger.startSpan('helper.getProjectBillingInformation')
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
@@ -1042,7 +1042,7 @@ async function getProjectBillingInformation (projectId) {
       // TODO - Hack to change int returned from api to decimal
       markup = markup / 100
     }
-    await logger.endSpan(span)
+    // await logger.endSpan(span)
     return {
       billingAccountId: _.get(res, 'data.tcBillingAccountId', null),
       markup
@@ -1067,7 +1067,7 @@ async function getProjectBillingInformation (projectId) {
  * @param {Array<Object>} terms The array of terms {id, roleId} to retrieve from terms API
  */
 async function validateChallengeTerms (terms = []) {
-  const span = await logger.startSpan('helper.validateChallengeTerms')
+  // const span = await logger.startSpan('helper.validateChallengeTerms')
   const listOfTerms = []
   const token = await getM2MToken()
   for (let term of terms) {
@@ -1078,16 +1078,16 @@ async function validateChallengeTerms (terms = []) {
     } catch (e) {
       if (_.get(e, 'response.status') === HttpStatus.NOT_FOUND) {
         const error = new errors.BadRequestError(`Terms of use identified by the id ${term.id} does not exist`)
-        await logger.endSpanWithError(span, error)
+        // await logger.endSpanWithError(span, error)
         throw error
       } else {
         // re-throw other error
-        await logger.endSpanWithError(span)
+        // await logger.endSpanWithError(span)
         throw e
       }
     }
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return listOfTerms
 }
 
@@ -1098,7 +1098,7 @@ async function validateChallengeTerms (terms = []) {
  * @returns {Array} the challenges that can be accessed by current user
  */
 async function _filterChallengesByGroupsAccess (currentUser, challenges) {
-  const span = await logger.startSpan('helper._filterChallengesByGroupsAccess')
+  // const span = await logger.startSpan('helper._filterChallengesByGroupsAccess')
   const res = []
   const needToCheckForGroupAccess = !currentUser ? true : !currentUser.isMachine && !hasAdminRole(currentUser)
   if (!needToCheckForGroupAccess) return challenges
@@ -1119,7 +1119,7 @@ async function _filterChallengesByGroupsAccess (currentUser, challenges) {
       }
     }
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res
 }
 
@@ -1211,20 +1211,20 @@ function sumOfPrizes (prizes) {
   * @returns {Promise<Object>} the group
   */
 async function getGroupById (groupId) {
-  const span = await logger.startSpan('helper.getGroupById')
+  // const span = await logger.startSpan('helper.getGroupById')
   const token = await getM2MToken()
   try {
     const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-    await logger.endSpan(span)
+    // await logger.endSpan(span)
     return result.data
   } catch (err) {
     if (err.response.status === HttpStatus.NOT_FOUND) {
-      await logger.endSpanWithError(span, err)
+      // await logger.endSpanWithError(span, err)
       return
     }
-    await logger.endSpanWithError(span, err)
+    // await logger.endSpanWithError(span, err)
     throw err
   }
 }
@@ -1235,7 +1235,7 @@ async function getGroupById (groupId) {
  * @returns {Array} the submission
  */
 async function getChallengeSubmissions (challengeId) {
-  const span = await logger.startSpan('helper.getChallengeSubmissions')
+  // const span = await logger.startSpan('helper.getChallengeSubmissions')
   const token = await getM2MToken()
   let allSubmissions = []
   // get search is paginated, we need to get all pages' data
@@ -1258,7 +1258,7 @@ async function getChallengeSubmissions (challengeId) {
       break
     }
   }
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return allSubmissions
 }
 
@@ -1268,13 +1268,13 @@ async function getChallengeSubmissions (challengeId) {
  * @returns {Object}
  */
 async function getMemberById (userId) {
-  const span = await logger.startSpan('helper.getMemberById')
+  // const span = await logger.startSpan('helper.getMemberById')
   const token = await getM2MToken()
   const res = await axios.get(`${config.MEMBERS_API_URL}?userId=${userId}`, {
     headers: { Authorization: `Bearer ${token}` }
   })
   if (res.data.length > 0) return res.data[0]
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return {}
 }
 
@@ -1284,12 +1284,12 @@ async function getMemberById (userId) {
  * @returns {Object}
  */
 async function getMemberByHandle (handle) {
-  const span = await logger.startSpan('helper.getMemberByHandle')
+  // const span = await logger.startSpan('helper.getMemberByHandle')
   const token = await getM2MToken()
   const res = await axios.get(`${config.MEMBERS_API_URL}/${handle}`, {
     headers: { Authorization: `Bearer ${token}` }
   })
-  await logger.endSpan(span)
+  // await logger.endSpan(span)
   return res.data || {}
 }
 
@@ -1300,7 +1300,7 @@ async function getMemberByHandle (handle) {
  * @param {Object} data the data
  */
 async function sendSelfServiceNotification (type, recipients, data) {
-  const span = await logger.startSpan('helper.sendSelfServiceNotification')
+  // const span = await logger.startSpan('helper.sendSelfServiceNotification')
   try {
     const res = await postBusEvent(constants.Topics.Notifications, {
       notifications: [
@@ -1321,7 +1321,7 @@ async function sendSelfServiceNotification (type, recipients, data) {
         }
       ]
     })
-    await logger.endSpan(span)
+    // await logger.endSpan(span)
     return res
   } catch (e) {
     logger.debug(`Failed to post notification ${type}: ${e.message}`)
@@ -1333,7 +1333,7 @@ async function sendSelfServiceNotification (type, recipients, data) {
  * @param {Object} request the request
  */
 async function submitZendeskRequest (request) {
-  const span = await logger.startSpan('helper.submitZendeskRequest')
+  // const span = await logger.startSpan('helper.submitZendeskRequest')
   try {
     const res = await axios.post(`${config.ZENDESK_API_URL}/api/v2/requests`, {
       request: {
@@ -1345,7 +1345,7 @@ async function submitZendeskRequest (request) {
         password: config.ZENDESK_API_TOKEN
       }
     })
-    await logger.endSpan(span)
+    // await logger.endSpan(span)
     return res.data || {}
   } catch (e) {
     logger.debug(`Failed to submit request: ${e.message}`)
