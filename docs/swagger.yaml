@@ -390,6 +390,11 @@ paths:
           type: array
           items:
             type: string
+        - name: tco
+          in: query
+          description: Filter by tco eligible events
+          required: false
+          type: boolean
         - name: includeAllEvents
           in: query
           description: Require all provided events to be present on a challenge for a match
