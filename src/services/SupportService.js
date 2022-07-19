@@ -5,8 +5,8 @@
 const _ = require('lodash')
 const Joi = require('joi')
 const config = require('config')
+const logger = require('tc-framework').logger(config)
 const helper = require('../common/helper')
-const logger = require('../common/logger')
 
 /**
  * Create a request in zendesk
@@ -15,6 +15,7 @@ const logger = require('../common/logger')
  * @returns {Object} the search result
  */
 async function createRequest (currentUser, request) {
+  const span = await logger.startSpan('SupportService.searchPhases')
   let subject
   if (request.isSelfService) {
     subject += 'Self-Service customer support request'
@@ -24,6 +25,7 @@ async function createRequest (currentUser, request) {
   if (request.challengeId) {
     subject += ` for Challenge ID: ${request.challengeId}`
   }
+  await logger.endSpan(span)
   return helper.submitZendeskRequest({
     requester: {
       name: `${request.firstName} ${request.lastName}`,
