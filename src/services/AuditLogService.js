@@ -4,6 +4,8 @@
 
 const _ = require('lodash')
 const Joi = require('joi')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const helper = require('../common/helper')
 // const logger = require('../common/logger')
 
@@ -13,6 +15,7 @@ const helper = require('../common/helper')
  * @returns {Object} the search result
  */
 async function searchAuditLogs (criteria) {
+  const span = await logger.startSpan('AuditLogService.searchAuditLogs')
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   let records = await helper.scanAll('AuditLog')
@@ -26,6 +29,7 @@ async function searchAuditLogs (criteria) {
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
 
+  await logger.endSpan(span)
   return { total, page, perPage, result }
 }
 

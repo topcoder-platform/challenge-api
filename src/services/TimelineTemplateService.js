@@ -6,7 +6,8 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
-// const logger = require('../common/logger')
+const config = require('config')
+const logger = require('tc-framework').logger(config)
 const constants = require('../../app-constants')
 
 /**
@@ -15,6 +16,7 @@ const constants = require('../../app-constants')
  * @returns {Object} the search result
  */
 async function searchTimelineTemplates (criteria) {
+  const span = await logger.startSpan('TimelineTemplateService.searchTimelineTemplates')
   const page = criteria.page || 1
   const perPage = criteria.perPage || 50
   const list = await helper.scanAll('TimelineTemplate')
@@ -22,6 +24,7 @@ async function searchTimelineTemplates (criteria) {
   const total = records.length
   const result = records.slice((page - 1) * perPage, page * perPage)
 
+  await logger.endSpan(span)
   return { total, page, perPage, result }
 }
 
@@ -39,12 +42,14 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate (timelineTemplate) {
+  const span = await logger.startSpan('TimelineTemplateService.createTimelineTemplate')
   await helper.validateDuplicate('TimelineTemplate', 'name', timelineTemplate.name)
   await helper.validatePhases(timelineTemplate.phases)
 
   const ret = await helper.create('TimelineTemplate', _.assign({ id: uuid() }, timelineTemplate))
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, ret)
+  await logger.endSpan(span)
   return ret
 }
 
@@ -67,7 +72,10 @@ createTimelineTemplate.schema = {
  * @returns {Object} the timeline template with given id
  */
 async function getTimelineTemplate (timelineTemplateId) {
-  return helper.getById('TimelineTemplate', timelineTemplateId)
+  const span = await logger.startSpan('TimelineTemplateService.getTimelineTemplate')
+  const res = await helper.getById('TimelineTemplate', timelineTemplateId)
+  await logger.endSpan(span)
+  return res
 }
 
 getTimelineTemplate.schema = {
@@ -82,6 +90,7 @@ getTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function update (timelineTemplateId, data, isFull) {
+  const span = await logger.startSpan('TimelineTemplateService.update')
   const timelineTemplate = await helper.getById('TimelineTemplate', timelineTemplateId)
 
   if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
@@ -101,6 +110,7 @@ async function update (timelineTemplateId, data, isFull) {
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateUpdated,
     isFull ? ret : _.assignIn({ id: timelineTemplateId }, data))
+  await logger.endSpan(span)
   return ret
 }
 
@@ -111,7 +121,10 @@ async function update (timelineTemplateId, data, isFull) {
  * @returns {Object} the updated timeline template
  */
 async function fullyUpdateTimelineTemplate (timelineTemplateId, data) {
-  return update(timelineTemplateId, data, true)
+  const span = await logger.startSpan('TimelineTemplateService.fullyUpdateTimelineTemplate')
+  const res = await update(timelineTemplateId, data, true)
+  await logger.endSpan(span)
+  return res
 }
 
 fullyUpdateTimelineTemplate.schema = {
@@ -135,7 +148,10 @@ fullyUpdateTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function partiallyUpdateTimelineTemplate (timelineTemplateId, data) {
-  return update(timelineTemplateId, data)
+  const span = await logger.startSpan('TimelineTemplateService.partiallyUpdateTimelineTemplate')
+  const res = await update(timelineTemplateId, data)
+  await logger.endSpan(span)
+  return res
 }
 
 partiallyUpdateTimelineTemplate.schema = {
@@ -158,10 +174,12 @@ partiallyUpdateTimelineTemplate.schema = {
  * @returns {Object} the deleted timeline template
  */
 async function deleteTimelineTemplate (timelineTemplateId) {
+  const span = await logger.startSpan('TimelineTemplateService.deleteTimelineTemplate')
   const ret = await helper.getById('TimelineTemplate', timelineTemplateId)
   await ret.delete()
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, ret)
+  await logger.endSpan(span)
   return ret
 }
 
