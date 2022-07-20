@@ -1908,7 +1908,7 @@ async function update (currentUser, challengeId, data, isFull) {
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
   if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
-    if (!_.isUndefined(_.get(challenge, 'task'))) {
+    if (!_.isUndefined(_.get(challenge, 'task')) && _.get(challenge, 'winners.length', 0) === 0) {
       data.task = challenge.task
     } else {
       delete data.task
