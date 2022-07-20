@@ -878,15 +878,23 @@ async function listChallengesByMember (memberId) {
   let allIds = []
   // get search is paginated, we need to get all pages' data
   let page = 1
+  let lastDate = null
   while (true) {
     let result = {};
+    let params = {
+      page,
+      perPage: 10000
+    }
+    if (lastDate) {
+      params = {
+        ...params,
+        lastDate
+      }
+    }
     try {
       result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: {
-          page,
-          perPage: 10000
-        }
+        params: params
       })
     } catch (e) {
       // only log the error but don't throw it, so the following logic can still be executed.
@@ -898,6 +906,9 @@ async function listChallengesByMember (memberId) {
     }
     allIds = allIds.concat(ids)
     page += 1
+    if (result.headers && result.headers['x-last-date']) {
+      lastDate = result.headers['x-last-date']
+    }
     if (result.headers && result.headers['x-total-pages'] && page > Number(result.headers['x-total-pages'])) {
       break
     }
