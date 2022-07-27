@@ -1245,9 +1245,10 @@ async function getPhasesAndPopulate (data) {
  * Get challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} id the challenge id
+ * @param {String} legacyId the legacy id
  * @returns {Object} the challenge with given id
  */
-async function getChallenge (currentUser, id) {
+async function getChallenge (currentUser, id, checkIfExists) {
   const span = await logger.startSpan('ChallengeService.getChallenge')
   // get challenge from Elasticsearch
   let challenge
@@ -1272,6 +1273,10 @@ async function getChallenge (currentUser, id) {
       throw e
     }
   }
+  if (checkIfExists) {
+    return _.pick(challenge, ['id', 'legacuId'])
+  }
+
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
 
   // // FIXME: Temporarily hard coded as the migrad
@@ -1318,7 +1323,8 @@ async function getChallenge (currentUser, id) {
 
 getChallenge.schema = {
   currentUser: Joi.any(),
-  id: Joi.id()
+  id: Joi.id(),
+  checkIfExists: Joi.boolean()
 }
 
 /**
