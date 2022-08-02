@@ -73,6 +73,7 @@ workflows:
                 - fix/challenge-timelines-edit-routes
                 - test/performance-profile
                 - July2022Updates
+                - fix-listmemberchallenges-step2
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
