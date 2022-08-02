@@ -464,6 +464,16 @@ async function createSelfServiceProject (name, description, type, token) {
 }
 
 /**
+ * Get project id by roundId
+ * @param {String} roundId the round id
+ */
+async function getProjectIdByRoundId (roundId) {
+  const url = `${config.CHALLENGE_MIGRATION_APP_URL}/getChallengeProjectId/${roundId}`
+  const res = await axios.get(url)
+  return _.get(res, 'data.projectId')
+}
+
+/**
  * Get project payment
  * @param {String} projectId the project id
  */
@@ -1292,6 +1302,7 @@ module.exports = {
   ensureUserCanModifyChallenge,
   userHasFullAccess,
   sumOfPrizes,
+  getProjectIdByRoundId,
   getGroupById,
   getChallengeSubmissions,
   getMemberById,
