@@ -12,7 +12,17 @@ const logger = require('../common/logger')
  * @param {Object} res the response
  */
 async function searchChallenges (req, res) {
-  const result = await service.searchChallenges(req.authUser, { ...req.query, ...req.body })
+  let result = await service.searchChallenges(req.authUser, { ...req.query, ...req.body })
+  if (!result.total && req.query.legacyId) {
+    // maybe the legacyId is roundId for mm challenge
+    // mm challenge use projectId as legacyId
+    try {
+      const legacyId = await helper.getProjectIdByRoundId(req.query.legacyId)
+      result = await service.searchChallenges(req.authUser, { ...req.query, ...req.body, legacyId })
+    } catch (e) {
+      logger.debug(`Failed to get projectId  with error: ${e.message}`)
+    }
+  }
   helper.setResHeaders(req, res, result)
   res.send(result.result)
 }
