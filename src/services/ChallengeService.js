@@ -1245,7 +1245,7 @@ async function getPhasesAndPopulate (data) {
  * Get challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} id the challenge id
- * @param {String} legacyId the legacy id
+ * @param {Boolean} checkIfExists flag to check if challenge exists
  * @returns {Object} the challenge with given id
  */
 async function getChallenge (currentUser, id, checkIfExists) {
@@ -1274,7 +1274,7 @@ async function getChallenge (currentUser, id, checkIfExists) {
     }
   }
   if (checkIfExists) {
-    return _.pick(challenge, ['id', 'legacuId'])
+    return _.pick(challenge, ['id', 'legacyId'])
   }
 
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
