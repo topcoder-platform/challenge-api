@@ -2077,8 +2077,7 @@ sendNotifications.schema = {
  * Remove unwanted properties from the challenge object
  * @param {Object} challenge the challenge object
  */
-async function sanitizeChallenge (challenge) {
-  const span = await logger.startSpan('ChallengeService.sanitizeChallenge')
+function sanitizeChallenge (challenge) {
   const sanitized = _.pick(challenge, [
     'trackId',
     'typeId',
@@ -2156,7 +2155,6 @@ async function sanitizeChallenge (challenge) {
   if (challenge.attachments) {
     sanitized.attachments = _.map(challenge.attachments, attachment => _.pick(attachment, ['id', 'name', 'url', 'fileSize', 'description', 'challengeId']))
   }
-  await logger.endSpan(span)
   return sanitized
 }
 
