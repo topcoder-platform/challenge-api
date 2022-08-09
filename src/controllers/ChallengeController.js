@@ -17,10 +17,17 @@ async function searchChallenges (req, res) {
     // maybe the legacyId is roundId for mm challenge
     // mm challenge use projectId as legacyId
     try {
+      logger.debug(`Staring to get mm challengeId`)
       const legacyId = await helper.getProjectIdByRoundId(req.query.legacyId)
+      logger.debug(`Get mm challengeId successfully ${legacyId}`)
       result = await service.searchChallenges(req.authUser, { ...req.query, ...req.body, legacyId })
+      logger.debug(`Get mm challenge successfully`)
     } catch (e) {
       logger.debug(`Failed to get projectId  with error: ${e.message}`)
+    }
+  } else {
+    if (req.query.legacyId) {
+      logger.debug(`Skipped to get mm challenge`)
     }
   }
   helper.setResHeaders(req, res, result)

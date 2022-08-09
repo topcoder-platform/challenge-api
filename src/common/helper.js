@@ -447,7 +447,7 @@ async function createResource (challengeId, memberHandle, roleId) {
  * @param {String} description The description
  * @param {String} type The type
  * @param {String} token The token
- * @returns 
+ * @returns
  */
 async function createSelfServiceProject (name, description, type, token) {
   const projectObj = {
