@@ -7,7 +7,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jmeter-maven-plugin.version>2.9.0</jmeter-maven-plugin.version>
-		<jmeterScript>Challenge API.jmx</jmeterScript>
+		<jmeterScript>Challenge Pref.jmx</jmeterScript>
     </properties>
     <dependencies>
         <dependency>
