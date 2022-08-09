@@ -1,10 +1,6 @@
 [
     {
-      "username": "TCConManager",
-      "password": "appirio123",
-      "project-id": "17322",
-      "challenge-prefix": "[JMeter]",
-      "challenge-name": "codejam challenge 010",
-      "challenge-date": "2021-12-15"
+      "TEST_USER_ID": "40159018",
+      "GROUP_ID": "041e0be4-7599-402f-989b-b2873b0bed7e"
     }
   ]
