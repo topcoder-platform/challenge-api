@@ -56,10 +56,21 @@ async function partiallyUpdateChallengeTrack (req, res) {
   res.send(result)
 }
 
+/**
+ * Delete challenge track
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function deleteChallengeTrack (req, res) {
+  const result = await service.deleteChallengeTrack(req.params.challengeTrackId)
+  res.send(result)
+}
+
 module.exports = {
   searchChallengeTracks,
   createChallengeTrack,
   getChallengeTrack,
   fullyUpdateChallengeTrack,
-  partiallyUpdateChallengeTrack
+  partiallyUpdateChallengeTrack,
+  deleteChallengeTrack
 }
