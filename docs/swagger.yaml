@@ -908,6 +908,46 @@ paths:
           description: Internal Server error
           schema:
             $ref: "#/definitions/ErrorModel"
+    delete:
+      tags:
+        - ChallengeTypes
+      description: Delete the challenge type with specified id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTypeId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challengeType to be deleted
+      responses:
+        "200":
+          description: Deleted - The request was successful and the resource is returned.
+          schema:
+            $ref: "#/definitions/ChallengeType"
+        "400":
+          description: Bad request. Request parameters were invalid.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "401":
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "403":
+          description: Forbidden. The requester does not have the correct permission to delete the challenge type.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "404":
+          description: Not Found. Challenge type not found
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorModel"
   /challenge-tracks:
     get:
       tags:
@@ -1137,6 +1177,46 @@ paths:
             $ref: "#/definitions/ErrorModel"
         "409":
           description: Conflict. Other challenge track has already used the same name or abbreviation.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorModel"
+    delete:
+      tags:
+        - ChallengeTracks
+      description: Delete the challenge track with specified id.
+      security:
+        - bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: challengeTrackId
+          in: path
+          required: true
+          type: string
+          format: UUID
+          description: The id of challengeTrack to be deleted.
+      responses:
+        "200":
+          description: Deleted - The request was successful and the resource is returned.
+          schema:
+            $ref: "#/definitions/ChallengeTrack"
+        "400":
+          description: Bad request. Request parameters were invalid.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "401":
+          description: Unauthorized. Fail to authenticate the requester.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "403":
+          description: Forbidden. The requester does not have the correct permission to delete the challenge track.
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "404":
+          description: Not Found. Challenge track not found
           schema:
             $ref: "#/definitions/ErrorModel"
         "500":
