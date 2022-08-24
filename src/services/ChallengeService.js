@@ -1446,6 +1446,9 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  if (challenge.task && (challenge.status === constants.challengeStatuses.Completed || data.status === constants.challengeStatuses.Completed || _.get(data, 'winners.length') > 0 || _.get(challenge, 'winners.length') > 0)) {
+    _.unset(data, 'task')
+  }
   let dynamicDescription = _.cloneDeep(data.description || challenge.description)
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
