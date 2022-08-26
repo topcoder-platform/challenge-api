@@ -1221,9 +1221,10 @@ async function getPhasesAndPopulate (data) {
  * Get challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} id the challenge id
+ * @param {Boolean} checkIfExists flag to check if challenge exists
  * @returns {Object} the challenge with given id
  */
-async function getChallenge (currentUser, id) {
+async function getChallenge (currentUser, id, checkIfExists) {
   // get challenge from Elasticsearch
   let challenge
   // logger.warn(JSON.stringify({
@@ -1243,6 +1244,9 @@ async function getChallenge (currentUser, id) {
     } else {
       throw e
     }
+  }
+  if (checkIfExists) {
+    return _.pick(challenge, ['id', 'legacyId'])
   }
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
 
@@ -1288,7 +1292,8 @@ async function getChallenge (currentUser, id) {
 
 getChallenge.schema = {
   currentUser: Joi.any(),
-  id: Joi.id()
+  id: Joi.id(),
+  checkIfExists: Joi.boolean()
 }
 
 /**
