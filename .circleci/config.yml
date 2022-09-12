@@ -70,9 +70,7 @@ workflows:
             branches:
               only:
                 - develop
-                - fix/challenge-timelines-edit-routes
-                - test/performance-profile
-                - July2022Updates
+                - fix/task-memberId-reset
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
