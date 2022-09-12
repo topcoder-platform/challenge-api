@@ -889,7 +889,7 @@ async function listChallengesByMember (memberId) {
   // get search is paginated, we need to get all pages' data
   let page = 1
   while (true) {
-    let result = {};
+    let result = {}
     try {
       result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
         headers: { Authorization: `Bearer ${token}` },

@@ -274,7 +274,7 @@ async function searchChallenges (currentUser, criteria) {
         { wildcard: { name: `*${criteria.search}*` } },
         { wildcard: { name: `${criteria.search}*` } },
         { wildcard: { name: `*${criteria.search}` } },
-        { match_phrase: { tags: criteria.search } },
+        { match_phrase: { tags: criteria.search } }
       ]
     } })
   } else {
@@ -1649,6 +1649,39 @@ async function update (currentUser, challengeId, data, isFull) {
     await validateWinners(data.winners, challengeId)
   }
 
+  // Only m2m tokens are allowed to modify the `task.*` information on a challenge
+  if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
+    if (!_.isUndefined(_.get(challenge, 'task'))) {
+      logger.info(`User ${currentUser.handle || currentUser.sub} is not allowed to modify the task information on challenge ${challengeId}`)
+      data.task = challenge.task
+      logger.info(`Task information on challenge ${challengeId} is reset to ${JSON.stringify(challenge.task)}. Original data: ${JSON.stringify(data.task)}`)
+    } else {
+      delete data.task
+    }
+  }
+
+  // task.memberId goes out of sync due to another processor setting "task.memberId" but subsequent immediate update to the task
+  // will not have the memberId set. So we need to set it using winners to ensure it is always in sync. The proper fix is to correct
+  // the sync issue in the processor. However this is quick fix that works since winner.userId is task.memberId.
+  if (_.get(challenge, 'legacy.pureV5Task') && !_.isUndefined(data.winners)) {
+    const winnerMemberId = _.get(data.winners, '[0].userId')
+    logger.info(`Setting task.memberId to ${winnerMemberId} for challenge ${challengeId}`)
+
+    if (winnerMemberId != null && data.task.memberId !== winnerMemberId) {
+      logger.info(`Task ${challengeId} has a winner ${winnerMemberId}`)
+      data.task = {
+        isTask: true,
+        isAssigned: true,
+        memberId: winnerMemberId
+      }
+      logger.warn(`task.memberId mismatched with winner memberId. task.memberId is updated to ${winnerMemberId}`)
+    } else {
+      logger.info(`task ${challengeId} has no winner set yet.`)
+    }
+  } else {
+    logger.info(`${challengeId} is not a pureV5 challenge or has no winners set yet.`)
+  }
+
   data.updated = moment().utc()
   data.updatedBy = currentUser.handle || currentUser.sub
   const updateDetails = {}
@@ -1708,6 +1741,9 @@ async function update (currentUser, challengeId, data, isFull) {
       // make sure that's always being udpated
       op = '$PUT'
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
+      op = '$PUT'
+    } else if (_.get(challenge, 'legacy.pureV5Task') && key === 'task') {
+      // always update task for pureV5 challenges
       op = '$PUT'
     }
 
@@ -1847,15 +1883,6 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
-
-  // Only m2m tokens are allowed to modify the `task.*` information on a challenge
-  if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
-    if (!_.isUndefined(_.get(challenge, 'task'))) {
-      data.task = challenge.task
-    } else {
-      delete data.task
-    }
-  }
 
   if (_.get(type, 'isTask')) {
     if (!_.isEmpty(_.get(data, 'task.memberId'))) {
