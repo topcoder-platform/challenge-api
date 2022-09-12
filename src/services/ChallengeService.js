@@ -1665,7 +1665,7 @@ async function update (currentUser, challengeId, data, isFull) {
   // the sync issue in the processor. However this is quick fix that works since winner.userId is task.memberId.
   if (_.get(challenge, 'legacy.pureV5Task') && !_.isUndefined(data.winners)) {
     const winnerMemberId = _.get(data.winners, '[0].userId')
-    logger.info(`Setting task.memberId to ${winnerMemberId} for challenge ${challengeId}. Task ${_.get(challenge, 'task')}`)
+    logger.info(`Setting task.memberId to ${winnerMemberId} for challenge ${challengeId}. Task ${_.get(data, 'task')} - ${_.get(challenge, 'task')}`)
 
     if (winnerMemberId != null && _.get(data, 'task.memberId') !== winnerMemberId) {
       logger.info(`Task ${challengeId} has a winner ${winnerMemberId}`)
