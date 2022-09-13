@@ -18,11 +18,6 @@ const prizeSetTypes = {
   CheckpointPrizes: 'checkpoint'
 }
 
-const topGearBillingAccounts = [
-  '80000062',
-  '80002800'
-]
-
 const challengeStatuses = {
   New: 'New',
   Draft: 'Draft',
@@ -145,6 +140,5 @@ module.exports = {
   DiscussionTypes,
   reviewTypes,
   SelfServiceNotificationTypes,
-  SelfServiceNotificationSettings,
-  topGearBillingAccounts
+  SelfServiceNotificationSettings
 }

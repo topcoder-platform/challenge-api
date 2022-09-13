@@ -1491,7 +1491,7 @@ async function update (currentUser, challengeId, data, isFull) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
     _.set(data, 'billing.markup', markup || 0)
   }
-  if (billingAccountId && _.includes(constants.topGearBillingAccounts, _.toString(billingAccountId))) {
+  if (billingAccountId && _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))) {
     if (_.isEmpty(data.metadata)) {
       data.metadata = []
     }
