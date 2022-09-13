@@ -1491,6 +1491,17 @@ async function update (currentUser, challengeId, data, isFull) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
     _.set(data, 'billing.markup', markup || 0)
   }
+  if (billingAccountId && _.includes(constants.topGearBillingAccounts, _.toString(billingAccountId))) {
+    if (_.isEmpty(data.metadata)) {
+      data.metadata = []
+    }
+    if (!_.find(data.metadata, e => e.name === 'postMortemRequired')) {
+      data.metadata.push({
+        name: 'postMortemRequired',
+        value: 'false'
+      })
+    }
+  }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && _.isUndefined(_.get(challenge, 'legacyId'))) {
