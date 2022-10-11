@@ -129,8 +129,10 @@ You can find sample `.env` files inside the `/docs` directory.
    npm run services:up
    ```
    
-4. ♻ Update following two parts:
-- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116
+4. ♻ Update following three parts:
+- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L140
+  `throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
+- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Phase.js#L33
   `throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
 - https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
 
