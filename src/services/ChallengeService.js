@@ -166,7 +166,7 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.types) {
     for (const t of criteria.types) {
       const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t })
-      if (typeSearchRes.total > 0) {
+      if (typeSearchRes.total > 0 || criteria.types.length === 1) {
         includedTypeIds.push(_.get(typeSearchRes, 'result[0].id'))
       }
     }
