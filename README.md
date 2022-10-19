@@ -71,6 +71,7 @@ The following parameters can be set in config files or in env variables:
 - SCOPES: the configurable M2M token scopes, refer `config/default.js` for more details
 - M2M_AUDIT_HANDLE: the audit name used when perform create/update operation using M2M token
 - FORUM_TITLE_LENGTH_LIMIT: the forum title length limit
+- TOPGEAR_BILLING_ACCOUNTS_ID: comma seperated array of Topgear Billing Account IDs
 
 You can find sample `.env` files inside the `/docs` directory.
 
