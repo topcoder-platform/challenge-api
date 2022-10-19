@@ -166,7 +166,7 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.types) {
     for (const t of criteria.types) {
       const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t })
-      if (typeSearchRes.total > 0) {
+      if (typeSearchRes.total > 0 || criteria.types.length === 1) {
         includedTypeIds.push(_.get(typeSearchRes, 'result[0].id'))
       }
     }
@@ -1446,6 +1446,9 @@ async function update (currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await helper.getById('Challenge', challengeId)
+  if (challenge.task && (challenge.status === constants.challengeStatuses.Completed || data.status === constants.challengeStatuses.Completed || _.get(data, 'winners.length') > 0 || _.get(challenge, 'winners.length') > 0)) {
+    _.unset(data, 'task')
+  }
   let dynamicDescription = _.cloneDeep(data.description || challenge.description)
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
@@ -1487,6 +1490,17 @@ async function update (currentUser, challengeId, data, isFull) {
   if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
     _.set(data, 'billing.markup', markup || 0)
+  }
+  if (billingAccountId && _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))) {
+    if (_.isEmpty(data.metadata)) {
+      data.metadata = []
+    }
+    if (!_.find(data.metadata, e => e.name === 'postMortemRequired')) {
+      data.metadata.push({
+        name: 'postMortemRequired',
+        value: 'false'
+      })
+    }
   }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
