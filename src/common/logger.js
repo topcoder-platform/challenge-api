@@ -7,7 +7,9 @@ const Joi = require('joi')
 const util = require('util')
 const config = require('config')
 const getParams = require('get-parameter-names')
+
 const { createLogger, format, transports } = require('winston')
+const AWSXRay = require('aws-xray-sdk')
 
 const logger = createLogger({
   level: config.LOG_LEVEL,
