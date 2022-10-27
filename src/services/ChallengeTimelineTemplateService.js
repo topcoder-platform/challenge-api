@@ -9,6 +9,7 @@ const helper = require('../common/helper')
 // const logger = require('../common/logger')
 const errors = require('../common/errors')
 const constants = require('../../app-constants')
+const logger = require('../common/logger')
 
 /**
  * Search challenge type timeline templates.
@@ -167,4 +168,8 @@ module.exports = {
   deleteChallengeTimelineTemplate
 }
 
-// logger.buildService(module.exports)
+logger.buildService(module.exports, {
+  validators: { enabled: true },
+  logging: { enabled: true },
+  tracing: { enabled: true, annotations: [ 'id' ], metadata: [ 'createdBy', 'status' ] }
+})

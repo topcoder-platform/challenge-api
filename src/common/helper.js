@@ -795,19 +795,23 @@ async function postBusEvent (topic, payload, options = {}) {
     }
   }
 
-  payload.traceInformation = traceInformation
-
   const message = {
     topic,
     originator: constants.EVENT_ORIGINATOR,
     timestamp: new Date().toISOString(),
     'mime-type': constants.EVENT_MIME_TYPE,
-    traceInformation: traceInformation != null ? traceInformation : undefined,
     payload
   }
+
   if (options.key) {
     message.key = options.key
   }
+
+  if (traceInformation) {
+    console.log(`Posting event to bus API with trace information: ${JSON.stringify(traceInformation)}`)
+    message.traceInformation = traceInformation
+  }
+
   await client.postEvent(message)
 }
 

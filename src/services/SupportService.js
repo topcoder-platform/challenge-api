@@ -24,7 +24,7 @@ async function createRequest (currentUser, request) {
   if (request.challengeId) {
     subject += ` for Challenge ID: ${request.challengeId}`
   }
-  return await helper.submitZendeskRequest({
+  return helper.submitZendeskRequest({
     requester: {
       name: `${request.firstName} ${request.lastName}`,
       email: request.email
@@ -61,4 +61,8 @@ module.exports = {
   createRequest
 }
 
-logger.buildService(module.exports)
+logger.buildService(module.exports, {
+  validators: { enabled: true },
+  logging: { enabled: true },
+  tracing: { enabled: true, annotations: [ 'id' ], metadata: [ 'createdBy', 'status' ] }
+})
