@@ -18,8 +18,12 @@ const swaggerUi = require('swagger-ui-express')
 const challengeAPISwaggerDoc = YAML.load('./docs/swagger.yaml')
 const { ForbiddenError } = require('./src/common/errors')
 
+const AWSXRay = require('aws-xray-sdk')
+
 // setup express app
 const app = express()
+
+app.use(AWSXRay.express.openSegment('v5-challenge-api'))
 
 // Disable POST, PUT, PATCH, DELETE operations if READONLY is set to true
 app.use((req, res, next) => {
@@ -77,6 +81,8 @@ app.use(interceptor((req, res) => {
 
 // Register routes
 require('./app-routes')(app)
+
+app.use(AWSXRay.express.closeSegment())
 
 // The error handler
 // eslint-disable-next-line no-unused-vars
