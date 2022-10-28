@@ -782,18 +782,18 @@ function getBusApiClient () {
  */
 async function postBusEvent (topic, payload, options = {}) {
   const client = getBusApiClient()
-  const subsegment = AWSXRay.getSegment().segment
+  // const subsegment = AWSXRay.getSegment().segment
 
-  const traceId = subsegment ? subsegment.trace_id : null
-  const parentSegmentId = subsegment ? subsegment.id : null
+  // const traceId = subsegment ? subsegment.trace_id : null
+  // const parentSegmentId = subsegment ? subsegment.id : null
 
-  let traceInformation = null
-  if (traceId != null) {
-    traceInformation = {
-      traceId: traceId,
-      parentSegmentId: parentSegmentId
-    }
-  }
+  // let traceInformation = null
+  // if (traceId != null) {
+  //   traceInformation = {
+  //     traceId: traceId,
+  //     parentSegmentId: parentSegmentId
+  //   }
+  // }
 
   const message = {
     topic,
@@ -807,10 +807,10 @@ async function postBusEvent (topic, payload, options = {}) {
     message.key = options.key
   }
 
-  if (traceInformation) {
-    console.log(`Posting event to bus API with trace information: ${JSON.stringify(traceInformation)}`)
-    message.traceInformation = traceInformation
-  }
+  // if (traceInformation) {
+  //   console.log(`Posting event to bus API with trace information: ${JSON.stringify(traceInformation)}`)
+  //   message.payload.traceInformation = traceInformation
+  // }
 
   await client.postEvent(message)
 }
