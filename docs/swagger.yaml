@@ -360,6 +360,9 @@ paths:
               projectId,
               name,
               typeId,
+              numOfRegistrants,
+              numOfSubmissions,
+              status,
               overview.totalPrizes,
             ]
         - name: sortOrder
@@ -3007,7 +3010,7 @@ definitions:
             type: boolean
           selfServiceCopilot:
             type: string
-      cancelReason: 
+      cancelReason:
         type: string
       billing:
         type: object
