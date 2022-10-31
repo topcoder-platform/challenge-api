@@ -276,9 +276,13 @@ module.exports = new ChallengePhaseHelper();
 
       if (predecessor == null) {
         p.scheduledStartDate = startDate
-        // p.actualStartDate = startDate
-
         p.scheduledEndDate = moment(p.actualStartDate != null ? p.actaulStartDate : startDate).add(p.duration, 'seconds').toDate()
+
+        if (moment(p.scheduledEndDate).isBefore(moment())) {
+          delete p.actualEndDate
+        } else {
+          p.actualEndDate = p.scheduledEndDate
+        }
       } else {
         const precedecessorPhase = _.find(phases, { phaseId: predecessor.phaseId })
         if (precedecessorPhase == null) {
@@ -295,6 +299,9 @@ module.exports = new ChallengePhaseHelper();
         p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, 'seconds').toDate()
       }
       p.isOpen = moment().isBetween(p.scheduledStartDate, p.scheduledEndDate)
+      if (p.isOpen) {
+        delete p.actualEndDate
+      }
       if (p.name === 'Submission') {
         isSubmissionPhaseOpen = p.isOpen
       }
