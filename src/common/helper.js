@@ -336,25 +336,6 @@ function partialMatch (filter, value) {
 }
 
 /**
- * Perform validation on phases.
- * @param {Array} phases the phases data.
- */
-async function validatePhases (phases) {
-  if (!phases || phases.length === 0) {
-    return
-  }
-  const records = await scan('Phase')
-  const map = new Map()
-  _.each(records, r => {
-    map.set(r.id, r)
-  })
-  const invalidPhases = _.filter(phases, p => !map.has(p.phaseId))
-  if (invalidPhases.length > 0) {
-    throw new errors.BadRequestError(`The following phases are invalid: ${toString(invalidPhases)}`)
-  }
-}
-
-/**
  * Download file from S3
  * @param {String} bucket the bucket name
  * @param {String} key the key name
@@ -1276,7 +1257,6 @@ module.exports = {
   scanAll,
   validateDuplicate,
   partialMatch,
-  validatePhases,
   downloadFromFileStack,
   downloadFromS3,
   deleteFromS3,

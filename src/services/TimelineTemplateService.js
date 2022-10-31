@@ -6,6 +6,7 @@ const _ = require('lodash')
 const Joi = require('joi')
 const uuid = require('uuid/v4')
 const helper = require('../common/helper')
+const phaseHelper = require('../common/phase-helper')
 // const logger = require('../common/logger')
 const constants = require('../../app-constants')
 
@@ -40,7 +41,7 @@ searchTimelineTemplates.schema = {
  */
 async function createTimelineTemplate (timelineTemplate) {
   await helper.validateDuplicate('TimelineTemplate', 'name', timelineTemplate.name)
-  await helper.validatePhases(timelineTemplate.phases)
+  await phaseHelper.validatePhases(timelineTemplate.phases)
 
   const ret = await helper.create('TimelineTemplate', _.assign({ id: uuid() }, timelineTemplate))
   // post bus event
@@ -89,7 +90,7 @@ async function update (timelineTemplateId, data, isFull) {
   }
 
   if (data.phases) {
-    await helper.validatePhases(data.phases)
+    await phaseHelper.validatePhases(data.phases)
   }
 
   if (isFull) {
