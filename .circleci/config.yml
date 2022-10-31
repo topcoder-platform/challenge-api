@@ -72,7 +72,7 @@ workflows:
             branches:
               only:
                 - develop
-                - fix/task-memberId-reset
+                - feat/phase-extension
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.

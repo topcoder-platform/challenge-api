@@ -1,0 +1,4 @@
+{
+    "editor.defaultFormatter": "standard.vscode-standard",
+    "standard.autoFixOnSave": true
+}
