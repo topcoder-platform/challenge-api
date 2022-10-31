@@ -66,7 +66,7 @@ class ChallengePhaseHelper {
 
     if (!phases || phases.length === 0) {
       // auto populate phases
-      for (const p of timelineTempate.phases) {
+      for (const p of timelineTempate) {
         phases.push({ ...p })
 >>>>>>> 21bc5fc (feat: challenge phase extension)
       }
