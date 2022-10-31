@@ -60,6 +60,9 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate(timelineTemplate) {
+  // await helper.validateDuplicate('TimelineTemplate', 'name', timelineTemplate.name)
+  // await phaseHelper.validatePhases(timelineTemplate.phases)
+
   const scanCriteria = getScanCriteria({
     name: timelineTemplate.name,
   });

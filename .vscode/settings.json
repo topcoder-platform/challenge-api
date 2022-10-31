@@ -1,8 +1,6 @@
 {
-    "editor.defaultFormatter": "standard.vscode-standard",
-    "standard.autoFixOnSave": true,
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "standard.autoFixOnSave": true
+  "standard.autoFixOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

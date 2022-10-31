@@ -3,6 +3,23 @@
  */
 
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
+const _ = require("lodash");
+const Joi = require("joi");
+const uuid = require("uuid/v4");
+const config = require("config");
+const xss = require("xss");
+const helper = require("../common/helper");
+const logger = require("../common/logger");
+const errors = require("../common/errors");
+const phaseHelper = require("../common/phase-helper");
+const constants = require("../../app-constants");
+const models = require("../models");
+const HttpStatus = require("http-status-codes");
+const moment = require("moment");
+const PhaseService = require("./PhaseService");
+const ChallengeTypeService = require("./ChallengeTypeService");
+const ChallengeTrackService = require("./ChallengeTrackService");
+const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateService");
 
 const {
   DomainHelper: { getLookupCriteria, getScanCriteria },
