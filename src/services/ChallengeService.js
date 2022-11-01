@@ -962,7 +962,7 @@ async function createChallenge (currentUser, challenge, userToken) {
     if (challenge.legacy.selfService) {
       if (!challenge.projectId) {
         const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`
-        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, 'N/A', config.NEW_SELF_SERVICE_PROJECT_TYPE, userToken)
+        challenge.projectId = await helper.createSelfServiceProject(selfServiceProjectName, 'N/A', config.NEW_SELF_SERVICE_PROJECT_TYPE)
       }
     } else if (!challenge.projectId) {
       throw new errors.BadRequestError('The projectId is required')
