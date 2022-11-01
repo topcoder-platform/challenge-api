@@ -268,6 +268,8 @@ module.exports = new ChallengePhaseHelper();
       return 0
     })
 
+    let isSubmissionPhaseOpen = false
+
     for (let p of phases) {
       const predecessor = timelineTemplateMap.get(p.predecessor)
 
@@ -308,6 +310,9 @@ module.exports = new ChallengePhaseHelper();
       }
       p.isOpen = moment().isBetween(p.scheduledStartDate, p.scheduledEndDate)
       if (p.isOpen) {
+        if (p.name === 'Submission') {
+          isSubmissionPhaseOpen = true
+        }
         delete p.actualEndDate
       }
 
@@ -315,12 +320,13 @@ module.exports = new ChallengePhaseHelper();
         delete p.actualStartDate
         delete p.actualEndDate
       }
-    }
 
-    // if submission phase is open, remove post-mortem phase
-    // if (isSubmissionPhaseOpen && postMortemPhaseIndex > -1) {
-    //   phases.splice(postMortemPhaseIndex, 1)
-    // }
+      if (p.name === 'Post-Mortem' && isSubmissionPhaseOpen) {
+        delete p.actualStartDate
+        delete p.actualEndDate
+        p.isOpen = false
+      }
+    }
 
     // phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
   }
