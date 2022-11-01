@@ -69,16 +69,24 @@ class ChallengePhaseHelper {
       return 0
     })
 
-    let isSubmissionPhaseOpen = false
-    let postMortemPhaseIndex = -1
-
     for (let p of phases) {
       const predecessor = timelineTemplateMap.get(p.predecessor)
 
       if (predecessor == null) {
-        p.scheduledStartDate = startDate
-        p.scheduledEndDate = moment(p.actualStartDate != null ? p.actaulStartDate : startDate).add(p.duration, 'seconds').toDate()
+        if (p.name === 'Registration') {
+          p.scheduledStartDate = moment(startDate).toDate()
+        }
+        if (p.name === 'Submission') {
+          p.scheduledStartDate = moment(startDate).add(5, 'minutes').toDate()
+        }
 
+        if (moment(p.scheduledStartDate).isSameOrBefore(moment())) {
+          p.actualStartDate = p.scheduledStartDate
+        } else {
+          delete p.actualStartDate
+        }
+
+        p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, 'seconds').toDate()
         if (moment(p.scheduledEndDate).isBefore(moment())) {
           delete p.actualEndDate
         } else {
@@ -103,18 +111,17 @@ class ChallengePhaseHelper {
       if (p.isOpen) {
         delete p.actualEndDate
       }
-      if (p.name === 'Submission') {
-        isSubmissionPhaseOpen = p.isOpen
-      }
-      if (p.name === 'Post-Mortem') {
-        postMortemPhaseIndex = _.findIndex(phases, { phaseId: p.phaseId })
+
+      if (moment(p.scheduledStartDate).isAfter(moment())) {
+        delete p.actualStartDate
+        delete p.actualEndDate
       }
     }
 
     // if submission phase is open, remove post-mortem phase
-    if (isSubmissionPhaseOpen && postMortemPhaseIndex > -1) {
-      phases.splice(postMortemPhaseIndex, 1)
-    }
+    // if (isSubmissionPhaseOpen && postMortemPhaseIndex > -1) {
+    //   phases.splice(postMortemPhaseIndex, 1)
+    // }
 
     // phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
   }
