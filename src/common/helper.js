@@ -20,6 +20,8 @@ const HttpStatus = require('http-status-codes')
 const xss = require('xss')
 const logger = require('./logger')
 
+const AWSXRay = require('aws-xray-sdk')
+
 // Bus API Client
 let busApiClient
 
@@ -761,6 +763,19 @@ function getBusApiClient () {
  */
 async function postBusEvent (topic, payload, options = {}) {
   const client = getBusApiClient()
+  // const subsegment = AWSXRay.getSegment().segment
+
+  // const traceId = subsegment ? subsegment.trace_id : null
+  // const parentSegmentId = subsegment ? subsegment.id : null
+
+  // let traceInformation = null
+  // if (traceId != null) {
+  //   traceInformation = {
+  //     traceId: traceId,
+  //     parentSegmentId: parentSegmentId
+  //   }
+  // }
+
   const message = {
     topic,
     originator: constants.EVENT_ORIGINATOR,
@@ -768,9 +783,16 @@ async function postBusEvent (topic, payload, options = {}) {
     'mime-type': constants.EVENT_MIME_TYPE,
     payload
   }
+
   if (options.key) {
     message.key = options.key
   }
+
+  // if (traceInformation) {
+  //   console.log(`Posting event to bus API with trace information: ${JSON.stringify(traceInformation)}`)
+  //   message.payload.traceInformation = traceInformation
+  // }
+
   await client.postEvent(message)
 }
 
@@ -1299,3 +1321,9 @@ module.exports = {
   getFromInternalCache,
   setToInternalCache
 }
+
+logger.buildService(module.exports, {
+  validators: { enabled: false },
+  logging: { enabled: false },
+  tracing: { enabled: true, annotations: [], metadata: [] }
+})

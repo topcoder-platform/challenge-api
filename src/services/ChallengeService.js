@@ -960,6 +960,8 @@ async function createChallenge (currentUser, challenge, userToken) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
 
+  console.log('challenge-phases', challenge.phases)
+
   // auto-populate totalPrizes
   if (challenge.prizeSets) {
     const prizeSetsGroup = _.groupBy(challenge.prizeSets, 'type')
@@ -1537,6 +1539,8 @@ async function update (currentUser, challengeId, data, isFull) {
     challenge.phases = newPhases
     data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
+
+    console.log('UPdating phases', challenge.phases)
   }
 
   // PUT HERE
@@ -2284,4 +2288,8 @@ module.exports = {
   sendNotifications
 }
 
-logger.buildService(module.exports)
+logger.buildService(module.exports, {
+  validators: { enabled: true },
+  logging: { enabled: true },
+  tracing: { enabled: true, annotations: [ 'id' ], metadata: [ 'createdBy', 'status' ] }
+})

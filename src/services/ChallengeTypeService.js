@@ -158,4 +158,8 @@ module.exports = {
   partiallyUpdateChallengeType
 }
 
-// logger.buildService(module.exports)
+// logger.buildService(module.exports, {
+//   tracing: {
+//     enabled: true
+//   }
+// })

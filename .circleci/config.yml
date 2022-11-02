@@ -71,6 +71,7 @@ workflows:
               only:
                 - develop
                 - feat/phase-extension
+                - feat/tracing
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
