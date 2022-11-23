@@ -19,6 +19,7 @@ const PhaseService = require('./PhaseService')
 const ChallengeTypeService = require('./ChallengeTypeService')
 const ChallengeTrackService = require('./ChallengeTrackService')
 const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateService')
+const { BadRequestError } = require('../common/errors')
 
 const esClient = helper.getESClient()
 
@@ -1515,7 +1516,11 @@ async function update (currentUser, challengeId, data, isFull) {
     }
   }
 
-  if ((challenge.status === constants.challengeStatuses.Active || challenge.status === constants.challengeStatuses.Draft) && (data.phases || data.startDate)) {
+  if (data.phases || data.startDate) {
+    if (!(challenge.status === constants.challengeStatuses.Active || challenge.status === constants.challengeStatuses.Draft)) {
+      throw new BadRequestError(`Challenge phase/start date can only be modify for "Active" and "Draft" challenges.`)
+    }
+
     if (data.phases && data.phases.length > 0) {
       for (let i = 0; i < challenge.phases.length; i += 1) {
         const updatedPhaseInfo = _.find(data.phases, p => p.phaseId === challenge.phases[i].phaseId)
