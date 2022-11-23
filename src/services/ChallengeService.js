@@ -1515,7 +1515,7 @@ async function update (currentUser, challengeId, data, isFull) {
     }
   }
 
-  if (challenge.status !== constants.challengeStatuses.Completed && (data.phases || data.startDate)) {
+  if ((challenge.status === constants.challengeStatuses.Active || challenge.status === constants.challengeStatuses.Draft) && (data.phases || data.startDate)) {
     if (data.phases && data.phases.length > 0) {
       for (let i = 0; i < challenge.phases.length; i += 1) {
         const updatedPhaseInfo = _.find(data.phases, p => p.phaseId === challenge.phases[i].phaseId)
