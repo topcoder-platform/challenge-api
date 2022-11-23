@@ -1515,7 +1515,7 @@ async function update (currentUser, challengeId, data, isFull) {
     }
   }
 
-  if (data.phases || data.startDate) {
+  if (challenge.status !== constants.challengeStatuses.Completed && (data.phases || data.startDate)) {
     if (data.phases && data.phases.length > 0) {
       for (let i = 0; i < challenge.phases.length; i += 1) {
         const updatedPhaseInfo = _.find(data.phases, p => p.phaseId === challenge.phases[i].phaseId)
@@ -1539,8 +1539,6 @@ async function update (currentUser, challengeId, data, isFull) {
     challenge.phases = newPhases
     data.startDate = newStartDate
     data.endDate = helper.calculateChallengeEndDate(challenge, data)
-
-    console.log('UPdating phases', challenge.phases)
   }
 
   // PUT HERE
