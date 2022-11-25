@@ -2013,10 +2013,7 @@ async function update (currentUser, challengeId, data, isFull) {
       challenge.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate
     }
   }
-  console.log('--------------------')
-  console.log(JSON.stringify(updateDetails, null, 2))
-  console.log(JSON.stringify(challenge, null, 2))
-  console.log('--------------------')
+
   // Update ES
   await esClient.update({
     index: config.get('ES.ES_INDEX'),
