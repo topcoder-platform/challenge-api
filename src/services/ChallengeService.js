@@ -1729,6 +1729,16 @@ async function update (currentUser, challengeId, data, isFull) {
 
   data.updated = moment().utc()
   data.updatedBy = currentUser.handle || currentUser.sub
+  const finalMetadata = [...challenge.metadata || []]
+  _.each(data.metadata || [], (rec) => {
+    const existingMeta = _.findIndex(finalMetadata, m => m.name === rec.name)
+    if (existingMeta > -1) {
+      finalMetadata[existingMeta].value = rec.value
+    } else {
+      finalMetadata.push(rec)
+    }
+  })
+  data.metadata = finalMetadata
   const updateDetails = {}
   const auditLogs = []
   let phasesHaveBeenModified = false
@@ -1954,16 +1964,6 @@ async function update (currentUser, challengeId, data, isFull) {
 
   delete data.attachments
   delete data.terms
-  const finalMetadata = [...challenge.metadata || []]
-  _.each(data.metadata || [], (rec) => {
-    const existingMeta = _.findIndex(finalMetadata, m => m.name === rec.name)
-    if (existingMeta > -1) {
-      finalMetadata[existingMeta].value = rec.value
-    } else {
-      finalMetadata.push(rec)
-    }
-  })
-  data.metadata = finalMetadata
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
