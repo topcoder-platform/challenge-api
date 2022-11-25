@@ -1923,7 +1923,7 @@ async function update (currentUser, challengeId, data, isFull) {
       finalMetadata.push(rec)
     }
   })
-  data.metdata = finalMetadata
+  data.metadata = finalMetadata
   _.assign(challenge, data)
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments
