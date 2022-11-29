@@ -1517,8 +1517,8 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   if (data.phases || data.startDate) {
-    if (!(challenge.status === constants.challengeStatuses.Active || challenge.status === constants.challengeStatuses.Draft)) {
-      throw new BadRequestError(`Challenge phase/start date can only be modify for "Active" and "Draft" challenges.`)
+    if (challenge.status === constants.challengeStatuses.Completed || challenge.status.indexOf(constants.challengeStatuses.Cancelled) > -1) {
+      throw new BadRequestError(`Challenge phase/start date can not be modified for Completed or Cancelled challenges.`)
     }
 
     if (data.phases && data.phases.length > 0) {
