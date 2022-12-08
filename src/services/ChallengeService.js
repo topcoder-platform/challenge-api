@@ -2083,8 +2083,8 @@ async function update (currentUser, challengeId, data, isFull) {
 async function sendNotifications (currentUser, challengeId) {
   const span = await logger.startSpan('ChallengeService.sendNotifications')
   const challenge = await getChallenge(currentUser, challengeId)
-  const creator = await helper.getMemberByHandle(challenge.createdBy)
-  if (challenge.status === constants.challengeStatuses.Completed) {
+  if (challenge.legacy && challenge.legacy.selfService && challenge.status === constants.challengeStatuses.Completed) {
+    const creator = await helper.getMemberByHandle(challenge.createdBy)
     await helper.sendSelfServiceNotification(
       constants.SelfServiceNotificationTypes.WORK_COMPLETED,
       [{ email: creator.email }],
@@ -2097,6 +2097,7 @@ async function sendNotifications (currentUser, challengeId) {
     await logger.endSpan(span)
     return { type: constants.SelfServiceNotificationTypes.WORK_COMPLETED }
   }
+  await logger.endSpan(span)
 }
 
 sendNotifications.schema = {
