@@ -1,11 +1,13 @@
 version: 2
 defaults: &defaults
     docker:
-      - image: circleci/python:2.7-stretch-browsers
+      - image: cimg/python:3.11.0-browsers
 install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
+    sudo apt update
     sudo apt install jq
+    sudo apt install python3-pip
     sudo pip install awscli --upgrade
     sudo pip install docker-compose
 install_deploysuite: &install_deploysuite
