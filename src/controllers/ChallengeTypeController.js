@@ -1,19 +1,19 @@
 /**
  * Controller for challenge type endpoints
  */
-const HttpStatus = require('http-status-codes')
-const service = require('../services/ChallengeTypeService')
-const helper = require('../common/helper')
+const HttpStatus = require("http-status-codes");
+const service = require("../services/ChallengeTypeService");
+const helper = require("../common/helper");
 
 /**
  * Search challenge types
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function searchChallengeTypes (req, res) {
-  const result = await service.searchChallengeTypes(req.query)
-  helper.setResHeaders(req, res, result)
-  res.send(result.result)
+async function searchChallengeTypes(req, res) {
+  const result = await service.searchChallengeTypes(req.query);
+  helper.setResHeaders(req, res, result);
+  res.send(result.result);
 }
 
 /**
@@ -21,9 +21,9 @@ async function searchChallengeTypes (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function createChallengeType (req, res) {
-  const result = await service.createChallengeType(req.body)
-  res.status(HttpStatus.CREATED).send(result)
+async function createChallengeType(req, res) {
+  const result = await service.createChallengeType(req.body);
+  res.status(HttpStatus.CREATED).send(result);
 }
 
 /**
@@ -31,9 +31,9 @@ async function createChallengeType (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function getChallengeType (req, res) {
-  const result = await service.getChallengeType(req.params.challengeTypeId)
-  res.send(result)
+async function getChallengeType(req, res) {
+  const result = await service.getChallengeType(req.params.challengeTypeId);
+  res.send(result);
 }
 
 /**
@@ -41,9 +41,12 @@ async function getChallengeType (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function fullyUpdateChallengeType (req, res) {
-  const result = await service.fullyUpdateChallengeType(req.params.challengeTypeId, req.body)
-  res.send(result)
+async function fullyUpdateChallengeType(req, res) {
+  const result = await service.fullyUpdateChallengeType(
+    req.params.challengeTypeId,
+    req.body
+  );
+  res.send(result);
 }
 
 /**
@@ -51,9 +54,12 @@ async function fullyUpdateChallengeType (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function partiallyUpdateChallengeType (req, res) {
-  const result = await service.partiallyUpdateChallengeType(req.params.challengeTypeId, req.body)
-  res.send(result)
+async function partiallyUpdateChallengeType(req, res) {
+  const result = await service.partiallyUpdateChallengeType(
+    req.params.challengeTypeId,
+    req.body
+  );
+  res.send(result);
 }
 
 module.exports = {
@@ -61,5 +67,5 @@ module.exports = {
   createChallengeType,
   getChallengeType,
   fullyUpdateChallengeType,
-  partiallyUpdateChallengeType
-}
+  partiallyUpdateChallengeType,
+};

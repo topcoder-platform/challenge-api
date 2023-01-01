@@ -1,4 +1,7 @@
 {
     "editor.defaultFormatter": "standard.vscode-standard",
-    "standard.autoFixOnSave": true
+    "standard.autoFixOnSave": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

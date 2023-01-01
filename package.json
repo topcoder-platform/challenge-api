@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "lint": "standard",
-    "lint:fix": "standard --fix",
+    "lint": "prettier src/**/*.js",
+    "lint:fix": "prettier --write src/**/*.js",
     "init-es": "node src/init-es.js",
     "init-db": "node src/init-db.js",
     "sync-es": "node src/scripts/sync-es.js",
@@ -35,9 +35,11 @@
     "mocha": "^6.1.4",
     "mocha-prepare": "^0.1.0",
     "nyc": "^14.0.0",
-    "standard": "^12.0.1"
+    "prettier": "^2.8.1"
   },
   "dependencies": {
+    "@topcoder-framework/domain-challenge": "^0.1.1-ci.0",
+    "@topcoder-framework/lib-common": "^0.1.1-ci.0",
     "aws-sdk": "^2.1145.0",
     "aws-xray-sdk": "^3.3.8",
     "axios": "^0.19.0",
@@ -76,9 +78,9 @@
     ]
   },
   "engines": {
-    "node": "10.x"
+    "node": "18.x"
   },
   "volta": {
-    "node": "12.22.12"
+    "node": "18.12.1"
   }
 }

@@ -1,21 +1,22 @@
-
 /**
  * This service provides operations of attachments.
  */
 
-const _ = require('lodash')
-const Joi = require('joi')
-const uuid = require('uuid/v4')
-const config = require('config')
-const errors = require('../common/errors')
-const helper = require('../common/helper')
-const s3ParseUrl = require('../common/s3ParseUrl')
-const models = require('../models')
-const logger = require('../common/logger')
-const constants = require('../../app-constants')
-const challengeService = require('./ChallengeService')
+const _ = require("lodash");
+const Joi = require("joi");
+const uuid = require("uuid/v4");
+const config = require("config");
+const errors = require("../common/errors");
+const helper = require("../common/helper");
+const s3ParseUrl = require("../common/s3ParseUrl");
+const models = require("../models");
+const logger = require("../common/logger");
+const constants = require("../../app-constants");
+const challengeService = require("./ChallengeService");
 
-const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(',').map((bucketName) => bucketName.trim())
+const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(",").map(
+  (bucketName) => bucketName.trim()
+);
 
 /**
  * Check if a url is acceptable.
@@ -23,15 +24,17 @@ const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(',').map((bucketNam
  * @param {String} url the url
  * @returns {undefined}
  */
-function validateUrl (url) {
-  const s3UrlObject = s3ParseUrl(url)
+function validateUrl(url) {
+  const s3UrlObject = s3ParseUrl(url);
   if (!s3UrlObject) {
-    return
+    return;
   }
   if (bucketWhitelist.includes(s3UrlObject.bucket)) {
-    return
+    return;
   }
-  throw new errors.BadRequestError(`The bucket ${s3UrlObject.bucket} is not in the whitelist`)
+  throw new errors.BadRequestError(
+    `The bucket ${s3UrlObject.bucket} is not in the whitelist`
+  );
 }
 
 /**
@@ -40,13 +43,15 @@ function validateUrl (url) {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the challenge and the attachment
  */
-async function _getChallengeAttachment (challengeId, attachmentId) {
-  const challenge = await helper.getById('Challenge', challengeId)
-  const attachment = await models.Attachment.get(attachmentId)
+async function _getChallengeAttachment(challengeId, attachmentId) {
+  const challenge = await helper.getById("Challenge", challengeId);
+  const attachment = await models.Attachment.get(attachmentId);
   if (!attachment || attachment.challengeId !== challengeId) {
-    throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
+    throw errors.NotFoundError(
+      `Attachment ${attachmentId} not found in challenge ${challengeId}`
+    );
   }
-  return { challenge, attachment }
+  return { challenge, attachment };
 }
 
 /**
@@ -55,38 +60,43 @@ async function _getChallengeAttachment (challengeId, attachmentId) {
  * @param {Array} attachments the attachments to be created
  * @returns {Object} the created attachment
  */
-async function createAttachment (currentUser, challengeId, attachments) {
-  const challenge = await helper.getById('Challenge', challengeId)
-  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
-  const newAttachments = []
+async function createAttachment(currentUser, challengeId, attachments) {
+  const challenge = await helper.getById("Challenge", challengeId);
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+  const newAttachments = [];
   for (const attachment of attachments) {
-    validateUrl(attachment.url)
-    const attachmentObject = { id: uuid(), challengeId, ...attachment }
-    const newAttachment = await helper.create('Attachment', attachmentObject)
-    await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, newAttachment)
-    newAttachments.push(newAttachment)
+    validateUrl(attachment.url);
+    const attachmentObject = { id: uuid(), challengeId, ...attachment };
+    const newAttachment = await helper.create("Attachment", attachmentObject);
+    await helper.postBusEvent(
+      constants.Topics.ChallengeAttachmentCreated,
+      newAttachment
+    );
+    newAttachments.push(newAttachment);
   }
   // update challenge object
   await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
-    attachments: [
-      ..._.get(challenge, 'attachments', []),
-      ...newAttachments
-    ]
-  })
+    attachments: [..._.get(challenge, "attachments", []), ...newAttachments],
+  });
   // post bus event
-  return newAttachments
+  return newAttachments;
 }
 
 createAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  attachments: Joi.array().items(Joi.object().keys({
-    name: Joi.string().required(),
-    url: Joi.string().uri().required(),
-    fileSize: Joi.fileSize(),
-    description: Joi.string()
-  })).required().min(1)
-}
+  attachments: Joi.array()
+    .items(
+      Joi.object().keys({
+        name: Joi.string().required(),
+        url: Joi.string().uri().required(),
+        fileSize: Joi.fileSize(),
+        description: Joi.string(),
+      })
+    )
+    .required()
+    .min(1),
+};
 
 /**
  * Get attachment
@@ -94,17 +104,20 @@ createAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the attachment with given id
  */
-async function getAttachment (currentUser, challengeId, attachmentId) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
-  await helper.ensureUserCanViewChallenge(currentUser, challenge)
-  return attachment
+async function getAttachment(currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(
+    challengeId,
+    attachmentId
+  );
+  await helper.ensureUserCanViewChallenge(currentUser, challenge);
+  return attachment;
 }
 
 getAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  attachmentId: Joi.id()
-}
+  attachmentId: Joi.id(),
+};
 
 /**
  * Update attachment.
@@ -114,32 +127,40 @@ getAttachment.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated attachment
  */
-async function update (currentUser, challengeId, attachmentId, data, isFull) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
-  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
-  validateUrl(data.url)
+async function update(currentUser, challengeId, attachmentId, data, isFull) {
+  const { challenge, attachment } = await _getChallengeAttachment(
+    challengeId,
+    attachmentId
+  );
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+  validateUrl(data.url);
 
   if (isFull) {
     // optional fields can be undefined
-    attachment.fileSize = data.fileSize
-    attachment.description = data.description
+    attachment.fileSize = data.fileSize;
+    attachment.description = data.description;
   }
 
-  const ret = await helper.update(attachment, data)
+  const ret = await helper.update(attachment, data);
   // update challenge object
-  const newAttachments = _.get(challenge, 'attachments', [])
+  const newAttachments = _.get(challenge, "attachments", []);
   try {
-    newAttachments[_.findIndex(newAttachments, a => a.id === attachmentId)] = ret
+    newAttachments[_.findIndex(newAttachments, (a) => a.id === attachmentId)] =
+      ret;
     await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
-      attachments: newAttachments
-    })
+      attachments: newAttachments,
+    });
   } catch (e) {
-    logger.warn(`The attachment ${attachmentId} does not exist on the challenge object`)
+    logger.warn(
+      `The attachment ${attachmentId} does not exist on the challenge object`
+    );
   }
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeAttachmentUpdated,
-    isFull ? ret : _.assignIn({ id: attachmentId }, data))
-  return ret
+  await helper.postBusEvent(
+    constants.Topics.ChallengeAttachmentUpdated,
+    isFull ? ret : _.assignIn({ id: attachmentId }, data)
+  );
+  return ret;
 }
 
 /**
@@ -149,21 +170,28 @@ async function update (currentUser, challengeId, attachmentId, data, isFull) {
  * @param {Object} data the attachment data to be updated
  * @returns {Object} the updated attachment
  */
-async function fullyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
-  return update(currentUser, challengeId, attachmentId, data, true)
+async function fullyUpdateAttachment(
+  currentUser,
+  challengeId,
+  attachmentId,
+  data
+) {
+  return update(currentUser, challengeId, attachmentId, data, true);
 }
 
 fullyUpdateAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id(),
-  data: Joi.object().keys({
-    name: Joi.string().required(),
-    url: Joi.string().uri().required(),
-    fileSize: Joi.fileSize(),
-    description: Joi.string()
-  }).required()
-}
+  data: Joi.object()
+    .keys({
+      name: Joi.string().required(),
+      url: Joi.string().uri().required(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string(),
+    })
+    .required(),
+};
 
 /**
  * Partially update attachment.
@@ -172,55 +200,73 @@ fullyUpdateAttachment.schema = {
  * @param {Object} data the attachment data to be updated
  * @returns {Object} the updated attachment
  */
-async function partiallyUpdateAttachment (currentUser, challengeId, attachmentId, data) {
-  return update(currentUser, challengeId, attachmentId, data)
+async function partiallyUpdateAttachment(
+  currentUser,
+  challengeId,
+  attachmentId,
+  data
+) {
+  return update(currentUser, challengeId, attachmentId, data);
 }
 
 partiallyUpdateAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   attachmentId: Joi.id(),
-  data: Joi.object().keys({
-    name: Joi.string(),
-    url: Joi.string().uri(),
-    fileSize: Joi.fileSize(),
-    description: Joi.string()
-  }).required()
-}
+  data: Joi.object()
+    .keys({
+      name: Joi.string(),
+      url: Joi.string().uri(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string(),
+    })
+    .required(),
+};
 
 /**
  * Delete attachment.
  * @param {String} attachmentId the attachment id
  * @returns {Object} the deleted attachment
  */
-async function deleteAttachment (currentUser, challengeId, attachmentId) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
-  await helper.ensureUserCanModifyChallenge(currentUser, challenge)
-  const s3UrlObject = s3ParseUrl(attachment.url)
+async function deleteAttachment(currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(
+    challengeId,
+    attachmentId
+  );
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+  const s3UrlObject = s3ParseUrl(attachment.url);
   if (s3UrlObject) {
-    await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key)
+    await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key);
   }
-  await attachment.delete()
+  await attachment.delete();
   // update challenge object
-  const newAttachments = _.get(challenge, 'attachments', [])
+  const newAttachments = _.get(challenge, "attachments", []);
   try {
-    newAttachments.splice(_.findIndex(newAttachments, a => a.id === attachmentId), 1)
+    newAttachments.splice(
+      _.findIndex(newAttachments, (a) => a.id === attachmentId),
+      1
+    );
     await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
-      attachments: newAttachments
-    })
+      attachments: newAttachments,
+    });
   } catch (e) {
-    logger.warn(`The attachment ${attachmentId} does not exist on the challenge object`)
+    logger.warn(
+      `The attachment ${attachmentId} does not exist on the challenge object`
+    );
   }
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeAttachmentDeleted, attachment)
-  return attachment
+  await helper.postBusEvent(
+    constants.Topics.ChallengeAttachmentDeleted,
+    attachment
+  );
+  return attachment;
 }
 
 deleteAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  attachmentId: Joi.id()
-}
+  attachmentId: Joi.id(),
+};
 
 /**
  * Download attachment.
@@ -228,26 +274,32 @@ deleteAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Promise<Object>} the downloaded attachment data
  */
-async function downloadAttachment (currentUser, challengeId, attachmentId) {
-  const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId)
-  await helper.ensureUserCanViewChallenge(currentUser, challenge)
-  const s3UrlObject = s3ParseUrl(attachment.url)
+async function downloadAttachment(currentUser, challengeId, attachmentId) {
+  const { challenge, attachment } = await _getChallengeAttachment(
+    challengeId,
+    attachmentId
+  );
+  await helper.ensureUserCanViewChallenge(currentUser, challenge);
+  const s3UrlObject = s3ParseUrl(attachment.url);
   if (s3UrlObject) {
     // download from S3
-    const data = await helper.downloadFromS3(s3UrlObject.bucket, s3UrlObject.key)
-    data.fileName = attachment.name
-    return data
+    const data = await helper.downloadFromS3(
+      s3UrlObject.bucket,
+      s3UrlObject.key
+    );
+    data.fileName = attachment.name;
+    return data;
   }
-  const data = await helper.downloadFromFileStack(attachment.url)
-  data.fileName = attachment.name
-  return data
+  const data = await helper.downloadFromFileStack(attachment.url);
+  data.fileName = attachment.name;
+  return data;
 }
 
 downloadAttachment.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  attachmentId: Joi.id()
-}
+  attachmentId: Joi.id(),
+};
 
 module.exports = {
   createAttachment,
@@ -255,11 +307,15 @@ module.exports = {
   fullyUpdateAttachment,
   partiallyUpdateAttachment,
   deleteAttachment,
-  downloadAttachment
-}
+  downloadAttachment,
+};
 
 logger.buildService(module.exports, {
   validators: { enabled: true },
   logging: { enabled: true },
-  tracing: { enabled: true, annotations: [ 'id' ], metadata: [ 'createdBy', 'status' ] }
-})
+  tracing: {
+    enabled: true,
+    annotations: ["id"],
+    metadata: ["createdBy", "status"],
+  },
+});
