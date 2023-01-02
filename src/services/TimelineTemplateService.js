@@ -2,6 +2,16 @@
  * This service provides operations of timeline template.
  */
 
+const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
+
+const {
+  DomainHelper: { getScanCriteria, getLookupCriteria },
+} = require("@topcoder-framework/lib-common");
+
+const {
+  TimelineTemplateDomain,
+} = require("@topcoder-framework/domain-challenge");
+
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
@@ -11,10 +21,15 @@ const phaseHelper = require("../common/phase-helper");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
 
+const timelineTemplateDomain = new TimelineTemplateDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
+);
+
 /**
  * Search timeline templates.
  * @param {Object} criteria the search criteria
- * @returns {Object} the search result
+ * @returns {Promise<Object>} the search result
  */
 async function searchTimelineTemplates(criteria) {
   const page = criteria.page || 1;
@@ -85,7 +100,9 @@ createTimelineTemplate.schema = {
  * @returns {Object} the timeline template with given id
  */
 async function getTimelineTemplate(timelineTemplateId) {
-  return helper.getById("TimelineTemplate", timelineTemplateId);
+  return timelineTemplateDomain.lookup(
+    getLookupCriteria("id", timelineTemplateId)
+  );
 }
 
 getTimelineTemplate.schema = {

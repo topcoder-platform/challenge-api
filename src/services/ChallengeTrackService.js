@@ -126,11 +126,7 @@ createChallengeTrack.schema = {
  * @returns {Object} the challenge type with given id
  */
 async function getChallengeTrack(id) {
-  const challengeTrack = await challengeTrackDomain.lookup(
-    getLookupCriteria("id", id)
-  );
-
-  return challengeTrack;
+  return challengeTrackDomain.lookup(getLookupCriteria("id", id));
 }
 
 getChallengeTrack.schema = {
