@@ -1468,6 +1468,12 @@ function setToInternalCache(key, value) {
   internalCache.set(key, value);
 }
 
+function grpcErrorToHTTPCode(grpcErrorCode) {
+  if (grpcErrorCode == 2) return HttpStatus.NOT_FOUND;
+
+  return HttpStatus.INTERNAL_SERVER_ERROR;
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1524,6 +1530,7 @@ module.exports = {
   updateSelfServiceProjectInfo,
   getFromInternalCache,
   setToInternalCache,
+  grpcErrorToHTTPCode,
 };
 
 logger.buildService(module.exports, {
