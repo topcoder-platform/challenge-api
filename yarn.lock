@@ -240,8 +240,8 @@
 
 "@topcoder-framework/domain-challenge@^0.1.1-ci.0":
   version "0.1.1-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.1.1-ci.0.tgz#c9658ac7e46fe3af0dcb0794507ca07679fbab51"
-  integrity sha512-OyOX9FooCUgVTEWxirhmeWjSAL8amEGmdOKRYEZkDrsbCqTXcueMXunp07ZhXSjcg0u+7wSbaDyTSSzJAmQL+g==
+  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.1.1-ci.0.tgz#7059f4e860b90b336d3bc267082d231bb256f89d"
+  integrity sha512-+jSn8+XAz4VHh2nTHzE3n4vzyvgqp9TqVmiQOkodR2V9CAeuZqNXW6+p3l5aP4PaSfjvU7BI3I9iOLEN09V6PQ==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     "@topcoder-framework/lib-common" "0.1.1-ci.0"
@@ -250,12 +250,12 @@
 
 "@topcoder-framework/lib-common@0.1.1-ci.0", "@topcoder-framework/lib-common@^0.1.1-ci.0":
   version "0.1.1-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.1.1-ci.0.tgz#2adf78498c45e2f9708b28a6e9debe921e134db9"
-  integrity sha512-/+1eQdGAhM2WFugYe0Bql/zvCSfK67lz9PnNnCfVzqsIoZh/kmTYGlJQTs8ASdwYYgtDKCalVH1tV41jGCvPAA==
+  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.1.1-ci.0.tgz#231392624af6598f089f1f830647dfcea72f02ce"
+  integrity sha512-OyZz0sLC+6i/qJCwpr796OxC9JIwTjeizNBGsp7u1AVoUiOacf3ilCCRk3z5o2+S4A2QSEwANENCOho+wrW0mg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#feat/challenge-domain"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition"
     tslib "^2.4.1"
 
 "@types/body-parser@*":
@@ -3447,6 +3447,10 @@ topcoder-bus-api-wrapper@topcoder-platform/tc-bus-api-wrapper.git:
     lodash "^4.17.15"
     superagent "^3.8.3"
     tc-core-library-js appirio-tech/tc-core-library-js.git#v2.6.4
+
+"topcoder-interface@github:topcoder-platform/plat-interface-definition":
+  version "1.0.0"
+  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/806b3f38b3876964dba15aa48d58ddda86b0f9a8"
 
 "topcoder-interface@github:topcoder-platform/plat-interface-definition#feat/challenge-domain":
   version "1.0.0"

@@ -2,6 +2,16 @@
  * This service provides operations of challenge types.
  */
 
+const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
+
+const {
+  DomainHelper: { getScanCriteria, getLookupCriteria },
+} = require("@topcoder-framework/lib-common");
+
+const {
+  ChallengeTrackDomain,
+} = require("@topcoder-framework/domain-challenge");
+
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
@@ -9,10 +19,15 @@ const helper = require("../common/helper");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
 
+const challengeTrackDomain = new ChallengeTrackDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
+);
+
 /**
  * Search challenge types
  * @param {Object} criteria the search criteria
- * @returns {Object} the search result
+ * @returns {Promise<Object>} the search result
  */
 async function searchChallengeTracks(criteria) {
   // TODO - move this to ES
@@ -111,8 +126,11 @@ createChallengeTrack.schema = {
  * @returns {Object} the challenge type with given id
  */
 async function getChallengeTrack(id) {
-  const ret = await helper.getById("ChallengeTrack", id);
-  return ret;
+  const challengeTrack = await challengeTrackDomain.lookup(
+    getLookupCriteria("id", id)
+  );
+
+  return challengeTrack;
 }
 
 getChallengeTrack.schema = {
