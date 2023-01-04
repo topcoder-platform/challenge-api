@@ -20,6 +20,10 @@ const errors = require("../common/errors");
 const constants = require("../../app-constants");
 const logger = require("../common/logger");
 
+const challengeTrackService = require("./ChallengeTrackService");
+const challengeTypeService = require("./ChallengeTypeService");
+const timelineTemplateService = require("./TimelineTemplateService");
+
 const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
@@ -31,8 +35,11 @@ const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
  * @returns {Promise<array>} the search result
  */
 async function searchChallengeTimelineTemplates(criteria) {
+  const scanCriteria = getScanCriteria(criteria);
+
+  // TODO: Get number of records from DB through GRPC Response Metadata
   const records = await challengeTimelineTemplateDomain.scan({
-    scanCriteria: getScanCriteria(criteria),
+    scanCriteria,
   });
 
   const nRecords = records.length;
@@ -90,10 +97,9 @@ async function createChallengeTimelineTemplate(data) {
     );
   }
 
-  // check exists
-  await helper.getById("ChallengeType", data.typeId);
-  await helper.getById("ChallengeTrack", data.trackId);
-  await helper.getById("TimelineTemplate", data.timelineTemplateId);
+  await challengeTypeService.getChallengeType(data.typeId);
+  await challengeTrackService.getChallengeTrack(data.trackId);
+  await timelineTemplateService.getTimelineTemplate(data.timelineTemplateId);
 
   if (data.isDefault) {
     await unsetDefaultTimelineTemplate(data.typeId, data.trackId);
@@ -154,7 +160,6 @@ async function fullyUpdateChallengeTimelineTemplate(
     record.timelineTemplateId === data.timelineTemplateId &&
     record.isDefault === data.isDefault
   ) {
-    // no change
     return record;
   }
 
@@ -165,22 +170,35 @@ async function fullyUpdateChallengeTimelineTemplate(
       `A challenge type timeline template with typeId: ${data.typeId}, trackId: ${data.trackId}, timelineTemplateId: ${data.timelineTemplateId} already exists.`
     );
   }
-  // check exists
-  await helper.getById("ChallengeType", data.typeId);
-  await helper.getById("ChallengeTrack", data.trackId);
-  await helper.getById("TimelineTemplate", data.timelineTemplateId);
+
+  await challengeTypeService.getChallengeType(data.typeId);
+  await challengeTrackService.getChallengeTrack(data.trackId);
+  await timelineTemplateService.getTimelineTemplate(data.timelineTemplateId);
 
   if (data.isDefault) {
     await unsetDefaultTimelineTemplate(data.typeId, data.trackId);
   }
 
-  const ret = await helper.update(record, data);
-  // post bus event
-  await helper.postBusEvent(
-    constants.Topics.ChallengeTimelineTemplateUpdated,
-    ret
-  );
-  return ret;
+  const updateInput = {
+    filterCriteria: getScanCriteria({
+      id: challengeTimelineTemplateId,
+    }),
+    updateInput: data,
+  };
+
+  const { items } = await challengeTimelineTemplateDomain.update(updateInput);
+  if (items.length > 0) {
+    // post bus event
+    await helper.postBusEvent(
+      constants.Topics.ChallengeTimelineTemplateUpdated,
+      ret
+    );
+    return items[0];
+  } else {
+    throw new errors.NotFoundError(
+      `A challenge type timeline template with id: ${challengeTimelineTemplateId} not found.`
+    );
+  }
 }
 
 fullyUpdateChallengeTimelineTemplate.schema = {
@@ -229,7 +247,7 @@ logger.buildService(module.exports, {
   logging: { enabled: true },
   tracing: {
     enabled: true,
-    annotations: ["id"],
-    metadata: ["createdBy", "status"],
+    annotations: [],
+    metadata: [],
   },
 });

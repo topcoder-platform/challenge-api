@@ -10,7 +10,6 @@ const xss = require("xss");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 const errors = require("../common/errors");
-const phaseHelper = require("../common/phase-helper");
 const constants = require("../../app-constants");
 const models = require("../models");
 const HttpStatus = require("http-status-codes");
@@ -20,6 +19,9 @@ const ChallengeTypeService = require("./ChallengeTypeService");
 const ChallengeTrackService = require("./ChallengeTrackService");
 const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateService");
 const { BadRequestError } = require("../common/errors");
+
+const phaseHelper = require("../common/phase-helper");
+const challengeHelper = require("../common/challenge-helper");
 
 const esClient = helper.getESClient();
 
@@ -973,53 +975,6 @@ searchChallenges.schema = {
 };
 
 /**
- * Validate the challenge data.
- * @param {Object} challenge the challenge data
- */
-async function validateChallengeData(challenge) {
-  let type;
-  let track;
-  if (challenge.typeId) {
-    try {
-      type = await helper.getById("ChallengeType", challenge.typeId);
-    } catch (e) {
-      if (e.name === "NotFoundError") {
-        throw new errors.BadRequestError(
-          `No challenge type found with id: ${challenge.typeId}.`
-        );
-      } else {
-        throw e;
-      }
-    }
-  }
-  if (challenge.trackId) {
-    try {
-      track = await helper.getById("ChallengeTrack", challenge.trackId);
-    } catch (e) {
-      if (e.name === "NotFoundError") {
-        throw new errors.BadRequestError(
-          `No challenge track found with id: ${challenge.trackId}.`
-        );
-      } else {
-        throw e;
-      }
-    }
-  }
-  if (challenge.timelineTemplateId) {
-    const template = await helper.getById(
-      "TimelineTemplate",
-      challenge.timelineTemplateId
-    );
-    if (!template.isActive) {
-      throw new errors.BadRequestError(
-        `The timeline template with id: ${challenge.timelineTemplateId} is inactive`
-      );
-    }
-  }
-  return { type, track };
-}
-
-/**
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
@@ -1046,6 +1001,7 @@ async function createChallenge(currentUser, challenge, userToken) {
       "Fail to create a self-service project"
     );
   }
+
   if (
     challenge.legacy.selfService &&
     challenge.metadata &&
@@ -1059,6 +1015,7 @@ async function createChallenge(currentUser, challenge, userToken) {
       }
     }
   }
+
   if (!_.isUndefined(_.get(challenge, "legacy.reviewType"))) {
     _.set(
       challenge,
@@ -1066,6 +1023,7 @@ async function createChallenge(currentUser, challenge, userToken) {
       _.toUpper(_.get(challenge, "legacy.reviewType"))
     );
   }
+
   challenge.name = xss(challenge.name);
   challenge.description = xss(challenge.description);
   if (!challenge.status) {
@@ -1089,7 +1047,9 @@ async function createChallenge(currentUser, challenge, userToken) {
   ) {
     _.set(challenge, "legacy.directProjectId", directProjectId);
   }
-  const { track, type } = await validateChallengeData(challenge);
+  const { track, type } =
+    await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
+
   const { billingAccountId, markup } =
     await helper.getProjectBillingInformation(_.get(challenge, "projectId"));
   if (
@@ -1907,7 +1867,8 @@ async function update(currentUser, challengeId, data, isFull) {
     newTermsOfUse = await helper.validateChallengeTerms(data.terms);
   }
 
-  await validateChallengeData(data);
+  await challengeHelper.validateAndGetChallengeTypeAndTrack(data);
+
   if (
     (challenge.status === constants.challengeStatuses.Completed ||
       challenge.status === constants.challengeStatuses.Cancelled) &&

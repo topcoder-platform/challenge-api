@@ -106,20 +106,18 @@ app.use(AWSXRay.express.closeSegment());
 // The error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  logger.logFullError(err, req.signature || `${req.method} ${req.url}`);
+  // logger.logFullError(err, req.signature || `${req.method} ${req.url}`);
   const errorResponse = {};
 
-  const status =
-    err.code != null && [2].indexOf(err.code) != -1
-      ? grpcErrorToHTTPCode(err.code)
-      : err.isJoi
-      ? HttpStatus.BAD_REQUEST
-      : err.httpStatus ||
-        _.get(err, "response.status") ||
-        HttpStatus.INTERNAL_SERVER_ERROR;
-
-  if (_.isArray(err.details)) {
-    if (err.isJoi) {
+  let status;
+  // TODO: Use @topcoder-framewor/lib-common-errors
+  if (err.code != null && [2, 12].indexOf(err.code) != -1) {
+    status = grpcErrorToHTTPCode(err.code);
+    errorResponse.message =
+      err.code == 2 ? err.details : "Internal server error";
+  } else if (err.isJoi) {
+    status = HttpStatus.BAD_REQUEST;
+    if (_.isArray(err.details)) {
       _.map(err.details, (e) => {
         if (e.message) {
           if (_.isUndefined(errorResponse.message)) {
@@ -130,10 +128,13 @@ app.use((err, req, res, next) => {
         }
       });
     }
+  } else {
+    status =
+      err.httpStatus ||
+      _.get(err, "response.status") ||
+      HttpStatus.INTERNAL_SERVER_ERROR;
   }
-  if (err.code != null && [2].indexOf(err.code) != -1) {
-    errorResponse.message = err.details;
-  }
+
   if (_.get(err, "response.status")) {
     // extra error message from axios http response(v4 and v5 tc api)
     errorResponse.message =

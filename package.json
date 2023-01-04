@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "dev": "nodemon app.js",
     "lint": "prettier src/**/*.js",
     "lint:fix": "prettier --write src/**/*.js",
     "init-es": "node src/init-es.js",
@@ -38,8 +39,8 @@
     "prettier": "^2.8.1"
   },
   "dependencies": {
-    "@topcoder-framework/domain-challenge": "^0.1.1-ci.0",
-    "@topcoder-framework/lib-common": "^0.1.1-ci.0",
+    "@topcoder-framework/domain-challenge": "^0.2.2-ci.0",
+    "@topcoder-framework/lib-common": "^0.2.2-ci.0",
     "aws-sdk": "^2.1145.0",
     "aws-xray-sdk": "^3.3.8",
     "axios": "^0.19.0",

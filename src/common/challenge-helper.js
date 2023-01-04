@@ -13,47 +13,28 @@ class ChallengeHelper {
     timelineTemplateId,
   }) {
     let challengeType;
-    let challengeTrack;
-    let timelineTemplate;
-
     if (typeId) {
       challengeType = await challengeTypeService.getChallengeType(typeId);
     }
 
+    let challengeTrack;
     if (trackId) {
       challengeTrack = await challengeTrackService.getChallengeTrack(trackId);
     }
+
     if (timelineTemplateId) {
-      timelineTemplate = await timelineTemplateService.getTimelineTemplate(
+      const template = await timelineTemplateService.getTimelineTemplate(
         timelineTemplateId
       );
-    }
-    if (challengeType && challengeTrack) {
-      if (challengeType.track !== challengeTrack.track) {
-        throw new Error(
-          `Challenge type track ${challengeType.track} does not match challenge track ${challengeTrack.track}`
+
+      if (!template.isActive) {
+        throw new errors.BadRequestError(
+          `The timeline template with id: ${challenge.timelineTemplateId} is inactive`
         );
       }
     }
-    if (challengeType && timelineTemplate) {
-      if (challengeType.track !== timelineTemplate.track) {
-        throw new Error(
-          `Challenge type track ${challengeType.track} does not match timeline template track ${timelineTemplate.track}`
-        );
-      }
-    }
-    if (challengeTrack && timelineTemplate) {
-      if (challengeTrack.track !== timelineTemplate.track) {
-        throw new Error(
-          `Challenge track ${challengeTrack.track} does not match timeline template track ${timelineTemplate.track}`
-        );
-      }
-    }
-    return {
-      typeId: challengeType ? challengeType.id : null,
-      trackId: challengeTrack ? challengeTrack.id : null,
-      timelineTemplateId: timelineTemplate ? timelineTemplate.id : null,
-    };
+
+    return { type: challengeType, track: challengeTrack };
   }
 }
 

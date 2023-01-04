@@ -220,6 +220,7 @@ async function getById(modelName, id) {
       .eq(id)
       .exec((err, result) => {
         if (err) {
+          console.log("rejecting error", err);
           return reject(err);
         }
         if (result.length > 0) {
