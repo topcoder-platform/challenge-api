@@ -212,7 +212,7 @@ fullyUpdateChallengeTimelineTemplate.schema = {
  * @returns {Object} the deleted challenge type timeline template
  */
 async function deleteChallengeTimelineTemplate(challengeTimelineTemplateId) {
-  const templates = await challengeTimelineTemplateDomain.delete(
+  const { items: templates } = await challengeTimelineTemplateDomain.delete(
     getLookupCriteria("id", challengeTimelineTemplateId)
   );
 
