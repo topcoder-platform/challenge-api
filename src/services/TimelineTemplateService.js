@@ -20,6 +20,7 @@ const phaseHelper = require("../common/phase-helper");
 // const logger = require('../common/logger')
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
+const errors = require('../common/errors');
 
 const timelineTemplateDomain = new TimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
@@ -32,12 +33,18 @@ const timelineTemplateDomain = new TimelineTemplateDomain(
  * @returns {Promise<Object>} the search result
  */
 async function searchTimelineTemplates(criteria) {
+  const scanCriteria = getScanCriteria(criteria);
+
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-  const list = await helper.scanAll("TimelineTemplate");
-  const records = _.filter(list, (e) =>
+  const { items } = await timelineTemplateDomain.scan({
+    scanCriteria
+  });
+
+  const records = _.filter(items, (e) =>
     helper.partialMatch(criteria.name, e.name)
   );
+
   const total = records.length;
   const result = records.slice((page - 1) * perPage, page * perPage);
 
@@ -58,17 +65,14 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate(timelineTemplate) {
-  await helper.validateDuplicate(
-    "TimelineTemplate",
-    "name",
-    timelineTemplate.name
-  );
-  await phaseHelper.validatePhases(timelineTemplate.phases);
+  const lookupCriteria = getLookupCriteria('name', timelineTemplate.name)
+  const existing = await timelineTemplateDomain.lookup(lookupCriteria)
+  if (existing) throw new errors.ConflictError(`Timeline template with name ${timelineTemplate.name} already exists`)
 
-  const ret = await helper.create(
-    "TimelineTemplate",
-    _.assign({ id: uuid() }, timelineTemplate)
-  );
+  // Do not validate phases for now
+  // await phaseHelper.validatePhases(timelineTemplate.phases);
+
+  const ret = await timelineTemplateDomain.create(timelineTemplate);
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, ret);
   return ret;
