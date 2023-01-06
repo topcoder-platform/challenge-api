@@ -240,22 +240,22 @@
 
 "@topcoder-framework/domain-challenge@^0.2.2-ci.0":
   version "0.2.2-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.2.2-ci.0.tgz#1e8d5fbcb8b142a5c9555826bd8df335ed11f964"
-  integrity sha512-UhR4ON5Or+fN/asFPM1ICA1wsSLJdJ40xzth4W4H22aswL9lsp1fgaWIh6Lhic2wCvHoZ8kyVKkiqjBiGGJ+6g==
+  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.2.2-ci.0.tgz#cf29615ba9b22fdb546b0e98f75973d1be2d1dd6"
+  integrity sha512-j7ij7JdWvwj+WSbrjfmt9gGQzNvidqV0czUFm2Ojc1sgyQGShOuFW5JrSbelhpJRuL/Xs5wJN15dh2jCG84Ugw==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     "@topcoder-framework/lib-common" "0.2.2-ci.0"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.4"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#feat/update-interfaces"
     tslib "^2.4.1"
 
 "@topcoder-framework/lib-common@0.2.2-ci.0", "@topcoder-framework/lib-common@^0.2.2-ci.0":
   version "0.2.2-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.2.2-ci.0.tgz#6c4e3062158a5b1a85ed5f501228a66adccfee7e"
-  integrity sha512-XHjR+WsCGZdNPXcEWwh8uNNPkYg+bsj6nU3GYkEabN6OVcF1XyHrOlHIEQlIxnQEDgY9Oj2ahgRPsotY4WWgSA==
+  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.2.2-ci.0.tgz#886904e7dbe03de0f98979187ed837584a98b409"
+  integrity sha512-0ZWcCRh+p3VjHjT72H5i7nhAl13cVx7XMI9lSqZCBtdd8vF5XI6sPKBXy9dT78w9N9BSXJQJF45rBF4P5NTDMg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.4"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#feat/update-interfaces"
     tslib "^2.4.1"
 
 "@types/body-parser@*":
@@ -577,10 +577,10 @@ aws-sign2@~0.7.0:
   resolved "http://localhost:4873/aws-sign2/-/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
   integrity sha512-08kcGqnYf/YmjoRhfxyu+CLxBjUtHLXLXX/vUfx9l2LYzG3c1m61nrpyFUZI6zeS+Li/wWMMidD9KgrqtGq3mA==
 
-aws-xray-sdk-core@3.4.0:
-  version "3.4.0"
-  resolved "http://localhost:4873/aws-xray-sdk-core/-/aws-xray-sdk-core-3.4.0.tgz#2ed466e8e3b4222f6d13bb22666936166d61e6e7"
-  integrity sha512-PH3jqjUp8fTIaRa0i6fjJxXJSR9yDwldH1Qw7nMDNAouL7txsrSM6BhrQEjcaZ2mwfU0PNx8tsFQ+2/nfNdR1w==
+aws-xray-sdk-core@3.4.1:
+  version "3.4.1"
+  resolved "http://localhost:4873/aws-xray-sdk-core/-/aws-xray-sdk-core-3.4.1.tgz#25592b7e4ed3ebd25ece9c1f258d3f68558e1ab6"
+  integrity sha512-HPQ+9GMF+yhDDXNKPp6HGAIv2yVapKTI7WRs2aN3TT+RxQkbmgO+3JlcMvRL2/lu0RqTVWoYCIhmF9/H/zRL1A==
   dependencies:
     "@aws-sdk/service-error-classification" "^3.4.1"
     "@aws-sdk/types" "^3.4.1"
@@ -589,36 +589,36 @@ aws-xray-sdk-core@3.4.0:
     cls-hooked "^4.2.2"
     semver "^5.3.0"
 
-aws-xray-sdk-express@3.4.0:
-  version "3.4.0"
-  resolved "http://localhost:4873/aws-xray-sdk-express/-/aws-xray-sdk-express-3.4.0.tgz#04b9baf2288c79401bbcc6d4393e3157d453ab43"
-  integrity sha512-H+hjSScPq9AGoqMhrxTnJSQ6EpQgC3y1PA8ZlTqoDUK+l/NNAeB2zprSzRGuCxZwPITVajSDjznNwhOxjp/tww==
+aws-xray-sdk-express@3.4.1:
+  version "3.4.1"
+  resolved "http://localhost:4873/aws-xray-sdk-express/-/aws-xray-sdk-express-3.4.1.tgz#e958976db0631b93feaea5db38979f461baea707"
+  integrity sha512-c8efb0ywsvzcqXT0PLbaAG0nMgpbzGu9FOagm569Ic/GMJwglACVAxsHJ3e3fYlRDbq2q6U0QhadqGb4MOa9YQ==
   dependencies:
     "@types/express" "*"
 
-aws-xray-sdk-mysql@3.4.0:
-  version "3.4.0"
-  resolved "http://localhost:4873/aws-xray-sdk-mysql/-/aws-xray-sdk-mysql-3.4.0.tgz#3d205bca23488d56a1a50f8ad923489b26116303"
-  integrity sha512-2kWkPzgNhgXH0ymNLXyssyGxWQ+DJyeKXDSYOVvt8EeHmk7qs17kY61sFfaWOhr20Cn0emZqA9AIJxaDfCUq/Q==
+aws-xray-sdk-mysql@3.4.1:
+  version "3.4.1"
+  resolved "http://localhost:4873/aws-xray-sdk-mysql/-/aws-xray-sdk-mysql-3.4.1.tgz#8f2eab61f020953742d09a42a96994e08028ba75"
+  integrity sha512-k2UczelWpBqNZfnG4+czoLDzhxzcvvZXBjvriVTokdXcNknCRG4lBCnSOh/RdvLq62SDaCwmv5c67B3NObfXbg==
   dependencies:
     "@types/mysql" "*"
 
-aws-xray-sdk-postgres@3.4.0:
-  version "3.4.0"
-  resolved "http://localhost:4873/aws-xray-sdk-postgres/-/aws-xray-sdk-postgres-3.4.0.tgz#fd64c52e1981a0d563170fe4175deb31ad7b70a7"
-  integrity sha512-TSf/76dEZgCRTPY9QOzyUg63RAUtxwC6tLU4R9ks6J6ZdmNz+XDHp7Ew5zCrsevZRHRVntm4M8nlBwwnbAnyYw==
+aws-xray-sdk-postgres@3.4.1:
+  version "3.4.1"
+  resolved "http://localhost:4873/aws-xray-sdk-postgres/-/aws-xray-sdk-postgres-3.4.1.tgz#5a24e36d6520186ab9b2e6af5724ee463d2117ea"
+  integrity sha512-3+qfZD8BttjOQ4jzsuRYJzDPOu4dl4nXZPPijAlLUZC978gFIOAWMqJZE6cDmOjXs2BVYdCW8wfiJ1NPYbesBw==
   dependencies:
     "@types/pg" "*"
 
 aws-xray-sdk@^3.3.8:
-  version "3.4.0"
-  resolved "http://localhost:4873/aws-xray-sdk/-/aws-xray-sdk-3.4.0.tgz#d07f6e0b2d5ad1c85b2b5bb99afce68192d116ca"
-  integrity sha512-hvEoatqrbbdF6GVTR3qCus3eG9Gt0wOMtiPoId6HMopKIFFs0t5t/DfKNsjsjTXy6DxcPRhVT7+ZHRdQpKrDjA==
+  version "3.4.1"
+  resolved "http://localhost:4873/aws-xray-sdk/-/aws-xray-sdk-3.4.1.tgz#e8991e71ce0b7c89d3c3a54c445209eee27a3c71"
+  integrity sha512-7iz+svMi47EBW3hCGLoMvXYDTG065gg+pdgk/CYXfx0EW9N+uCovKCQodfIwFAMSQ6P4bMxw6jD30h+XtMeTgQ==
   dependencies:
-    aws-xray-sdk-core "3.4.0"
-    aws-xray-sdk-express "3.4.0"
-    aws-xray-sdk-mysql "3.4.0"
-    aws-xray-sdk-postgres "3.4.0"
+    aws-xray-sdk-core "3.4.1"
+    aws-xray-sdk-express "3.4.1"
+    aws-xray-sdk-mysql "3.4.1"
+    aws-xray-sdk-postgres "3.4.1"
 
 aws4@^1.8.0:
   version "1.11.0"
@@ -3485,9 +3485,9 @@ topcoder-bus-api-wrapper@topcoder-platform/tc-bus-api-wrapper.git:
     superagent "^3.8.3"
     tc-core-library-js appirio-tech/tc-core-library-js.git#v2.6.4
 
-"topcoder-interface@github:topcoder-platform/plat-interface-definition#v0.0.4":
+"topcoder-interface@github:topcoder-platform/plat-interface-definition#feat/update-interfaces":
   version "1.0.0"
-  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/92836980d5132c341bc0479c3283710dc112582e"
+  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/7659791bfdb89d1c54078c89c169e01ddebfea7d"
 
 topo@3.x.x:
   version "3.0.3"
