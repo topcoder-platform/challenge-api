@@ -117,8 +117,7 @@ getTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function update(timelineTemplateId, data, isFull) {
-  const timelineTemplate = await helper.getById(
-    "TimelineTemplate",
+  const timelineTemplate = await getTimelineTemplate(
     timelineTemplateId
   );
 
@@ -126,7 +125,8 @@ async function update(timelineTemplateId, data, isFull) {
     data.name &&
     data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()
   ) {
-    await helper.validateDuplicate("TimelineTemplate", "name", data.name);
+    const { items: existingByName } = await timelineTemplateDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
+    if (existingByName.length > 0) throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`)
   }
 
   if (data.phases) {
@@ -138,13 +138,16 @@ async function update(timelineTemplateId, data, isFull) {
     timelineTemplate.description = data.description;
   }
 
-  const ret = await helper.update(timelineTemplate, data);
+  const { items } = await timelineTemplateDomain.update({
+    filterCriteria: getScanCriteria({ id }),
+    updateInput: data
+  });
   // post bus event
   await helper.postBusEvent(
     constants.Topics.TimelineTemplateUpdated,
-    isFull ? ret : _.assignIn({ id: timelineTemplateId }, data)
+    isFull ? items[0] : _.assignIn({ id: timelineTemplateId }, data)
   );
-  return ret;
+  return items[0];
 }
 
 /**
@@ -214,11 +217,10 @@ partiallyUpdateTimelineTemplate.schema = {
  * @returns {Object} the deleted timeline template
  */
 async function deleteTimelineTemplate(timelineTemplateId) {
-  const ret = await helper.getById("TimelineTemplate", timelineTemplateId);
-  await ret.delete();
+  const { items } = await timelineTemplateDomain.delete(getLookupCriteria("id", timelineTemplateId));
   // post bus event
-  await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, ret);
-  return ret;
+  await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, items[0]);
+  return items[0];
 }
 
 deleteTimelineTemplate.schema = {

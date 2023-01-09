@@ -1,13 +1,25 @@
 /**
  * This service provides operations of phases.
  */
+const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
+
+const {
+  DomainHelper: { getLookupCriteria, getScanCriteria },
+} = require("@topcoder-framework/lib-common");
+
+const { PhaseDomain } = require('@topcoder-framework/domain-challenge')
 
 const _ = require("lodash");
 const Joi = require("joi");
-const uuid = require("uuid/v4");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
+const errors = require("../common/errors");
+
+const phaseDomain = new PhaseDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
+);
 
 /**
  * Search phases
@@ -17,12 +29,9 @@ const constants = require("../../app-constants");
 async function searchPhases(criteria) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-  const list = await helper.scanAll("Phase");
-  const records = _.filter(list, (e) =>
-    helper.partialMatch(criteria.name, e.name)
-  );
-  const total = records.length;
-  const result = records.slice((page - 1) * perPage, page * perPage);
+  const { items } = await phaseDomain.scan({ scanCriteria: getScanCriteria(_.pick(criteria, ['name'])) })
+  const total = items.length;
+  const result = items.slice((page - 1) * perPage, page * perPage);
 
   return { total, page, perPage, result };
 }
@@ -41,8 +50,9 @@ searchPhases.schema = {
  * @returns {Object} the created phase
  */
 async function createPhase(phase) {
-  await helper.validateDuplicate("Phase", "name", phase.name);
-  const ret = await helper.create("Phase", _.assign({ id: uuid() }, phase));
+  const { items: existingByName } = await phaseDomain.scan({ scanCriteria: getScanCriteria({ name: phase.name }) })
+  if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
+  const ret = await phaseDomain.create(phase);
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret);
   return ret;
@@ -65,7 +75,7 @@ createPhase.schema = {
  * @returns {Object} the phase with given id
  */
 async function getPhase(phaseId) {
-  return helper.getById("Phase", phaseId);
+  return phaseDomain.lookup(getLookupCriteria("id", phaseId));
 }
 
 getPhase.schema = {
@@ -80,24 +90,27 @@ getPhase.schema = {
  * @returns {Object} the updated phase
  */
 async function update(phaseId, data, isFull) {
-  const phase = await helper.getById("Phase", phaseId);
+  const phase = await getPhase(phaseId)
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    await helper.validateDuplicate("Phase", "name", data.name);
+    const { items: existingByName } = await phaseDomain.scan({ scanCriteria: getScanCriteria({ name: phase.name }) })
+    if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
   }
 
   if (isFull) {
     // description is optional field, can be undefined
     phase.description = data.description;
   }
-
-  const ret = await helper.update(phase, data);
+  const { items } = await phaseDomain.update({
+    filterCriteria: getScanCriteria({ id }),
+    updateInput: data
+  });
   // post bus event
   await helper.postBusEvent(
     constants.Topics.ChallengePhaseUpdated,
-    isFull ? ret : _.assignIn({ id: phaseId }, data)
+    isFull ? items[0] : _.assignIn({ id: phaseId }, data)
   );
-  return ret;
+  return items[0];
 }
 
 /**
@@ -150,11 +163,10 @@ partiallyUpdatePhase.schema = {
  * @returns {Object} the deleted phase
  */
 async function deletePhase(phaseId) {
-  const ret = await helper.getById("Phase", phaseId);
-  await ret.delete();
+  const { items } = await phaseDomain.delete(getLookupCriteria("id", phaseId));
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, ret);
-  return ret;
+  await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, items[0]);
+  return items[0];
 }
 
 deletePhase.schema = {

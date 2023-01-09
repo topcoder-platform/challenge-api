@@ -240,8 +240,8 @@
 
 "@topcoder-framework/domain-challenge@^0.2.2-ci.0":
   version "0.2.2-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.2.2-ci.0.tgz#cf29615ba9b22fdb546b0e98f75973d1be2d1dd6"
-  integrity sha512-j7ij7JdWvwj+WSbrjfmt9gGQzNvidqV0czUFm2Ojc1sgyQGShOuFW5JrSbelhpJRuL/Xs5wJN15dh2jCG84Ugw==
+  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.2.2-ci.0.tgz#518c7a961ab04be1b96817eec13526ceea4dcc52"
+  integrity sha512-69FVTgGiDkNbhQV1DsstmWNHvndbIZCsgA7WHVJp3kSJBeu7wyUR6FCI3xfHMVemCKvffsBtIqznBM+WNQgwIg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     "@topcoder-framework/lib-common" "0.2.2-ci.0"
@@ -250,8 +250,8 @@
 
 "@topcoder-framework/lib-common@0.2.2-ci.0", "@topcoder-framework/lib-common@^0.2.2-ci.0":
   version "0.2.2-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.2.2-ci.0.tgz#886904e7dbe03de0f98979187ed837584a98b409"
-  integrity sha512-0ZWcCRh+p3VjHjT72H5i7nhAl13cVx7XMI9lSqZCBtdd8vF5XI6sPKBXy9dT78w9N9BSXJQJF45rBF4P5NTDMg==
+  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.2.2-ci.0.tgz#79f43fdcce0f2835c0741b4ca352e4b2fa4d03c0"
+  integrity sha512-ErvzPdG2ZjxRCvmpCfeoQJzU/rmkbguhXp8fgpBA7KG7EYqzn3st7DthIVUZvplO29ZIA0EYcj4v6ALgPgr9Gg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
@@ -557,9 +557,9 @@ aws-sdk@2.395.0:
     xml2js "0.4.19"
 
 aws-sdk@^2.1145.0:
-  version "2.1289.0"
-  resolved "http://localhost:4873/aws-sdk/-/aws-sdk-2.1289.0.tgz#8efa68a738ce386667aeffbd8679491cfa6e458f"
-  integrity sha512-wT7SZ385NEm6X4VC1Bhf1loBZi2BDVqEET4G9I7E2tyuEdfeubPvZpCV/BgdId3qwqB4LjbMLBje18Op3zpgBA==
+  version "2.1290.0"
+  resolved "http://localhost:4873/aws-sdk/-/aws-sdk-2.1290.0.tgz#cb4e56656cb4ad08a645cd016380df4b324f8261"
+  integrity sha512-qRrXLgK4FpkdxeagjrHuhtEEvYrvRbddTBg1I7KBuMCIhXHzSS3nEUmdZjdyMuQJEvt0BCJjwVkNh8e/5TauDQ==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -621,9 +621,9 @@ aws-xray-sdk@^3.3.8:
     aws-xray-sdk-postgres "3.4.1"
 
 aws4@^1.8.0:
-  version "1.11.0"
-  resolved "http://localhost:4873/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
-  integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
+  version "1.12.0"
+  resolved "http://localhost:4873/aws4/-/aws4-1.12.0.tgz#ce1c9d143389679e253b314241ea9aa5cec980d3"
+  integrity sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==
 
 axios@^0.19.0:
   version "0.19.2"
@@ -2829,9 +2829,9 @@ precond@0.2:
   integrity sha512-QCYG84SgGyGzqJ/vlMsxeXd/pgL/I94ixdNFyh1PusWmTCyVfPJjZ1K1jvHtsbfnXQs2TSkEP2fR7QiMZAnKFQ==
 
 prettier@^2.8.1:
-  version "2.8.1"
-  resolved "http://localhost:4873/prettier/-/prettier-2.8.1.tgz#4e1fd11c34e2421bc1da9aea9bd8127cd0a35efc"
-  integrity sha512-lqGoSJBQNJidqCHE80vqZJHWHRFoNYsSpP9AjFhlhi9ODCJA541svILes/+/1GM3VaL/abZi7cpFzOpdR9UPKg==
+  version "2.8.2"
+  resolved "http://localhost:4873/prettier/-/prettier-2.8.2.tgz#c4ea1b5b454d7c4b59966db2e06ed7eec5dfd160"
+  integrity sha512-BtRV9BcncDyI2tsuS19zzhzoxD8Dh8LiCx7j7tHzrkz8GFXAexeWFdi22mjE1d16dftH2qNaytVxqiRTGlMfpw==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
