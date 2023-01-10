@@ -1,9 +1,27 @@
+const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
+
+const {
+  DomainHelper: { getLookupCriteria, getScanCriteria },
+} = require("@topcoder-framework/lib-common");
+
+const { PhaseDomain, TimelineTemplateDomain } = require('@topcoder-framework/domain-challenge')
+
 const _ = require("lodash");
 const uuid = require("uuid/v4");
 const moment = require("moment");
 
 const errors = require("./errors");
 const helper = require("./helper");
+
+const timelineTemplateDomain = new TimelineTemplateDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
+);
+
+const phaseDomain = new PhaseDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
+);
 
 class ChallengePhaseHelper {
   /**
@@ -159,7 +177,7 @@ class ChallengePhaseHelper {
     if (!phases || phases.length === 0) {
       return;
     }
-    const records = await helper.scan("Phase");
+    const { items: records } = await phaseDomain.scan({ scanCriteria: getScanCriteria({}) });
     const map = new Map();
     _.each(records, (r) => {
       map.set(r.id, r);
@@ -173,7 +191,7 @@ class ChallengePhaseHelper {
   }
 
   async getPhaseDefinitionsAndMap() {
-    const records = await helper.scan("Phase");
+    const { items: records } = await phaseDomain.scan({ scanCriteria: getScanCriteria({}) });
     const map = new Map();
     _.each(records, (r) => {
       map.set(r.id, r);
@@ -182,10 +200,10 @@ class ChallengePhaseHelper {
   }
 
   async getTemplateAndTemplateMap(timelineTemplateId) {
-    const records = await helper.getById(
-      "TimelineTemplate",
+    const records = await timelineTemplateDomain.lookup(getLookupCriteria(
+      "id", 
       timelineTemplateId
-    );
+    ));
     const map = new Map();
     _.each(records.phases, (r) => {
       map.set(r.phaseId, r);
