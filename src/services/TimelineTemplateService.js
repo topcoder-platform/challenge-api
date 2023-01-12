@@ -20,6 +20,7 @@ const phaseHelper = require("../common/phase-helper");
 // const logger = require('../common/logger')
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
+const { items } = require("joi/lib/types/array");
 
 const timelineTemplateDomain = new TimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
@@ -34,7 +35,16 @@ const timelineTemplateDomain = new TimelineTemplateDomain(
 async function searchTimelineTemplates(criteria) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-  const list = await helper.scanAll("TimelineTemplate");
+  // const list = await helper.scanAll("TimelineTemplate");
+  console.log("Requested criteria", criteria);
+  const scanCriteria = getScanCriteria(criteria);
+  console.log(scanCriteria, "scanCriteria");
+  const { items: list } = await timelineTemplateDomain.scan({
+    scanCriteria,
+  });
+
+  console.log("List of items", list);
+
   const records = _.filter(list, (e) =>
     helper.partialMatch(criteria.name, e.name)
   );

@@ -11,10 +11,9 @@ const util = require("util");
 const AWS = require("aws-sdk");
 const config = require("config");
 const m2mAuth = require("tc-core-library-js").auth.m2m;
-const m2m = m2mAuth(
-  _.pick(config, ["AUTH0_URL", "AUTH0_AUDIENCE", "TOKEN_CACHE_TIME"])
-);
+const m2m = m2mAuth(_.pick(config, ["AUTH0_URL", "AUTH0_AUDIENCE", "TOKEN_CACHE_TIME"]));
 const axios = require("axios");
+
 const busApi = require("topcoder-bus-api-wrapper");
 const elasticsearch = require("elasticsearch");
 const NodeCache = require("node-cache");
@@ -23,6 +22,8 @@ const xss = require("xss");
 const logger = require("./logger");
 
 const AWSXRay = require("aws-xray-sdk");
+const { Http } = require("winston/lib/winston/transports");
+const { Timestamp } = require("@topcoder-framework/lib-common");
 
 // Bus API Client
 let busApiClient;
@@ -112,16 +113,10 @@ function setResHeaders(req, res, result) {
       totalPages
     )}>; rel="last"`;
     if (parseInt(result.page, 10) > 1) {
-      link += `, <${getPageLink(
-        req,
-        parseInt(result.page, 10) - 1
-      )}>; rel="prev"`;
+      link += `, <${getPageLink(req, parseInt(result.page, 10) - 1)}>; rel="prev"`;
     }
     if (parseInt(result.page, 10) < totalPages) {
-      link += `, <${getPageLink(
-        req,
-        parseInt(result.page, 10) + 1
-      )}>; rel="next"`;
+      link += `, <${getPageLink(req, parseInt(result.page, 10) + 1)}>; rel="next"`;
     }
     res.set("Link", link);
   }
@@ -134,10 +129,7 @@ function setResHeaders(req, res, result) {
 function hasAdminRole(authUser) {
   if (authUser && authUser.roles) {
     for (let i = 0; i < authUser.roles.length; i++) {
-      if (
-        authUser.roles[i].toLowerCase() ===
-        constants.UserRoles.Admin.toLowerCase()
-      ) {
+      if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
         return true;
       }
     }
@@ -226,11 +218,7 @@ async function getById(modelName, id) {
         if (result.length > 0) {
           return resolve(result[0]);
         } else {
-          return reject(
-            new errors.NotFoundError(
-              `${modelName} with id: ${id} doesn't exist`
-            )
-          );
+          return reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`));
         }
       });
   });
@@ -261,13 +249,8 @@ async function getByIds(modelName, ids) {
 async function validateDuplicate(modelName, name, value) {
   const list = await scan(modelName);
   for (let i = 0; i < list.length; i++) {
-    if (
-      list[i][name] &&
-      String(list[i][name]).toLowerCase() === String(value).toLowerCase()
-    ) {
-      throw new errors.ConflictError(
-        `${modelName} with ${name}: ${value} already exist`
-      );
+    if (list[i][name] && String(list[i][name]).toLowerCase() === String(value).toLowerCase()) {
+      throw new errors.ConflictError(`${modelName} with ${name}: ${value} already exist`);
     }
   }
 }
@@ -340,10 +323,7 @@ async function scanAll(modelName, scanParams) {
   let results = await models[modelName].scan(scanParams).exec();
   let lastKey = results.lastKey;
   while (!_.isUndefined(results.lastKey)) {
-    const newResult = await models[modelName]
-      .scan(scanParams)
-      .startAt(lastKey)
-      .exec();
+    const newResult = await models[modelName].scan(scanParams).startAt(lastKey).exec();
     results = [...results, ...newResult];
     lastKey = newResult.lastKey;
   }
@@ -412,10 +392,7 @@ async function deleteFromS3(bucket, key) {
  * @returns {Promise<String>} the M2M token
  */
 async function getM2MToken() {
-  return m2m.getMachineToken(
-    config.AUTH0_CLIENT_ID,
-    config.AUTH0_CLIENT_SECRET
-  );
+  return m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET);
 }
 
 /**
@@ -438,10 +415,7 @@ async function getChallengeResources(challengeId) {
     }
     result = result.concat(res.data);
     page += 1;
-    if (
-      res.headers["x-total-pages"] &&
-      page > Number(res.headers["x-total-pages"])
-    ) {
+    if (res.headers["x-total-pages"] && page > Number(res.headers["x-total-pages"])) {
       break;
     }
   }
@@ -526,16 +500,10 @@ async function capturePayment(paymentId) {
   const token = await getM2MToken();
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`;
   logger.info(`Calling: ${url} to capture payment`);
-  const res = await axios.patch(
-    url,
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
   logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`);
   if (res.data.status !== "succeeded") {
-    throw new Error(
-      `Failed to charge payment. Current status: ${res.data.status}`
-    );
+    throw new Error(`Failed to charge payment. Current status: ${res.data.status}`);
   }
   return res.data;
 }
@@ -547,15 +515,9 @@ async function capturePayment(paymentId) {
 async function cancelPayment(paymentId) {
   const token = await getM2MToken();
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`;
-  const res = await axios.patch(
-    url,
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
   if (res.data.status !== "canceled") {
-    throw new Error(
-      `Failed to cancel payment. Current status: ${res.data.status}`
-    );
+    throw new Error(`Failed to cancel payment. Current status: ${res.data.status}`);
   }
   return res.data;
 }
@@ -612,17 +574,13 @@ async function activateProject(projectId, currentUser, name, description) {
     }
   } catch (e) {
     logger.debug(e);
-    logger.debug(
-      `Failed to charge payment ${payment.id} with error: ${e.message}`
-    );
+    logger.debug(`Failed to charge payment ${payment.id} with error: ${e.message}`);
     await cancelProject(
       projectId,
       `Failed to charge payment ${payment.id} with error: ${e.message}`,
       currentUser
     );
-    throw new Error(
-      `Failed to charge payment ${payment.id} with error: ${e.message}`
-    );
+    throw new Error(`Failed to charge payment ${payment.id} with error: ${e.message}`);
   }
   const token = await getM2MToken();
   const url = `${config.PROJECTS_API_URL}/${projectId}`;
@@ -657,11 +615,7 @@ async function activateProject(projectId, currentUser, name, description) {
  * @param {*} workItemPlannedEndDate the planned end date of the work item
  * @param {*} currentUser the current user
  */
-async function updateSelfServiceProjectInfo(
-  projectId,
-  workItemPlannedEndDate,
-  currentUser
-) {
+async function updateSelfServiceProjectInfo(projectId, workItemPlannedEndDate, currentUser) {
   const project = await ensureProjectExist(projectId, currentUser);
   const payment = await getProjectPayment(projectId);
   const token = await getM2MToken();
@@ -712,8 +666,7 @@ async function userHasFullAccess(challengeId, userId) {
     _.filter(
       challengeResources,
       (r) =>
-        _.toString(r.memberId) === _.toString(userId) &&
-        _.includes(rolesWithFullAccess, r.roleId)
+        _.toString(r.memberId) === _.toString(userId) && _.includes(rolesWithFullAccess, r.roleId)
     ).length > 0
   );
 }
@@ -744,10 +697,7 @@ async function getUserGroups(userId) {
     }
     allGroups = allGroups.concat(groups);
     page += 1;
-    if (
-      result.headers["x-total-pages"] &&
-      page > Number(result.headers["x-total-pages"])
-    ) {
+    if (result.headers["x-total-pages"] && page > Number(result.headers["x-total-pages"])) {
       break;
     }
   }
@@ -761,15 +711,12 @@ async function getUserGroups(userId) {
  */
 async function getCompleteUserGroupTreeIds(userId) {
   const token = await getM2MToken();
-  const result = await axios.get(
-    `${config.GROUPS_API_URL}/memberGroups/${userId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-      params: {
-        uuid: true,
-      },
-    }
-  );
+  const result = await axios.get(`${config.GROUPS_API_URL}/memberGroups/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      uuid: true,
+    },
+  });
 
   return result.data || [];
 }
@@ -831,9 +778,7 @@ function ensureNoDuplicateOrNullElements(arr, name) {
     }
     for (let j = i + 1; j < a.length; j += 1) {
       if (a[i] === a[j]) {
-        throw new errors.BadRequestError(
-          `There are duplicate elements (${a[i]}) for ${name}.`
-        );
+        throw new errors.BadRequestError(`There are duplicate elements (${a[i]}) for ${name}.`);
       }
     }
   }
@@ -898,9 +843,7 @@ async function postBusEvent(topic, payload, options = {}) {
 
   if (traceInformation) {
     console.log(
-      `Posting event to bus API with trace information: ${JSON.stringify(
-        traceInformation
-      )}`
+      `Posting event to bus API with trace information: ${JSON.stringify(traceInformation)}`
     );
     message.payload.traceInformation = traceInformation;
   }
@@ -954,10 +897,7 @@ async function ensureProjectExist(projectId, currentUser) {
     }
     if (
       _.get(res, "data.type") === "self-service" &&
-      _.includes(
-        config.SELF_SERVICE_WHITELIST_HANDLES,
-        currentUser.handle.toLowerCase()
-      )
+      _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase())
     ) {
       return res.data;
     }
@@ -967,16 +907,12 @@ async function ensureProjectExist(projectId, currentUser) {
         (m) => _.toString(m.userId) === _.toString(currentUser.userId)
       )
     ) {
-      throw new errors.ForbiddenError(
-        `You don't have access to project with ID: ${projectId}`
-      );
+      throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`);
     }
     return res.data;
   } catch (err) {
     if (_.get(err, "response.status") === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(
-        `Project with id: ${projectId} doesn't exist`
-      );
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`);
     } else {
       // re-throw other error
       throw err;
@@ -1023,22 +959,16 @@ async function listChallengesByMember(memberId) {
   while (true) {
     let result = {};
     try {
-      result = await axios.get(
-        `${config.RESOURCES_API_URL}/${memberId}/challenges`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            page,
-            perPage: 10000,
-          },
-        }
-      );
+      result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          page,
+          perPage: 10000,
+        },
+      });
     } catch (e) {
       // only log the error but don't throw it, so the following logic can still be executed.
-      logger.debug(
-        `Failed to get challenges that accessible to the memberId ${memberId}`,
-        e
-      );
+      logger.debug(`Failed to get challenges that accessible to the memberId ${memberId}`, e);
     }
     const ids = result.data || [];
     if (ids.length === 0) {
@@ -1064,10 +994,7 @@ async function listChallengesByMember(memberId) {
  * @returns {String} method valid method
  */
 async function validateESRefreshMethod(method) {
-  Joi.attempt(
-    method,
-    Joi.string().label("ES_REFRESH").valid(["true", "false", "wait_for"])
-  );
+  Joi.attempt(method, Joi.string().label("ES_REFRESH").valid(["true", "false", "wait_for"]));
   return method;
 }
 
@@ -1087,9 +1014,7 @@ async function getProjectDefaultTerms(projectId) {
     return res.data.terms || [];
   } catch (err) {
     if (_.get(err, "response.status") === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(
-        `Project with id: ${projectId} doesn't exist`
-      );
+      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`);
     } else {
       // re-throw other error
       throw err;
@@ -1103,7 +1028,7 @@ async function getProjectDefaultTerms(projectId) {
  * @param {Number} projectId The id of the project for which to get the default terms of use
  * @returns {Promise<Number>} The billing account ID
  */
-async function getProjectBillingInformation(projectId) {
+async function getProjectBillingInformation(projectId, retryLimit = 3) {
   const token = await getM2MToken();
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`;
   try {
@@ -1122,7 +1047,14 @@ async function getProjectBillingInformation(projectId) {
       markup,
     };
   } catch (err) {
-    if (_.get(err, "response.status") === HttpStatus.NOT_FOUND) {
+    const responseCode = _.get(err, "response.status");
+
+    if (responseCode === HttpStatus.TOO_MANY_REQUESTS) {
+      // wait for 2 seconds//
+      return getProjectBillingInformation(projectId);
+    }
+
+    if (responseCode === HttpStatus.NOT_FOUND) {
       return {
         billingAccountId: null,
         markup: null,
@@ -1196,12 +1128,7 @@ async function _filterChallengesByGroupsAccess(currentUser, challenges) {
         userGroups = await getCompleteUserGroupTreeIds(currentUser.userId);
       }
       // get user groups if not yet
-      if (
-        _.find(
-          challenge.groups,
-          (group) => !!_.find(userGroups, (ug) => ug === group)
-        )
-      ) {
+      if (_.find(challenge.groups, (group) => !!_.find(userGroups, (ug) => ug === group))) {
         res.push(challenge);
       }
     }
@@ -1215,9 +1142,7 @@ async function _filterChallengesByGroupsAccess(currentUser, challenges) {
  * @param {Object} challenge the challenge to check
  */
 async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
-  const filtered = await _filterChallengesByGroupsAccess(currentUser, [
-    challenge,
-  ]);
+  const filtered = await _filterChallengesByGroupsAccess(currentUser, [challenge]);
   if (filtered.length === 0) {
     throw new errors.ForbiddenError(
       "helper ensureAcessibilityToModifiedGroups :: You don't have access to this group!"
@@ -1234,16 +1159,11 @@ async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
 async function _ensureAccessibleForTaskChallenge(currentUser, challenge) {
   let challengeResourceIds;
   // Check if challenge is task and apply security rules
-  if (
-    _.get(challenge, "task.isTask", false) &&
-    _.get(challenge, "task.isAssigned", false)
-  ) {
+  if (_.get(challenge, "task.isTask", false) && _.get(challenge, "task.isAssigned", false)) {
     if (currentUser) {
       if (!currentUser.isMachine) {
         const challengeResources = await getChallengeResources(challenge.id);
-        challengeResourceIds = _.map(challengeResources, (r) =>
-          _.toString(r.memberId)
-        );
+        challengeResourceIds = _.map(challengeResources, (r) => _.toString(r.memberId));
       }
     }
     const canAccesChallenge = _.isUndefined(currentUser)
@@ -1252,9 +1172,7 @@ async function _ensureAccessibleForTaskChallenge(currentUser, challenge) {
         hasAdminRole(currentUser) ||
         _.includes(challengeResourceIds || [], _.toString(currentUser.userId));
     if (!canAccesChallenge) {
-      throw new errors.ForbiddenError(
-        `You don't have access to view this challenge`
-      );
+      throw new errors.ForbiddenError(`You don't have access to view this challenge`);
     }
   }
 }
@@ -1283,10 +1201,7 @@ async function ensureUserCanModifyChallenge(currentUser, challenge) {
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge);
   // check full access
-  const isUserHasFullAccess = await userHasFullAccess(
-    challenge.id,
-    currentUser.userId
-  );
+  const isUserHasFullAccess = await userHasFullAccess(challenge.id, currentUser.userId);
   if (
     !currentUser.isMachine &&
     !hasAdminRole(currentUser) &&
@@ -1347,26 +1262,20 @@ async function getChallengeSubmissions(challengeId) {
   // get search is paginated, we need to get all pages' data
   let page = 1;
   while (true) {
-    const result = await axios.get(
-      `${config.SUBMISSIONS_API_URL}?challengeId=${challengeId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          page,
-          perPage: 100,
-        },
-      }
-    );
+    const result = await axios.get(`${config.SUBMISSIONS_API_URL}?challengeId=${challengeId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page,
+        perPage: 100,
+      },
+    });
     const ids = result.data || [];
     if (ids.length === 0) {
       break;
     }
     allSubmissions = allSubmissions.concat(ids);
     page += 1;
-    if (
-      result.headers["x-total-pages"] &&
-      page > Number(result.headers["x-total-pages"])
-    ) {
+    if (result.headers["x-total-pages"] && page > Number(result.headers["x-total-pages"])) {
       break;
     }
   }
@@ -1421,9 +1330,7 @@ async function sendSelfServiceNotification(type, recipients, data) {
               ...data,
               supportUrl: `${config.SELF_SERVICE_APP_URL}/support`,
             },
-            sendgridTemplateId:
-              constants.SelfServiceNotificationSettings[type]
-                .sendgridTemplateId,
+            sendgridTemplateId: constants.SelfServiceNotificationSettings[type].sendgridTemplateId,
             version: "v3",
           },
         },
@@ -1475,7 +1382,18 @@ function grpcErrorToHTTPCode(grpcErrorCode) {
   return HttpStatus.INTERNAL_SERVER_ERROR;
 }
 
+// TODO: move to @topcoder-framework/lib-common
+function dateToTimestamp(date) {
+  const timeInMilliseconds = date.getTime();
+
+  return {
+    seconds: timeInMilliseconds / 1000,
+    nanos: (timeInMilliseconds % 1000) * 1e6,
+  };
+}
+
 module.exports = {
+  dateToTimestamp,
   wrapExpress,
   autoWrapExpress,
   setResHeaders,
