@@ -98,11 +98,6 @@ module.exports = {
     WORK_COMPLETED: process.env.WORK_COMPLETED || ''
   },
 
-  AXIOS_RETRY: {
-    RETRIES: process.env.RETRIES || 3,
-    RETRY_COUNT: process.env.RETRY_COUNT || 1
-  },
-
   EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@topcoder.com',
   SELF_SERVICE_EMAIL_CC_ACCOUNTS: process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS ? _.map(process.env.SELF_SERVICE_EMAIL_CC_ACCOUNTS.split(','), email => ({ email })) : [{ email: 'sathya.jayabal@gmail.com' }],
   SELF_SERVICE_WHITELIST_HANDLES: process.env.SELF_SERVICE_WHITELIST_HANDLES ? process.env.SELF_SERVICE_WHITELIST_HANDLES.split(',') : ['TCConnCopilot', 'sstestcopilot'],
