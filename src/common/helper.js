@@ -13,6 +13,7 @@ const config = require('config')
 const m2mAuth = require('tc-core-library-js').auth.m2m
 const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
 const axios = require('axios')
+const axiosRetry = require('axios-retry')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 const NodeCache = require('node-cache')
@@ -443,6 +444,22 @@ async function createResource (challengeId, memberHandle, roleId) {
   const res = await axios.post(url, userObj, { headers: { Authorization: `Bearer ${token}` } })
   return res || false
 }
+
+function exponentialDelay (retryNumber = 0) {
+  const delay = Math.pow(2, retryNumber) * 200
+  const randomSum = delay * 0.2 * Math.random() // 0-20% of the delay
+  return delay + randomSum
+}
+
+axiosRetry(axios, {
+  retries: `${config.AXIOS_RETRIES}`, // number of retries
+  retryCondition: (e) => {
+    return e.config.url.indexOf('v5/projects') > 0 && (axiosRetry.isNetworkOrIdempotentRequestError(e) || e.response.status === 429);
+  },
+  onRetry: (retryCount, error, requestConfig) => 
+    logger.info(retryCount),
+  retryDelay: exponentialDelay
+});
 
 /**
  * Create Project
