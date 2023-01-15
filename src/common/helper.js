@@ -454,12 +454,13 @@ function exponentialDelay (retryNumber = 0) {
 axiosRetry(axios, {
   retries: `${config.AXIOS_RETRIES}`, // number of retries
   retryCondition: (e) => {
-    return e.config.url.indexOf('v5/projects') > 0 && (axiosRetry.isNetworkOrIdempotentRequestError(e) || e.response.status === 429);
+    return e.config.url.indexOf('v5/projects') > 0 &&
+    (axiosRetry.isNetworkOrIdempotentRequestError(e) || e.response.status === HttpStatus.TOO_MANY_REQUESTS)
   },
-  onRetry: (retryCount, error, requestConfig) => 
-    logger.info(retryCount),
+  onRetry: (retryCount, error, requestConfig) =>
+    logger.info(`${error.message} while calling: ${requestConfig.url} - retry count: ${retryCount}`),
   retryDelay: exponentialDelay
-});
+})
 
 /**
  * Create Project
@@ -624,7 +625,7 @@ async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, 
   const payment = await getProjectPayment(projectId)
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  const res = await axios.patch(url, {
+  await axios.patch(url, {
     details: {
       ...project.details,
       paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
