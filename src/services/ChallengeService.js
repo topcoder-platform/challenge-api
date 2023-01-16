@@ -23,12 +23,12 @@ const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateSer
 const { BadRequestError } = require("../common/errors");
 
 const phaseHelper = require("../common/phase-helper");
+const projectHelper = require("../common/project-helper");
 const challengeHelper = require("../common/challenge-helper");
 
 const esClient = helper.getESClient();
 
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
-const { DataExchange } = require("aws-sdk");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
@@ -947,6 +947,27 @@ searchChallenges.schema = {
     .unknown(true),
 };
 
+async function validateCreateChallengeRequest(currentUser, challenge) {
+  // projectId is required for non self-service challenges
+  if (challenge.legacy.selfService == null && challenge.projectId == null) {
+    throw new errors.BadRequestError("projectId is required for non self-service challenges.");
+  }
+
+  if (challenge.status === constants.challengeStatuses.Active) {
+    throw new errors.BadRequestError(
+      "You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active."
+    );
+  }
+
+  helper.ensureNoDuplicateOrNullElements(challenge.tags, "tags");
+  helper.ensureNoDuplicateOrNullElements(challenge.groups, "groups");
+  // helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
+  // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
+
+  // check groups authorization
+  await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
+}
+
 /**
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
@@ -955,10 +976,7 @@ searchChallenges.schema = {
  * @returns {Object} the created challenge
  */
 async function createChallenge(currentUser, challenge, userToken) {
-  // projectId is required for non self-service challenges
-  if (challenge.legacy.selfService == null && challenge.projectId == null) {
-    throw new errors.BadRequestError("projectId is required for non self-service challenges.");
-  }
+  await validateCreateChallengeRequest(currentUser, challenge);
 
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
@@ -983,6 +1001,16 @@ async function createChallenge(currentUser, challenge, userToken) {
     }
   }
 
+  /** Ensure project exists, and set direct project id, billing account id & markup */
+  const { projectId } = challenge;
+
+  const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
+  const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId);
+
+  _.set(challenge, "legacy.directProjectId", directProjectId);
+  _.set(challenge, "billing.billingAccountId", billingAccountId);
+  _.set(challenge, "billing.markup", markup || 0);
+
   if (!_.isUndefined(_.get(challenge, "legacy.reviewType"))) {
     _.set(challenge, "legacy.reviewType", _.toUpper(_.get(challenge, "legacy.reviewType")));
   }
@@ -994,27 +1022,6 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (!challenge.startDate) {
     challenge.startDate = new Date();
   } else challenge.startDate = new Date(challenge.startDate);
-
-  if (challenge.status === constants.challengeStatuses.Active) {
-    throw new errors.BadRequestError(
-      "You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active."
-    );
-  }
-
-  const { directProjectId } = await helper.ensureProjectExist(challenge.projectId, currentUser);
-
-  if (_.get(challenge, "legacy.pureV5Task") || _.get(challenge, "legacy.pureV5")) {
-    _.set(challenge, "legacy.directProjectId", directProjectId);
-  }
-
-  const { billingAccountId, markup } = await helper.getProjectBillingInformation(
-    _.get(challenge, "projectId")
-  );
-
-  if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
-    _.set(challenge, "billing.billingAccountId", billingAccountId);
-    _.set(challenge, "billing.markup", markup || 0);
-  }
 
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
 
@@ -1031,17 +1038,8 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    await phaseHelper.validatePhases(challenge.phases);
+    await PhaseService.validatePhases(challenge.phases);
   }
-
-  // TODO: Move to domain-challenge
-  helper.ensureNoDuplicateOrNullElements(challenge.tags, "tags");
-  helper.ensureNoDuplicateOrNullElements(challenge.groups, "groups");
-  // helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
-  // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
-
-  // check groups authorization
-  await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
 
   // populate phases
   if (!challenge.timelineTemplateId) {
@@ -1068,11 +1066,12 @@ async function createChallenge(currentUser, challenge, userToken) {
     if (!challenge.phases) {
       challenge.phases = [];
     }
-    // await phaseHelper.populatePhases(
-    //   challenge.phases,
-    //   challenge.startDate,
-    //   challenge.timelineTemplateId
-    // );
+
+    await phaseHelper.populatePhases(
+      challenge.phases,
+      challenge.startDate,
+      challenge.timelineTemplateId
+    );
   }
 
   // populate challenge terms
@@ -1104,10 +1103,9 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   const ret = await challengeDomain.create(challenge);
 
-  console.log("Created challenge", ret);
-
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
+
   if (ret.phases && ret.phases.length > 0) {
     const registrationPhase = _.find(ret.phases, (p) => p.name === "Registration");
     const submissionPhase = _.find(ret.phases, (p) => p.name === "Submission");
@@ -1131,6 +1129,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (track) {
     ret.track = track.name;
   }
+
   if (type) {
     ret.type = type.name;
   }
@@ -1163,6 +1162,7 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
+
   return ret;
 }
 
@@ -1559,7 +1559,7 @@ async function update(currentUser, challengeId, data, isFull) {
     }
   }
 
-  const { billingAccountId, markup } = await helper.getProjectBillingInformation(
+  const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
     _.get(challenge, "projectId")
   );
   if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
@@ -1834,9 +1834,9 @@ async function update(currentUser, challengeId, data, isFull) {
     const newPhases = _.cloneDeep(challenge.phases) || [];
     const newStartDate = data.startDate || challenge.startDate;
 
-    await phaseHelper.validatePhases(newPhases);
-    // populate phases
+    await PhaseService.validatePhases(newPhases);
 
+    // populate phases
     await phaseHelper.populatePhases(
       newPhases,
       newStartDate,

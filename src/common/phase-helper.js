@@ -1,9 +1,12 @@
 const _ = require("lodash");
+
 const uuid = require("uuid/v4");
 const moment = require("moment");
 
 const errors = require("./errors");
-const helper = require("./helper");
+
+const phaseService = require("../services/PhaseService");
+const timelineTemplateService = require("../services/TimelineTemplateService");
 
 class ChallengePhaseHelper {
   /**
@@ -145,25 +148,10 @@ class ChallengePhaseHelper {
     // phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
   }
 
-  async validatePhases(phases) {
-    if (!phases || phases.length === 0) {
-      return;
-    }
-    const records = await helper.scan("Phase");
-    const map = new Map();
-    _.each(records, (r) => {
-      map.set(r.id, r);
-    });
-    const invalidPhases = _.filter(phases, (p) => !map.has(p.phaseId));
-    if (invalidPhases.length > 0) {
-      throw new errors.BadRequestError(
-        `The following phases are invalid: ${toString(invalidPhases)}`
-      );
-    }
-  }
-
   async getPhaseDefinitionsAndMap() {
-    const records = await helper.scan("Phase");
+    // const records = await helper.scan("Phase");
+    const { result: records } = await phaseService.searchPhases();
+
     const map = new Map();
     _.each(records, (r) => {
       map.set(r.id, r);
@@ -172,7 +160,7 @@ class ChallengePhaseHelper {
   }
 
   async getTemplateAndTemplateMap(timelineTemplateId) {
-    const records = await helper.getById("TimelineTemplate", timelineTemplateId);
+    const records = await timelineTemplateService.getTimelineTemplate(timelineTemplateId);
     const map = new Map();
     _.each(records.phases, (r) => {
       map.set(r.phaseId, r);

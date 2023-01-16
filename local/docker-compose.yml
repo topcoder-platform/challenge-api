@@ -1,33 +1,33 @@
 version: '3'
 services:
-  dynamodb:
-    image: amazon/dynamodb-local
-    ports:
-      - "8000:8000"
-    command: "-inMemory -port 8000"
+  # dynamodb:
+  #   image: amazon/dynamodb-local
+  #   ports:
+  #     - "8000:8000"
+  #   command: "-inMemory -port 8000"
   esearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.0"
     ports:
       - "9200:9200"
     environment:
       - "discovery.type=single-node"
-  minio1:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-    environment:
-      MINIO_ACCESS_KEY: "FAKE_ACCESS_KEY"
-      MINIO_SECRET_KEY: "FAKE_SECRET_ACCESS_KEY"
-    command: "server /data"
-  mock-api:
-    image: mock-api:latest
-    build:
-      context: ../
-      dockerfile: mock-api/Dockerfile
-    volumes:
-      - ../mock-api:/challenge-api/mock-api
-    environment:
-      DYNAMODB_URL: http://dynamodb:7777
-      IS_LOCAL_DB: "true"
-    ports:
-      - "4000:4000"
+  # minio1:
+  #   image: minio/minio
+  #   ports:
+  #     - "9000:9000"
+  #   environment:
+  #     MINIO_ACCESS_KEY: "FAKE_ACCESS_KEY"
+  #     MINIO_SECRET_KEY: "FAKE_SECRET_ACCESS_KEY"
+  #   command: "server /data"
+  # mock-api:
+  #   image: mock-api:latest
+  #   build:
+  #     context: ../
+  #     dockerfile: mock-api/Dockerfile
+  #   volumes:
+  #     - ../mock-api:/challenge-api/mock-api
+  #   environment:
+  #     DYNAMODB_URL: http://dynamodb:7777
+  #     IS_LOCAL_DB: "true"
+  #   ports:
+  #     - "4000:4000"

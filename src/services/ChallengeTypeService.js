@@ -36,28 +36,15 @@ async function searchChallengeTypes(criteria) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
 
-  if (criteria.name)
-    records = _.filter(records, (e) =>
-      helper.partialMatch(criteria.name, e.name)
-    );
+  if (criteria.name) records = _.filter(records, (e) => helper.partialMatch(criteria.name, e.name));
   if (criteria.description)
-    records = _.filter(records, (e) =>
-      helper.partialMatch(criteria.description, e.description)
-    );
+    records = _.filter(records, (e) => helper.partialMatch(criteria.description, e.description));
   if (criteria.abbreviation)
-    records = _.filter(records, (e) =>
-      helper.partialMatch(criteria.abbreviation, e.abbreviation)
-    );
+    records = _.filter(records, (e) => helper.partialMatch(criteria.abbreviation, e.abbreviation));
   if (!_.isUndefined(criteria.isActive))
-    records = _.filter(
-      records,
-      (e) => e.isActive === (criteria.isActive === "true")
-    );
+    records = _.filter(records, (e) => e.isActive === (criteria.isActive === "true"));
   if (!_.isUndefined(criteria.isTask))
-    records = _.filter(
-      records,
-      (e) => e.isTask === (criteria.isTask === "true")
-    );
+    records = _.filter(records, (e) => e.isTask === (criteria.isTask === "true"));
 
   const total = records.length;
   const result = records.slice((page - 1) * perPage, page * perPage);
@@ -84,15 +71,8 @@ searchChallengeTypes.schema = {
  */
 async function createChallengeType(type) {
   await helper.validateDuplicate("ChallengeType", "name", type.name);
-  await helper.validateDuplicate(
-    "ChallengeType",
-    "abbreviation",
-    type.abbreviation
-  );
-  const ret = await helper.create(
-    "ChallengeType",
-    _.assign({ id: uuid() }, type)
-  );
+  await helper.validateDuplicate("ChallengeType", "abbreviation", type.abbreviation);
+  const ret = await helper.create("ChallengeType", _.assign({ id: uuid() }, type));
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret);
   return ret;
@@ -135,11 +115,7 @@ async function fullyUpdateChallengeType(id, data) {
     await helper.validateDuplicate("ChallengeType", "name", data.name);
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    await helper.validateDuplicate(
-      "ChallengeType",
-      "abbreviation",
-      data.abbreviation
-    );
+    await helper.validateDuplicate("ChallengeType", "abbreviation", data.abbreviation);
   }
   if (_.isUndefined(data.description)) {
     type.description = undefined;
@@ -174,22 +150,12 @@ async function partiallyUpdateChallengeType(id, data) {
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     await helper.validateDuplicate("ChallengeType", "name", data.name);
   }
-  if (
-    data.abbreviation &&
-    type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()
-  ) {
-    await helper.validateDuplicate(
-      "ChallengeType",
-      "abbreviation",
-      data.abbreviation
-    );
+  if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
+    await helper.validateDuplicate("ChallengeType", "abbreviation", data.abbreviation);
   }
   const ret = await helper.update(type, data);
   // post bus event
-  await helper.postBusEvent(
-    constants.Topics.ChallengeTypeUpdated,
-    _.assignIn({ id }, data)
-  );
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data));
   return ret;
 }
 

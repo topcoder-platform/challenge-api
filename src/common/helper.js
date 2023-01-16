@@ -10,8 +10,6 @@ const errors = require("./errors");
 const util = require("util");
 const AWS = require("aws-sdk");
 const config = require("config");
-const m2mAuth = require("tc-core-library-js").auth.m2m;
-const m2m = m2mAuth(_.pick(config, ["AUTH0_URL", "AUTH0_AUDIENCE", "TOKEN_CACHE_TIME"]));
 const axios = require("axios");
 
 const busApi = require("topcoder-bus-api-wrapper");
@@ -21,9 +19,10 @@ const HttpStatus = require("http-status-codes");
 const xss = require("xss");
 const logger = require("./logger");
 
+const projectHelper = require("./project-helper");
+const m2mHelper = require("./m2m-helper");
+
 const AWSXRay = require("aws-xray-sdk");
-const { Http } = require("winston/lib/winston/transports");
-const { Timestamp } = require("@topcoder-framework/lib-common");
 
 // Bus API Client
 let busApiClient;
@@ -388,20 +387,12 @@ async function deleteFromS3(bucket, key) {
 }
 
 /**
- * Get M2M token.
- * @returns {Promise<String>} the M2M token
- */
-async function getM2MToken() {
-  return m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET);
-}
-
-/**
  * Get challenge resources
  * @param {String} challengeId the challenge id
  * @returns {Promise<Array>} the challenge resources
  */
 async function getChallengeResources(challengeId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const perPage = 100;
   let page = 1;
   let result = [];
@@ -429,7 +420,7 @@ async function getChallengeResources(challengeId) {
  * @param {String} roleId the resource role ID to assign
  */
 async function createResource(challengeId, memberHandle, roleId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
 
   const userObj = {
     challengeId,
@@ -479,7 +470,7 @@ async function getProjectIdByRoundId(roundId) {
  * @param {String} projectId the project id
  */
 async function getProjectPayment(projectId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.CUSTOMER_PAYMENTS_URL}`;
   const res = await axios.get(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -497,7 +488,7 @@ async function getProjectPayment(projectId) {
  * @param {String} paymentId the payment ID
  */
 async function capturePayment(paymentId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`;
   logger.info(`Calling: ${url} to capture payment`);
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
@@ -513,7 +504,7 @@ async function capturePayment(paymentId) {
  * @param {String} paymentId the payment ID
  */
 async function cancelPayment(paymentId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/cancel`;
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
   if (res.data.status !== "canceled") {
@@ -530,14 +521,14 @@ async function cancelPayment(paymentId) {
  */
 async function cancelProject(projectId, cancelReason, currentUser) {
   let payment = await getProjectPayment(projectId);
-  const project = await ensureProjectExist(projectId, currentUser);
+  const project = await projectHelper.getProject(projectId, currentUser);
   if (project.status === "cancelled") return; // already canceled
   try {
     payment = await cancelPayment(payment.id);
   } catch (e) {
     logger.debug(`Failed to cancel payment with error: ${e.message}`);
   }
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.PROJECTS_API_URL}/${projectId}`;
   await axios.patch(
     url,
@@ -568,7 +559,7 @@ async function activateProject(projectId, currentUser, name, description) {
   let project;
   try {
     payment = await getProjectPayment(projectId);
-    project = await ensureProjectExist(projectId, currentUser);
+    project = await projectHelper.getProject(projectId, currentUser);
     if (payment.status !== "succeeded") {
       payment = await capturePayment(payment.id);
     }
@@ -582,7 +573,7 @@ async function activateProject(projectId, currentUser, name, description) {
     );
     throw new Error(`Failed to charge payment ${payment.id} with error: ${e.message}`);
   }
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.PROJECTS_API_URL}/${projectId}`;
   const res = await axios.patch(
     url,
@@ -616,9 +607,9 @@ async function activateProject(projectId, currentUser, name, description) {
  * @param {*} currentUser the current user
  */
 async function updateSelfServiceProjectInfo(projectId, workItemPlannedEndDate, currentUser) {
-  const project = await ensureProjectExist(projectId, currentUser);
+  const project = await projectHelper.getProject(projectId, currentUser);
   const payment = await getProjectPayment(projectId);
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.PROJECTS_API_URL}/${projectId}`;
   const res = await axios.patch(
     url,
@@ -643,7 +634,7 @@ async function updateSelfServiceProjectInfo(projectId, workItemPlannedEndDate, c
  * @returns {Promise<Array>} the challenge resources
  */
 async function getResourceRoles() {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const res = await axios.get(config.RESOURCE_ROLES_API_URL, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -677,7 +668,7 @@ async function userHasFullAccess(challengeId, userId) {
  * @returns {Promise<Array>} the user groups
  */
 async function getUserGroups(userId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   let allGroups = [];
   // get search is paginated, we need to get all pages' data
   let page = 1;
@@ -710,7 +701,7 @@ async function getUserGroups(userId) {
  * @returns {Promise<Array>} the user groups
  */
 async function getCompleteUserGroupTreeIds(userId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const result = await axios.get(`${config.GROUPS_API_URL}/memberGroups/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -727,7 +718,7 @@ async function getCompleteUserGroupTreeIds(userId) {
  * @returns {Array<String>} an array with the groups ID and the IDs of all subGroups
  */
 async function expandWithSubGroups(groupId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -744,7 +735,7 @@ async function expandWithSubGroups(groupId) {
  * @returns {Array<String>} an array with the group ID and the IDs of all parent groups up the chain
  */
 async function expandWithParentGroups(groupId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -881,46 +872,6 @@ function getESClient() {
 }
 
 /**
- * Ensure project exist
- * @param {String} projectId the project id
- * @param {String} currentUser the user
- */
-async function ensureProjectExist(projectId, currentUser) {
-  let token = await getM2MToken();
-  const url = `${config.PROJECTS_API_URL}/${projectId}`;
-  try {
-    const res = await axios.get(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (currentUser.isMachine || hasAdminRole(currentUser)) {
-      return res.data;
-    }
-    if (
-      _.get(res, "data.type") === "self-service" &&
-      _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase())
-    ) {
-      return res.data;
-    }
-    if (
-      !_.find(
-        _.get(res, "data.members", []),
-        (m) => _.toString(m.userId) === _.toString(currentUser.userId)
-      )
-    ) {
-      throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`);
-    }
-    return res.data;
-  } catch (err) {
-    if (_.get(err, "response.status") === HttpStatus.NOT_FOUND) {
-      throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`);
-    } else {
-      // re-throw other error
-      throw err;
-    }
-  }
-}
-
-/**
  * Calculates challenge end date based on its phases
  * @param {any} challenge
  */
@@ -952,7 +903,7 @@ function calculateChallengeEndDate(challenge, data) {
  * @returns {Promise<Array>} an array of challenge ids represents challenges that given member has access to.
  */
 async function listChallengesByMember(memberId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   let allIds = [];
   // get search is paginated, we need to get all pages' data
   let page = 1;
@@ -1005,7 +956,7 @@ async function validateESRefreshMethod(method) {
  * @returns {Promise<Array<Number>>} An array containing the ids of the default project terms of use
  */
 async function getProjectDefaultTerms(projectId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}`;
   try {
     const res = await axios.get(projectUrl, {
@@ -1023,50 +974,6 @@ async function getProjectDefaultTerms(projectId) {
 }
 
 /**
- * This functions gets the default billing account for a given project id
- *
- * @param {Number} projectId The id of the project for which to get the default terms of use
- * @returns {Promise<Number>} The billing account ID
- */
-async function getProjectBillingInformation(projectId, retryLimit = 3) {
-  const token = await getM2MToken();
-  const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`;
-  try {
-    const res = await axios.get(projectUrl, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    let markup = _.get(res, "data.markup", null)
-      ? _.toNumber(_.get(res, "data.markup", null))
-      : null;
-    if (markup && markup > 0) {
-      // TODO - Hack to change int returned from api to decimal
-      markup = markup / 100;
-    }
-    return {
-      billingAccountId: _.get(res, "data.tcBillingAccountId", null),
-      markup,
-    };
-  } catch (err) {
-    const responseCode = _.get(err, "response.status");
-
-    if (responseCode === HttpStatus.TOO_MANY_REQUESTS) {
-      // wait for 2 seconds//
-      return getProjectBillingInformation(projectId);
-    }
-
-    if (responseCode === HttpStatus.NOT_FOUND) {
-      return {
-        billingAccountId: null,
-        markup: null,
-      };
-    } else {
-      // re-throw other error
-      throw err;
-    }
-  }
-}
-
-/**
  * This function gets the challenge terms array with the terms data
  * The terms data is retrieved from the terms API using the specified terms ids
  *
@@ -1074,7 +981,7 @@ async function getProjectBillingInformation(projectId, retryLimit = 3) {
  */
 async function validateChallengeTerms(terms = []) {
   const listOfTerms = [];
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   for (let term of terms) {
     // Get the terms details from the API
     try {
@@ -1237,7 +1144,7 @@ function sumOfPrizes(prizes) {
  * @returns {Promise<Object>} the group
  */
 async function getGroupById(groupId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   try {
     const result = await axios.get(`${config.GROUPS_API_URL}/${groupId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -1257,7 +1164,7 @@ async function getGroupById(groupId) {
  * @returns {Array} the submission
  */
 async function getChallengeSubmissions(challengeId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   let allSubmissions = [];
   // get search is paginated, we need to get all pages' data
   let page = 1;
@@ -1288,7 +1195,7 @@ async function getChallengeSubmissions(challengeId) {
  * @returns {Object}
  */
 async function getMemberById(userId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const res = await axios.get(`${config.MEMBERS_API_URL}?userId=${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -1302,7 +1209,7 @@ async function getMemberById(userId) {
  * @returns {Object}
  */
 async function getMemberByHandle(handle) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   const res = await axios.get(`${config.MEMBERS_API_URL}/${handle}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -1382,18 +1289,7 @@ function grpcErrorToHTTPCode(grpcErrorCode) {
   return HttpStatus.INTERNAL_SERVER_ERROR;
 }
 
-// TODO: move to @topcoder-framework/lib-common
-function dateToTimestamp(date) {
-  const timeInMilliseconds = date.getTime();
-
-  return {
-    seconds: timeInMilliseconds / 1000,
-    nanos: (timeInMilliseconds % 1000) * 1e6,
-  };
-}
-
 module.exports = {
-  dateToTimestamp,
   wrapExpress,
   autoWrapExpress,
   setResHeaders,
@@ -1417,13 +1313,11 @@ module.exports = {
   ensureNoDuplicateOrNullElements,
   postBusEvent,
   getESClient,
-  ensureProjectExist,
   calculateChallengeEndDate,
   listChallengesByMember,
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
-  getProjectBillingInformation,
   expandWithSubGroups,
   getCompleteUserGroupTreeIds,
   expandWithParentGroups,

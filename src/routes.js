@@ -2,332 +2,358 @@
  * Contains all routes
  */
 
-const constants = require('../app-constants')
-const { SCOPES: {
-  READ,
-  CREATE,
-  UPDATE,
-  DELETE,
-  ALL
-} } = require('config')
+const constants = require("../app-constants");
+const {
+  SCOPES: { READ, CREATE, UPDATE, DELETE, ALL },
+} = require("config");
 
 module.exports = {
-  '/challenges': {
+  "/challenges": {
     get: {
-      controller: 'ChallengeController',
-      method: 'searchChallenges',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.SelfServiceCustomer, constants.UserRoles.Manager, constants.UserRoles.User],
-      scopes: [READ, ALL]
+      controller: "ChallengeController",
+      method: "searchChallenges",
+      access: [
+        constants.UserRoles.Admin,
+        constants.UserRoles.Copilot,
+        constants.UserRoles.SelfServiceCustomer,
+        constants.UserRoles.Manager,
+        constants.UserRoles.User,
+      ],
+      scopes: [READ, ALL],
     },
     post: {
-      controller: 'ChallengeController',
-      method: 'createChallenge',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.SelfServiceCustomer, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
-      scopes: [CREATE, ALL]
-    }
+      controller: "ChallengeController",
+      method: "createChallenge",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+        constants.UserRoles.SelfServiceCustomer,
+        constants.UserRoles.Copilot,
+        constants.UserRoles.Manager,
+        constants.UserRoles.User,
+      ],
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenges/support-requests': {
+  "/challenges/support-requests": {
     post: {
-      controller: 'SupportController',
-      method: 'createRequest'
-    }
+      controller: "SupportController",
+      method: "createRequest",
+    },
   },
-  '/challenges/health': {
+  "/challenges/health": {
     get: {
-      controller: 'HealthController',
-      method: 'checkHealth'
-    }
+      controller: "HealthController",
+      method: "checkHealth",
+    },
   },
-  '/challenges/:challengeId': {
+  "/challenges/:challengeId": {
     get: {
-      controller: 'ChallengeController',
-      method: 'getChallenge',
-      scopes: [READ, ALL]
+      controller: "ChallengeController",
+      method: "getChallenge",
+      scopes: [READ, ALL],
     },
     put: {
-      controller: 'ChallengeController',
-      method: 'fullyUpdateChallenge',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.SelfServiceCustomer, constants.UserRoles.Copilot, constants.UserRoles.Manager, constants.UserRoles.User],
-      scopes: [UPDATE, ALL]
+      controller: "ChallengeController",
+      method: "fullyUpdateChallenge",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+        constants.UserRoles.SelfServiceCustomer,
+        constants.UserRoles.Copilot,
+        constants.UserRoles.Manager,
+        constants.UserRoles.User,
+      ],
+      scopes: [UPDATE, ALL],
     },
     patch: {
-      controller: 'ChallengeController',
-      method: 'partiallyUpdateChallenge',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.SelfServiceCustomer, constants.UserRoles.Manager, constants.UserRoles.User],
-      scopes: [UPDATE, ALL]
+      controller: "ChallengeController",
+      method: "partiallyUpdateChallenge",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+        constants.UserRoles.Copilot,
+        constants.UserRoles.SelfServiceCustomer,
+        constants.UserRoles.Manager,
+        constants.UserRoles.User,
+      ],
+      scopes: [UPDATE, ALL],
     },
     delete: {
-      controller: 'ChallengeController',
-      method: 'deleteChallenge',
-      auth: 'jwt',
-      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.SelfServiceCustomer, constants.UserRoles.Manager, constants.UserRoles.User],
-      scopes: [DELETE, ALL]
-    }
+      controller: "ChallengeController",
+      method: "deleteChallenge",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+        constants.UserRoles.Copilot,
+        constants.UserRoles.SelfServiceCustomer,
+        constants.UserRoles.Manager,
+        constants.UserRoles.User,
+      ],
+      scopes: [DELETE, ALL],
+    },
   },
-  '/challenges/:challengeId/statistics': {
+  "/challenges/:challengeId/statistics": {
     get: {
-      controller: 'ChallengeController',
-      method: 'getChallengeStatistics'
-    }
+      controller: "ChallengeController",
+      method: "getChallengeStatistics",
+    },
   },
-  '/challenges/:challengeId/notifications': {
+  "/challenges/:challengeId/notifications": {
     post: {
-      controller: 'ChallengeController',
-      method: 'sendNotifications',
-      auth: 'jwt',
+      controller: "ChallengeController",
+      method: "sendNotifications",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenge-types': {
+  "/challenge-types": {
     get: {
-      controller: 'ChallengeTypeController',
-      method: 'searchChallengeTypes'
+      controller: "ChallengeTypeController",
+      method: "searchChallengeTypes",
     },
     post: {
-      controller: 'ChallengeTypeController',
-      method: 'createChallengeType',
-      auth: 'jwt',
+      controller: "ChallengeTypeController",
+      method: "createChallengeType",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenge-types/:challengeTypeId': {
+  "/challenge-types/:challengeTypeId": {
     get: {
-      controller: 'ChallengeTypeController',
-      method: 'getChallengeType'
+      controller: "ChallengeTypeController",
+      method: "getChallengeType",
     },
     put: {
-      controller: 'ChallengeTypeController',
-      method: 'fullyUpdateChallengeType',
-      auth: 'jwt',
+      controller: "ChallengeTypeController",
+      method: "fullyUpdateChallengeType",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     patch: {
-      controller: 'ChallengeTypeController',
-      method: 'partiallyUpdateChallengeType',
-      auth: 'jwt',
+      controller: "ChallengeTypeController",
+      method: "partiallyUpdateChallengeType",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
-    }
+      scopes: [UPDATE, ALL],
+    },
   },
-  '/challenge-tracks': {
+  "/challenge-tracks": {
     get: {
-      controller: 'ChallengeTrackController',
-      method: 'searchChallengeTracks'
+      controller: "ChallengeTrackController",
+      method: "searchChallengeTracks",
     },
     post: {
-      controller: 'ChallengeTrackController',
-      method: 'createChallengeTrack',
-      auth: 'jwt',
+      controller: "ChallengeTrackController",
+      method: "createChallengeTrack",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenge-tracks/:challengeTrackId': {
+  "/challenge-tracks/:challengeTrackId": {
     get: {
-      controller: 'ChallengeTrackController',
-      method: 'getChallengeTrack'
+      controller: "ChallengeTrackController",
+      method: "getChallengeTrack",
     },
     put: {
-      controller: 'ChallengeTrackController',
-      method: 'fullyUpdateChallengeTrack',
-      auth: 'jwt',
+      controller: "ChallengeTrackController",
+      method: "fullyUpdateChallengeTrack",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     patch: {
-      controller: 'ChallengeTrackController',
-      method: 'partiallyUpdateChallengeTrack',
-      auth: 'jwt',
+      controller: "ChallengeTrackController",
+      method: "partiallyUpdateChallengeTrack",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
-    }
+      scopes: [UPDATE, ALL],
+    },
   },
-  '/challenge-timelines': {
+  "/challenge-timelines": {
     get: {
-      controller: 'ChallengeTimelineTemplateController',
-      method: 'searchChallengeTimelineTemplates'
+      controller: "ChallengeTimelineTemplateController",
+      method: "searchChallengeTimelineTemplates",
       // auth: 'jwt',
       // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       // scopes: [READ, ALL]
     },
     post: {
-      controller: 'ChallengeTimelineTemplateController',
-      method: 'createChallengeTimelineTemplate',
-      auth: 'jwt',
+      controller: "ChallengeTimelineTemplateController",
+      method: "createChallengeTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenge-timelines/:challengeTimelineTemplateId': {
+  "/challenge-timelines/:challengeTimelineTemplateId": {
     get: {
-      controller: 'ChallengeTimelineTemplateController',
-      method: 'getChallengeTimelineTemplate'
+      controller: "ChallengeTimelineTemplateController",
+      method: "getChallengeTimelineTemplate",
       // auth: 'jwt',
       // access: [constants.UserRoles.Admin, constants.UserRoles.Copilot],
       // scopes: [READ, ALL]
     },
     put: {
-      controller: 'ChallengeTimelineTemplateController',
-      method: 'fullyUpdateChallengeTimelineTemplate',
-      auth: 'jwt',
+      controller: "ChallengeTimelineTemplateController",
+      method: "fullyUpdateChallengeTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     delete: {
-      controller: 'ChallengeTimelineTemplateController',
-      method: 'deleteChallengeTimelineTemplate',
-      auth: 'jwt',
+      controller: "ChallengeTimelineTemplateController",
+      method: "deleteChallengeTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [DELETE, ALL]
-    }
+      scopes: [DELETE, ALL],
+    },
   },
-  '/challenge-audit-logs': {
+  "/challenge-audit-logs": {
     get: {
-      controller: 'AuditLogController',
-      method: 'searchAuditLogs',
-      auth: 'jwt',
+      controller: "AuditLogController",
+      method: "searchAuditLogs",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [READ]
-    }
+      scopes: [READ],
+    },
   },
-  '/challenge-phases': {
+  "/challenge-phases": {
     get: {
-      controller: 'ChallengePhaseController',
-      method: 'searchPhases',
-      scopes: [READ, ALL]
+      controller: "ChallengePhaseController",
+      method: "searchPhases",
+      scopes: [READ, ALL],
     },
     post: {
-      controller: 'ChallengePhaseController',
-      method: 'createPhase',
-      auth: 'jwt',
+      controller: "ChallengePhaseController",
+      method: "createPhase",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenge-phases/:challengePhaseId': {
+  "/challenge-phases/:challengePhaseId": {
     get: {
-      controller: 'ChallengePhaseController',
-      method: 'getPhase',
-      auth: 'jwt',
+      controller: "ChallengePhaseController",
+      method: "getPhase",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [READ, ALL]
+      scopes: [READ, ALL],
     },
     put: {
-      controller: 'ChallengePhaseController',
-      method: 'fullyUpdatePhase',
-      auth: 'jwt',
+      controller: "ChallengePhaseController",
+      method: "fullyUpdatePhase",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     patch: {
-      controller: 'ChallengePhaseController',
-      method: 'partiallyUpdatePhase',
-      auth: 'jwt',
+      controller: "ChallengePhaseController",
+      method: "partiallyUpdatePhase",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     delete: {
-      controller: 'ChallengePhaseController',
-      method: 'deletePhase',
-      auth: 'jwt',
+      controller: "ChallengePhaseController",
+      method: "deletePhase",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [DELETE, ALL]
-    }
+      scopes: [DELETE, ALL],
+    },
   },
-  '/timeline-templates': {
+  "/timeline-templates": {
     get: {
-      controller: 'TimelineTemplateController',
-      method: 'searchTimelineTemplates',
-      scopes: [READ, ALL]
+      controller: "TimelineTemplateController",
+      method: "searchTimelineTemplates",
+      scopes: [READ, ALL],
     },
     post: {
-      controller: 'TimelineTemplateController',
-      method: 'createTimelineTemplate',
-      auth: 'jwt',
+      controller: "TimelineTemplateController",
+      method: "createTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/timeline-templates/:timelineTemplateId': {
+  "/timeline-templates/:timelineTemplateId": {
     get: {
-      controller: 'TimelineTemplateController',
-      method: 'getTimelineTemplate',
-      auth: 'jwt',
+      controller: "TimelineTemplateController",
+      method: "getTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [READ, ALL]
+      scopes: [READ, ALL],
     },
     put: {
-      controller: 'TimelineTemplateController',
-      method: 'fullyUpdateTimelineTemplate',
-      auth: 'jwt',
+      controller: "TimelineTemplateController",
+      method: "fullyUpdateTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     patch: {
-      controller: 'TimelineTemplateController',
-      method: 'partiallyUpdateTimelineTemplate',
-      auth: 'jwt',
+      controller: "TimelineTemplateController",
+      method: "partiallyUpdateTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     delete: {
-      controller: 'TimelineTemplateController',
-      method: 'deleteTimelineTemplate',
-      auth: 'jwt',
+      controller: "TimelineTemplateController",
+      method: "deleteTimelineTemplate",
+      auth: "jwt",
       access: [constants.UserRoles.Admin],
-      scopes: [DELETE, ALL]
-    }
+      scopes: [DELETE, ALL],
+    },
   },
-  '/challenges/:challengeId/attachments': {
+  "/challenges/:challengeId/attachments": {
     post: {
-      controller: 'AttachmentController',
-      method: 'createAttachment',
-      auth: 'jwt',
+      controller: "AttachmentController",
+      method: "createAttachment",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [CREATE, ALL]
-    }
+      scopes: [CREATE, ALL],
+    },
   },
-  '/challenges/:challengeId/attachments/:attachmentId': {
+  "/challenges/:challengeId/attachments/:attachmentId": {
     get: {
-      controller: 'AttachmentController',
-      method: 'getAttachment',
-      auth: 'jwt', // any authenticated role is allowed
-      scopes: [READ, ALL]
+      controller: "AttachmentController",
+      method: "getAttachment",
+      auth: "jwt", // any authenticated role is allowed
+      scopes: [READ, ALL],
     },
     put: {
-      controller: 'AttachmentController',
-      method: 'updateAttachment',
-      auth: 'jwt',
+      controller: "AttachmentController",
+      method: "updateAttachment",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     patch: {
-      controller: 'AttachmentController',
-      method: 'partiallyUpdateAttachment',
-      auth: 'jwt',
+      controller: "AttachmentController",
+      method: "partiallyUpdateAttachment",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [UPDATE, ALL]
+      scopes: [UPDATE, ALL],
     },
     delete: {
-      controller: 'AttachmentController',
-      method: 'deleteAttachment',
-      auth: 'jwt',
+      controller: "AttachmentController",
+      method: "deleteAttachment",
+      auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
-      scopes: [DELETE, ALL]
-    }
+      scopes: [DELETE, ALL],
+    },
   },
-  '/challenges/:challengeId/attachments/:attachmentId/download': {
+  "/challenges/:challengeId/attachments/:attachmentId/download": {
     get: {
-      controller: 'AttachmentController',
-      method: 'downloadAttachment',
-      auth: 'jwt', // any authenticated role is allowed
-      scopes: [READ, ALL]
-    }
-  }
-}
+      controller: "AttachmentController",
+      method: "downloadAttachment",
+      auth: "jwt", // any authenticated role is allowed
+      scopes: [READ, ALL],
+    },
+  },
+};

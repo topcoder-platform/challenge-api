@@ -8,24 +8,23 @@ const {
   DomainHelper: { getScanCriteria, getLookupCriteria },
 } = require("@topcoder-framework/lib-common");
 
-const {
-  TimelineTemplateDomain,
-} = require("@topcoder-framework/domain-challenge");
+const { TimelineTemplateDomain } = require("@topcoder-framework/domain-challenge");
 
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
 const helper = require("../common/helper");
-const phaseHelper = require("../common/phase-helper");
-// const logger = require('../common/logger')
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
-const { items } = require("joi/lib/types/array");
+
+const PhaseService = require("./PhaseService");
 
 const timelineTemplateDomain = new TimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
 );
+
+module.exports = {};
 
 /**
  * Search timeline templates.
@@ -35,19 +34,13 @@ const timelineTemplateDomain = new TimelineTemplateDomain(
 async function searchTimelineTemplates(criteria) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-  // const list = await helper.scanAll("TimelineTemplate");
-  console.log("Requested criteria", criteria);
   const scanCriteria = getScanCriteria(criteria);
-  console.log(scanCriteria, "scanCriteria");
+
   const { items: list } = await timelineTemplateDomain.scan({
     scanCriteria,
   });
 
-  console.log("List of items", list);
-
-  const records = _.filter(list, (e) =>
-    helper.partialMatch(criteria.name, e.name)
-  );
+  const records = _.filter(list, (e) => helper.partialMatch(criteria.name, e.name));
   const total = records.length;
   const result = records.slice((page - 1) * perPage, page * perPage);
 
@@ -68,17 +61,10 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate(timelineTemplate) {
-  await helper.validateDuplicate(
-    "TimelineTemplate",
-    "name",
-    timelineTemplate.name
-  );
-  await phaseHelper.validatePhases(timelineTemplate.phases);
+  await helper.validateDuplicate("TimelineTemplate", "name", timelineTemplate.name);
+  await PhaseService.validatePhases(timelineTemplate.phases);
 
-  const ret = await helper.create(
-    "TimelineTemplate",
-    _.assign({ id: uuid() }, timelineTemplate)
-  );
+  const ret = await helper.create("TimelineTemplate", _.assign({ id: uuid() }, timelineTemplate));
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, ret);
   return ret;
@@ -110,9 +96,7 @@ createTimelineTemplate.schema = {
  * @returns {Object} the timeline template with given id
  */
 async function getTimelineTemplate(timelineTemplateId) {
-  return timelineTemplateDomain.lookup(
-    getLookupCriteria("id", timelineTemplateId)
-  );
+  return timelineTemplateDomain.lookup(getLookupCriteria("id", timelineTemplateId));
 }
 
 getTimelineTemplate.schema = {
@@ -127,20 +111,14 @@ getTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function update(timelineTemplateId, data, isFull) {
-  const timelineTemplate = await helper.getById(
-    "TimelineTemplate",
-    timelineTemplateId
-  );
+  const timelineTemplate = await helper.getById("TimelineTemplate", timelineTemplateId);
 
-  if (
-    data.name &&
-    data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()
-  ) {
+  if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
     await helper.validateDuplicate("TimelineTemplate", "name", data.name);
   }
 
   if (data.phases) {
-    await phaseHelper.validatePhases(data.phases);
+    await PhaseService.validatePhases(data.phases);
   }
 
   if (isFull) {
@@ -235,14 +213,12 @@ deleteTimelineTemplate.schema = {
   timelineTemplateId: Joi.id(),
 };
 
-module.exports = {
-  searchTimelineTemplates,
-  createTimelineTemplate,
-  getTimelineTemplate,
-  fullyUpdateTimelineTemplate,
-  partiallyUpdateTimelineTemplate,
-  deleteTimelineTemplate,
-};
+module.exports.searchTimelineTemplates = searchTimelineTemplates;
+module.exports.createTimelineTemplate = createTimelineTemplate;
+module.exports.getTimelineTemplate = getTimelineTemplate;
+module.exports.fullyUpdateTimelineTemplate = fullyUpdateTimelineTemplate;
+module.exports.partiallyUpdateTimelineTemplate = partiallyUpdateTimelineTemplate;
+module.exports.deleteTimelineTemplate = deleteTimelineTemplate;
 
 logger.buildService(module.exports, {
   validators: { enabled: true },

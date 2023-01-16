@@ -238,20 +238,20 @@
   resolved "http://localhost:4873/@tootallnate%2fonce/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@topcoder-framework/domain-challenge@^0.4.12-ci.0":
-  version "0.4.12-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.4.12-ci.0.tgz#d81a87fccd42f2642b5217b224efd56fe1dc0a7f"
-  integrity sha512-xB1/VL1VmBfBkQA2j7cmjXeGCUpIjK8v71Cg/NReRXuPouF4jYX1owOFnKQ5DOzmANqQsatWHiZigO83rubH5w==
+"@topcoder-framework/domain-challenge@^0.4.18-ci.0":
+  version "0.4.18-ci.0"
+  resolved "http://localhost:4873/@topcoder-framework%2fdomain-challenge/-/domain-challenge-0.4.18-ci.0.tgz#94add12cc49aef23ebf598a0f6151157eec3eeeb"
+  integrity sha512-SJhQxyOlKL9lQiVVbABRZoQxDZKIH3hpDVCnBbKBD+O9Xxn+W3ijxc+dsdadVeoWR0N5CnT63+yXo0m0zn3eLw==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/lib-common" "0.4.12-ci.0"
+    "@topcoder-framework/lib-common" "0.4.18-ci.0"
     topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.9"
     tslib "^2.4.1"
 
-"@topcoder-framework/lib-common@0.4.12-ci.0", "@topcoder-framework/lib-common@^0.4.12-ci.0":
-  version "0.4.12-ci.0"
-  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.4.12-ci.0.tgz#3c4fe3b96eefd195ee3e9d04d946339880b8e8e0"
-  integrity sha512-xH1vKPAIFEKagiSGJ8/tWh3jyfd8yK4wmM4p3ETa0KJnv4EWUPMGmLYUjjtsqI5joNetPkyxP6uf9x09GSw5Yw==
+"@topcoder-framework/lib-common@0.4.18-ci.0", "@topcoder-framework/lib-common@^0.4.18-ci.0":
+  version "0.4.18-ci.0"
+  resolved "http://localhost:4873/@topcoder-framework%2flib-common/-/lib-common-0.4.18-ci.0.tgz#8c42cb92b01e10396671a8d25c0639733c871f0b"
+  integrity sha512-QOBr0m5p+1y3jDQRd9SNhB0tqeIZW76yotaG8vI9WU8/wUEn7Ii90wl7puna1qypNqJtFdAizHlwSa2e/akvnw==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
