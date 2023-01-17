@@ -79,7 +79,13 @@ class ChallengePhaseHelper {
           p.scheduledStartDate = moment(startDate).toDate()
         }
         if (p.name === 'Submission') {
-          p.scheduledStartDate = moment(startDate).add(5, 'minutes').toDate()
+          if (p.scheduledStartDate != null) {
+            p.scheduledStartDate = moment(p.scheduledStartDate).toDate()
+          }
+          else {
+            p.scheduledStartDate = moment(startDate).add(5, 'minutes').toDate()
+          }
+
         }
 
         if (moment(p.scheduledStartDate).isSameOrBefore(moment())) {
