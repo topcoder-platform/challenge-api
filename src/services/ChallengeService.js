@@ -2112,7 +2112,7 @@ fullyUpdateChallenge.schema = {
       duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean(),
       actualEndDate: Joi.date().allow(null),
-      scheduledStartDate: Joi.date().allow(null),,
+      scheduledStartDate: Joi.date().allow(null)
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -2219,7 +2219,8 @@ partiallyUpdateChallenge.schema = {
       phaseId: Joi.id(),
       duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean(),
-      actualEndDate: Joi.date().allow(null)
+      actualEndDate: Joi.date().allow(null),
+      scheduledStartDate: Joi.date().allow(null)
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
