@@ -1146,6 +1146,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
 
+  /** Disable Creating Resources locally (because challenge is not being indexed in ES and will result in challenge NOT FOUND error)
   if (challenge.legacy.selfService) {
     if (currentUser.handle) {
       await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
@@ -1159,6 +1160,7 @@ async function createChallenge(currentUser, challenge, userToken) {
       // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
     }
   }
+  */
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
