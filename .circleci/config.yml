@@ -70,8 +70,7 @@ workflows:
             branches:
               only:
                 - develop
-                - feat/phase-extension
-                - feat/tracing
+                - PLAT-2111
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
