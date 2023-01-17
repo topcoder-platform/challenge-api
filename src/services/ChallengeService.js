@@ -1358,6 +1358,17 @@ async function update (currentUser, challengeId, data, isFull) {
     _.set(data, 'billing.billingAccountId', billingAccountId)
     _.set(data, 'billing.markup', markup || 0)
   }
+  if (billingAccountId && _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))) {
+    if (_.isEmpty(data.metadata)) {
+      data.metadata = []
+    }
+    if (!_.find(data.metadata, e => e.name === 'postMortemRequired')) {
+      data.metadata.push({
+        name: 'postMortemRequired',
+        value: 'false'
+      })
+    }
+  }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
       if (!_.get(challenge, 'legacy.pureV5Task') && !_.get(challenge, 'legacy.pureV5') && _.isUndefined(_.get(challenge, 'legacyId'))) {
@@ -1596,6 +1607,16 @@ async function update (currentUser, challengeId, data, isFull) {
 
   data.updated = moment().utc()
   data.updatedBy = currentUser.handle || currentUser.sub
+  const finalMetadata = [...challenge.metadata || []]
+  _.each(data.metadata || [], (rec) => {
+    const existingMeta = _.findIndex(finalMetadata, m => m.name === rec.name)
+    if (existingMeta > -1) {
+      finalMetadata[existingMeta].value = rec.value
+    } else {
+      finalMetadata.push(rec)
+    }
+  })
+  data.metadata = finalMetadata
   const updateDetails = {}
   const auditLogs = []
   let phasesHaveBeenModified = false
