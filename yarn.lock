@@ -245,31 +245,31 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@topcoder-framework/client-relational@^0.6.4":
-  version "0.6.4"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.6.4.tgz#c18ea40eef7cfc231f7b034797ff9e6f6c841992"
-  integrity sha512-v3AZUdogJblzTtErzb8pJwjruGFFSPDCdfRw6lnrqreAMDzZNoq8FFNRkd4QCRikRa9it4KU3wUoEm2rFLz4UQ==
+"@topcoder-framework/client-relational@^0.6.5":
+  version "0.6.5"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.6.5.tgz#632faec4c6d548564b1dfa9e08f628e45c541c07"
+  integrity sha512-KkgEZreVQrwNLYGK91BqkGeFaxZUKeE1KjhGFtGl7WO5y3TGtgHKZqUtzfiJb4XPedQ/IhMkfp4mXAP6BGleaQ==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/lib-common" "^0.6.4"
+    "@topcoder-framework/lib-common" "^0.6.5"
     topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.27"
     tslib "^2.4.1"
 
 "@topcoder-framework/domain-challenge@^0.6.4":
-  version "0.6.4"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.6.4.tgz#d825514509b1cb57aa72655f0c4473d85d094d46"
-  integrity sha512-74PR36xFfR7uv8Fe1TaMmqWKE5HS9Dx/mw3pS/RRHxgdedvmI/JctcZcbyWbhONFhw3vYXIQ3nnrqfNA3m6gUg==
+  version "0.6.5"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.6.5.tgz#cf7788f0059382f66fc9814d47dd8fbc7aad8e94"
+  integrity sha512-RY1b+8Ve8Jyo5lPLFZSp9qx5s6gWSO9K0kRO7dDtLTylBQP1OthuEU7xcZFVWgVKN4FLHcJzBMgi8Fsk7Wm7cg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/client-relational" "^0.6.4"
-    "@topcoder-framework/lib-common" "^0.6.4"
+    "@topcoder-framework/client-relational" "^0.6.5"
+    "@topcoder-framework/lib-common" "^0.6.5"
     topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.27"
     tslib "^2.4.1"
 
-"@topcoder-framework/lib-common@^0.6.4":
-  version "0.6.4"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.6.4.tgz#04970c0beb5b7a98dc93ecc31c34a17a7ee40048"
-  integrity sha512-cwX6AqANAyv4Ir1U0LPYmvuDsdLT1QKhM/KomqUIYHD6NBNthh4mQ4pX65UPFd5n9ALsPO82lNT9nReaiMfquQ==
+"@topcoder-framework/lib-common@^0.6.4", "@topcoder-framework/lib-common@^0.6.5":
+  version "0.6.5"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.6.5.tgz#7034e2cadd6a81a02e30d69ffc4355171e195ac7"
+  integrity sha512-z+rVKEv8gUV741TNcPh1nTcaR3H3jpCYwEoUG0LDNyrZBnc5yl83b5BlNosNF2lzS4RyqV8ilnz1nYMRQK2ERw==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
@@ -549,9 +549,9 @@ aws-sdk@2.395.0:
     xml2js "0.4.19"
 
 aws-sdk@^2.1145.0:
-  version "2.1337.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1337.0.tgz#2e40171b3ff70dfb3b7d698bdc0c8568743eb04f"
-  integrity sha512-Nq6EnocdYP7LScN3kbG1ZKQr5iMEIkObW4ikSjkSz9SofPNDlOr4EFfYNaGzuF91M93YZ++7JIGMTb05ubjHlA==
+  version "2.1338.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1338.0.tgz#e9272a0563940ceebed5910d271c944f31dbae00"
+  integrity sha512-apxv53ABuvi87UQHAUqRrJOaGNMiPXAe6bizzJhOnsaNqasg2KjDDit7QSCi6HlLNG44n1ApIvMtR/k+NnxU4Q==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -3128,9 +3128,9 @@ safe-regex-test@^1.0.0:
     is-regex "^1.1.4"
 
 safe-stable-stringify@^2.3.1:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/safe-stable-stringify/-/safe-stable-stringify-2.4.2.tgz#ec7b037768098bf65310d1d64370de0dc02353aa"
-  integrity sha512-gMxvPJYhP0O9n2pvcfYfIuYgbledAOJFcqRThtPRmjscaipiwcwPPKLytpVzMkG2HAN87Qmo2d4PtGiri1dSLA==
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/safe-stable-stringify/-/safe-stable-stringify-2.4.3.tgz#138c84b6f6edb3db5f8ef3ef7115b8f55ccbf886"
+  integrity sha512-e2bDA2WJT0wxseVd4lsDP4+3ONX6HpMXQa1ZhFQ7SU+GjvORCmShbCMltrtIDfkYhVHrOcPtj+KhmDBdPdZD1g==
 
 "safer-buffer@>= 2.1.2 < 3", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   version "2.1.2"
