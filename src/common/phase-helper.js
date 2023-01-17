@@ -280,11 +280,9 @@ module.exports = new ChallengePhaseHelper();
         if (p.name === 'Submission') {
           if (p.scheduledStartDate != null) {
             p.scheduledStartDate = moment(p.scheduledStartDate).toDate()
-          }
-          else {
+          } else {
             p.scheduledStartDate = moment(startDate).add(5, 'minutes').toDate()
           }
-
         }
 
         if (moment(p.scheduledStartDate).isSameOrBefore(moment())) {
