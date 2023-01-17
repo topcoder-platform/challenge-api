@@ -961,8 +961,6 @@ async function createChallenge (currentUser, challenge, userToken) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge)
   }
 
-  console.log('challenge-phases', challenge.phases)
-
   // auto-populate totalPrizes
   if (challenge.prizeSets) {
     const prizeSetsGroup = _.groupBy(challenge.prizeSets, 'type')
@@ -2028,7 +2026,7 @@ function sanitizeChallenge (challenge) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
   if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate']))
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate', 'scheduledStartDate']))
   }
   if (challenge.prizeSets) {
     sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({

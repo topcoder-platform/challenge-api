@@ -13,7 +13,6 @@ class ChallengePhaseHelper {
    * @param {String} timelineTemplateId the timeline template id
    */
   async populatePhases (phases, startDate, timelineTemplateId) {
-    console.log('populatePhases', phases, startDate, timelineTemplateId)
     if (_.isUndefined(timelineTemplateId)) {
       throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
     }
@@ -48,7 +47,6 @@ class ChallengePhaseHelper {
             throw new errors.BadRequestError(`Predecessor ${phaseTemplate.predecessor} not found in given phases.`)
           }
           p.predecessor = phaseTemplate.predecessor
-          console.log('Setting predecessor', p.predecessor, 'for phase', p.phaseId)
         }
       }
     }
@@ -113,7 +111,9 @@ class ChallengePhaseHelper {
         p.scheduledStartDate = phaseEndDate.toDate()
         p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, 'seconds').toDate()
       }
+
       p.isOpen = moment().isBetween(p.scheduledStartDate, p.scheduledEndDate)
+
       if (p.isOpen) {
         if (p.name === 'Submission') {
           isSubmissionPhaseOpen = true
