@@ -2512,151 +2512,99 @@ async function fullyUpdateChallenge(currentUser, challengeId, data) {
 fullyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  data: Joi.object()
-    .keys({
-      legacy: Joi.object()
-        .keys({
-          reviewType: Joi.string()
-            .valid(_.values(constants.reviewTypes))
-            .insensitive()
-            .default(constants.reviewTypes.Internal),
-          confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
-          forumId: Joi.number().integer(),
-          directProjectId: Joi.number().integer(),
-          screeningScorecardId: Joi.number().integer(),
-          reviewScorecardId: Joi.number().integer(),
-          isTask: Joi.boolean(),
-          useSchedulingAPI: Joi.boolean(),
-          pureV5Task: Joi.boolean(),
-          pureV5: Joi.boolean(),
-          selfService: Joi.boolean(),
-          selfServiceCopilot: Joi.string().allow(null),
-        })
-        .unknown(true),
-      cancelReason: Joi.string(),
-      billing: Joi.object()
-        .keys({
-          billingAccountId: Joi.string(),
-          markup: Joi.number().min(0).max(100),
-        })
-        .unknown(true),
-      task: Joi.object().keys({
-        isTask: Joi.boolean().default(false),
-        isAssigned: Joi.boolean().default(false),
-        memberId: Joi.string().allow(null),
-      }),
-      trackId: Joi.optionalId(),
-      typeId: Joi.optionalId(),
+  data: Joi.object().keys({
+    legacy: Joi.object().keys({
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
+      confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+      forumId: Joi.number().integer(),
+      directProjectId: Joi.number().integer(),
+      screeningScorecardId: Joi.number().integer(),
+      reviewScorecardId: Joi.number().integer(),
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean(),
+      pureV5: Joi.boolean(),
+      selfService: Joi.boolean(),
+      selfServiceCopilot: Joi.string().allow(null)
+    }).unknown(true),
+    cancelReason: Joi.string(),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
+    }).unknown(true),
+    task: Joi.object().keys({
+      isTask: Joi.boolean().default(false),
+      isAssigned: Joi.boolean().default(false),
+      memberId: Joi.string().allow(null)
+    }),
+    trackId: Joi.optionalId(),
+    typeId: Joi.optionalId(),
+    name: Joi.string().required(),
+    description: Joi.string(),
+    privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
+    metadata: Joi.array().items(Joi.object().keys({
       name: Joi.string().required(),
+      value: Joi.required()
+    }).unknown(true)).unique((a, b) => a.name === b.name),
+    timelineTemplateId: Joi.string(), // Joi.optionalId(),
+    phases: Joi.array().items(Joi.object().keys({
+      phaseId: Joi.id(),
+      duration: Joi.number().integer().min(0),
+      isOpen: Joi.boolean(),
+      actualEndDate: Joi.date().allow(null),
+      scheduledStartDate: Joi.date().allow(null)
+    }).unknown(true)),
+    prizeSets: Joi.array().items(Joi.object().keys({
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
       description: Joi.string(),
-      privateDescription: Joi.string(),
-      descriptionFormat: Joi.string(),
-      metadata: Joi.array()
-        .items(
-          Joi.object()
-            .keys({
-              name: Joi.string().required(),
-              value: Joi.required(),
-            })
-            .unknown(true)
-        )
-        .unique((a, b) => a.name === b.name),
-      timelineTemplateId: Joi.string(), // Joi.optionalId(),
-      phases: Joi.array().items(
-        Joi.object()
-          .keys({
-            phaseId: Joi.id(),
-            duration: Joi.number().integer().min(0),
-            isOpen: Joi.boolean(),
-            actualEndDate: Joi.date().allow(null),
-            scheduledStartDate: Joi.date().allow(null),
-          })
-          .unknown(true)
-      ),
-      prizeSets: Joi.array().items(
-        Joi.object()
-          .keys({
-            type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
-            description: Joi.string(),
-            prizes: Joi.array()
-              .items(
-                Joi.object().keys({
-                  description: Joi.string(),
-                  type: Joi.string().required(),
-                  value: Joi.number().min(0).required(),
-                })
-              )
-              .min(1)
-              .required(),
-          })
-          .unknown(true)
-      ),
-      events: Joi.array().items(
-        Joi.object()
-          .keys({
-            id: Joi.number().required(),
-            name: Joi.string(),
-            key: Joi.string(),
-          })
-          .unknown(true)
-      ),
-      discussions: Joi.array().items(
-        Joi.object().keys({
-          id: Joi.optionalId(),
-          name: Joi.string().required(),
-          type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
-          provider: Joi.string().required(),
-          url: Joi.string(),
-          options: Joi.array().items(Joi.object()),
-        })
-      ),
-      tags: Joi.array().items(Joi.string()), // tag names
-      projectId: Joi.number().integer().positive().required(),
-      legacyId: Joi.number().integer().positive(),
-      startDate: Joi.date(),
-      status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-      attachments: Joi.array().items(
-        Joi.object().keys({
-          id: Joi.id(),
-          challengeId: Joi.id(),
-          name: Joi.string().required(),
-          url: Joi.string().uri().required(),
-          fileSize: Joi.fileSize(),
-          description: Joi.string(),
-        })
-      ),
-      groups: Joi.array().items(Joi.optionalId()),
-      // gitRepoURLs: Joi.array().items(Joi.string().uri()),
-      winners: Joi.array()
-        .items(
-          Joi.object()
-            .keys({
-              userId: Joi.number().integer().positive().required(),
-              handle: Joi.string().required(),
-              placement: Joi.number().integer().positive().required(),
-              type: Joi.string()
-                .valid(_.values(constants.prizeSetTypes))
-                .default(constants.prizeSetTypes.ChallengePrizes),
-            })
-            .unknown(true)
-        )
-        .min(1),
-      terms: Joi.array()
-        .items(
-          Joi.object()
-            .keys({
-              id: Joi.id(),
-              roleId: Joi.id(),
-            })
-            .unknown(true)
-        )
-        .optional()
-        .allow([]),
-      overview: Joi.any().forbidden(),
-    })
-    .unknown(true)
-    .required(),
-};
+      prizes: Joi.array().items(Joi.object().keys({
+        description: Joi.string(),
+        type: Joi.string().required(),
+        value: Joi.number().min(0).required()
+      })).min(1).required()
+    }).unknown(true)),
+    events: Joi.array().items(Joi.object().keys({
+      id: Joi.number().required(),
+      name: Joi.string(),
+      key: Joi.string()
+    }).unknown(true)),
+    discussions: Joi.array().items(Joi.object().keys({
+      id: Joi.optionalId(),
+      name: Joi.string().required(),
+      type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+      provider: Joi.string().required(),
+      url: Joi.string(),
+      options: Joi.array().items(Joi.object())
+    })),
+    tags: Joi.array().items(Joi.string()), // tag names
+    projectId: Joi.number().integer().positive().required(),
+    legacyId: Joi.number().integer().positive(),
+    startDate: Joi.date(),
+    status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
+    attachments: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      challengeId: Joi.id(),
+      name: Joi.string().required(),
+      url: Joi.string().uri().required(),
+      fileSize: Joi.fileSize(),
+      description: Joi.string()
+    })),
+    groups: Joi.array().items(Joi.optionalId()),
+    // gitRepoURLs: Joi.array().items(Joi.string().uri()),
+    winners: Joi.array().items(Joi.object().keys({
+      userId: Joi.number().integer().positive().required(),
+      handle: Joi.string().required(),
+      placement: Joi.number().integer().positive().required(),
+      type: Joi.string().valid(_.values(constants.prizeSetTypes)).default(constants.prizeSetTypes.ChallengePrizes)
+    }).unknown(true)).min(1),
+    terms: Joi.array().items(Joi.object().keys({
+      id: Joi.id(),
+      roleId: Joi.id()
+    }).unknown(true)).optional().allow([]),
+    overview: Joi.any().forbidden()
+  }).unknown(true).required()
+}
 
 /**
  * Partially update challenge.
@@ -2672,6 +2620,7 @@ async function partiallyUpdateChallenge(currentUser, challengeId, data) {
 partiallyUpdateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
+<<<<<<< HEAD
   data: Joi.object()
     .keys({
       legacy: Joi.object()
@@ -2707,6 +2656,53 @@ partiallyUpdateChallenge.schema = {
         .unknown(true),
       trackId: Joi.optionalId(),
       typeId: Joi.optionalId(),
+=======
+  data: Joi.object().keys({
+    legacy: Joi.object().keys({
+      track: Joi.string(),
+      subTrack: Joi.string(),
+      reviewType: Joi.string().valid(_.values(constants.reviewTypes)).insensitive().default(constants.reviewTypes.Internal),
+      confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+      directProjectId: Joi.number(),
+      forumId: Joi.number().integer(),
+      isTask: Joi.boolean(),
+      useSchedulingAPI: Joi.boolean(),
+      pureV5Task: Joi.boolean(),
+      pureV5: Joi.boolean(),
+      selfService: Joi.boolean(),
+      selfServiceCopilot: Joi.string().allow(null)
+    }).unknown(true),
+    cancelReason: Joi.string(),
+    task: Joi.object().keys({
+      isTask: Joi.boolean().default(false),
+      isAssigned: Joi.boolean().default(false),
+      memberId: Joi.string().allow(null)
+    }),
+    billing: Joi.object().keys({
+      billingAccountId: Joi.string(),
+      markup: Joi.number().min(0).max(100)
+    }).unknown(true),
+    trackId: Joi.optionalId(),
+    typeId: Joi.optionalId(),
+    name: Joi.string(),
+    description: Joi.string(),
+    privateDescription: Joi.string(),
+    descriptionFormat: Joi.string(),
+    metadata: Joi.array().items(Joi.object().keys({
+      name: Joi.string().required(),
+      value: Joi.required()
+    }).unknown(true)).unique((a, b) => a.name === b.name),
+    timelineTemplateId: Joi.string(), // changing this to update migrated challenges
+    phases: Joi.array().items(Joi.object().keys({
+      phaseId: Joi.id(),
+      duration: Joi.number().integer().min(0),
+      isOpen: Joi.boolean(),
+      actualEndDate: Joi.date().allow(null),
+      scheduledStartDate: Joi.date().allow(null)
+    }).unknown(true)).min(1),
+    events: Joi.array().items(Joi.object().keys({
+      id: Joi.number().required(),
+>>>>>>> e4c580c (fix: allow setting schedule start date)
       name: Joi.string(),
       description: Joi.string(),
       privateDescription: Joi.string(),
