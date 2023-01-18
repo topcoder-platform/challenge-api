@@ -91,6 +91,8 @@ module.exports = {
 
   NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || 'self-service',
 
+  AXIOS_RETRIES: process.env.AXIOS_RETRIES || 3,
+
   SENDGRID_TEMPLATES: {
     WORK_REQUEST_SUBMITTED: process.env.WORK_REQUEST_SUBMITTED || '',
     WORK_REQUEST_STARTED: process.env.WORK_REQUEST_STARTED || '',
