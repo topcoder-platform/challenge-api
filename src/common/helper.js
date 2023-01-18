@@ -51,6 +51,7 @@ function wrapExpress (fn) {
 
 // Internal cache
 const internalCache = new NodeCache({ stdTTL: config.INTERNAL_CACHE_TTL })
+const shortInternalCache = new NodeCache({ stdTTL: config.SHORT_INTERNAL_CACHE_TTL, checkperiod: config.SHORT_INTERNAL_CACHE_TTL - 10 })
 
 /**
  * Wrap all functions from object
@@ -973,6 +974,13 @@ async function getProjectDefaultTerms (projectId) {
  * @returns {Promise<Number>} The billing account ID
  */
 async function getProjectBillingInformation (projectId) {
+  const key = `ba-${projectId}`
+  const ret = getFromShortInternalCache(key)
+
+  if (ret != null) {
+    return ret;
+  }
+
   const token = await getM2MToken()
   const projectUrl = `${config.PROJECTS_API_URL}/${projectId}/billingAccount`
   try {
@@ -982,10 +990,12 @@ async function getProjectBillingInformation (projectId) {
       // TODO - Hack to change int returned from api to decimal
       markup = markup / 100
     }
-    return {
+    const ret = {
       billingAccountId: _.get(res, 'data.tcBillingAccountId', null),
       markup
     }
+    setToShortInternalCache(key, ret)
+    return ret;
   } catch (err) {
     if (_.get(err, 'response.status') === HttpStatus.NOT_FOUND) {
       return {
@@ -1277,6 +1287,14 @@ function getFromInternalCache (key) {
 
 function setToInternalCache (key, value) {
   internalCache.set(key, value)
+}
+
+function getFromShortInternalCache (key) {
+  return shortInternalCache.get(key)
+}
+
+function setToShortInternalCache (key, value) {
+  shortInternalCache.set(key, value)
 }
 
 module.exports = {
