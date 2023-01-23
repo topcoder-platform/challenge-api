@@ -16,6 +16,7 @@ const uuid = require("uuid/v4");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
+const errors = require('../common/errors');
 
 const PhaseService = require("./PhaseService");
 
@@ -32,17 +33,16 @@ module.exports = {};
  * @returns {Promise<Object>} the search result
  */
 async function searchTimelineTemplates(criteria) {
+  const scanCriteria = getScanCriteria(_.omit(criteria, ['page', 'perPage']));
+
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-  const scanCriteria = getScanCriteria(criteria);
-
-  const { items: list } = await timelineTemplateDomain.scan({
-    scanCriteria,
+  const { items } = await timelineTemplateDomain.scan({
+    scanCriteria
   });
 
-  const records = _.filter(list, (e) => helper.partialMatch(criteria.name, e.name));
-  const total = records.length;
-  const result = records.slice((page - 1) * perPage, page * perPage);
+  const total = items.length;
+  const result = items.slice((page - 1) * perPage, page * perPage);
 
   return { total, page, perPage, result };
 }
@@ -61,10 +61,14 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate(timelineTemplate) {
-  await helper.validateDuplicate("TimelineTemplate", "name", timelineTemplate.name);
-  await PhaseService.validatePhases(timelineTemplate.phases);
+  const scanCriteria = getScanCriteria('name', timelineTemplate.name)
+  const existing = await timelineTemplateDomain.scan({ scanCriteria })
+  if (existing) throw new errors.ConflictError(`Timeline template with name ${timelineTemplate.name} already exists`)
 
-  const ret = await helper.create("TimelineTemplate", _.assign({ id: uuid() }, timelineTemplate));
+  // Do not validate phases for now
+  // await phaseHelper.validatePhases(timelineTemplate.phases);
+
+  const ret = await timelineTemplateDomain.create(timelineTemplate);
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateCreated, ret);
   return ret;
@@ -111,10 +115,16 @@ getTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function update(timelineTemplateId, data, isFull) {
-  const timelineTemplate = await helper.getById("TimelineTemplate", timelineTemplateId);
+  const timelineTemplate = await getTimelineTemplate(
+    timelineTemplateId
+  );
 
-  if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
-    await helper.validateDuplicate("TimelineTemplate", "name", data.name);
+  if (
+    data.name &&
+    data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()
+  ) {
+    const { items: existingByName } = await timelineTemplateDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
+    if (existingByName.length > 0) throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`)
   }
 
   if (data.phases) {
@@ -126,13 +136,16 @@ async function update(timelineTemplateId, data, isFull) {
     timelineTemplate.description = data.description;
   }
 
-  const ret = await helper.update(timelineTemplate, data);
+  const { items } = await timelineTemplateDomain.update({
+    filterCriteria: getScanCriteria({ id }),
+    updateInput: data
+  });
   // post bus event
   await helper.postBusEvent(
     constants.Topics.TimelineTemplateUpdated,
-    isFull ? ret : _.assignIn({ id: timelineTemplateId }, data)
+    isFull ? items[0] : _.assignIn({ id: timelineTemplateId }, data)
   );
-  return ret;
+  return items[0];
 }
 
 /**
@@ -202,11 +215,10 @@ partiallyUpdateTimelineTemplate.schema = {
  * @returns {Object} the deleted timeline template
  */
 async function deleteTimelineTemplate(timelineTemplateId) {
-  const ret = await helper.getById("TimelineTemplate", timelineTemplateId);
-  await ret.delete();
+  const { items } = await timelineTemplateDomain.delete(getLookupCriteria("id", timelineTemplateId));
   // post bus event
-  await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, ret);
-  return ret;
+  await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, items[0]);
+  return items[0];
 }
 
 deleteTimelineTemplate.schema = {

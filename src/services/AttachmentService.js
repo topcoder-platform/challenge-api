@@ -1,6 +1,13 @@
 /**
  * This service provides operations of attachments.
  */
+const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
+
+const {
+  DomainHelper: { getLookupCriteria, getScanCriteria },
+} = require("@topcoder-framework/lib-common");
+
+const { AttachmentDomain } = require("@topcoder-framework/domain-challenge");
 
 const _ = require("lodash");
 const Joi = require("joi");
@@ -16,6 +23,11 @@ const challengeService = require("./ChallengeService");
 
 const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(",").map(
   (bucketName) => bucketName.trim()
+);
+
+const attachmentDomain = new AttachmentDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
 );
 
 /**
@@ -45,7 +57,7 @@ function validateUrl(url) {
  */
 async function _getChallengeAttachment(challengeId, attachmentId) {
   const challenge = await helper.getById("Challenge", challengeId);
-  const attachment = await models.Attachment.get(attachmentId);
+  const attachment = await attachmentDomain.lookup(getLookupCriteria("id", attachmentId));
   if (!attachment || attachment.challengeId !== challengeId) {
     throw errors.NotFoundError(
       `Attachment ${attachmentId} not found in challenge ${challengeId}`
@@ -66,8 +78,8 @@ async function createAttachment(currentUser, challengeId, attachments) {
   const newAttachments = [];
   for (const attachment of attachments) {
     validateUrl(attachment.url);
-    const attachmentObject = { id: uuid(), challengeId, ...attachment };
-    const newAttachment = await helper.create("Attachment", attachmentObject);
+    const attachmentObject = { challengeId, ...attachment };
+    const newAttachment = await attachmentDomain.create(attachmentObject);
     await helper.postBusEvent(
       constants.Topics.ChallengeAttachmentCreated,
       newAttachment
@@ -141,12 +153,15 @@ async function update(currentUser, challengeId, attachmentId, data, isFull) {
     attachment.description = data.description;
   }
 
-  const ret = await helper.update(attachment, data);
+  const { items } = await attachmentDomain.update({
+    filterCriteria: getScanCriteria({ id: attachmentId }),
+    updateInput: data
+  });
   // update challenge object
   const newAttachments = _.get(challenge, "attachments", []);
   try {
     newAttachments[_.findIndex(newAttachments, (a) => a.id === attachmentId)] =
-      ret;
+      items[0];
     await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
       attachments: newAttachments,
     });
@@ -158,9 +173,9 @@ async function update(currentUser, challengeId, attachmentId, data, isFull) {
   // post bus event
   await helper.postBusEvent(
     constants.Topics.ChallengeAttachmentUpdated,
-    isFull ? ret : _.assignIn({ id: attachmentId }, data)
+    isFull ? items[0] : _.assignIn({ id: attachmentId }, data)
   );
-  return ret;
+  return items[0];
 }
 
 /**
@@ -238,7 +253,9 @@ async function deleteAttachment(currentUser, challengeId, attachmentId) {
   if (s3UrlObject) {
     await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key);
   }
-  await attachment.delete();
+
+  await attachmentDomain.delete(getLookupCriteria("id", attachmentId));
+
   // update challenge object
   const newAttachments = _.get(challenge, "attachments", []);
   try {
