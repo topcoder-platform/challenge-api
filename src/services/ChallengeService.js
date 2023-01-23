@@ -1271,6 +1271,8 @@ createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object()
     .keys({
+      typeId: Joi.id(),
+      trackId: Joi.id(),
       legacy: Joi.object().keys({
         reviewType: Joi.string()
           .valid(_.values(constants.reviewTypes))
@@ -1294,8 +1296,6 @@ createChallenge.schema = {
           markup: Joi.number().min(0).max(100),
         })
         .unknown(true),
-      typeId: Joi.id(),
-      trackId: Joi.id(),
       task: Joi.object().keys({
         isTask: Joi.boolean().default(false),
         isAssigned: Joi.boolean().default(false),
@@ -1318,29 +1318,31 @@ createChallenge.schema = {
         Joi.object().keys({
           phaseId: Joi.id(),
           duration: Joi.number().integer().min(0),
+          constraints: Joi.object()
+            .keys({
+              name: Joi.string(),
+              value: Joi.number().integer().min(0),
+            })
+            .optional(),
         })
       ),
-      events: Joi.array()
-        .items(
-          Joi.object().keys({
-            id: Joi.number().required(),
-            name: Joi.string(),
-            key: Joi.string(),
-          })
-        )
-        .default([]),
-      discussions: Joi.array()
-        .items(
-          Joi.object().keys({
-            id: Joi.optionalId(),
-            name: Joi.string().required(),
-            type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
-            provider: Joi.string().required(),
-            url: Joi.string(),
-            options: Joi.array().items(Joi.object()),
-          })
-        )
-        .default([]),
+      events: Joi.array().items(
+        Joi.object().keys({
+          id: Joi.number().required(),
+          name: Joi.string(),
+          key: Joi.string(),
+        })
+      ),
+      discussions: Joi.array().items(
+        Joi.object().keys({
+          id: Joi.optionalId(),
+          name: Joi.string().required(),
+          type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+          provider: Joi.string().required(),
+          url: Joi.string(),
+          options: Joi.array().items(Joi.object()),
+        })
+      ),
       prizeSets: Joi.array().items(
         Joi.object().keys({
           type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -1357,12 +1359,12 @@ createChallenge.schema = {
             .required(),
         })
       ),
-      tags: Joi.array().items(Joi.string()).default([]), // tag names
+      tags: Joi.array().items(Joi.string()), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
       startDate: Joi.date(),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
-      groups: Joi.array().items(Joi.optionalId()).unique().default([]),
+      groups: Joi.array().items(Joi.optionalId()).unique(),
       // gitRepoURLs: Joi.array().items(Joi.string().uri()),
       terms: Joi.array().items(
         Joi.object().keys({
@@ -1374,7 +1376,6 @@ createChallenge.schema = {
     .required(),
   userToken: Joi.string().required(),
 };
-
 /**
  * Populate phase data from phase API.
  * @param {Object} the challenge entity
@@ -2447,7 +2448,14 @@ function sanitizeChallenge(challenge) {
   }
   if (challenge.phases) {
     sanitized.phases = _.map(challenge.phases, (phase) =>
-      _.pick(phase, ["phaseId", "duration", "isOpen", "actualEndDate", "scheduledStartDate"])
+      _.pick(phase, [
+        "phaseId",
+        "duration",
+        "isOpen",
+        "actualEndDate",
+        "scheduledStartDate",
+        "constraints",
+      ])
     );
   }
   if (challenge.prizeSets) {
@@ -2553,6 +2561,16 @@ fullyUpdateChallenge.schema = {
             isOpen: Joi.boolean(),
             actualEndDate: Joi.date().allow(null),
             scheduledStartDate: Joi.date().allow(null),
+            constraints: Joi.array()
+              .items(
+                Joi.object()
+                  .keys({
+                    name: Joi.string(),
+                    value: Joi.number().integer().min(0),
+                  })
+                  .optional()
+              )
+              .optional(),
           })
           .unknown(true)
       ),
@@ -2714,6 +2732,16 @@ partiallyUpdateChallenge.schema = {
               isOpen: Joi.boolean(),
               actualEndDate: Joi.date().allow(null),
               scheduledStartDate: Joi.date().allow(null),
+              constraints: Joi.array()
+                .items(
+                  Joi.object()
+                    .keys({
+                      name: Joi.string(),
+                      value: Joi.number().integer().min(0),
+                    })
+                    .optional()
+                )
+                .optional(),
             })
             .unknown(true)
         )
@@ -2794,6 +2822,7 @@ partiallyUpdateChallenge.schema = {
     .unknown(true)
     .required(),
 };
+
 /**
  * Delete challenge.
  * @param {Object} currentUser the user who perform operation
