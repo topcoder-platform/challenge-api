@@ -8,24 +8,24 @@ const {
   DomainHelper: { getScanCriteria, getLookupCriteria },
 } = require("@topcoder-framework/lib-common");
 
-const {
-  TimelineTemplateDomain,
-} = require("@topcoder-framework/domain-challenge");
+const { TimelineTemplateDomain } = require("@topcoder-framework/domain-challenge");
 
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
 const helper = require("../common/helper");
-const phaseHelper = require("../common/phase-helper");
-// const logger = require('../common/logger')
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
 const errors = require('../common/errors');
+
+const PhaseService = require("./PhaseService");
 
 const timelineTemplateDomain = new TimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
 );
+
+module.exports = {};
 
 /**
  * Search timeline templates.
@@ -100,9 +100,7 @@ createTimelineTemplate.schema = {
  * @returns {Object} the timeline template with given id
  */
 async function getTimelineTemplate(timelineTemplateId) {
-  return timelineTemplateDomain.lookup(
-    getLookupCriteria("id", timelineTemplateId)
-  );
+  return timelineTemplateDomain.lookup(getLookupCriteria("id", timelineTemplateId));
 }
 
 getTimelineTemplate.schema = {
@@ -130,7 +128,7 @@ async function update(timelineTemplateId, data, isFull) {
   }
 
   if (data.phases) {
-    await phaseHelper.validatePhases(data.phases);
+    await PhaseService.validatePhases(data.phases);
   }
 
   if (isFull) {
@@ -227,14 +225,12 @@ deleteTimelineTemplate.schema = {
   timelineTemplateId: Joi.id(),
 };
 
-module.exports = {
-  searchTimelineTemplates,
-  createTimelineTemplate,
-  getTimelineTemplate,
-  fullyUpdateTimelineTemplate,
-  partiallyUpdateTimelineTemplate,
-  deleteTimelineTemplate,
-};
+module.exports.searchTimelineTemplates = searchTimelineTemplates;
+module.exports.createTimelineTemplate = createTimelineTemplate;
+module.exports.getTimelineTemplate = getTimelineTemplate;
+module.exports.fullyUpdateTimelineTemplate = fullyUpdateTimelineTemplate;
+module.exports.partiallyUpdateTimelineTemplate = partiallyUpdateTimelineTemplate;
+module.exports.deleteTimelineTemplate = deleteTimelineTemplate;
 
 logger.buildService(module.exports, {
   validators: { enabled: true },

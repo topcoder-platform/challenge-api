@@ -155,8 +155,7 @@ function enhanceTraceWith(type, additionalData, functionArgs, subsegment) {
   }
 
   try {
-    const functionToCall =
-      type === "Annotation" ? "addAnnotation" : "addMetadata";
+    const functionToCall = type === "Annotation" ? "addAnnotation" : "addMetadata";
 
     for (const key of additionalData) {
       if (key.indexOf(".") != null) {
@@ -167,10 +166,7 @@ function enhanceTraceWith(type, additionalData, functionArgs, subsegment) {
         }
         const keyValue = extractUsingPath(allArgs, key);
         if (Object.keys(keyValue).length > 0) {
-          subsegment[functionToCall](
-            key.substr(key.lastIndexOf(".") + 1),
-            keyValue
-          );
+          subsegment[functionToCall](key.substr(key.lastIndexOf(".") + 1), keyValue);
         }
       } else if (functionArgs[key] != null) {
         subsegment[functionToCall](key, functionArgs[key]);
@@ -240,11 +236,7 @@ logger.buildService = (
     tracing: { enabled: true, annotations: [], metadata: [] },
   }
 ) => {
-  if (
-    config != null &&
-    config.validations != null &&
-    config.validators.enabled
-  ) {
+  if (config != null && config.validations != null && config.validators.enabled) {
     logger.decorateWithValidators(service);
   }
 
@@ -259,11 +251,7 @@ logger.buildService = (
     AWSXRay.captureHTTPsGlobal(require("https"));
     AWSXRay.captureAWSClient(new AWS.DynamoDB());
 
-    logger.decorateWithTracing(
-      service,
-      config.tracing.annotations,
-      config.tracing.metadata
-    );
+    logger.decorateWithTracing(service, config.tracing.annotations, config.tracing.metadata);
   }
 };
 

@@ -7,11 +7,14 @@ const {
 const { PhaseDomain, TimelineTemplateDomain } = require('@topcoder-framework/domain-challenge')
 
 const _ = require("lodash");
+
 const uuid = require("uuid/v4");
 const moment = require("moment");
 
 const errors = require("./errors");
-const helper = require("./helper");
+
+const phaseService = require("../services/PhaseService");
+const timelineTemplateService = require("../services/TimelineTemplateService");
 
 const timelineTemplateDomain = new TimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
@@ -31,15 +34,13 @@ class ChallengePhaseHelper {
    * @param {String} timelineTemplateId the timeline template id
    */
   async populatePhases(phases, startDate, timelineTemplateId) {
-    console.log("populatePhases", phases, startDate, timelineTemplateId);
     if (_.isUndefined(timelineTemplateId)) {
-      throw new errors.BadRequestError(
-        `Invalid timeline template ID: ${timelineTemplateId}`
-      );
+      throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`);
     }
 
-    const { timelineTempate, timelineTemplateMap } =
-      await this.getTemplateAndTemplateMap(timelineTemplateId);
+    const { timelineTempate, timelineTemplateMap } = await this.getTemplateAndTemplateMap(
+      timelineTemplateId
+    );
     const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
 
     if (!phases || phases.length === 0) {
@@ -52,6 +53,7 @@ class ChallengePhaseHelper {
     for (const p of phases) {
       const phaseDefinition = phaseDefinitionMap.get(p.phaseId);
 
+      // TODO: move to domain-challenge
       p.id = uuid();
       p.name = phaseDefinition.name;
       p.description = phaseDefinition.description;
@@ -73,12 +75,7 @@ class ChallengePhaseHelper {
             );
           }
           p.predecessor = phaseTemplate.predecessor;
-          console.log(
-            "Setting predecessor",
-            p.predecessor,
-            "for phase",
-            p.phaseId
-          );
+          console.log("Setting predecessor", p.predecessor, "for phase", p.phaseId);
         }
       }
     }
@@ -118,9 +115,7 @@ class ChallengePhaseHelper {
           delete p.actualStartDate;
         }
 
-        p.scheduledEndDate = moment(p.scheduledStartDate)
-          .add(p.duration, "seconds")
-          .toDate();
+        p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, "seconds").toDate();
         if (moment(p.scheduledEndDate).isBefore(moment())) {
           delete p.actualEndDate;
         } else {
@@ -146,9 +141,7 @@ class ChallengePhaseHelper {
         }
 
         p.scheduledStartDate = phaseEndDate.toDate();
-        p.scheduledEndDate = moment(p.scheduledStartDate)
-          .add(p.duration, "seconds")
-          .toDate();
+        p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, "seconds").toDate();
       }
       p.isOpen = moment().isBetween(p.scheduledStartDate, p.scheduledEndDate);
       if (p.isOpen) {
@@ -191,7 +184,8 @@ class ChallengePhaseHelper {
   }
 
   async getPhaseDefinitionsAndMap() {
-    const { items: records } = await phaseDomain.scan({ scanCriteria: getScanCriteria({}) });
+    const { result: records } = await phaseService.searchPhases();
+
     const map = new Map();
     _.each(records, (r) => {
       map.set(r.id, r);
@@ -200,10 +194,8 @@ class ChallengePhaseHelper {
   }
 
   async getTemplateAndTemplateMap(timelineTemplateId) {
-    const records = await timelineTemplateDomain.lookup(getLookupCriteria(
-      "id", 
-      timelineTemplateId
-    ));
+    const records = await timelineTemplateService.getTimelineTemplate(timelineTemplateId);
+
     const map = new Map();
     _.each(records.phases, (r) => {
       map.set(r.phaseId, r);

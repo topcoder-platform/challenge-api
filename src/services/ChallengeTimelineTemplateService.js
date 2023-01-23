@@ -38,17 +38,17 @@ async function searchChallengeTimelineTemplates(criteria) {
   const scanCriteria = getScanCriteria(criteria);
 
   // TODO: Get number of records from DB through GRPC Response Metadata
-  const records = await challengeTimelineTemplateDomain.scan({
+  const { items } = await challengeTimelineTemplateDomain.scan({
     scanCriteria,
   });
 
-  const nRecords = records.length;
+  const nRecords = items.length;
 
   return {
     total: nRecords,
     page: 1,
     perPage: Math.max(nRecords, 10),
-    result: records,
+    result: items,
   };
 }
 

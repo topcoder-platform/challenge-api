@@ -3,11 +3,11 @@
  */
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
-const {
-  DomainHelper: { getLookupCriteria, getScanCriteria },
-} = require("@topcoder-framework/lib-common");
-
 const { PhaseDomain } = require('@topcoder-framework/domain-challenge')
+
+const {
+  DomainHelper: { getScanCriteria, getLookupCriteria },
+} = require("@topcoder-framework/lib-common");
 
 const _ = require("lodash");
 const Joi = require("joi");
@@ -16,22 +16,26 @@ const logger = require("../common/logger");
 const constants = require("../../app-constants");
 const errors = require("../common/errors");
 
-const phaseDomain = new PhaseDomain(
-  GRPC_CHALLENGE_SERVER_HOST,
-  GRPC_CHALLENGE_SERVER_PORT
-);
+const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
 /**
  * Search phases
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchPhases(criteria) {
+async function searchPhases(criteria = {}) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-  const { items } = await phaseDomain.scan({ scanCriteria: getScanCriteria(_.pick(criteria, ['name'])) })
-  const total = items.length;
-  const result = items.slice((page - 1) * perPage, page * perPage);
+
+  const scanCriteria = getScanCriteria(criteria);
+
+  const { items: list } = await phaseDomain.scan({
+    scanCriteria,
+  });
+
+  const records = _.filter(list, (e) => helper.partialMatch(criteria.name, e.name));
+  const total = records.length;
+  const result = records.slice((page - 1) * perPage, page * perPage);
 
   return { total, page, perPage, result };
 }
@@ -173,9 +177,28 @@ deletePhase.schema = {
   phaseId: Joi.id(),
 };
 
+async function validatePhases(phases) {
+  if (!phases || phases.length === 0) {
+    return;
+  }
+  const records = searchPhases(); // get all phases
+  console.log("ALL PHASES", records);
+  const map = new Map();
+  _.each(records, (r) => {
+    map.set(r.id, r);
+  });
+  const invalidPhases = _.filter(phases, (p) => !map.has(p.phaseId));
+  if (invalidPhases.length > 0) {
+    throw new errors.BadRequestError(
+      `The following phases are invalid: ${toString(invalidPhases)}`
+    );
+  }
+}
+
 module.exports = {
   searchPhases,
   createPhase,
+  validatePhases,
   getPhase,
   fullyUpdatePhase,
   partiallyUpdatePhase,
