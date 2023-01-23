@@ -4,6 +4,10 @@
 
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
+const {
+  DomainHelper: { getLookupCriteria },
+} = require("@topcoder-framework/lib-common");
+
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
@@ -1503,7 +1507,7 @@ async function update(currentUser, challengeId, data, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
-  const challenge = await helper.getById("Challenge", challengeId);
+  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
   let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
@@ -2162,7 +2166,10 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`);
-  await models.Challenge.update({ id: challengeId }, updateDetails);
+  await challengeDomain.update({
+    filterCriteria: getScanCriteria({ id: challengeId }),
+    updateInput: updateDetails
+  });
 
   if (auditLogs.length > 0) {
     await models.AuditLog.batchPut(auditLogs);
@@ -2723,7 +2730,7 @@ partiallyUpdateChallenge.schema = {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge(currentUser, challengeId) {
-  const challenge = await helper.getById("Challenge", challengeId);
+  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(
       `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`
@@ -2734,7 +2741,9 @@ async function deleteChallenge(currentUser, challengeId) {
   // check if user are allowed to delete the challenge
   await ensureAccessibleForChallenge(currentUser, challenge);
   // delete DB record
-  await models.Challenge.delete(challenge);
+  await challengeDomain.delete(
+    getLookupCriteria("id", challengeId)
+  );
   // delete ES document
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
