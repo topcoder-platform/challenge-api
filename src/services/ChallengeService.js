@@ -4,6 +4,10 @@
 
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
+const {
+  DomainHelper: { getLookupCriteria },
+} = require("@topcoder-framework/lib-common");
+
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
@@ -1503,7 +1507,7 @@ async function update(currentUser, challengeId, data, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
-  const challenge = await helper.getById("Challenge", challengeId);
+  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
   let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
@@ -1920,7 +1924,6 @@ async function update(currentUser, challengeId, data, isFull) {
   data.updated = moment().utc();
   data.updatedBy = currentUser.handle || currentUser.sub;
   const updateDetails = {};
-  const auditLogs = [];
   let phasesHaveBeenModified = false;
   _.each(data, (value, key) => {
     let op;
@@ -2025,33 +2028,12 @@ async function update(currentUser, challengeId, data, isFull) {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : "NULL";
           newValue = JSON.stringify(value);
         }
-        // logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
-        auditLogs.push({
-          id: uuid(),
-          challengeId,
-          fieldName: key,
-          oldValue,
-          newValue,
-          created: moment().utc(),
-          createdBy: currentUser.handle || currentUser.sub,
-          memberId: currentUser.userId || null,
-        });
       }
     }
   });
 
   if (isFull && _.isUndefined(data.metadata) && challenge.metadata) {
     updateDetails["$DELETE"] = { metadata: null };
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "metadata",
-      oldValue: JSON.stringify(challenge.metadata),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.metadata;
     // send null to Elasticsearch to clear the field
     data.metadata = null;
@@ -2061,16 +2043,6 @@ async function update(currentUser, challengeId, data, isFull) {
       updateDetails["$DELETE"] = {};
     }
     updateDetails["$DELETE"].attachments = null;
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "attachments",
-      oldValue: JSON.stringify(challenge.attachments),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.attachments;
     // send null to Elasticsearch to clear the field
     data.attachments = null;
@@ -2080,16 +2052,6 @@ async function update(currentUser, challengeId, data, isFull) {
       updateDetails["$DELETE"] = {};
     }
     updateDetails["$DELETE"].groups = null;
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "groups",
-      oldValue: JSON.stringify(challenge.groups),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.groups;
     // send null to Elasticsearch to clear the field
     data.groups = null;
@@ -2121,16 +2083,6 @@ async function update(currentUser, challengeId, data, isFull) {
       updateDetails["$DELETE"] = {};
     }
     updateDetails["$DELETE"].winners = null;
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "winners",
-      oldValue: JSON.stringify(challenge.winners),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.winners;
     // send null to Elasticsearch to clear the field
     data.winners = null;
@@ -2162,11 +2114,10 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`);
-  await models.Challenge.update({ id: challengeId }, updateDetails);
-
-  if (auditLogs.length > 0) {
-    await models.AuditLog.batchPut(auditLogs);
-  }
+  await challengeDomain.update({
+    filterCriteria: getScanCriteria({ id: challengeId }),
+    updateInput: updateDetails
+  });
 
   delete data.attachments;
   delete data.terms;
@@ -2723,7 +2674,7 @@ partiallyUpdateChallenge.schema = {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge(currentUser, challengeId) {
-  const challenge = await helper.getById("Challenge", challengeId);
+  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(
       `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`
@@ -2734,7 +2685,9 @@ async function deleteChallenge(currentUser, challengeId) {
   // check if user are allowed to delete the challenge
   await ensureAccessibleForChallenge(currentUser, challenge);
   // delete DB record
-  await models.Challenge.delete(challenge);
+  await challengeDomain.delete(
+    getLookupCriteria("id", challengeId)
+  );
   // delete ES document
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
