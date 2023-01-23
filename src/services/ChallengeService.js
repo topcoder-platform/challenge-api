@@ -1070,7 +1070,11 @@ createChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer().min(0)
+      duration: Joi.number().integer().min(0),
+      constraints: Joi.object().keys({
+        name: Joi.string(),
+        value: Joi.number().integer().min(0)
+      }).optional()
     })),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
@@ -2026,7 +2030,7 @@ function sanitizeChallenge (challenge) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
   if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate', 'scheduledStartDate']))
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate', 'scheduledStartDate', 'constraints']))
   }
   if (challenge.prizeSets) {
     sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
@@ -2110,7 +2114,11 @@ fullyUpdateChallenge.schema = {
       duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean(),
       actualEndDate: Joi.date().allow(null),
-      scheduledStartDate: Joi.date().allow(null)
+      scheduledStartDate: Joi.date().allow(null),
+      constraints: Joi.array().items(Joi.object().keys({
+        name: Joi.string(),
+        value: Joi.number().integer().min(0)
+      }).optional()).optional()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -2218,7 +2226,11 @@ partiallyUpdateChallenge.schema = {
       duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean(),
       actualEndDate: Joi.date().allow(null),
-      scheduledStartDate: Joi.date().allow(null)
+      scheduledStartDate: Joi.date().allow(null),
+      constraints: Joi.array().items(Joi.object().keys({
+        name: Joi.string(),
+        value: Joi.number().integer().min(0)
+      }).optional()).optional()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
