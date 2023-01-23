@@ -1924,7 +1924,6 @@ async function update(currentUser, challengeId, data, isFull) {
   data.updated = moment().utc();
   data.updatedBy = currentUser.handle || currentUser.sub;
   const updateDetails = {};
-  const auditLogs = [];
   let phasesHaveBeenModified = false;
   _.each(data, (value, key) => {
     let op;
@@ -2029,33 +2028,12 @@ async function update(currentUser, challengeId, data, isFull) {
           oldValue = challenge[key] ? JSON.stringify(challenge[key]) : "NULL";
           newValue = JSON.stringify(value);
         }
-        // logger.debug(`Audit Log: Key ${key} OldValue: ${oldValue} NewValue: ${newValue}`)
-        auditLogs.push({
-          id: uuid(),
-          challengeId,
-          fieldName: key,
-          oldValue,
-          newValue,
-          created: moment().utc(),
-          createdBy: currentUser.handle || currentUser.sub,
-          memberId: currentUser.userId || null,
-        });
       }
     }
   });
 
   if (isFull && _.isUndefined(data.metadata) && challenge.metadata) {
     updateDetails["$DELETE"] = { metadata: null };
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "metadata",
-      oldValue: JSON.stringify(challenge.metadata),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.metadata;
     // send null to Elasticsearch to clear the field
     data.metadata = null;
@@ -2065,16 +2043,6 @@ async function update(currentUser, challengeId, data, isFull) {
       updateDetails["$DELETE"] = {};
     }
     updateDetails["$DELETE"].attachments = null;
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "attachments",
-      oldValue: JSON.stringify(challenge.attachments),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.attachments;
     // send null to Elasticsearch to clear the field
     data.attachments = null;
@@ -2084,16 +2052,6 @@ async function update(currentUser, challengeId, data, isFull) {
       updateDetails["$DELETE"] = {};
     }
     updateDetails["$DELETE"].groups = null;
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "groups",
-      oldValue: JSON.stringify(challenge.groups),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.groups;
     // send null to Elasticsearch to clear the field
     data.groups = null;
@@ -2125,16 +2083,6 @@ async function update(currentUser, challengeId, data, isFull) {
       updateDetails["$DELETE"] = {};
     }
     updateDetails["$DELETE"].winners = null;
-    auditLogs.push({
-      id: uuid(),
-      challengeId,
-      fieldName: "winners",
-      oldValue: JSON.stringify(challenge.winners),
-      newValue: "NULL",
-      created: moment().utc(),
-      createdBy: currentUser.handle || currentUser.sub,
-      memberId: currentUser.userId || null,
-    });
     delete challenge.winners;
     // send null to Elasticsearch to clear the field
     data.winners = null;
@@ -2170,10 +2118,6 @@ async function update(currentUser, challengeId, data, isFull) {
     filterCriteria: getScanCriteria({ id: challengeId }),
     updateInput: updateDetails
   });
-
-  if (auditLogs.length > 0) {
-    await models.AuditLog.batchPut(auditLogs);
-  }
 
   delete data.attachments;
   delete data.terms;
