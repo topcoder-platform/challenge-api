@@ -1000,11 +1000,11 @@ async function createChallenge (currentUser, challenge, userToken) {
     _.set(challenge, 'legacy.directProjectId', directProjectId)
   }
   const { track, type } = await validateChallengeData(challenge)
-  const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
-  if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
-    _.set(challenge, 'billing.billingAccountId', billingAccountId)
-    _.set(challenge, 'billing.markup', markup || 0)
-  }
+  // const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
+  // if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+  //   _.set(challenge, 'billing.billingAccountId', billingAccountId)
+  //   _.set(challenge, 'billing.markup', markup || 0)
+  // }
   if (_.get(type, 'isTask')) {
     _.set(challenge, 'task.isTask', true)
     if (_.isUndefined(_.get(challenge, 'task.isAssigned'))) {
@@ -1486,12 +1486,13 @@ async function update (currentUser, challengeId, data, isFull) {
     }
   }
 
-  const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
-  if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
-    _.set(data, 'billing.billingAccountId', billingAccountId)
-    _.set(data, 'billing.markup', markup || 0)
-  }
-  if (billingAccountId && _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))) {
+  // const { billingAccountId, markup } = await helper.getProjectBillingInformation(_.get(challenge, 'projectId'))
+  // if (billingAccountId && _.isUndefined(_.get(challenge, 'billing.billingAccountId'))) {
+  //   _.set(data, 'billing.billingAccountId', billingAccountId)
+  //   _.set(data, 'billing.markup', markup || 0)
+  // }
+  const existingBillingAccountId= _.get(challenge, 'billing.billingAccountId');
+  if (existingBillingAccountId && _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(existingBillingAccountId))) {
     if (_.isEmpty(data.metadata)) {
       data.metadata = []
     }
@@ -1510,7 +1511,7 @@ async function update (currentUser, challengeId, data, isFull) {
         throw error
       }
       // if activating a challenge, the challenge must have a billing account id
-      if ((!billingAccountId || billingAccountId === null) &&
+      if ((!existingBillingAccountId || existingBillingAccountId === null) &&
         challenge.status === constants.challengeStatuses.Draft) {
         const error = new errors.BadRequestError('Cannot Activate this project, it has no active billing account.')
         await logger.endSpanWithError(span, error)
