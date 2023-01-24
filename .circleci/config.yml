@@ -75,6 +75,7 @@ workflows:
                 - fix/challenge-timelines-edit-routes
                 - test/performance-profile
                 - ss-bughunt
+                - PLAT-2164
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
