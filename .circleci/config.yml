@@ -72,7 +72,6 @@ workflows:
             branches:
               only:
                 - develop
-                - PLAT-2111
                 - PLAT-2032
 
       # Production builds are exectuted only on tagged commits to the
