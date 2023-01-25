@@ -1440,6 +1440,9 @@ async function update (currentUser, challengeId, data, isFull) {
   if (data.projectId) {
     await helper.ensureProjectExist(data.projectId, currentUser)
   }
+  if (data.billing != null){
+    throw new errors.BadRequestError("Updating BA is not allowed");
+  }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(data.groups, 'groups')
@@ -1491,6 +1494,7 @@ async function update (currentUser, challengeId, data, isFull) {
   //   _.set(data, 'billing.billingAccountId', billingAccountId)
   //   _.set(data, 'billing.markup', markup || 0)
   // }
+  console.log(billing);
   const existingBillingAccountId= _.get(challenge, 'billing.billingAccountId');
   if (existingBillingAccountId && _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(existingBillingAccountId))) {
     if (_.isEmpty(data.metadata)) {
