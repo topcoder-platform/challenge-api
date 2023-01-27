@@ -7,7 +7,7 @@ const {
   DomainHelper: { getLookupCriteria, getScanCriteria },
 } = require("@topcoder-framework/lib-common");
 
-const { AttachmentDomain } = require("@topcoder-framework/domain-challenge");
+const { AttachmentDomain, ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 
 const _ = require("lodash");
 const Joi = require("joi");
@@ -26,6 +26,10 @@ const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(",").map(
 );
 
 const attachmentDomain = new AttachmentDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT
+);
+const challengeDomain = new ChallengeDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
 );
@@ -56,7 +60,7 @@ function validateUrl(url) {
  * @returns {Object} the challenge and the attachment
  */
 async function _getChallengeAttachment(challengeId, attachmentId) {
-  const challenge = await helper.getById("Challenge", challengeId);
+  const challenge = await helperchallengeDomain.lookup(getLookupCriteria("id", challengeId));
   const attachment = await attachmentDomain.lookup(getLookupCriteria("id", attachmentId));
   if (!attachment || attachment.challengeId !== challengeId) {
     throw errors.NotFoundError(
@@ -73,7 +77,7 @@ async function _getChallengeAttachment(challengeId, attachmentId) {
  * @returns {Object} the created attachment
  */
 async function createAttachment(currentUser, challengeId, attachments) {
-  const challenge = await helper.getById("Challenge", challengeId);
+  const challenge = await helperchallengeDomain.lookup(getLookupCriteria("id", challengeId));
   await helper.ensureUserCanModifyChallenge(currentUser, challenge);
   const newAttachments = [];
   for (const attachment of attachments) {
