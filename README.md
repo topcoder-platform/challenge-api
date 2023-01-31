@@ -102,7 +102,7 @@ You can find sample `.env` files inside the `/docs` directory.
 1. 📦 Install npm dependencies
 
    ```bash
-   npm install
+   yarn install
    ```
 
 2. ⚙ Local config   
