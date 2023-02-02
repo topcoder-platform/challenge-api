@@ -61,6 +61,57 @@ app.get('/v5/resources', (req, res) => {
   res.json(resources)
 })
 
+app.post('/v5/resources', (req, res) => {
+  winston.debug(`create resources request body: ${JSON.stringify(req.body, null, 2)}`)
+  
+  res.json({success: 'ok'})
+})
+
+
+app.get('/v1/emsi-skills/challenge-emsi-skills', (req, res) => {
+  winston.debug(`Get EMSI skills of challenge with id = ${req.query.challengeId}`)
+
+  res.set('X-Total-Pages', 1)
+
+  res.json([
+    {
+        "name": "Android Studio",
+        "emsiId": "KS120H16DSFH8546JPX1",
+        "confidence": 1,
+        "created": "2023-01-26T06:51:46.956Z",
+        "updated": "2023-01-26T06:51:46.956Z"
+    },
+    {
+        "name": "Git (Version Control System)",
+        "emsiId": "ESA91D8112EB9ECA3570",
+        "confidence": 1,
+        "created": "2023-01-26T06:51:46.966Z",
+        "updated": "2023-01-26T06:51:46.966Z"
+    },
+    {
+        "name": "Gitlab",
+        "emsiId": "KSFX6JBNDFS27G78LHSA",
+        "confidence": 1,
+        "created": "2023-01-26T06:51:46.975Z",
+        "updated": "2023-01-26T06:51:46.975Z"
+    },
+    {
+        "name": "Android (Operating System)",
+        "emsiId": "KS120GZ5YXC6YVM1NGPR",
+        "confidence": 0.9652777910232544,
+        "created": "2023-01-26T06:51:46.984Z",
+        "updated": "2023-01-26T06:51:46.984Z"
+    },
+    {
+        "name": "Apple IOS",
+        "emsiId": "KS120KG6WHGRLKG6DFS3",
+        "confidence": 0.934184730052948,
+        "created": "2023-01-26T06:51:47.002Z",
+        "updated": "2023-01-26T06:51:47.002Z"
+    }
+])
+})
+
 // get challenges member can access to
 app.get('/v5/resources/:memberId/challenges', (req, res) => {
   const memberId = req.params.memberId

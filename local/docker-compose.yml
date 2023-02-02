@@ -27,7 +27,7 @@ services:
     volumes:
       - ../mock-api:/challenge-api/mock-api
     environment:
-      DYNAMODB_URL: http://dynamodb:7777
+      DYNAMODB_URL: http://dynamodb:8000
       IS_LOCAL_DB: "true"
     ports:
       - "4000:4000"

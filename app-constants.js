@@ -131,6 +131,8 @@ const SelfServiceNotificationSettings = {
   }
 }
 
+const ChallengeEmsiSkillsSelectFields = ['emsiId', 'name', 'confidence']
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -144,5 +146,6 @@ module.exports = {
   DiscussionTypes,
   reviewTypes,
   SelfServiceNotificationTypes,
-  SelfServiceNotificationSettings
+  SelfServiceNotificationSettings,
+  ChallengeEmsiSkillsSelectFields
 }

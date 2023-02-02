@@ -1373,6 +1373,43 @@ function setToInternalCache (key, value) {
   internalCache.set(key, value)
 }
 
+// Get the challenge emsi skills from Topcoder emsi skills api
+const getChallengeEmsiSkills = async challengeId => {
+  const token = await getM2MToken()
+  const perPage = 30
+  let page = 1
+  let result = []
+  while (true) {
+    const url = `${config.TC_EMSI_SKILLS_API_URL}/challenge-emsi-skills?challengeId=${challengeId}&perPage=${perPage}&page=${page}`
+    let res
+    try {
+      res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+    } catch (e) {
+      if (e.response.status === HttpStatus.NOT_FOUND) {
+        // Log the error and return an empty array
+        logger.error(`EMSI skills for challengeId=${challengeId} are not found`)
+        return []
+      } else {
+        // Other errors will be propagated to the caller
+        // propagate the error
+        throw e
+      }
+    }
+
+    if (!res.data || res.data.length === 0) {
+      break
+    }
+    result = result.concat(res.data)
+    page += 1
+    if (res.headers['x-total-pages'] && page > Number(res.headers['x-total-pages'])) {
+      break
+    }
+  }
+  // pick only needed fields
+  result = _.map(result, skill => _.pick(skill, constants.ChallengeEmsiSkillsSelectFields))
+  return result
+}
+
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1429,5 +1466,6 @@ module.exports = {
   submitZendeskRequest,
   updateSelfServiceProjectInfo,
   getFromInternalCache,
-  setToInternalCache
+  setToInternalCache,
+  getChallengeEmsiSkills
 }

@@ -733,6 +733,15 @@ async function searchChallenges (currentUser, criteria) {
     }
   })
 
+  // Get emsi skills of the challenges
+  result = _.map(result, async challenge => {
+    challenge.emsiSkills = await helper.getChallengeEmsiSkills(challenge.id)
+    return challenge
+  })
+
+  // wait for all promises to get resolved
+  result = await Promise.all(result)
+
   await logger.endSpan(span)
   return { total, page, perPage, result }
 }
@@ -1315,6 +1324,9 @@ async function getChallenge (currentUser, id, checkIfExists) {
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, 'winners')
   }
+  
+  const challengeEmsiSkills = await helper.getChallengeEmsiSkills(challenge.id)
+  challenge.emsiSkills = challengeEmsiSkills
 
   await logger.endSpan(span)
 

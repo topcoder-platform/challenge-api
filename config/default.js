@@ -110,5 +110,7 @@ module.exports = {
   ZENDESK_API_URL: process.env.ZENDESK_API_URL || '',
   ZENDESK_CUSTOM_FIELD_TAG_ID: process.env.ZENDESK_CUSTOM_FIELD_TAG_ID,
   ZENDESK_DEFAULT_PRIORITY: process.env.ZENDESK_DEFAULT_PRIORITY || 'high',
-  INTERNAL_CACHE_TTL: process.env.INTERNAL_CACHE_TTL || 1800
+  INTERNAL_CACHE_TTL: process.env.INTERNAL_CACHE_TTL || 1800,
+
+  TC_EMSI_SKILLS_API_URL: process.env.TC_EMSI_SKILLS_API_URL || 'https://api.topcoder-dev.com/v1/emsi-skills'
 }
