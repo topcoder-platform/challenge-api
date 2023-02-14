@@ -665,4 +665,46 @@ describe('challenge type API E2E tests', () => {
       should.equal(response.body.message, '"legacyId" must be a number')
     })
   })
+
+  describe('remove challenge type API tests', () => {
+    it('remove challenge type - forbidden', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.USER_TOKEN}`)
+      should.equal(response.status, 403)
+      should.equal(response.body.message, 'You are not allowed to perform this action!')
+    })
+
+    it('remove challenge type successfully', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 200)
+      should.equal(response.body.id, id)
+    })
+
+    it('remove challenge type - not found 1', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/${id}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 404)
+      should.equal(response.body.message, `ChallengeType with id: ${id} doesn't exist`)
+    })
+
+    it('remove challenge type - not found 2', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/${notFoundId}`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 404)
+      should.equal(response.body.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
+    })
+
+    it('remove challenge type - invalid id', async () => {
+      const response = await chai.request(app)
+        .delete(`${basePath}/invalid`)
+        .set('Authorization', `Bearer ${config.ADMIN_TOKEN}`)
+      should.equal(response.status, 400)
+      should.equal(response.body.message, '"challengeTypeId" must be a valid GUID')
+    })
+  })
 })

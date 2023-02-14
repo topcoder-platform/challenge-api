@@ -45,6 +45,10 @@ const validChallengeParams = {
   StartDate: 'startDate',
   ProjectId: 'projectId',
   Name: 'name',
+  Type: 'type',
+  NumOfSubmissions: 'numOfSubmissions',
+  NumOfRegistrants: 'numOfRegistrants',
+  Status: 'status',
   TypeId: 'typeId',
   Prizes: 'overview.totalPrizes'
 }
@@ -64,6 +68,10 @@ const Topics = {
   ChallengeDeleted: 'challenge.notification.delete',
   ChallengeTypeCreated: 'test.new.bus.events', // 'challenge.action.type.created',
   ChallengeTypeUpdated: 'test.new.bus.events', // 'challenge.action.type.updated',
+  ChallengeTypeDeleted: 'test.new.bus.events', // 'challenge.action.type.deleted',
+  ChallengeTrackCreated: 'test.new.bus.events', // 'challenge.action.track.created',
+  ChallengeTrackUpdated: 'test.new.bus.events', // 'challenge.action.track.updated',
+  ChallengeTrackDeleted: 'test.new.bus.events', // 'challenge.action.track.deleted',
   ChallengePhaseCreated: 'test.new.bus.events', // 'challenge.action.phase.created',
   ChallengePhaseUpdated: 'test.new.bus.events', // 'challenge.action.phase.updated',
   ChallengePhaseDeleted: 'test.new.bus.events', // 'challenge.action.phase.deleted',

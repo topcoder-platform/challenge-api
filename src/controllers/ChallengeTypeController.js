@@ -56,10 +56,21 @@ async function partiallyUpdateChallengeType (req, res) {
   res.send(result)
 }
 
+/**
+ * Delete challenge type
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function deleteChallengeType (req, res) {
+  const result = await service.deleteChallengeType(req.params.challengeTypeId)
+  res.send(result)
+}
+
 module.exports = {
   searchChallengeTypes,
   createChallengeType,
   getChallengeType,
   fullyUpdateChallengeType,
-  partiallyUpdateChallengeType
+  partiallyUpdateChallengeType,
+  deleteChallengeType
 }

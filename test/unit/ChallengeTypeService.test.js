@@ -630,4 +630,41 @@ describe('challenge type service unit tests', () => {
       throw new Error('should not reach here')
     })
   })
+
+  describe('remove challenge type tests', () => {
+    it('remove challenge type successfully', async () => {
+      const result = await service.deleteChallengeType(id2)
+      should.equal(result.id, id2)
+    })
+
+    it('remove challenge type - not found 1', async () => {
+      try {
+        await service.deleteChallengeType(notFoundId)
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('remove challenge type - not found 2', async () => {
+      try {
+        await service.deleteChallengeType(id2)
+      } catch (e) {
+        should.equal(e.message, `ChallengeType with id: ${id2} doesn't exist`)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+
+    it('remove challenge type - invalid id', async () => {
+      try {
+        await service.deleteChallengeType('invalid')
+      } catch (e) {
+        should.equal(e.message.indexOf('"challengeType" must be a valid GUID') >= 0, true)
+        return
+      }
+      throw new Error('should not reach here')
+    })
+  })
 })

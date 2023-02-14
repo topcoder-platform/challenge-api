@@ -172,12 +172,30 @@ partiallyUpdateChallengeTrack.schema = {
   }).required()
 }
 
+/**
+ * Delete challenge track.
+ * @param {String} id the challenge track id
+ * @return {Object} the deleted challenge track
+ */
+async function deleteChallengeTrack (id) {
+  const record = await helper.getById('ChallengeTrack', id)
+  await record.delete()
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTrackDeleted, record)
+  return record
+}
+
+deleteChallengeTrack.schema = {
+  id: Joi.id()
+}
+
 module.exports = {
   searchChallengeTracks,
   createChallengeTrack,
   getChallengeTrack,
   fullyUpdateChallengeTrack,
-  partiallyUpdateChallengeTrack
+  partiallyUpdateChallengeTrack,
+  deleteChallengeTrack
 }
 
 // logger.buildService(module.exports)

@@ -150,12 +150,30 @@ partiallyUpdateChallengeType.schema = {
   }).required()
 }
 
+/**
+ * Delete challenge type.
+ * @param {String} id the challenge type id
+ * @returns {Object} the deleted challenge type
+ */
+async function deleteChallengeType (id) {
+  const ret = await helper.getById('ChallengeType', id)
+  await ret.delete()
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, ret)
+  return ret
+}
+
+deleteChallengeType.schema = {
+  id: Joi.id()
+}
+
 module.exports = {
   searchChallengeTypes,
   createChallengeType,
   getChallengeType,
   fullyUpdateChallengeType,
-  partiallyUpdateChallengeType
+  partiallyUpdateChallengeType,
+  deleteChallengeType
 }
 
 // logger.buildService(module.exports)
