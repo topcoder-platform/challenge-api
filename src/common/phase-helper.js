@@ -76,7 +76,7 @@ class ChallengePhaseHelper {
         if (p.name === 'Registration') {
           p.scheduledStartDate = moment(startDate).toDate()
         }
-        if (p.name === 'Submission') {
+        if (_.includes(['Submission', 'Checkpoint Submission'], p.name)) {
           if (p.scheduledStartDate != null) {
             p.scheduledStartDate = moment(p.scheduledStartDate).toDate()
           } else {
