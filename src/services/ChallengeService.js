@@ -794,7 +794,6 @@ async function searchChallenges(currentUser, criteria) {
 
   const esQuery = {
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     size: perPage,
     from: (page - 1) * perPage, // Es Index starts from 0
     body: {
@@ -817,7 +816,7 @@ async function searchChallenges(currentUser, criteria) {
   // Search with constructed query
   let docs;
   try {
-    docs = await esClient.search(esQuery);
+    docs = (await esClient.search(esQuery)).body;
   } catch (e) {
     // Catch error when the ES is fresh and has no data
     logger.error(`Query Error from ES ${JSON.stringify(e, null, 4)}`);
@@ -1139,7 +1138,6 @@ async function createChallenge(currentUser, challenge, userToken) {
   // Create in ES
   await esClient.create({
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     refresh: config.get("ES.ES_REFRESH"),
     id: ret.id,
     body: ret,
@@ -1304,15 +1302,15 @@ async function getChallenge(currentUser, id, checkIfExists) {
   let challenge;
   // logger.warn(JSON.stringify({
   //   index: config.get('ES.ES_INDEX'),
-  //   type: config.get('ES.ES_TYPE'),
   //   _id: id
   // }))
   try {
-    challenge = await esClient.getSource({
-      index: config.get("ES.ES_INDEX"),
-      type: config.get("ES.ES_TYPE"),
-      id,
-    });
+    challenge = (
+      await esClient.getSource({
+        index: config.get("ES.ES_INDEX"),
+        id,
+      })
+    ).body;
   } catch (e) {
     if (e.statusCode === HttpStatus.NOT_FOUND) {
       throw new errors.NotFoundError(`Challenge of id ${id} is not found.`);
@@ -2195,7 +2193,6 @@ async function update(currentUser, challengeId, data, isFull) {
   // Update ES
   await esClient.update({
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     refresh: config.get("ES.ES_REFRESH"),
     id: challengeId,
     body: {
@@ -2701,7 +2698,6 @@ async function deleteChallenge(currentUser, challengeId) {
   // delete ES document
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     refresh: config.get("ES.ES_REFRESH"),
     id: challengeId,
   });

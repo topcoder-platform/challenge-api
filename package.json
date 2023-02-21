@@ -39,6 +39,7 @@
     "prettier": "^2.8.1"
   },
   "dependencies": {
+    "@opensearch-project/opensearch": "^2.2.0",
     "@topcoder-framework/domain-challenge": "^0.4.3",
     "@topcoder-framework/lib-common": "^0.4.3",
     "aws-sdk": "^2.1145.0",
@@ -50,7 +51,6 @@
     "cors": "^2.7.1",
     "dotenv": "^8.2.0",
     "dynamoose": "^1.11.1",
-    "elasticsearch": "^16.1.1",
     "express": "^4.15.4",
     "express-fileupload": "^1.1.6",
     "express-interceptor": "^1.2.0",

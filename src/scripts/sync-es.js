@@ -16,7 +16,6 @@ async function migrateRecords() {
   for (const challenge of result) {
     await esClient.update({
       index: config.get("ES.ES_INDEX"),
-      type: config.get("ES.ES_TYPE"),
       id: challenge.id,
       body: { doc: challenge, doc_as_upsert: true },
     });
