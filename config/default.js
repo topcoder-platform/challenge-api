@@ -78,7 +78,9 @@ module.exports = {
   CLIENT_MANAGER_ROLE_ID: process.env.OBSERVER_ROLE_ID || "9b2f1905-8128-42da-85df-ed64410f4781",
 
   // topgear billing accounts
-  TOPGEAR_BILLING_ACCOUNTS_ID: process.env.TOPGEAR_BILLING_ACCOUNTS_ID ? process.env.TOPGEAR_BILLING_ACCOUNTS_ID.split(',') : [],
+  TOPGEAR_BILLING_ACCOUNTS_ID: process.env.TOPGEAR_BILLING_ACCOUNTS_ID
+    ? process.env.TOPGEAR_BILLING_ACCOUNTS_ID.split(",")
+    : [],
 
   // health check timeout in milliseconds
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
@@ -122,4 +124,6 @@ module.exports = {
   ZENDESK_CUSTOM_FIELD_TAG_ID: process.env.ZENDESK_CUSTOM_FIELD_TAG_ID,
   ZENDESK_DEFAULT_PRIORITY: process.env.ZENDESK_DEFAULT_PRIORITY || "high",
   INTERNAL_CACHE_TTL: process.env.INTERNAL_CACHE_TTL || 1800,
+  GRPC_CHALLENGE_SERVER_HOST: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_HOST || "localhost",
+  GRPC_CHALLENGE_SERVER_PORT: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_PORT || 8888,
 };

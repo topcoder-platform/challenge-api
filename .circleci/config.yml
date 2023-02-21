@@ -13,15 +13,15 @@ install_dependency: &install_dependency
 install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
   command: |
-    git clone --branch v1.4 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
+    git clone --branch v1.4.14 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
     cp ./../buildscript/master_deploy.sh .
     cp ./../buildscript/buildenv.sh .
     cp ./../buildscript/awsconfiguration.sh .
 restore_cache_settings_for_build: &restore_cache_settings_for_build
-  key: docker-node-modules-{{ checksum "yarn.lock" }}
+  key: docker-node-modules-{{ checksum "package-lock.json" }}
 
 save_cache_settings: &save_cache_settings
-  key: docker-node-modules-{{ checksum "yarn.lock" }}
+  key: docker-node-modules-{{ checksum "package-lock.json" }}
   paths:
     - node_modules
 
@@ -31,7 +31,15 @@ builddeploy_steps: &builddeploy_steps
       - run: *install_dependency
       - run: *install_deploysuite
       - restore_cache: *restore_cache_settings_for_build
-      - run: ./build.sh ${APPNAME}
+      - run:
+          name: "Authenticate with CodeArtifact and build docker image"
+          command: |
+            ./awsconfiguration.sh ${CODEARTIFACT_ENV}
+            source awsenvconf
+            aws codeartifact login --tool npm --repository topcoder-framework --domain topcoder --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --namespace @topcoder-framework
+            cp ~/.npmrc .
+            rm -f awsenvconf            
+            ./build.sh ${APPNAME}
       - save_cache: *save_cache_settings
       - deploy:
           name: Running MasterScript.
@@ -41,8 +49,6 @@ builddeploy_steps: &builddeploy_steps
             ./buildenv.sh -e $DEPLOY_ENV -b ${LOGICAL_ENV}-${APPNAME}-deployvar
             source buildenvvar
             ./master_deploy.sh -d ECS -e $DEPLOY_ENV -t latest -s ${LOGICAL_ENV}-global-appvar,${LOGICAL_ENV}-${APPNAME}-appvar -i ${APPNAME}
-
-
 jobs:
   # Build & Deploy against development backend
   "build-dev":
@@ -50,7 +56,16 @@ jobs:
     environment:
       DEPLOY_ENV: "DEV"
       LOGICAL_ENV: "dev"
-      APPNAME: "challenge-api"    
+      APPNAME: "challenge-api"
+    steps: *builddeploy_steps
+
+  "build-qa":
+    <<: *defaults
+    environment:
+      DEPLOY_ENV: "QA"
+      LOGICAL_ENV: "qa"
+      APPNAME: "challenge-api"
+      CODEARTIFACT_ENV: "PROD"
     steps: *builddeploy_steps
 
   "build-prod":
@@ -72,6 +87,13 @@ workflows:
             branches:
               only:
                 - dev
+
+      - "build-qa":
+          context : org-global
+          filters:
+            branches:
+              only:
+                - refactor/domain-challenge
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
