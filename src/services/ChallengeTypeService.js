@@ -30,8 +30,8 @@ async function searchChallengeTypes(criteria) {
   // TODO - move this to ES
   let records = helper.getFromInternalCache("ChallengeType");
   if (records == null) {
-    const { items } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria() })
-    records = items
+    const { items } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria() });
+    records = items;
     helper.setToInternalCache("ChallengeType", records);
   }
   const page = criteria.page || 1;
@@ -71,11 +71,19 @@ searchChallengeTypes.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeType(type) {
-  const { items: existingByName } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ name: type.name }) })
-  if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
-  const { items: existingByAbbr } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: type.abbreviation }) })
-  if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)
-  const ret = await challengeTypeDomain.create(type)
+  const { items: existingByName } = await challengeTypeDomain.scan({
+    scanCriteria: getScanCriteria({ name: type.name }),
+  });
+  if (existingByName.length > 0)
+    throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`);
+  const { items: existingByAbbr } = await challengeTypeDomain.scan({
+    scanCriteria: getScanCriteria({ abbreviation: type.abbreviation }),
+  });
+  if (existingByAbbr.length > 0)
+    throw new errors.ConflictError(
+      `Challenge Type with abbreviation ${type.abbreviation} already exists`
+    );
+  const ret = await challengeTypeDomain.create(type);
   // post bus event
   // await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret);
   return ret;
@@ -115,19 +123,27 @@ getChallengeType.schema = {
 async function fullyUpdateChallengeType(id, data) {
   const type = await getChallengeType(id);
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`)
+    const { items: existingByName } = await challengeTypeDomain.scan({
+      scanCriteria: getScanCriteria({ name: data.name }),
+    });
+    if (existingByName.length > 0)
+      throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`);
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    const { items: existingByAbbr } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: data.abbreviation }) })
-    if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${data.abbreviation} already exists`)
+    const { items: existingByAbbr } = await challengeTypeDomain.scan({
+      scanCriteria: getScanCriteria({ abbreviation: data.abbreviation }),
+    });
+    if (existingByAbbr.length > 0)
+      throw new errors.ConflictError(
+        `Challenge Type with abbreviation ${data.abbreviation} already exists`
+      );
   }
   if (_.isUndefined(data.description)) {
     type.description = undefined;
   }
   const { items } = await challengeTypeDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: data
+    updateInput: data,
   });
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, items[0]);
@@ -154,27 +170,29 @@ fullyUpdateChallengeType.schema = {
  * @returns {Object} the updated challenge type
  */
 async function partiallyUpdateChallengeType(id, data) {
-  const type = await getChallengeType(id)
+  const type = await getChallengeType(id);
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`)
+    const { items: existingByName } = await challengeTypeDomain.scan({
+      scanCriteria: getScanCriteria({ name: data.name }),
+    });
+    if (existingByName.length > 0)
+      throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`);
   }
-  if (
-    data.abbreviation &&
-    type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()
-  ) {
-    const { items: existingByAbbr } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: data.abbreviation }) })
-    if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${data.abbreviation} already exists`)
+  if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
+    const { items: existingByAbbr } = await challengeTypeDomain.scan({
+      scanCriteria: getScanCriteria({ abbreviation: data.abbreviation }),
+    });
+    if (existingByAbbr.length > 0)
+      throw new errors.ConflictError(
+        `Challenge Type with abbreviation ${data.abbreviation} already exists`
+      );
   }
   const { items } = await challengeTypeDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: _.extend(type, data)
+    updateInput: _.extend(type, data),
   });
   // post bus event
-  await helper.postBusEvent(
-    constants.Topics.ChallengeTypeUpdated,
-    _.assignIn({ id }, data)
-  );
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data));
   return items[0];
 }
 
@@ -189,6 +207,23 @@ partiallyUpdateChallengeType.schema = {
       abbreviation: Joi.string(),
     })
     .required(),
+};
+
+/**
+ * Delete challenge type.
+ * @param {String} id the challenge type id
+ * @returns {Object} the deleted challenge type
+ */
+async function deleteChallengeType(id) {
+  const ret = await helper.getById("ChallengeType", id);
+  await ret.delete();
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, ret);
+  return ret;
+}
+
+deleteChallengeType.schema = {
+  id: Joi.id(),
 };
 
 module.exports = {

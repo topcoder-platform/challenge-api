@@ -77,6 +77,9 @@ module.exports = {
   OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || "2a4dc376-a31c-4d00-b173-13934d89e286",
   CLIENT_MANAGER_ROLE_ID: process.env.OBSERVER_ROLE_ID || "9b2f1905-8128-42da-85df-ed64410f4781",
 
+  // topgear billing accounts
+  TOPGEAR_BILLING_ACCOUNTS_ID: process.env.TOPGEAR_BILLING_ACCOUNTS_ID ? process.env.TOPGEAR_BILLING_ACCOUNTS_ID.split(',') : [],
+
   // health check timeout in milliseconds
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
 
@@ -95,6 +98,8 @@ module.exports = {
   FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90,
 
   NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || "self-service",
+
+  AXIOS_RETRIES: process.env.AXIOS_RETRIES || 3,
 
   SENDGRID_TEMPLATES: {
     WORK_REQUEST_SUBMITTED: process.env.WORK_REQUEST_SUBMITTED || "",

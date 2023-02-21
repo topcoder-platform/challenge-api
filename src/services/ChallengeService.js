@@ -206,10 +206,8 @@ async function searchChallenges(currentUser, criteria) {
 
   if (criteria.types) {
     for (const t of criteria.types) {
-      const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({
-        abbreviation: t,
-      });
-      if (typeSearchRes.total > 0) {
+      const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t });
+      if (typeSearchRes.total > 0 || criteria.types.length === 1) {
         includedTypeIds.push(_.get(typeSearchRes, "result[0].id"));
       }
     }
@@ -1507,7 +1505,7 @@ async function update(currentUser, challengeId, data, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
-  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
+  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId));
   let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
@@ -1571,6 +1569,20 @@ async function update(currentUser, challengeId, data, isFull) {
   if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
     _.set(data, "billing.billingAccountId", billingAccountId);
     _.set(data, "billing.markup", markup || 0);
+  }
+  if (
+    billingAccountId &&
+    _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))
+  ) {
+    if (_.isEmpty(data.metadata)) {
+      data.metadata = [];
+    }
+    if (!_.find(data.metadata, (e) => e.name === "postMortemRequired")) {
+      data.metadata.push({
+        name: "postMortemRequired",
+        value: "false",
+      });
+    }
   }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
@@ -2116,7 +2128,7 @@ async function update(currentUser, challengeId, data, isFull) {
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`);
   await challengeDomain.update({
     filterCriteria: getScanCriteria({ id: challengeId }),
-    updateInput: updateDetails
+    updateInput: updateDetails,
   });
 
   delete data.attachments;
@@ -2674,7 +2686,7 @@ partiallyUpdateChallenge.schema = {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge(currentUser, challengeId) {
-  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
+  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId));
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(
       `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`
@@ -2685,9 +2697,7 @@ async function deleteChallenge(currentUser, challengeId) {
   // check if user are allowed to delete the challenge
   await ensureAccessibleForChallenge(currentUser, challenge);
   // delete DB record
-  await challengeDomain.delete(
-    getLookupCriteria("id", challengeId)
-  );
+  await challengeDomain.delete(getLookupCriteria("id", challengeId));
   // delete ES document
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
@@ -2716,13 +2726,4 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
 };
-
-logger.buildService(module.exports, {
-  validators: { enabled: true },
-  logging: { enabled: true },
-  tracing: {
-    enabled: true,
-    annotations: ["id"],
-    metadata: ["createdBy", "status"],
-  },
-});
+logger.buildService(module.exports);

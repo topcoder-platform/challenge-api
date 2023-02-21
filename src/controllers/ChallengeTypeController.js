@@ -42,10 +42,7 @@ async function getChallengeType(req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateChallengeType(req, res) {
-  const result = await service.fullyUpdateChallengeType(
-    req.params.challengeTypeId,
-    req.body
-  );
+  const result = await service.fullyUpdateChallengeType(req.params.challengeTypeId, req.body);
   res.send(result);
 }
 
@@ -55,10 +52,17 @@ async function fullyUpdateChallengeType(req, res) {
  * @param {Object} res the response
  */
 async function partiallyUpdateChallengeType(req, res) {
-  const result = await service.partiallyUpdateChallengeType(
-    req.params.challengeTypeId,
-    req.body
-  );
+  const result = await service.partiallyUpdateChallengeType(req.params.challengeTypeId, req.body);
+  res.send(result);
+}
+
+/**
+ * Delete challenge type
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function deleteChallengeType(req, res) {
+  const result = await service.deleteChallengeType(req.params.challengeTypeId);
   res.send(result);
 }
 
@@ -68,4 +72,5 @@ module.exports = {
   getChallengeType,
   fullyUpdateChallengeType,
   partiallyUpdateChallengeType,
+  deleteChallengeType,
 };

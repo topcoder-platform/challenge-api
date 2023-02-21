@@ -18,31 +18,19 @@ const swaggerUi = require("swagger-ui-express");
 const challengeAPISwaggerDoc = YAML.load("./docs/swagger.yaml");
 const { ForbiddenError } = require("./src/common/errors");
 
-const AWSXRay = require("aws-xray-sdk");
-const { grpcErrorToHTTPCode } = require("./src/common/helper");
-
 // setup express app
 const app = express();
 
-app.use(AWSXRay.express.openSegment("v5-challenge-api"));
-
 // Disable POST, PUT, PATCH, DELETE operations if READONLY is set to true
 app.use((req, res, next) => {
-  if (
-    config.READONLY === true &&
-    ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)
-  ) {
+  if (config.READONLY === true && ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
     throw new ForbiddenError("Action is temporarely not allowed!");
   }
   next();
 });
 
 // serve challenge V5 API swagger definition
-app.use(
-  "/v5/challenges/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(challengeAPISwaggerDoc)
-);
+app.use("/v5/challenges/docs", swaggerUi.serve, swaggerUi.setup(challengeAPISwaggerDoc));
 
 app.use(
   cors({
@@ -81,12 +69,7 @@ app.use(
         } catch (e) {
           logger.error("Invalid response body.");
         }
-        if (
-          obj &&
-          obj.result &&
-          obj.result.content &&
-          obj.result.content.message
-        ) {
+        if (obj && obj.result && obj.result.content && obj.result.content.message) {
           const ret = { message: obj.result.content.message };
           res.statusCode = 401;
           send(JSON.stringify(ret));
@@ -101,23 +84,17 @@ app.use(
 // Register routes
 require("./app-routes")(app);
 
-app.use(AWSXRay.express.closeSegment());
-
 // The error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  // logger.logFullError(err, req.signature || `${req.method} ${req.url}`);
+  logger.logFullError(err, req.signature || `${req.method} ${req.url}`);
   const errorResponse = {};
+  const status = err.isJoi
+    ? HttpStatus.BAD_REQUEST
+    : err.httpStatus || _.get(err, "response.status") || HttpStatus.INTERNAL_SERVER_ERROR;
 
-  let status;
-  // TODO: Use @topcoder-framewor/lib-common-errors
-  if (err.code != null && [2, 12].indexOf(err.code) != -1) {
-    status = grpcErrorToHTTPCode(err.code);
-    errorResponse.message =
-      err.code == 2 ? err.details : "Internal server error";
-  } else if (err.isJoi) {
-    status = HttpStatus.BAD_REQUEST;
-    if (_.isArray(err.details)) {
+  if (_.isArray(err.details)) {
+    if (err.isJoi) {
       _.map(err.details, (e) => {
         if (e.message) {
           if (_.isUndefined(errorResponse.message)) {
@@ -128,18 +105,11 @@ app.use((err, req, res, next) => {
         }
       });
     }
-  } else {
-    status =
-      err.httpStatus ||
-      _.get(err, "response.status") ||
-      HttpStatus.INTERNAL_SERVER_ERROR;
   }
-
   if (_.get(err, "response.status")) {
     // extra error message from axios http response(v4 and v5 tc api)
     errorResponse.message =
-      _.get(err, "response.data.result.content.message") ||
-      _.get(err, "response.data.message");
+      _.get(err, "response.data.result.content.message") || _.get(err, "response.data.message");
   }
 
   if (_.isUndefined(errorResponse.message)) {

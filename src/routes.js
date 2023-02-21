@@ -140,6 +140,13 @@ module.exports = {
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL],
     },
+    delete: {
+      controller: "ChallengeTypeController",
+      method: "deleteChallengeType",
+      auth: "jwt",
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      scopes: [DELETE, ALL],
+    },
   },
   "/challenge-tracks": {
     get: {
@@ -172,6 +179,13 @@ module.exports = {
       auth: "jwt",
       access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
       scopes: [UPDATE, ALL],
+    },
+    delete: {
+      controller: "ChallengeTrackController",
+      method: "deleteChallengeTrack",
+      auth: "jwt",
+      access: [constants.UserRoles.Admin, constants.UserRoles.Copilot, constants.UserRoles.Manager],
+      scopes: [DELETE, ALL],
     },
   },
   "/challenge-timelines": {

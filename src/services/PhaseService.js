@@ -3,7 +3,7 @@
  */
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
-const { PhaseDomain } = require('@topcoder-framework/domain-challenge')
+const { PhaseDomain } = require("@topcoder-framework/domain-challenge");
 
 const {
   DomainHelper: { getScanCriteria, getLookupCriteria },
@@ -54,8 +54,11 @@ searchPhases.schema = {
  * @returns {Object} the created phase
  */
 async function createPhase(phase) {
-  const { items: existingByName } = await phaseDomain.scan({ scanCriteria: getScanCriteria({ name: phase.name }) })
-  if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
+  const { items: existingByName } = await phaseDomain.scan({
+    scanCriteria: getScanCriteria({ name: phase.name }),
+  });
+  if (existingByName.length > 0)
+    throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
   const ret = await phaseDomain.create(phase);
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret);
@@ -94,11 +97,14 @@ getPhase.schema = {
  * @returns {Object} the updated phase
  */
 async function update(phaseId, data, isFull) {
-  const phase = await getPhase(phaseId)
+  const phase = await getPhase(phaseId);
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    const { items: existingByName } = await phaseDomain.scan({ scanCriteria: getScanCriteria({ name: phase.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
+    const { items: existingByName } = await phaseDomain.scan({
+      scanCriteria: getScanCriteria({ name: phase.name }),
+    });
+    if (existingByName.length > 0)
+      throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
   }
 
   if (isFull) {
@@ -107,7 +113,7 @@ async function update(phaseId, data, isFull) {
   }
   const { items } = await phaseDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: data
+    updateInput: data,
   });
   // post bus event
   await helper.postBusEvent(
@@ -205,12 +211,4 @@ module.exports = {
   deletePhase,
 };
 
-logger.buildService(module.exports, {
-  validators: { enabled: true },
-  logging: { enabled: true },
-  tracing: {
-    enabled: true,
-    annotations: ["id"],
-    metadata: ["createdBy", "status"],
-  },
-});
+logger.buildService(module.exports);

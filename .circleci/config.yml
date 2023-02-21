@@ -1,13 +1,15 @@
 version: 2
 defaults: &defaults
     docker:
-      - image: circleci/python:2.7-stretch-browsers
+      - image: cimg/python:3.11.0-browsers
 install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
+    sudo apt update
     sudo apt install jq
-    sudo pip install awscli --upgrade
-    sudo pip install docker-compose
+    sudo apt install python3-pip
+    sudo pip3 install awscli --upgrade
+    sudo pip3 install docker-compose
 install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
   command: |
@@ -16,10 +18,10 @@ install_deploysuite: &install_deploysuite
     cp ./../buildscript/buildenv.sh .
     cp ./../buildscript/awsconfiguration.sh .
 restore_cache_settings_for_build: &restore_cache_settings_for_build
-  key: docker-node-modules-{{ checksum "package-lock.json" }}
+  key: docker-node-modules-{{ checksum "yarn.lock" }}
 
 save_cache_settings: &save_cache_settings
-  key: docker-node-modules-{{ checksum "package-lock.json" }}
+  key: docker-node-modules-{{ checksum "yarn.lock" }}
   paths:
     - node_modules
 
@@ -69,9 +71,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
-                - feat/phase-extension
-                - feat/tracing
+                - dev
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.

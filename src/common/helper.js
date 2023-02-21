@@ -11,7 +11,7 @@ const util = require("util");
 const AWS = require("aws-sdk");
 const config = require("config");
 const axios = require("axios");
-
+const axiosRetry = require("axios-retry");
 const busApi = require("topcoder-bus-api-wrapper");
 const elasticsearch = require("elasticsearch");
 const NodeCache = require("node-cache");
@@ -21,8 +21,6 @@ const logger = require("./logger");
 
 const projectHelper = require("./project-helper");
 const m2mHelper = require("./m2m-helper");
-
-const AWSXRay = require("aws-xray-sdk");
 
 // Bus API Client
 let busApiClient;
@@ -434,6 +432,28 @@ async function createResource(challengeId, memberHandle, roleId) {
   return res || false;
 }
 
+function exponentialDelay(retryNumber = 0) {
+  const delay = Math.pow(2, retryNumber) * 200;
+  const randomSum = delay * 0.2 * Math.random(); // 0-20% of the delay
+  return delay + randomSum;
+}
+
+axiosRetry(axios, {
+  retries: `${config.AXIOS_RETRIES}`, // number of retries
+  retryCondition: (e) => {
+    return (
+      e.config.url.indexOf("v5/projects") > 0 &&
+      (axiosRetry.isNetworkOrIdempotentRequestError(e) ||
+        e.response.status === HttpStatus.TOO_MANY_REQUESTS)
+    );
+  },
+  onRetry: (retryCount, error, requestConfig) =>
+    logger.info(
+      `${error.message} while calling: ${requestConfig.url} - retry count: ${retryCount}`
+    ),
+  retryDelay: exponentialDelay,
+});
+
 /**
  * Create Project
  * @param {String} name The name
@@ -611,7 +631,8 @@ async function updateSelfServiceProjectInfo(projectId, workItemPlannedEndDate, c
   const payment = await getProjectPayment(projectId);
   const token = await m2mHelper.getM2MToken();
   const url = `${config.PROJECTS_API_URL}/${projectId}`;
-  const res = await axios.patch(
+
+  await axios.patch(
     url,
     {
       details: {
@@ -807,19 +828,6 @@ function getBusApiClient() {
  */
 async function postBusEvent(topic, payload, options = {}) {
   const client = getBusApiClient();
-  const subsegment = AWSXRay.getSegment().segment;
-
-  const traceId = subsegment ? subsegment.trace_id : null;
-  const parentSegmentId = subsegment ? subsegment.id : null;
-
-  let traceInformation = null;
-  if (traceId != null) {
-    traceInformation = {
-      traceId: traceId,
-      parentSegmentId: parentSegmentId,
-    };
-  }
-
   const message = {
     topic,
     originator: constants.EVENT_ORIGINATOR,
@@ -827,18 +835,9 @@ async function postBusEvent(topic, payload, options = {}) {
     "mime-type": constants.EVENT_MIME_TYPE,
     payload,
   };
-
   if (options.key) {
     message.key = options.key;
   }
-
-  if (traceInformation) {
-    console.log(
-      `Posting event to bus API with trace information: ${JSON.stringify(traceInformation)}`
-    );
-    message.payload.traceInformation = traceInformation;
-  }
-
   await client.postEvent(message);
 }
 
@@ -1346,8 +1345,4 @@ module.exports = {
   grpcErrorToHTTPCode,
 };
 
-logger.buildService(module.exports, {
-  validators: { enabled: false },
-  logging: { enabled: false },
-  tracing: { enabled: true, annotations: [], metadata: [] },
-});
+logger.buildService(module.exports);

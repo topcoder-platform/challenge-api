@@ -41,6 +41,24 @@ const initES = async () => {
           },
           normalizer: "custom_sort_normalizer",
         },
+        status: {
+          type: 'keyword',
+          fields: {
+            text: {
+              type: 'text'
+            }
+          },
+          normalizer: 'custom_sort_normalizer'
+        },
+        type: {
+          type: 'keyword',
+          fields: {
+            text: {
+              type: 'text'
+            }
+          },
+          normalizer: 'custom_sort_normalizer'
+        },
         prizeSets: {
           properties: {
             type: { type: "text" },

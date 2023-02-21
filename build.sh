@@ -7,10 +7,10 @@ docker create --name app $APP_NAME:latest
 
 if [ -d node_modules ]
 then
-  mv package-lock.json old-package-lock.json
-  docker cp app:/$APP_NAME/package-lock.json package-lock.json
+  mv yarn.lock old-yarn.lock
+  docker cp app:/$APP_NAME/yarn.lock yarn.lock
   set +eo pipefail
-  UPDATE_CACHE=$(cmp package-lock.json old-package-lock.json)
+  UPDATE_CACHE=$(cmp yarn.lock old-yarn.lock)
   set -eo pipefail
 else
   UPDATE_CACHE=1

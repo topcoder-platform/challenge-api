@@ -4,7 +4,7 @@ const {
   DomainHelper: { getLookupCriteria, getScanCriteria },
 } = require("@topcoder-framework/lib-common");
 
-const { PhaseDomain, TimelineTemplateDomain } = require('@topcoder-framework/domain-challenge')
+const { PhaseDomain, TimelineTemplateDomain } = require("@topcoder-framework/domain-challenge");
 
 const _ = require("lodash");
 
@@ -16,15 +16,12 @@ const errors = require("./errors");
 const phaseService = require("../services/PhaseService");
 const timelineTemplateService = require("../services/TimelineTemplateService");
 
-const timelineTemplateDomain = new TimelineTemplateDomain(
-  GRPC_CHALLENGE_SERVER_HOST,
-  GRPC_CHALLENGE_SERVER_PORT
-);
+// const timelineTemplateDomain = new TimelineTemplateDomain(
+//   GRPC_CHALLENGE_SERVER_HOST,
+//   GRPC_CHALLENGE_SERVER_PORT
+// );
 
-const phaseDomain = new PhaseDomain(
-  GRPC_CHALLENGE_SERVER_HOST,
-  GRPC_CHALLENGE_SERVER_PORT
-);
+const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
 class ChallengePhaseHelper {
   /**
