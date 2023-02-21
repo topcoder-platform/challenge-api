@@ -22,6 +22,9 @@ const challengeTrackService = require("./ChallengeTrackService");
 const challengeTypeService = require("./ChallengeTypeService");
 const timelineTemplateService = require("./TimelineTemplateService");
 
+console.log(
+  `Connecting to GRPC Challenge Server at ${GRPC_CHALLENGE_SERVER_HOST}:${GRPC_CHALLENGE_SERVER_PORT}`
+);
 const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
@@ -37,7 +40,7 @@ async function searchChallengeTimelineTemplates(criteria) {
 
   // TODO: Get number of records from DB through GRPC Response Metadata
   const { items } = await challengeTimelineTemplateDomain.scan({
-    scanCriteria,
+    criteria: scanCriteria,
   });
 
   const nRecords = items.length;

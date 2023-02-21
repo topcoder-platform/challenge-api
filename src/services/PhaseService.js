@@ -30,7 +30,7 @@ async function searchPhases(criteria = {}) {
   const scanCriteria = getScanCriteria(criteria);
 
   const { items: list } = await phaseDomain.scan({
-    scanCriteria,
+    criteria: scanCriteria,
   });
 
   const records = _.filter(list, (e) => helper.partialMatch(criteria.name, e.name));
@@ -55,7 +55,7 @@ searchPhases.schema = {
  */
 async function createPhase(phase) {
   const { items: existingByName } = await phaseDomain.scan({
-    scanCriteria: getScanCriteria({ name: phase.name }),
+    criteria: getScanCriteria({ name: phase.name }),
   });
   if (existingByName.length > 0)
     throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
@@ -101,7 +101,7 @@ async function update(phaseId, data, isFull) {
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
     const { items: existingByName } = await phaseDomain.scan({
-      scanCriteria: getScanCriteria({ name: phase.name }),
+      criteria: getScanCriteria({ name: phase.name }),
     });
     if (existingByName.length > 0)
       throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);

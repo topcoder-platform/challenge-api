@@ -167,7 +167,7 @@ class ChallengePhaseHelper {
     if (!phases || phases.length === 0) {
       return;
     }
-    const { items: records } = await phaseDomain.scan({ scanCriteria: getScanCriteria({}) });
+    const { items: records } = await phaseDomain.scan({ criteria: getScanCriteria({}) });
     const map = new Map();
     _.each(records, (r) => {
       map.set(r.id, r);

@@ -38,7 +38,7 @@ async function searchTimelineTemplates(criteria) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
   const { items } = await timelineTemplateDomain.scan({
-    scanCriteria,
+    criteria: scanCriteria,
   });
 
   const total = items.length;
@@ -62,7 +62,7 @@ searchTimelineTemplates.schema = {
  */
 async function createTimelineTemplate(timelineTemplate) {
   const scanCriteria = getScanCriteria("name", timelineTemplate.name);
-  const existing = await timelineTemplateDomain.scan({ scanCriteria });
+  const existing = await timelineTemplateDomain.scan({ criteria: scanCriteria });
   if (existing)
     throw new errors.ConflictError(
       `Timeline template with name ${timelineTemplate.name} already exists`
@@ -122,7 +122,7 @@ async function update(timelineTemplateId, data, isFull) {
 
   if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
     const { items: existingByName } = await timelineTemplateDomain.scan({
-      scanCriteria: getScanCriteria({ name: data.name }),
+      criteria: getScanCriteria({ name: data.name }),
     });
     if (existingByName.length > 0)
       throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`);
