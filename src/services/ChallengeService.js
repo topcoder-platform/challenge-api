@@ -5,7 +5,7 @@
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
 const {
-  DomainHelper: { getLookupCriteria },
+  DomainHelper: { getLookupCriteria, getScanCriteria },
 } = require("@topcoder-framework/lib-common");
 
 const _ = require("lodash");
@@ -2194,7 +2194,14 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   try {
-    await challengeDomain.update({ challenge })
+    await challengeDomain.update({
+      filterCriteria: getScanCriteria({
+        id: challengeId,
+      }),
+      updateInput: {
+        ...challenge
+      }
+    })
   } catch (e) {
     throw e
   }
