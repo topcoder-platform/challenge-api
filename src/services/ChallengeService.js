@@ -118,6 +118,14 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
   }
 }
 
+/**
+ * Search challenges by legacyId
+ * @param {Object} currentUser the user who perform operation
+ * @param {Number} legacyId the legacyId
+ * @param {Number} page the page
+ * @param {Number} perPage the perPage
+ * @returns {Array} the search result
+ */
 async function searchByLegacyId (currentUser, legacyId, page, perPage) {
   const esQuery = {
     index: config.get('ES.ES_INDEX'),
@@ -1217,13 +1225,16 @@ async function getChallenge (currentUser, id, checkIfExists) {
   // delete challenge.typeId
 
   // Remove privateDescription for unregistered users
-  let memberChallengeIds
   if (currentUser) {
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       _.unset(challenge, 'billing')
-      memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
-      if (!_.includes(memberChallengeIds, challenge.id)) {
+      if (_.isEmpty(challenge.privateDescription)) {
         _.unset(challenge, 'privateDescription')
+      } else if (!_.get(challenge, 'task.isTask', false) || !_.get(challenge, 'task.isAssigned', false)) {
+        const memberResources = await helper.listResourcesByMemberAndChallenge(currentUser.userId, challenge.id)
+        if (_.isEmpty(memberResources)) {
+          _.unset(challenge, 'privateDescription')
+        }
       }
     }
   } else {
