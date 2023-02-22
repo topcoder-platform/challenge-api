@@ -118,6 +118,45 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
   }
 }
 
+async function searchByLegacyId (currentUser, legacyId, page, perPage) {
+  const esQuery = {
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    size: perPage,
+    from: (page - 1) * perPage,
+    body: {
+      query: {
+        term: {
+          legacyId
+        }
+      },
+      fields: ['id']
+    }
+  }
+
+  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    logger.error(`Query Error from ES ${JSON.stringify(e)}`)
+    docs = {
+      hits: {
+        hits: []
+      }
+    }
+  }
+  const ids = _.map(docs.hits.hits, item => item._source.id)
+  const result = []
+  for (const id of ids) {
+    try {
+      const challenge = await getChallenge(currentUser, id)
+      result.push(challenge)
+    } catch (e) {}
+  }
+  return result
+}
+
 /**
  * Search challenges
  * @param {Object} currentUser the user who perform operation
@@ -129,6 +168,10 @@ async function searchChallenges (currentUser, criteria) {
 
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
+  if (!_.isUndefined(criteria.legacyId)) {
+    const result = searchByLegacyId(currentUser, criteria.legacyId, page, perPage)
+    return { total: result.length, page, perPage, result }
+  }
   const boolQuery = []
   let sortByScore = false
   const matchPhraseKeys = [
