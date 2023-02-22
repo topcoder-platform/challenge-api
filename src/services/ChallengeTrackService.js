@@ -33,7 +33,7 @@ async function searchChallengeTracks(criteria) {
   // TODO - move this to ES
   let records = helper.getFromInternalCache("ChallengeTrack");
   if (records == null) {
-    const { items } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria() })
+    const { items } = await challengeTrackDomain.scan({ criteria: getScanCriteria() })
     records = items
     helper.setToInternalCache("ChallengeTrack", records);
   }
@@ -90,9 +90,9 @@ searchChallengeTracks.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeTrack(type) {
-  const { items: existingByName } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria({ name: type.name }) })
+  const { items: existingByName } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
   if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
-  const { items: existingByAbbr } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: type.abbreviation }) })
+  const { items: existingByAbbr } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
   if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)
 
   const ret = await challengeTrackDomain.create(type);
@@ -136,11 +136,11 @@ getChallengeTrack.schema = {
 async function fullyUpdateChallengeTrack(id, data) {
   const type = await getChallengeTrack(id)
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria({ name: type.name }) })
+    const { items: existingByName } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    const { items: existingByAbbr } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: type.abbreviation }) })
+    const { items: existingByAbbr } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
     if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)  
   }
   if (_.isUndefined(data.description)) {
@@ -184,14 +184,14 @@ fullyUpdateChallengeTrack.schema = {
 async function partiallyUpdateChallengeTrack(id, data) {
   const type = await getChallengeTrack(id)
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria({ name: type.name }) })
+    const { items: existingByName } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
   }
   if (
     data.abbreviation &&
     type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()
   ) {
-    const { items: existingByAbbr } = await challengeTrackDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: type.abbreviation }) })
+    const { items: existingByAbbr } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
     if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)  
   }
 

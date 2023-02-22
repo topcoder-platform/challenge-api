@@ -30,7 +30,7 @@ async function searchChallengeTypes(criteria) {
   // TODO - move this to ES
   let records = helper.getFromInternalCache("ChallengeType");
   if (records == null) {
-    const { items } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria() })
+    const { items } = await challengeTypeDomain.scan({ criteria: getScanCriteria() })
     records = items
     helper.setToInternalCache("ChallengeType", records);
   }
@@ -71,9 +71,9 @@ searchChallengeTypes.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeType(type) {
-  const { items: existingByName } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ name: type.name }) })
+  const { items: existingByName } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
   if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
-  const { items: existingByAbbr } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: type.abbreviation }) })
+  const { items: existingByAbbr } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
   if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)
   const ret = await challengeTypeDomain.create(type)
   // post bus event
@@ -99,7 +99,7 @@ createChallengeType.schema = {
  * @returns {Object} the challenge type with given id
  */
 async function getChallengeType(id) {
-  return challengeTypeDomain.lookup(getLookupCriteria("id", id));
+  return await challengeTypeDomain.lookup(getLookupCriteria("id", id));
 }
 
 getChallengeType.schema = {
@@ -115,11 +115,11 @@ getChallengeType.schema = {
 async function fullyUpdateChallengeType(id, data) {
   const type = await getChallengeType(id);
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
+    const { items: existingByName } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ name: data.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`)
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    const { items: existingByAbbr } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: data.abbreviation }) })
+    const { items: existingByAbbr } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ abbreviation: data.abbreviation }) })
     if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${data.abbreviation} already exists`)
   }
   if (_.isUndefined(data.description)) {
@@ -156,14 +156,14 @@ fullyUpdateChallengeType.schema = {
 async function partiallyUpdateChallengeType(id, data) {
   const type = await getChallengeType(id)
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
+    const { items: existingByName } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ name: data.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`)
   }
   if (
     data.abbreviation &&
     type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()
   ) {
-    const { items: existingByAbbr } = await challengeTypeDomain.scan({ scanCriteria: getScanCriteria({ abbreviation: data.abbreviation }) })
+    const { items: existingByAbbr } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ abbreviation: data.abbreviation }) })
     if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${data.abbreviation} already exists`)
   }
   const { items } = await challengeTypeDomain.update({

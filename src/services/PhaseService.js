@@ -54,7 +54,7 @@ searchPhases.schema = {
  * @returns {Object} the created phase
  */
 async function createPhase(phase) {
-  const { items: existingByName } = await phaseDomain.scan({ scanCriteria: getScanCriteria({ name: phase.name }) })
+  const { items: existingByName } = await phaseDomain.scan({ criteria: getScanCriteria({ name: phase.name }) })
   if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
   const ret = await phaseDomain.create(phase);
   // post bus event
@@ -97,7 +97,7 @@ async function update(phaseId, data, isFull) {
   const phase = await getPhase(phaseId)
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    const { items: existingByName } = await phaseDomain.scan({ scanCriteria: getScanCriteria({ name: phase.name }) })
+    const { items: existingByName } = await phaseDomain.scan({ criteria: getScanCriteria({ name: phase.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
   }
 

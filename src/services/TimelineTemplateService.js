@@ -123,7 +123,7 @@ async function update(timelineTemplateId, data, isFull) {
     data.name &&
     data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()
   ) {
-    const { items: existingByName } = await timelineTemplateDomain.scan({ scanCriteria: getScanCriteria({ name: data.name }) })
+    const { items: existingByName } = await timelineTemplateDomain.scan({ criteria: getScanCriteria({ name: data.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`)
   }
 

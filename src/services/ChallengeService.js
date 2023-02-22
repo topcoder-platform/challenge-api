@@ -24,6 +24,7 @@ const PhaseService = require("./PhaseService");
 const ChallengeTypeService = require("./ChallengeTypeService");
 const ChallengeTrackService = require("./ChallengeTrackService");
 const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateService");
+const TimelineTemplateService = require("./TimelineTemplateService")
 const { BadRequestError } = require("../common/errors");
 
 const phaseHelper = require("../common/phase-helper");
@@ -35,6 +36,47 @@ const esClient = helper.getESClient();
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+
+/**
+ * Validate the challenge data.
+ * @param {Object} challenge the challenge data
+ */
+async function validateChallengeData (challenge) {
+  let type
+  let track
+  if (challenge.typeId) {
+    try {
+      type = await ChallengeTypeService.getChallengeType(challenge.typeId)
+    } catch (e) {
+      if (e.name === 'NotFoundError') {
+        const error = new errors.BadRequestError(`No challenge type found with id: ${challenge.typeId}.`)
+        throw error
+      } else {
+        throw e
+      }
+    }
+  }
+  if (challenge.trackId) {
+    try {
+      track = await ChallengeTrackService.getChallengeTrack(challenge.trackId)
+    } catch (e) {
+      if (e.name === 'NotFoundError') {
+        const error = new errors.BadRequestError(`No challenge track found with id: ${challenge.trackId}.`)
+        throw error
+      } else {
+        throw e
+      }
+    }
+  }
+  if (challenge.timelineTemplateId) {
+    const template = await TimelineTemplateService.getTimelineTemplate(challenge.timelineTemplateId)
+    if (!template.isActive) {
+      const error = new errors.BadRequestError(`The timeline template with id: ${challenge.timelineTemplateId} is inactive`)
+      throw error
+    }
+  }
+  return { type, track }
+}
 
 /**
  * Check if user can perform modification/deletion to a challenge
@@ -1507,7 +1549,7 @@ async function update(currentUser, challengeId, data, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
-  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
+  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId))
   let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
@@ -2114,10 +2156,6 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`);
-  await challengeDomain.update({
-    filterCriteria: getScanCriteria({ id: challengeId }),
-    updateInput: updateDetails
-  });
 
   delete data.attachments;
   delete data.terms;
@@ -2145,6 +2183,11 @@ async function update(currentUser, challengeId, data, isFull) {
     challenge.type = type.name;
   }
 
+  try {
+    await challengeDomain.update({ challenge })
+  } catch (e) {
+    throw e
+  }
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`);
   const options = {};
@@ -2674,7 +2717,7 @@ partiallyUpdateChallenge.schema = {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge(currentUser, challengeId) {
-  const challenge = await challengeDomain.scan(getLookupCriteria("id", challengeId))
+  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId))
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(
       `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`

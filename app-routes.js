@@ -103,7 +103,7 @@ module.exports = (app) => {
           })
         }
   
-        actions.push(method)
+        actions.push(async (req, res, next) => method(req, res, next).catch(e => console.log(e)))
         app[verb](`/${config.API_VERSION}${path}`, helper.autoWrapExpress(actions))
       })
     })
