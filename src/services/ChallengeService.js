@@ -129,8 +129,7 @@ async function searchByLegacyId (currentUser, legacyId, page, perPage) {
         term: {
           legacyId
         }
-      },
-      fields: ['id']
+      }
     }
   }
 
@@ -169,7 +168,7 @@ async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
   if (!_.isUndefined(criteria.legacyId)) {
-    const result = searchByLegacyId(currentUser, criteria.legacyId, page, perPage)
+    const result = await searchByLegacyId(currentUser, criteria.legacyId, page, perPage)
     return { total: result.length, page, perPage, result }
   }
   const boolQuery = []
