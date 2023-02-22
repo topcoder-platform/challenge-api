@@ -16,7 +16,7 @@ const uuid = require("uuid/v4");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
-const errors = require('../common/errors');
+const errors = require("../common/errors");
 
 const PhaseService = require("./PhaseService");
 
@@ -33,12 +33,12 @@ module.exports = {};
  * @returns {Promise<Object>} the search result
  */
 async function searchTimelineTemplates(criteria) {
-  const scanCriteria = getScanCriteria(_.omit(criteria, ['page', 'perPage']));
+  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
 
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
   const { items } = await timelineTemplateDomain.scan({
-    scanCriteria
+    criteria: scanCriteria,
   });
 
   const total = items.length;
@@ -61,9 +61,12 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate(timelineTemplate) {
-  const scanCriteria = getScanCriteria('name', timelineTemplate.name)
-  const existing = await timelineTemplateDomain.scan({ scanCriteria })
-  if (existing) throw new errors.ConflictError(`Timeline template with name ${timelineTemplate.name} already exists`)
+  const scanCriteria = getScanCriteria("name", timelineTemplate.name);
+  const existing = await timelineTemplateDomain.scan({ criteria: scanCriteria });
+  if (existing)
+    throw new errors.ConflictError(
+      `Timeline template with name ${timelineTemplate.name} already exists`
+    );
 
   // Do not validate phases for now
   // await phaseHelper.validatePhases(timelineTemplate.phases);
@@ -138,7 +141,7 @@ async function update(timelineTemplateId, data, isFull) {
 
   const { items } = await timelineTemplateDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: data
+    updateInput: data,
   });
   // post bus event
   await helper.postBusEvent(
@@ -215,7 +218,9 @@ partiallyUpdateTimelineTemplate.schema = {
  * @returns {Object} the deleted timeline template
  */
 async function deleteTimelineTemplate(timelineTemplateId) {
-  const { items } = await timelineTemplateDomain.delete(getLookupCriteria("id", timelineTemplateId));
+  const { items } = await timelineTemplateDomain.delete(
+    getLookupCriteria("id", timelineTemplateId)
+  );
   // post bus event
   await helper.postBusEvent(constants.Topics.TimelineTemplateDeleted, items[0]);
   return items[0];
@@ -232,12 +237,4 @@ module.exports.fullyUpdateTimelineTemplate = fullyUpdateTimelineTemplate;
 module.exports.partiallyUpdateTimelineTemplate = partiallyUpdateTimelineTemplate;
 module.exports.deleteTimelineTemplate = deleteTimelineTemplate;
 
-logger.buildService(module.exports, {
-  validators: { enabled: true },
-  logging: { enabled: true },
-  tracing: {
-    enabled: true,
-    annotations: ["id"],
-    metadata: ["createdBy", "status"],
-  },
-});
+logger.buildService(module.exports);

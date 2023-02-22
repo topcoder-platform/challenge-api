@@ -43,7 +43,6 @@ module.exports = {
     HOST: process.env.ES_HOST || "localhost:9200",
     API_VERSION: process.env.ES_API_VERSION || "6.8",
     ES_INDEX: process.env.ES_INDEX || "challenge",
-    ES_TYPE: process.env.ES_TYPE || "_doc", // ES 6.x accepts only 1 Type per index and it's mandatory to define it
     ES_REFRESH: process.env.ES_REFRESH || "true",
     TEMP_REINDEXING: process.env.TEMP_REINDEXING || true, // if true, it won't delete the existing index when reindexing data
   },
@@ -77,6 +76,11 @@ module.exports = {
   OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || "2a4dc376-a31c-4d00-b173-13934d89e286",
   CLIENT_MANAGER_ROLE_ID: process.env.OBSERVER_ROLE_ID || "9b2f1905-8128-42da-85df-ed64410f4781",
 
+  // topgear billing accounts
+  TOPGEAR_BILLING_ACCOUNTS_ID: process.env.TOPGEAR_BILLING_ACCOUNTS_ID
+    ? process.env.TOPGEAR_BILLING_ACCOUNTS_ID.split(",")
+    : [],
+
   // health check timeout in milliseconds
   HEALTH_CHECK_TIMEOUT: process.env.HEALTH_CHECK_TIMEOUT || 3000,
 
@@ -95,6 +99,8 @@ module.exports = {
   FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90,
 
   NEW_SELF_SERVICE_PROJECT_TYPE: process.env.NEW_SELF_SERVICE_PROJECT_TYPE || "self-service",
+
+  AXIOS_RETRIES: process.env.AXIOS_RETRIES || 3,
 
   SENDGRID_TEMPLATES: {
     WORK_REQUEST_SUBMITTED: process.env.WORK_REQUEST_SUBMITTED || "",
@@ -117,4 +123,6 @@ module.exports = {
   ZENDESK_CUSTOM_FIELD_TAG_ID: process.env.ZENDESK_CUSTOM_FIELD_TAG_ID,
   ZENDESK_DEFAULT_PRIORITY: process.env.ZENDESK_DEFAULT_PRIORITY || "high",
   INTERNAL_CACHE_TTL: process.env.INTERNAL_CACHE_TTL || 1800,
+  GRPC_CHALLENGE_SERVER_HOST: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_HOST || "localhost",
+  GRPC_CHALLENGE_SERVER_PORT: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_PORT || 8888,
 };

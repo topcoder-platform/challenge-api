@@ -8,9 +8,7 @@ const {
   DomainHelper: { getScanCriteria, getLookupCriteria },
 } = require("@topcoder-framework/lib-common");
 
-const {
-  ChallengeTimelineTemplateDomain,
-} = require("@topcoder-framework/domain-challenge");
+const { ChallengeTimelineTemplateDomain } = require("@topcoder-framework/domain-challenge");
 
 const Joi = require("joi");
 
@@ -24,6 +22,9 @@ const challengeTrackService = require("./ChallengeTrackService");
 const challengeTypeService = require("./ChallengeTypeService");
 const timelineTemplateService = require("./TimelineTemplateService");
 
+console.log(
+  `Connecting to GRPC Challenge Server at ${GRPC_CHALLENGE_SERVER_HOST}:${GRPC_CHALLENGE_SERVER_PORT}`
+);
 const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
@@ -39,7 +40,7 @@ async function searchChallengeTimelineTemplates(criteria) {
 
   // TODO: Get number of records from DB through GRPC Response Metadata
   const { items } = await challengeTimelineTemplateDomain.scan({
-    scanCriteria,
+    criteria: scanCriteria,
   });
 
   const nRecords = items.length;
@@ -92,9 +93,7 @@ async function createChallengeTimelineTemplate(data) {
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data);
   if (records.total > 0) {
-    throw new errors.ConflictError(
-      "The challenge type timeline template is already defined."
-    );
+    throw new errors.ConflictError("The challenge type timeline template is already defined.");
   }
 
   await challengeTypeService.getChallengeType(data.typeId);
@@ -108,10 +107,7 @@ async function createChallengeTimelineTemplate(data) {
   const template = await challengeTimelineTemplateDomain.create(data);
 
   // post bus event
-  await helper.postBusEvent(
-    constants.Topics.ChallengeTimelineTemplateCreated,
-    template
-  );
+  await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateCreated, template);
   return template;
 }
 
@@ -147,13 +143,8 @@ getChallengeTimelineTemplate.schema = {
  * @param {Object} data the challenge type timeline template data to be updated
  * @returns {Object} the updated challenge type timeline template
  */
-async function fullyUpdateChallengeTimelineTemplate(
-  challengeTimelineTemplateId,
-  data
-) {
-  const record = await getChallengeTimelineTemplate(
-    challengeTimelineTemplateId
-  );
+async function fullyUpdateChallengeTimelineTemplate(challengeTimelineTemplateId, data) {
+  const record = await getChallengeTimelineTemplate(challengeTimelineTemplateId);
   if (
     record.typeId === data.typeId &&
     record.trackId === data.trackId &&
@@ -189,10 +180,7 @@ async function fullyUpdateChallengeTimelineTemplate(
   const { items } = await challengeTimelineTemplateDomain.update(updateInput);
   if (items.length > 0) {
     // post bus event
-    await helper.postBusEvent(
-      constants.Topics.ChallengeTimelineTemplateUpdated,
-      ret
-    );
+    await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateUpdated, ret);
     return items[0];
   } else {
     throw new errors.NotFoundError(
@@ -223,10 +211,7 @@ async function deleteChallengeTimelineTemplate(challengeTimelineTemplateId) {
   }
 
   // post bus event
-  await helper.postBusEvent(
-    constants.Topics.ChallengeTimelineTemplateDeleted,
-    templates[0]
-  );
+  await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateDeleted, templates[0]);
   return templates[0];
 }
 
@@ -242,12 +227,4 @@ module.exports = {
   deleteChallengeTimelineTemplate,
 };
 
-logger.buildService(module.exports, {
-  validators: { enabled: true },
-  logging: { enabled: true },
-  tracing: {
-    enabled: true,
-    annotations: [],
-    metadata: [],
-  },
-});
+logger.buildService(module.exports);

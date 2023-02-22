@@ -7,14 +7,14 @@
  * node src/init-es force
  */
 const config = require("config");
-// const logger = require('./common/logger')
+const logger = require("./common/logger");
 const helper = require("./common/helper");
 
 const client = helper.getESClient();
 
 const initES = async () => {
   if (process.argv.length === 3 && process.argv[2] === "force") {
-    console.log(`Delete index ${config.ES.ES_INDEX} if any.`);
+    logger.info(`Delete index ${config.ES.ES_INDEX} if any.`);
     try {
       await client.indices.delete({ index: config.ES.ES_INDEX });
     } catch (err) {
@@ -22,48 +22,70 @@ const initES = async () => {
     }
   }
 
-  const exists = await client.indices.exists({ index: config.ES.ES_INDEX });
+  const { body: exists } = await client.indices.exists({ index: config.ES.ES_INDEX });
   if (exists) {
-    console.log(`The index ${config.ES.ES_INDEX} exists.`);
+    logger.info(`The index ${config.ES.ES_INDEX} exists.`);
   } else {
-    console.log(`The index ${config.ES.ES_INDEX} will be created.`);
+    logger.info(`The index ${config.ES.ES_INDEX} will be created.`);
 
-    const body = { mappings: {} };
-    body.mappings[config.get("ES.ES_TYPE")] = {
-      properties: {
-        id: { type: "keyword" },
-        name: {
-          type: "keyword",
-          fields: {
-            text: {
-              type: "text",
+    const body = {
+      mappings: {
+        // properties: {
+        properties: {
+          id: { type: "keyword" },
+          name: {
+            type: "keyword",
+            fields: {
+              text: {
+                type: "text",
+              },
             },
+            normalizer: "custom_sort_normalizer",
           },
-          normalizer: "custom_sort_normalizer",
-        },
-        prizeSets: {
-          properties: {
-            type: { type: "text" },
-            prizes: {
-              properties: {
-                type: { type: "text" },
-                value: { type: "float" },
+          status: {
+            type: "keyword",
+            fields: {
+              text: {
+                type: "text",
+              },
+            },
+            normalizer: "custom_sort_normalizer",
+          },
+          type: {
+            type: "keyword",
+            fields: {
+              text: {
+                type: "text",
+              },
+            },
+            normalizer: "custom_sort_normalizer",
+          },
+          prizeSets: {
+            properties: {
+              type: { type: "text" },
+              prizes: {
+                properties: {
+                  type: { type: "text" },
+                  value: { type: "float" },
+                },
               },
             },
           },
         },
-      },
-      dynamic_templates: [
-        {
-          metadata: {
-            path_match: "metadata.*",
-            mapping: {
-              type: "text",
+        dynamic_templates: [
+          {
+            metadata: {
+              path_match: "metadata.*",
+              mapping: {
+                type: "text",
+              },
             },
           },
-        },
-      ],
+        ],
+        //}
+      },
     };
+
     body.settings = {
       analysis: {
         normalizer: {
@@ -85,11 +107,10 @@ const initES = async () => {
 
 initES()
   .then(() => {
-    console.log("Done!");
+    logger.info("Done!");
     process.exit();
   })
   .catch((e) => {
-    // logger.logFullError(e);
-    e.printStackTrace();
+    logger.logFullError(e);
     process.exit();
   });

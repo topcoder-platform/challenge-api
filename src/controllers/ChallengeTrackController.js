@@ -42,10 +42,7 @@ async function getChallengeTrack(req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateChallengeTrack(req, res) {
-  const result = await service.fullyUpdateChallengeTrack(
-    req.params.challengeTrackId,
-    req.body
-  );
+  const result = await service.fullyUpdateChallengeTrack(req.params.challengeTrackId, req.body);
   res.send(result);
 }
 
@@ -55,10 +52,17 @@ async function fullyUpdateChallengeTrack(req, res) {
  * @param {Object} res the response
  */
 async function partiallyUpdateChallengeTrack(req, res) {
-  const result = await service.partiallyUpdateChallengeTrack(
-    req.params.challengeTrackId,
-    req.body
-  );
+  const result = await service.partiallyUpdateChallengeTrack(req.params.challengeTrackId, req.body);
+  res.send(result);
+}
+
+/**
+ * Delete challenge track
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function deleteChallengeTrack(req, res) {
+  const result = await service.deleteChallengeTrack(req.params.challengeTrackId);
   res.send(result);
 }
 
@@ -68,4 +72,5 @@ module.exports = {
   getChallengeTrack,
   fullyUpdateChallengeTrack,
   partiallyUpdateChallengeTrack,
+  deleteChallengeTrack,
 };

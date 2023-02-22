@@ -248,10 +248,8 @@ async function searchChallenges(currentUser, criteria) {
 
   if (criteria.types) {
     for (const t of criteria.types) {
-      const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({
-        abbreviation: t,
-      });
-      if (typeSearchRes.total > 0) {
+      const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t });
+      if (typeSearchRes.total > 0 || criteria.types.length === 1) {
         includedTypeIds.push(_.get(typeSearchRes, "result[0].id"));
       }
     }
@@ -838,7 +836,6 @@ async function searchChallenges(currentUser, criteria) {
 
   const esQuery = {
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     size: perPage,
     from: (page - 1) * perPage, // Es Index starts from 0
     body: {
@@ -861,7 +858,7 @@ async function searchChallenges(currentUser, criteria) {
   // Search with constructed query
   let docs;
   try {
-    docs = await esClient.search(esQuery);
+    docs = (await esClient.search(esQuery)).body;
   } catch (e) {
     // Catch error when the ES is fresh and has no data
     logger.error(`Query Error from ES ${JSON.stringify(e, null, 4)}`);
@@ -1183,7 +1180,6 @@ async function createChallenge(currentUser, challenge, userToken) {
   // Create in ES
   await esClient.create({
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     refresh: config.get("ES.ES_REFRESH"),
     id: ret.id,
     body: ret,
@@ -1348,15 +1344,15 @@ async function getChallenge(currentUser, id, checkIfExists) {
   let challenge;
   // logger.warn(JSON.stringify({
   //   index: config.get('ES.ES_INDEX'),
-  //   type: config.get('ES.ES_TYPE'),
   //   _id: id
   // }))
   try {
-    challenge = await esClient.getSource({
-      index: config.get("ES.ES_INDEX"),
-      type: config.get("ES.ES_TYPE"),
-      id,
-    });
+    challenge = (
+      await esClient.getSource({
+        index: config.get("ES.ES_INDEX"),
+        id,
+      })
+    ).body;
   } catch (e) {
     if (e.statusCode === HttpStatus.NOT_FOUND) {
       throw new errors.NotFoundError(`Challenge of id ${id} is not found.`);
@@ -1613,6 +1609,20 @@ async function update(currentUser, challengeId, data, isFull) {
   if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
     _.set(data, "billing.billingAccountId", billingAccountId);
     _.set(data, "billing.markup", markup || 0);
+  }
+  if (
+    billingAccountId &&
+    _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))
+  ) {
+    if (_.isEmpty(data.metadata)) {
+      data.metadata = [];
+    }
+    if (!_.find(data.metadata, (e) => e.name === "postMortemRequired")) {
+      data.metadata.push({
+        name: "postMortemRequired",
+        value: "false",
+      });
+    }
   }
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
@@ -2226,7 +2236,6 @@ async function update(currentUser, challengeId, data, isFull) {
   // Update ES
   await esClient.update({
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     refresh: config.get("ES.ES_REFRESH"),
     id: challengeId,
     body: {
@@ -2728,13 +2737,10 @@ async function deleteChallenge(currentUser, challengeId) {
   // check if user are allowed to delete the challenge
   await ensureAccessibleForChallenge(currentUser, challenge);
   // delete DB record
-  await challengeDomain.delete(
-    getLookupCriteria("id", challengeId)
-  );
+  await challengeDomain.delete(getLookupCriteria("id", challengeId));
   // delete ES document
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
     refresh: config.get("ES.ES_REFRESH"),
     id: challengeId,
   });
@@ -2759,13 +2765,4 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
 };
-
-logger.buildService(module.exports, {
-  validators: { enabled: true },
-  logging: { enabled: true },
-  tracing: {
-    enabled: true,
-    annotations: ["id"],
-    metadata: ["createdBy", "status"],
-  },
-});
+logger.buildService(module.exports);

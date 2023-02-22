@@ -18,19 +18,11 @@ async function searchAuditLogs(criteria) {
   let records = await helper.scanAll("AuditLog");
   // TODO this needs to be in ES
   if (criteria.fieldName)
-    records = _.filter(records, (e) =>
-      helper.partialMatch(criteria.fieldName, e.fieldName)
-    );
+    records = _.filter(records, (e) => helper.partialMatch(criteria.fieldName, e.fieldName));
   if (criteria.createdDateStart)
-    records = _.filter(
-      records,
-      (e) => criteria.createdDateStart.getTime() <= e.created.getTime()
-    );
+    records = _.filter(records, (e) => criteria.createdDateStart.getTime() <= e.created.getTime());
   if (criteria.createdDateEnd)
-    records = _.filter(
-      records,
-      (e) => criteria.createdDateEnd.getTime() <= e.created.getTime()
-    );
+    records = _.filter(records, (e) => criteria.createdDateEnd.getTime() <= e.created.getTime());
   if (criteria.challengeId)
     records = _.filter(records, (e) => criteria.challengeId === e.challengeId);
   if (criteria.createdBy)
@@ -61,4 +53,4 @@ module.exports = {
   searchAuditLogs,
 };
 
-// logger.buildService(module.exports)
+// logger.buildService(module.exports);

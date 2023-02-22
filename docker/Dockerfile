@@ -1,5 +1,5 @@
 # Use the base image with Node.js
-FROM node:12.22.12-buster
+FROM node:18.14.1-alpine3.17
 
 # Copy the current directory into the Docker image
 COPY . /challenge-api
@@ -8,6 +8,6 @@ COPY . /challenge-api
 WORKDIR /challenge-api
 
 # Install the dependencies from package.json
-RUN npm install
+RUN yarn install
 
-CMD npm start
+CMD yarn start

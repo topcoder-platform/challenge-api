@@ -127,7 +127,7 @@ async function fullyUpdateChallengeType(id, data) {
   }
   const { items } = await challengeTypeDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: data
+    updateInput: data,
   });
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, items[0]);
@@ -154,7 +154,7 @@ fullyUpdateChallengeType.schema = {
  * @returns {Object} the updated challenge type
  */
 async function partiallyUpdateChallengeType(id, data) {
-  const type = await getChallengeType(id)
+  const type = await getChallengeType(id);
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
     const { items: existingByName } = await challengeTypeDomain.scan({ criteria: getScanCriteria({ name: data.name }) })
     if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`)
@@ -168,13 +168,10 @@ async function partiallyUpdateChallengeType(id, data) {
   }
   const { items } = await challengeTypeDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: _.extend(type, data)
+    updateInput: _.extend(type, data),
   });
   // post bus event
-  await helper.postBusEvent(
-    constants.Topics.ChallengeTypeUpdated,
-    _.assignIn({ id }, data)
-  );
+  await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data));
   return items[0];
 }
 
@@ -189,6 +186,23 @@ partiallyUpdateChallengeType.schema = {
       abbreviation: Joi.string(),
     })
     .required(),
+};
+
+/**
+ * Delete challenge type.
+ * @param {String} id the challenge type id
+ * @returns {Object} the deleted challenge type
+ */
+async function deleteChallengeType(id) {
+  const ret = await helper.getById("ChallengeType", id);
+  await ret.delete();
+  // post bus event
+  await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, ret);
+  return ret;
+}
+
+deleteChallengeType.schema = {
+  id: Joi.id(),
 };
 
 module.exports = {

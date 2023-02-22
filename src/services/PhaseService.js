@@ -3,7 +3,7 @@
  */
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
-const { PhaseDomain } = require('@topcoder-framework/domain-challenge')
+const { PhaseDomain } = require("@topcoder-framework/domain-challenge");
 
 const {
   DomainHelper: { getScanCriteria, getLookupCriteria },
@@ -30,7 +30,7 @@ async function searchPhases(criteria = {}) {
   const scanCriteria = getScanCriteria(criteria);
 
   const { items: list } = await phaseDomain.scan({
-    scanCriteria,
+    criteria: scanCriteria,
   });
 
   const records = _.filter(list, (e) => helper.partialMatch(criteria.name, e.name));
@@ -94,7 +94,7 @@ getPhase.schema = {
  * @returns {Object} the updated phase
  */
 async function update(phaseId, data, isFull) {
-  const phase = await getPhase(phaseId)
+  const phase = await getPhase(phaseId);
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
     const { items: existingByName } = await phaseDomain.scan({ criteria: getScanCriteria({ name: phase.name }) })
@@ -107,7 +107,7 @@ async function update(phaseId, data, isFull) {
   }
   const { items } = await phaseDomain.update({
     filterCriteria: getScanCriteria({ id }),
-    updateInput: data
+    updateInput: data,
   });
   // post bus event
   await helper.postBusEvent(
@@ -205,12 +205,4 @@ module.exports = {
   deletePhase,
 };
 
-logger.buildService(module.exports, {
-  validators: { enabled: true },
-  logging: { enabled: true },
-  tracing: {
-    enabled: true,
-    annotations: ["id"],
-    metadata: ["createdBy", "status"],
-  },
-});
+logger.buildService(module.exports);
