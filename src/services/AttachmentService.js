@@ -11,13 +11,11 @@ const { AttachmentDomain, ChallengeDomain } = require("@topcoder-framework/domai
 
 const _ = require("lodash");
 const Joi = require("joi");
-const uuid = require("uuid/v4");
 const config = require("config");
 const errors = require("../common/errors");
 const helper = require("../common/helper");
 const s3ParseUrl = require("../common/s3ParseUrl");
-const models = require("../models");
-const logger = require("../common/logger");
+\const logger = require("../common/logger");
 const constants = require("../../app-constants");
 const challengeService = require("./ChallengeService");
 

@@ -22,6 +22,7 @@ const { Client: ESClient } = require("@opensearch-project/opensearch");
 
 const projectHelper = require("./project-helper");
 const m2mHelper = require("./m2m-helper");
+const { hasAdminRole } = require("./role-helper");
 
 // Bus API Client
 let busApiClient;
@@ -118,21 +119,6 @@ function setResHeaders(req, res, result) {
     }
     res.set("Link", link);
   }
-}
-
-/**
- * Check if the user has admin role
- * @param {Object} authUser the user
- */
-function hasAdminRole(authUser) {
-  if (authUser && authUser.roles) {
-    for (let i = 0; i < authUser.roles.length; i++) {
-      if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 /**
@@ -1285,7 +1271,6 @@ module.exports = {
   autoWrapExpress,
   setResHeaders,
   checkIfExists,
-  hasAdminRole,
   toString,
   getById,
   getByIds,

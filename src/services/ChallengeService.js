@@ -17,14 +17,13 @@ const helper = require("../common/helper");
 const logger = require("../common/logger");
 const errors = require("../common/errors");
 const constants = require("../../app-constants");
-const models = require("../models");
 const HttpStatus = require("http-status-codes");
 const moment = require("moment");
 const PhaseService = require("./PhaseService");
 const ChallengeTypeService = require("./ChallengeTypeService");
 const ChallengeTrackService = require("./ChallengeTrackService");
 const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateService");
-const TimelineTemplateService = require("./TimelineTemplateService")
+const TimelineTemplateService = require("./TimelineTemplateService");
 const { BadRequestError } = require("../common/errors");
 
 const phaseHelper = require("../common/phase-helper");
@@ -34,6 +33,7 @@ const challengeHelper = require("../common/challenge-helper");
 const esClient = helper.getESClient();
 
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+const { hasAdminRole } = require("../common/role-helper");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
@@ -41,41 +41,49 @@ const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHA
  * Validate the challenge data.
  * @param {Object} challenge the challenge data
  */
-async function validateChallengeData (challenge) {
-  let type
-  let track
+async function validateChallengeData(challenge) {
+  let type;
+  let track;
   if (challenge.typeId) {
     try {
-      type = await ChallengeTypeService.getChallengeType(challenge.typeId)
+      type = await ChallengeTypeService.getChallengeType(challenge.typeId);
     } catch (e) {
-      if (e.name === 'NotFoundError') {
-        const error = new errors.BadRequestError(`No challenge type found with id: ${challenge.typeId}.`)
-        throw error
+      if (e.name === "NotFoundError") {
+        const error = new errors.BadRequestError(
+          `No challenge type found with id: ${challenge.typeId}.`
+        );
+        throw error;
       } else {
-        throw e
+        throw e;
       }
     }
   }
   if (challenge.trackId) {
     try {
-      track = await ChallengeTrackService.getChallengeTrack(challenge.trackId)
+      track = await ChallengeTrackService.getChallengeTrack(challenge.trackId);
     } catch (e) {
-      if (e.name === 'NotFoundError') {
-        const error = new errors.BadRequestError(`No challenge track found with id: ${challenge.trackId}.`)
-        throw error
+      if (e.name === "NotFoundError") {
+        const error = new errors.BadRequestError(
+          `No challenge track found with id: ${challenge.trackId}.`
+        );
+        throw error;
       } else {
-        throw e
+        throw e;
       }
     }
   }
   if (challenge.timelineTemplateId) {
-    const template = await TimelineTemplateService.getTimelineTemplate(challenge.timelineTemplateId)
+    const template = await TimelineTemplateService.getTimelineTemplate(
+      challenge.timelineTemplateId
+    );
     if (!template.isActive) {
-      const error = new errors.BadRequestError(`The timeline template with id: ${challenge.timelineTemplateId} is inactive`)
-      throw error
+      const error = new errors.BadRequestError(
+        `The timeline template with id: ${challenge.timelineTemplateId} is inactive`
+      );
+      throw error;
     }
   }
-  return { type, track }
+  return { type, track };
 }
 
 /**
@@ -89,7 +97,7 @@ async function ensureAccessibleForChallenge(user, challenge) {
   const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId);
   if (
     !user.isMachine &&
-    !helper.hasAdminRole(user) &&
+    !hasAdminRole(user) &&
     challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() &&
     !userHasFullAccess
   ) {
@@ -110,7 +118,7 @@ async function filterChallengesByGroupsAccess(currentUser, challenges) {
   let userGroups;
   const needToCheckForGroupAccess = !currentUser
     ? true
-    : !currentUser.isMachine && !helper.hasAdminRole(currentUser);
+    : !currentUser.isMachine && !hasAdminRole(currentUser);
   const subGroupsMap = {};
   for (const challenge of challenges) {
     challenge.groups = _.filter(
@@ -176,7 +184,7 @@ async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
 async function ensureAcessibilityToModifiedGroups(currentUser, data, challenge) {
   const needToCheckForGroupAccess = !currentUser
     ? true
-    : !currentUser.isMachine && !helper.hasAdminRole(currentUser);
+    : !currentUser.isMachine && !hasAdminRole(currentUser);
   if (!needToCheckForGroupAccess) {
     return;
   }
@@ -217,7 +225,7 @@ async function searchChallenges(currentUser, criteria) {
     "updatedBy",
   ];
 
-  const hasAdminRole = helper.hasAdminRole(currentUser);
+  const hasAdminRole = hasAdminRole(currentUser);
 
   const includeSelfService =
     currentUser &&
@@ -1133,13 +1141,12 @@ async function createChallenge(currentUser, challenge, userToken) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge);
   }
 
-  if (challenge.events == null) {
-    challenge.events = [];
-  }
-
-  if (challenge.attachments == null) {
-    challenge.attachments = [];
-  }
+  if (challenge.events == null) challenge.events = [];
+  if (challenge.attachments == null) challenge.attachments = [];
+  if (challenge.prizeSets == null) challenge.prizeSets = [];
+  if (challenge.metadata == null) challenge.metadata = [];
+  if (challenge.groups == null) challenge.groups = [];
+  if (challenge.tags == null) challenge.tags = [];
 
   if (challenge.startDate != null) challenge.startDate = challenge.startDate.getTime();
   if (challenge.endDate != null) challenge.endDate = challenge.endDate.getTime();
@@ -1382,7 +1389,7 @@ async function getChallenge(currentUser, id, checkIfExists) {
   // Remove privateDescription for unregistered users
   let memberChallengeIds;
   if (currentUser) {
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    if (!currentUser.isMachine && !hasAdminRole(currentUser)) {
       _.unset(challenge, "billing");
       memberChallengeIds = await helper.listChallengesByMember(currentUser.userId);
       if (!_.includes(memberChallengeIds, challenge.id)) {
@@ -1545,7 +1552,7 @@ async function update(currentUser, challengeId, data, isFull) {
   helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
-  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId))
+  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
   let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
@@ -2199,11 +2206,11 @@ async function update(currentUser, challengeId, data, isFull) {
         id: challengeId,
       }),
       updateInput: {
-        ...challenge
-      }
-    })
+        ...challenge,
+      },
+    });
   } catch (e) {
-    throw e
+    throw e;
   }
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`);
@@ -2733,7 +2740,7 @@ partiallyUpdateChallenge.schema = {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge(currentUser, challengeId) {
-  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId))
+  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(
       `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`

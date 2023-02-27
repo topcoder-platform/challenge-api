@@ -61,12 +61,17 @@ searchTimelineTemplates.schema = {
  * @returns {Object} the created timeline template
  */
 async function createTimelineTemplate(timelineTemplate) {
-  const scanCriteria = getScanCriteria("name", timelineTemplate.name);
+  const scanCriteria = getScanCriteria({
+    name: timelineTemplate.name,
+  });
+
   const existing = await timelineTemplateDomain.scan({ criteria: scanCriteria });
-  if (existing)
+
+  if (existing && existing.items.length) {
     throw new errors.ConflictError(
       `Timeline template with name ${timelineTemplate.name} already exists`
     );
+  }
 
   // Do not validate phases for now
   // await phaseHelper.validatePhases(timelineTemplate.phases);
@@ -118,16 +123,17 @@ getTimelineTemplate.schema = {
  * @returns {Object} the updated timeline template
  */
 async function update(timelineTemplateId, data, isFull) {
-  const timelineTemplate = await getTimelineTemplate(
-    timelineTemplateId
-  );
+  const timelineTemplate = await getTimelineTemplate(timelineTemplateId);
 
-  if (
-    data.name &&
-    data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()
-  ) {
-    const { items: existingByName } = await timelineTemplateDomain.scan({ criteria: getScanCriteria({ name: data.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`)
+  if (data.name && data.name.toLowerCase() !== timelineTemplate.name.toLowerCase()) {
+    const { items: existingByName } = await timelineTemplateDomain.scan({
+      criteria: getScanCriteria({ name: data.name }),
+    });
+
+    if (existingByName.length > 1)
+      throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`);
+    else if (existingByName.length === 1 && existingByName[0].id !== timelineTemplateId)
+      throw new errors.ConflictError(`Timeline template with name ${data.name} already exists`);
   }
 
   if (data.phases) {
@@ -140,9 +146,10 @@ async function update(timelineTemplateId, data, isFull) {
   }
 
   const { items } = await timelineTemplateDomain.update({
-    filterCriteria: getScanCriteria({ id }),
+    filterCriteria: getScanCriteria({ id: timelineTemplateId }),
     updateInput: data,
   });
+
   // post bus event
   await helper.postBusEvent(
     constants.Topics.TimelineTemplateUpdated,

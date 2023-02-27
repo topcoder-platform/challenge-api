@@ -4,6 +4,7 @@ const axios = require("axios");
 const config = require("config");
 const HttpStatus = require("http-status-codes");
 const m2mHelper = require("./m2m-helper");
+const { hasAdminRole } = require("./role-helper");
 
 class ProjectHelper {
   /**

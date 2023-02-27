@@ -159,8 +159,6 @@ class ChallengePhaseHelper {
         p.isOpen = false;
       }
     }
-
-    // phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
   }
 
   async validatePhases(phases) {

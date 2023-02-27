@@ -54,8 +54,11 @@ searchPhases.schema = {
  * @returns {Object} the created phase
  */
 async function createPhase(phase) {
-  const { items: existingByName } = await phaseDomain.scan({ criteria: getScanCriteria({ name: phase.name }) })
-  if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
+  const { items: existingByName } = await phaseDomain.scan({
+    criteria: getScanCriteria({ name: phase.name }),
+  });
+  if (existingByName.length > 0)
+    throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
   const ret = await phaseDomain.create(phase);
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret);
@@ -97,8 +100,11 @@ async function update(phaseId, data, isFull) {
   const phase = await getPhase(phaseId);
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    const { items: existingByName } = await phaseDomain.scan({ criteria: getScanCriteria({ name: phase.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Phase with name ${phase.name} already exists`)
+    const { items: existingByName } = await phaseDomain.scan({
+      criteria: getScanCriteria({ name: phase.name }),
+    });
+    if (existingByName.length > 0)
+      throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
   }
 
   if (isFull) {
@@ -181,8 +187,8 @@ async function validatePhases(phases) {
   if (!phases || phases.length === 0) {
     return;
   }
-  const records = searchPhases(); // get all phases
-  console.log("ALL PHASES", records);
+  const searchPhasesResult = await searchPhases(); // get all phases
+  const records = searchPhasesResult.result;
   const map = new Map();
   _.each(records, (r) => {
     map.set(r.id, r);
