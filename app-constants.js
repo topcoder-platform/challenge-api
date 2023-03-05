@@ -84,6 +84,9 @@ const Topics = {
   ChallengeAttachmentCreated: "test.new.bus.events", // 'challenge.action.attachment.created',
   ChallengeAttachmentUpdated: "test.new.bus.events", // 'challenge.action.attachment.updated',
   ChallengeAttachmentDeleted: "test.new.bus.events", // 'challenge.action.attachment.deleted',
+  ChallengeTimelineTemplateCreated: "challenge.action.challenge.timeline.created",
+  ChallengeTimelineTemplateUpdated: "challenge.action.challenge.timeline.updated",
+  ChallengeTimelineTemplateDeleted: "challenge.action.challenge.timeline.deleted",
   // Self Service topics
   Notifications: "notifications.action.create",
 };

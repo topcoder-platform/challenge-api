@@ -180,7 +180,7 @@ async function fullyUpdateChallengeTimelineTemplate(challengeTimelineTemplateId,
   const { items } = await challengeTimelineTemplateDomain.update(updateInput);
   if (items.length > 0) {
     // post bus event
-    await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateUpdated, ret);
+    await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateUpdated, items[0]);
     return items[0];
   } else {
     throw new errors.NotFoundError(
