@@ -27,6 +27,9 @@ async function searchPhases(criteria = {}) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
 
+  delete criteria.page;
+  delete criteria.perPage;
+
   const scanCriteria = getScanCriteria(criteria);
 
   const { items: list } = await phaseDomain.scan({
@@ -100,10 +103,11 @@ async function update(phaseId, data, isFull) {
   const phase = await getPhase(phaseId);
 
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    const { items: existingByName } = await phaseDomain.scan({
-      criteria: getScanCriteria({ name: phase.name }),
+    const { items } = await phaseDomain.scan({
+      criteria: getScanCriteria({ name: data.name }),
     });
-    if (existingByName.length > 0)
+    console.log("items", items);
+    if (items.length > 0)
       throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
   }
 
@@ -112,7 +116,7 @@ async function update(phaseId, data, isFull) {
     phase.description = data.description;
   }
   const { items } = await phaseDomain.update({
-    filterCriteria: getScanCriteria({ id }),
+    filterCriteria: getScanCriteria({ id: phaseId }),
     updateInput: data,
   });
   // post bus event
