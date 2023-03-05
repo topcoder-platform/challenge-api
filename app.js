@@ -89,9 +89,16 @@ require("./app-routes")(app);
 app.use((err, req, res, next) => {
   logger.logFullError(err, req.signature || `${req.method} ${req.url}`);
   const errorResponse = {};
-  const status = err.isJoi
+  let status = err.isJoi
     ? HttpStatus.BAD_REQUEST
     : err.httpStatus || _.get(err, "response.status") || HttpStatus.INTERNAL_SERVER_ERROR;
+
+  // Check if err is a GrpcError
+  if (err.details != null && err.code != null) {
+    status = err.code == 5 ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST; // TODO: Use @topcoder-framework/lib-common to map GrpcError codes to HTTP codes
+    errorResponse.code = err.code;
+    errorResponse.message = err.details;
+  }
 
   if (_.isArray(err.details)) {
     if (err.isJoi) {
