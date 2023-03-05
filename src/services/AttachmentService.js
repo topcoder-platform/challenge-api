@@ -15,7 +15,7 @@ const config = require("config");
 const errors = require("../common/errors");
 const helper = require("../common/helper");
 const s3ParseUrl = require("../common/s3ParseUrl");
-\const logger = require("../common/logger");
+const logger = require("../common/logger");
 const constants = require("../../app-constants");
 const challengeService = require("./ChallengeService");
 
