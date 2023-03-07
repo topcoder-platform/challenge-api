@@ -24,21 +24,17 @@ const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_S
  * @returns {Object} the search result
  */
 async function searchPhases(criteria = {}) {
+  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
+
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
-
-  delete criteria.page;
-  delete criteria.perPage;
-
-  const scanCriteria = getScanCriteria(criteria);
 
   const { items: list } = await phaseDomain.scan({
     criteria: scanCriteria,
   });
 
-  const records = _.filter(list, (e) => helper.partialMatch(criteria.name, e.name));
-  const total = records.length;
-  const result = records.slice((page - 1) * perPage, page * perPage);
+  const total = list.length;
+  const result = list.slice((page - 1) * perPage, page * perPage);
 
   return { total, page, perPage, result };
 }

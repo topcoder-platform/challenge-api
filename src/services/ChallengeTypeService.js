@@ -27,25 +27,21 @@ const challengeTypeDomain = new ChallengeTypeDomain(
  * @returns {Object} the search result
  */
 async function searchChallengeTypes(criteria) {
-  // TODO - move this to ES
-  let records = helper.getFromInternalCache("ChallengeType");
-  if (records == null) {
-    const { items } = await challengeTypeDomain.scan({ criteria: getScanCriteria(criteria) });
-    records = items;
-    helper.setToInternalCache("ChallengeType", records);
-  }
+  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
+
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
 
-  if (criteria.name) records = _.filter(records, (e) => helper.partialMatch(criteria.name, e.name));
-  if (criteria.description)
-    records = _.filter(records, (e) => helper.partialMatch(criteria.description, e.description));
-  if (criteria.abbreviation)
-    records = _.filter(records, (e) => helper.partialMatch(criteria.abbreviation, e.abbreviation));
-  if (!_.isUndefined(criteria.isActive))
-    records = _.filter(records, (e) => e.isActive === (criteria.isActive === "true"));
-  if (!_.isUndefined(criteria.isTask))
-    records = _.filter(records, (e) => e.isTask === (criteria.isTask === "true"));
+  const cacheKey = `ChallengeType_${page}_${perPage}_${JSON.stringify(criteria)}`;
+  console.log("cache-key", cacheKey);
+
+  // TODO - move this to ES
+  let records = helper.getFromInternalCache(cacheKey);
+  if (records == null || records.length === 0) {
+    const { items } = await challengeTypeDomain.scan({ criteria: scanCriteria });
+    records = items;
+    helper.setToInternalCache(cacheKey, records);
+  }
 
   const total = records.length;
   const result = records.slice((page - 1) * perPage, page * perPage);
@@ -84,8 +80,9 @@ async function createChallengeType(type) {
       `Challenge Type with abbreviation ${type.abbreviation} already exists`
     );
   const ret = await challengeTypeDomain.create(type);
+  helper.flushInternalCache();
   // post bus event
-  // await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret);
+  await helper.postBusEvent(constants.Topics.ChallengeTypeCreated, ret);
   return ret;
 }
 
@@ -145,11 +142,11 @@ async function fullyUpdateChallengeType(id, data) {
     filterCriteria: getScanCriteria({ id }),
     updateInput: data,
   });
+  helper.flushInternalCache();
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, items[0]);
   return items[0];
 }
-
 fullyUpdateChallengeType.schema = {
   id: Joi.id(),
   data: Joi.object()
@@ -191,6 +188,7 @@ async function partiallyUpdateChallengeType(id, data) {
     filterCriteria: getScanCriteria({ id }),
     updateInput: _.extend(type, data),
   });
+  helper.flushInternalCache();
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeUpdated, _.assignIn({ id }, data));
   return items[0];
@@ -215,11 +213,11 @@ partiallyUpdateChallengeType.schema = {
  * @returns {Object} the deleted challenge type
  */
 async function deleteChallengeType(id) {
-  const ret = await helper.getById("ChallengeType", id);
-  await ret.delete();
+  const { items } = await challengeTypeDomain.delete(getLookupCriteria("id", id));
+  helper.flushInternalCache();
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, ret);
-  return ret;
+  await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, items[0]);
+  return items[0];
 }
 
 deleteChallengeType.schema = {
@@ -232,6 +230,7 @@ module.exports = {
   getChallengeType,
   fullyUpdateChallengeType,
   partiallyUpdateChallengeType,
+  deleteChallengeType,
 };
 
 // logger.buildService(module.exports, {

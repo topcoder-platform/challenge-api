@@ -4,6 +4,7 @@
 
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
+const _ = require("lodash");
 const {
   DomainHelper: { getScanCriteria, getLookupCriteria },
 } = require("@topcoder-framework/lib-common");
@@ -22,9 +23,6 @@ const challengeTrackService = require("./ChallengeTrackService");
 const challengeTypeService = require("./ChallengeTypeService");
 const timelineTemplateService = require("./TimelineTemplateService");
 
-console.log(
-  `Connecting to GRPC Challenge Server at ${GRPC_CHALLENGE_SERVER_HOST}:${GRPC_CHALLENGE_SERVER_PORT}`
-);
 const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
   GRPC_CHALLENGE_SERVER_HOST,
   GRPC_CHALLENGE_SERVER_PORT
@@ -36,9 +34,8 @@ const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
  * @returns {Promise<array>} the search result
  */
 async function searchChallengeTimelineTemplates(criteria) {
-  const scanCriteria = getScanCriteria(criteria);
+  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
 
-  // TODO: Get number of records from DB through GRPC Response Metadata
   const { items } = await challengeTimelineTemplateDomain.scan({
     criteria: scanCriteria,
   });

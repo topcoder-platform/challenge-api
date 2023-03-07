@@ -1697,6 +1697,7 @@ async function update(currentUser, challengeId, data, isFull) {
   ) {
     throw new errors.ForbiddenError("Cannot change typeId");
   }
+
   if (
     _.get(challenge, "legacy.useSchedulingAPI") &&
     _.get(data, "legacy.useSchedulingAPI") &&

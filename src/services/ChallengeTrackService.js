@@ -28,27 +28,19 @@ const challengeTrackDomain = new ChallengeTrackDomain(
  * @returns {Promise<Object>} the search result
  */
 async function searchChallengeTracks(criteria) {
-  // TODO - move this to ES
-  let records = helper.getFromInternalCache("ChallengeTrack");
-  if (records == null) {
-    const { items } = await challengeTrackDomain.scan({ criteria: getScanCriteria() })
-    records = items
-    helper.setToInternalCache("ChallengeTrack", records);
-  }
-
+  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
 
-  if (criteria.name) records = _.filter(records, (e) => helper.partialMatch(criteria.name, e.name));
-  if (criteria.description)
-    records = _.filter(records, (e) => helper.partialMatch(criteria.description, e.description));
-  if (criteria.track)
-    records = _.filter(records, (e) => _.toLower(criteria.track) === _.toLower(e.track));
-  if (criteria.abbreviation)
-    records = _.filter(records, (e) => helper.partialMatch(criteria.abbreviation, e.abbreviation));
-  if (!_.isUndefined(criteria.isActive))
-    records = _.filter(records, (e) => e.isActive === (criteria.isActive === "true"));
-  // if (criteria.legacyId) records = _.filter(records, e => (e.legacyId === criteria.legacyId))
+  const cacheKey = `ChallengeTrack${page}_${perPage}_${JSON.stringify(criteria)}`;
+
+  // TODO - move this to ES
+  let records = helper.getFromInternalCache(cacheKey);
+  if (records == null || records.length == 0) {
+    const { items } = await challengeTrackDomain.scan({ criteria: scanCriteria });
+    records = items;
+    helper.setToInternalCache(cacheKey, records);
+  }
 
   const total = records.length;
   const result = records.slice((page - 1) * perPage, page * perPage);
@@ -75,14 +67,23 @@ searchChallengeTracks.schema = {
  * @returns {Object} the created challenge type
  */
 async function createChallengeTrack(type) {
-  const { items: existingByName } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
-  if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
-  const { items: existingByAbbr } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
-  if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)
+  const { items: existingByName } = await challengeTrackDomain.scan({
+    criteria: getScanCriteria({ name: type.name }),
+  });
+  if (existingByName.length > 0)
+    throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`);
+  const { items: existingByAbbr } = await challengeTrackDomain.scan({
+    criteria: getScanCriteria({ abbreviation: type.abbreviation }),
+  });
+  if (existingByAbbr.length > 0)
+    throw new errors.ConflictError(
+      `Challenge Type with abbreviation ${type.abbreviation} already exists`
+    );
 
   const ret = await challengeTrackDomain.create(type);
+  helper.flushInternalCache();
   // post bus event
-  // await helper.postBusEvent(constants.Topics.ChallengeTrackCreated, ret);
+  await helper.postBusEvent(constants.Topics.ChallengeTrackCreated, ret);
   return ret;
 }
 
@@ -121,12 +122,20 @@ getChallengeTrack.schema = {
 async function fullyUpdateChallengeTrack(id, data) {
   const type = await getChallengeTrack(id);
   if (type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
+    const { items: existingByName } = await challengeTrackDomain.scan({
+      criteria: getScanCriteria({ name: type.name }),
+    });
+    if (existingByName.length > 0)
+      throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`);
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
-    const { items: existingByAbbr } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
-    if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)  
+    const { items: existingByAbbr } = await challengeTrackDomain.scan({
+      criteria: getScanCriteria({ abbreviation: type.abbreviation }),
+    });
+    if (existingByAbbr.length > 0)
+      throw new errors.ConflictError(
+        `Challenge Type with abbreviation ${type.abbreviation} already exists`
+      );
   }
   if (_.isUndefined(data.description)) {
     type.description = undefined;
@@ -141,6 +150,7 @@ async function fullyUpdateChallengeTrack(id, data) {
     filterCriteria: getScanCriteria({ id }),
     updateInput: _.extend(type, data),
   });
+  helper.flushInternalCache();
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackUpdated, items[0]);
   return items[0];
@@ -169,21 +179,27 @@ fullyUpdateChallengeTrack.schema = {
 async function partiallyUpdateChallengeTrack(id, data) {
   const type = await getChallengeTrack(id);
   if (data.name && type.name.toLowerCase() !== data.name.toLowerCase()) {
-    const { items: existingByName } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ name: type.name }) })
-    if (existingByName.length > 0) throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`)
+    const { items: existingByName } = await challengeTrackDomain.scan({
+      criteria: getScanCriteria({ name: type.name }),
+    });
+    if (existingByName.length > 0)
+      throw new errors.ConflictError(`Challenge Type with name ${type.name} already exists`);
   }
-  if (
-    data.abbreviation &&
-    type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()
-  ) {
-    const { items: existingByAbbr } = await challengeTrackDomain.scan({ criteria: getScanCriteria({ abbreviation: type.abbreviation }) })
-    if (existingByAbbr.length > 0) throw new errors.ConflictError(`Challenge Type with abbreviation ${type.abbreviation} already exists`)  
+  if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
+    const { items: existingByAbbr } = await challengeTrackDomain.scan({
+      criteria: getScanCriteria({ abbreviation: type.abbreviation }),
+    });
+    if (existingByAbbr.length > 0)
+      throw new errors.ConflictError(
+        `Challenge Type with abbreviation ${type.abbreviation} already exists`
+      );
   }
 
   const { items } = await challengeTrackDomain.update({
     filterCriteria: getScanCriteria({ id }),
     updateInput: _.extend(type, data),
   });
+  helper.flushInternalCache();
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackUpdated, _.assignIn({ id }, data));
   return items[0];
@@ -209,11 +225,12 @@ partiallyUpdateChallengeTrack.schema = {
  * @return {Object} the deleted challenge track
  */
 async function deleteChallengeTrack(id) {
-  const record = await helper.getById("ChallengeTrack", id);
-  await record.delete();
+  const { items } = await challengeTrackDomain.delete(getLookupCriteria("id", id));
+  helper.flushInternalCache();
+
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTrackDeleted, record);
-  return record;
+  await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, items[0]);
+  return items[0];
 }
 
 deleteChallengeTrack.schema = {

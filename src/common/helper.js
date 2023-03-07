@@ -1260,6 +1260,10 @@ function setToInternalCache(key, value) {
   internalCache.set(key, value);
 }
 
+function flushInternalCache() {
+  internalCache.flushAll();
+}
+
 function grpcErrorToHTTPCode(grpcErrorCode) {
   if (grpcErrorCode == 2) return HttpStatus.NOT_FOUND;
 
@@ -1320,6 +1324,7 @@ module.exports = {
   getFromInternalCache,
   setToInternalCache,
   grpcErrorToHTTPCode,
+  flushInternalCache,
 };
 
 logger.buildService(module.exports);

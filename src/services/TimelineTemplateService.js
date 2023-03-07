@@ -12,7 +12,6 @@ const { TimelineTemplateDomain } = require("@topcoder-framework/domain-challenge
 
 const _ = require("lodash");
 const Joi = require("joi");
-const uuid = require("uuid/v4");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
