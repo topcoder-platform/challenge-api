@@ -13,6 +13,7 @@ const config = require('config')
 const m2mAuth = require('tc-core-library-js').auth.m2m
 const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
 const axios = require('axios')
+const axiosRetry = require('axios-retry')
 const busApi = require('topcoder-bus-api-wrapper')
 const elasticsearch = require('elasticsearch')
 const NodeCache = require('node-cache')
@@ -352,25 +353,6 @@ function partialMatch (filter, value) {
 }
 
 /**
- * Perform validation on phases.
- * @param {Array} phases the phases data.
- */
-async function validatePhases (phases) {
-  if (!phases || phases.length === 0) {
-    return
-  }
-  const records = await scan('Phase')
-  const map = new Map()
-  _.each(records, r => {
-    map.set(r.id, r)
-  })
-  const invalidPhases = _.filter(phases, p => !map.has(p.phaseId))
-  if (invalidPhases.length > 0) {
-    throw new errors.BadRequestError(`The following phases are invalid: ${toString(invalidPhases)}`)
-  }
-}
-
-/**
  * Download file from S3
  * @param {String} bucket the bucket name
  * @param {String} key the key name
@@ -473,6 +455,23 @@ async function createResource (challengeId, memberHandle, roleId) {
   // await logger.endSpan(span)
   return res || false
 }
+
+function exponentialDelay (retryNumber = 0) {
+  const delay = Math.pow(2, retryNumber) * 200
+  const randomSum = delay * 0.2 * Math.random() // 0-20% of the delay
+  return delay + randomSum
+}
+
+axiosRetry(axios, {
+  retries: `${config.AXIOS_RETRIES}`, // number of retries
+  retryCondition: (e) => {
+    return e.config.url.indexOf('v5/projects') > 0 &&
+    (axiosRetry.isNetworkOrIdempotentRequestError(e) || e.response.status === HttpStatus.TOO_MANY_REQUESTS)
+  },
+  onRetry: (retryCount, error, requestConfig) =>
+    logger.info(`${error.message} while calling: ${requestConfig.url} - retry count: ${retryCount}`),
+  retryDelay: exponentialDelay
+})
 
 /**
  * Create Project
@@ -672,7 +671,7 @@ async function updateSelfServiceProjectInfo (projectId, workItemPlannedEndDate, 
   const payment = await getProjectPayment(projectId)
   const token = await getM2MToken()
   const url = `${config.PROJECTS_API_URL}/${projectId}`
-  const res = await axios.patch(url, {
+  await axios.patch(url, {
     details: {
       ...project.details,
       paymentProvider: config.DEFAULT_PAYMENT_PROVIDER,
@@ -1000,6 +999,30 @@ async function listChallengesByMember (memberId) {
 }
 
 /**
+ * Lists resources that given member has in the given challenge.
+ * @param {Number} memberId the member id
+ * @param {String} id the challenge id
+ * @returns {Promise<Array>} an array of resources.
+ */
+async function listResourcesByMemberAndChallenge (memberId, challengeId) {
+  const token = await getM2MToken()
+  let response = {}
+  try {
+    response = await axios.get(config.RESOURCES_API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        memberId,
+        challengeId
+      }
+    })
+  } catch (e) {
+    logger.debug(`Failed to get resources on challenge ${challengeId} that memberId ${memberId} has`, e)
+  }
+  const result = response.data || []
+  return result
+}
+
+/**
  * Check if ES refresh method is valid.
  *
  * @param {String} method method to be tested
@@ -1154,16 +1177,15 @@ async function ensureAccessibleByGroupsAccess (currentUser, challenge) {
  * @param {Object} challenge the challenge to check
  */
 async function _ensureAccessibleForTaskChallenge (currentUser, challenge) {
-  let challengeResourceIds
+  let memberResources
   // Check if challenge is task and apply security rules
   if (_.get(challenge, 'task.isTask', false) && _.get(challenge, 'task.isAssigned', false)) {
     if (currentUser) {
       if (!currentUser.isMachine) {
-        const challengeResources = await getChallengeResources(challenge.id)
-        challengeResourceIds = _.map(challengeResources, r => _.toString(r.memberId))
+        memberResources = await listResourcesByMemberAndChallenge(currentUser.userId, challenge.id)
       }
     }
-    const canAccesChallenge = _.isUndefined(currentUser) ? false : currentUser.isMachine || hasAdminRole(currentUser) || _.includes((challengeResourceIds || []), _.toString(currentUser.userId))
+    const canAccesChallenge = _.isUndefined(currentUser) ? false : currentUser.isMachine || hasAdminRole(currentUser) || !_.isEmpty(memberResources)
     if (!canAccesChallenge) {
       throw new errors.ForbiddenError(`You don't have access to view this challenge`)
     }
@@ -1388,7 +1410,6 @@ module.exports = {
   scanAll,
   validateDuplicate,
   partialMatch,
-  validatePhases,
   downloadFromFileStack,
   downloadFromS3,
   deleteFromS3,
@@ -1401,6 +1422,7 @@ module.exports = {
   ensureProjectExist,
   calculateChallengeEndDate,
   listChallengesByMember,
+  listResourcesByMemberAndChallenge,
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,

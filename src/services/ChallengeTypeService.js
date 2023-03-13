@@ -168,12 +168,10 @@ partiallyUpdateChallengeType.schema = {
  * @returns {Object} the deleted challenge type
  */
 async function deleteChallengeType (id) {
-  const span = await logger.startSpan('ChallengeTypeService.deleteChallengeType')
   const ret = await helper.getById('ChallengeType', id)
   await ret.delete()
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTypeDeleted, ret)
-  await logger.endSpan(span)
   return ret
 }
 

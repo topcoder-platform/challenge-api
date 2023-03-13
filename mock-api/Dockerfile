@@ -2,10 +2,10 @@ FROM node:10.20-jessie
 
 COPY . /challenge-api
 
-RUN (cd /challenge-api && npm install)
+RUN (cd /challenge-api && yarn install)
 
 WORKDIR /challenge-api/mock-api
 
-RUN npm install
+RUN yarn install
 
-CMD npm start
+CMD yarn start

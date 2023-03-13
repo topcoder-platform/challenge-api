@@ -45,6 +45,10 @@ const validChallengeParams = {
   StartDate: 'startDate',
   ProjectId: 'projectId',
   Name: 'name',
+  Type: 'type',
+  NumOfSubmissions: 'numOfSubmissions',
+  NumOfRegistrants: 'numOfRegistrants',
+  Status: 'status',
   TypeId: 'typeId',
   Prizes: 'overview.totalPrizes'
 }

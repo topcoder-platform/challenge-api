@@ -189,12 +189,10 @@ partiallyUpdateChallengeTrack.schema = {
  * @return {Object} the deleted challenge track
  */
 async function deleteChallengeTrack (id) {
-  const span = await logger.startSpan('ChallengeTrackService.deleteChallengeTrack')
   const record = await helper.getById('ChallengeTrack', id)
   await record.delete()
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTrackDeleted, record)
-  await logger.endSpan(span)
   return record
 }
 

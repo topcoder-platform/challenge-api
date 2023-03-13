@@ -10,6 +10,7 @@ const xss = require('xss')
 const helper = require('../common/helper')
 const logger = require('tc-framework').logger(config)
 const errors = require('../common/errors')
+const phaseHelper = require('../common/phase-helper')
 const constants = require('../../app-constants')
 const models = require('../models')
 const HttpStatus = require('http-status-codes')
@@ -18,6 +19,7 @@ const PhaseService = require('./PhaseService')
 const ChallengeTypeService = require('./ChallengeTypeService')
 const ChallengeTrackService = require('./ChallengeTrackService')
 const ChallengeTimelineTemplateService = require('./ChallengeTimelineTemplateService')
+const { BadRequestError } = require('../common/errors')
 
 const esClient = helper.getESClient()
 
@@ -119,6 +121,52 @@ async function ensureAcessibilityToModifiedGroups (currentUser, data, challenge)
 }
 
 /**
+ * Search challenges by legacyId
+ * @param {Object} currentUser the user who perform operation
+ * @param {Number} legacyId the legacyId
+ * @param {Number} page the page
+ * @param {Number} perPage the perPage
+ * @returns {Array} the search result
+ */
+async function searchByLegacyId (currentUser, legacyId, page, perPage) {
+  const esQuery = {
+    index: config.get('ES.ES_INDEX'),
+    type: config.get('ES.ES_TYPE'),
+    size: perPage,
+    from: (page - 1) * perPage,
+    body: {
+      query: {
+        term: {
+          legacyId
+        }
+      }
+    }
+  }
+
+  logger.debug(`es Query ${JSON.stringify(esQuery)}`)
+  let docs
+  try {
+    docs = await esClient.search(esQuery)
+  } catch (e) {
+    logger.error(`Query Error from ES ${JSON.stringify(e)}`)
+    docs = {
+      hits: {
+        hits: []
+      }
+    }
+  }
+  const ids = _.map(docs.hits.hits, item => item._source.id)
+  const result = []
+  for (const id of ids) {
+    try {
+      const challenge = await getChallenge(currentUser, id)
+      result.push(challenge)
+    } catch (e) {}
+  }
+  return result
+}
+
+/**
  * Search challenges
  * @param {Object} currentUser the user who perform operation
  * @param {Object} criteria the search criteria
@@ -130,6 +178,10 @@ async function searchChallenges (currentUser, criteria) {
 
   const page = criteria.page || 1
   const perPage = criteria.perPage || 20
+  if (!_.isUndefined(criteria.legacyId)) {
+    const result = await searchByLegacyId(currentUser, criteria.legacyId, page, perPage)
+    return { total: result.length, page, perPage, result }
+  }
   const boolQuery = []
   let sortByScore = false
   const matchPhraseKeys = [
@@ -166,7 +218,7 @@ async function searchChallenges (currentUser, criteria) {
   if (criteria.types) {
     for (const t of criteria.types) {
       const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t })
-      if (typeSearchRes.total > 0) {
+      if (typeSearchRes.total > 0 || criteria.types.length === 1) {
         includedTypeIds.push(_.get(typeSearchRes, 'result[0].id'))
       }
     }
@@ -854,102 +906,6 @@ async function validateChallengeData (challenge) {
 }
 
 /**
- * Populate challenge phases.
- * @param {Array} phases the phases to populate
- * @param {Date} startDate the challenge start date
- * @param {String} timelineTemplateId the timeline template id
- */
-async function populatePhases (phases, startDate, timelineTemplateId) {
-  if (_.isUndefined(timelineTemplateId)) {
-    throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`)
-  }
-  const template = await helper.getById('TimelineTemplate', timelineTemplateId)
-  if (!phases || phases.length === 0) {
-    // auto populate phases
-    for (const p of template.phases) {
-      phases.push({
-        phaseId: p.phaseId,
-        duration: p.defaultDuration
-      })
-    }
-  }
-  const phaseDefinitions = await helper.scan('Phase')
-  // generate phase instance ids
-  for (let i = 0; i < phases.length; i += 1) {
-    phases[i].id = uuid()
-  }
-
-  for (let i = 0; i < phases.length; i += 1) {
-    const phase = phases[i]
-    const templatePhase = _.find(template.phases, (p) => p.phaseId === phase.phaseId)
-    const phaseDefinition = _.find(phaseDefinitions, (p) => p.id === phase.phaseId)
-    phase.name = _.get(phaseDefinition, 'name')
-    phase.isOpen = _.get(phase, 'isOpen', false)
-    if (templatePhase) {
-      // use default duration if not provided
-      if (!phase.duration) {
-        phase.duration = templatePhase.defaultDuration
-      }
-      // set predecessor
-      if (templatePhase.predecessor) {
-        const prePhase = _.find(phases, (p) => p.phaseId === templatePhase.predecessor)
-        if (!prePhase) {
-          throw new errors.BadRequestError(`Predecessor ${templatePhase.predecessor} not found from given phases.`)
-        }
-        phase.predecessor = prePhase.phaseId
-      }
-    }
-  }
-
-  // calculate dates
-  if (!startDate) {
-    return
-  }
-  const done = []
-  for (let i = 0; i < phases.length; i += 1) {
-    done.push(false)
-  }
-  let doing = true
-  while (doing) {
-    doing = false
-    for (let i = 0; i < phases.length; i += 1) {
-      if (!done[i]) {
-        const phase = phases[i]
-        if (!phase.predecessor) {
-          phase.scheduledStartDate = startDate
-          phase.scheduledEndDate = moment(startDate).add(phase.duration || 0, 'seconds').toDate()
-          phase.actualStartDate = phase.scheduledStartDate
-          done[i] = true
-          doing = true
-        } else {
-          const preIndex = _.findIndex(phases, (p) => p.phaseId === phase.predecessor)
-          let canProcess = true
-          if (preIndex < 0) {
-            canProcess = false
-            delete phase.predecessor
-            i -= 1
-          }
-          if (canProcess && done[preIndex]) {
-            phase.scheduledStartDate = phases[preIndex].scheduledEndDate
-            phase.scheduledEndDate = moment(phase.scheduledStartDate).add(phase.duration || 0, 'seconds').toDate()
-            phase.actualStartDate = phase.scheduledStartDate
-            done[i] = true
-            doing = true
-          }
-        }
-      }
-    }
-  }
-  // validate that all dates are calculated
-  for (let i = 0; i < phases.length; i += 1) {
-    if (!done[i]) {
-      throw new Error(`Invalid phase predecessor: ${phases[i].predecessor}`)
-    }
-  }
-  phases.sort((a, b) => moment(a.scheduledStartDate).isAfter(b.scheduledStartDate))
-}
-
-/**
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to created
@@ -1023,7 +979,7 @@ async function createChallenge (currentUser, challenge, userToken) {
     }
   }
   if (challenge.phases && challenge.phases.length > 0) {
-    await helper.validatePhases(challenge.phases)
+    await phaseHelper.validatePhases(challenge.phases)
   }
   helper.ensureNoDuplicateOrNullElements(challenge.tags, 'tags')
   helper.ensureNoDuplicateOrNullElements(challenge.groups, 'groups')
@@ -1059,7 +1015,7 @@ async function createChallenge (currentUser, challenge, userToken) {
     if (!challenge.phases) {
       challenge.phases = []
     }
-    await populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
+    await phaseHelper.populatePhases(challenge.phases, challenge.startDate, challenge.timelineTemplateId)
   }
 
   // populate challenge terms
@@ -1188,7 +1144,11 @@ createChallenge.schema = {
     timelineTemplateId: Joi.string(), // Joi.optionalId(),
     phases: Joi.array().items(Joi.object().keys({
       phaseId: Joi.id(),
-      duration: Joi.number().integer().min(0)
+      duration: Joi.number().integer().min(0),
+      constraints: Joi.object().keys({
+        name: Joi.string(),
+        value: Joi.number().integer().min(0)
+      }).optional()
     })),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
@@ -1249,7 +1209,6 @@ async function getPhasesAndPopulate (data) {
  * @returns {Object} the challenge with given id
  */
 async function getChallenge (currentUser, id, checkIfExists) {
-  const span = await logger.startSpan('ChallengeService.getChallenge')
   // get challenge from Elasticsearch
   let challenge
   // logger.warn(JSON.stringify({
@@ -1276,7 +1235,6 @@ async function getChallenge (currentUser, id, checkIfExists) {
   if (checkIfExists) {
     return _.pick(challenge, ['id', 'legacyId'])
   }
-
   await helper.ensureUserCanViewChallenge(currentUser, challenge)
 
   // // FIXME: Temporarily hard coded as the migrad
@@ -1294,13 +1252,16 @@ async function getChallenge (currentUser, id, checkIfExists) {
   // delete challenge.typeId
 
   // Remove privateDescription for unregistered users
-  let memberChallengeIds
   if (currentUser) {
     if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
       _.unset(challenge, 'billing')
-      memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
-      if (!_.includes(memberChallengeIds, challenge.id)) {
+      if (_.isEmpty(challenge.privateDescription)) {
         _.unset(challenge, 'privateDescription')
+      } else if (!_.get(challenge, 'task.isTask', false) || !_.get(challenge, 'task.isAssigned', false)) {
+        const memberResources = await helper.listResourcesByMemberAndChallenge(currentUser.userId, challenge.id)
+        if (_.isEmpty(memberResources)) {
+          _.unset(challenge, 'privateDescription')
+        }
       }
     }
   } else {
@@ -1687,6 +1648,10 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   if (data.phases || data.startDate) {
+    if (challenge.status === constants.challengeStatuses.Completed || challenge.status.indexOf(constants.challengeStatuses.Cancelled) > -1) {
+      throw new BadRequestError(`Challenge phase/start date can not be modified for Completed or Cancelled challenges.`)
+    }
+
     if (data.phases && data.phases.length > 0) {
       for (let i = 0; i < challenge.phases.length; i += 1) {
         const updatedPhaseInfo = _.find(data.phases, p => p.phaseId === challenge.phases[i].phaseId)
@@ -1702,10 +1667,10 @@ async function update (currentUser, challengeId, data, isFull) {
     const newPhases = _.cloneDeep(challenge.phases) || []
     const newStartDate = data.startDate || challenge.startDate
 
-    await helper.validatePhases(newPhases)
+    await phaseHelper.validatePhases(newPhases)
     // populate phases
 
-    await populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
+    await phaseHelper.populatePhases(newPhases, newStartDate, data.timelineTemplateId || challenge.timelineTemplateId)
     data.phases = newPhases
     challenge.phases = newPhases
     data.startDate = newStartDate
@@ -1727,8 +1692,51 @@ async function update (currentUser, challengeId, data, isFull) {
     await validateWinners(data.winners, challengeId)
   }
 
+  // Only m2m tokens are allowed to modify the `task.*` information on a challenge
+  if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
+    if (!_.isUndefined(_.get(challenge, 'task'))) {
+      logger.info(`User ${currentUser.handle || currentUser.sub} is not allowed to modify the task information on challenge ${challengeId}`)
+      data.task = challenge.task
+      logger.info(`Task information on challenge ${challengeId} is reset to ${JSON.stringify(challenge.task)}. Original data: ${JSON.stringify(data.task)}`)
+    } else {
+      delete data.task
+    }
+  }
+
+  // task.memberId goes out of sync due to another processor setting "task.memberId" but subsequent immediate update to the task
+  // will not have the memberId set. So we need to set it using winners to ensure it is always in sync. The proper fix is to correct
+  // the sync issue in the processor. However this is quick fix that works since winner.userId is task.memberId.
+  if (_.get(challenge, 'legacy.pureV5Task') && !_.isUndefined(data.winners)) {
+    const winnerMemberId = _.get(data.winners, '[0].userId')
+    logger.info(`Setting task.memberId to ${winnerMemberId} for challenge ${challengeId}. Task ${_.get(data, 'task')} - ${_.get(challenge, 'task')}`)
+
+    if (winnerMemberId != null && _.get(data, 'task.memberId') !== winnerMemberId) {
+      logger.info(`Task ${challengeId} has a winner ${winnerMemberId}`)
+      data.task = {
+        isTask: true,
+        isAssigned: true,
+        memberId: winnerMemberId
+      }
+      logger.warn(`task.memberId mismatched with winner memberId. task.memberId is updated to ${winnerMemberId}`)
+    } else {
+      logger.info(`task ${challengeId} has no winner set yet.`)
+    }
+  } else {
+    logger.info(`${challengeId} is not a pureV5 challenge or has no winners set yet.`)
+  }
+
   data.updated = moment().utc()
   data.updatedBy = currentUser.handle || currentUser.sub
+  const finalMetadata = [...challenge.metadata || []]
+  _.each(data.metadata || [], (rec) => {
+    const existingMeta = _.findIndex(finalMetadata, m => m.name === rec.name)
+    if (existingMeta > -1) {
+      finalMetadata[existingMeta].value = rec.value
+    } else {
+      finalMetadata.push(rec)
+    }
+  })
+  data.metadata = finalMetadata
   const updateDetails = {}
   const auditLogs = []
   let phasesHaveBeenModified = false
@@ -1786,6 +1794,9 @@ async function update (currentUser, challengeId, data, isFull) {
       // make sure that's always being udpated
       op = '$PUT'
     } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
+      op = '$PUT'
+    } else if (_.get(challenge, 'legacy.pureV5Task') && key === 'task') {
+      // always update task for pureV5 challenges
       op = '$PUT'
     }
 
@@ -1925,15 +1936,6 @@ async function update (currentUser, challengeId, data, isFull) {
   }
 
   const { track, type } = await validateChallengeData(_.pick(challenge, ['trackId', 'typeId']))
-
-  // Only m2m tokens are allowed to modify the `task.*` information on a challenge
-  if (!_.isUndefined(_.get(data, 'task')) && !currentUser.isMachine) {
-    if (!_.isUndefined(_.get(challenge, 'task'))) {
-      data.task = challenge.task
-    } else {
-      delete data.task
-    }
-  }
 
   if (_.get(type, 'isTask')) {
     if (!_.isEmpty(_.get(data, 'task.memberId'))) {
@@ -2149,7 +2151,7 @@ function sanitizeChallenge (challenge) {
     sanitized.metadata = _.map(challenge.metadata, meta => _.pick(meta, ['name', 'value']))
   }
   if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate']))
+    sanitized.phases = _.map(challenge.phases, phase => _.pick(phase, ['phaseId', 'duration', 'isOpen', 'actualEndDate', 'scheduledStartDate', 'constraints']))
   }
   if (challenge.prizeSets) {
     sanitized.prizeSets = _.map(challenge.prizeSets, prizeSet => ({
@@ -2235,7 +2237,12 @@ fullyUpdateChallenge.schema = {
       phaseId: Joi.id(),
       duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean(),
-      actualEndDate: Joi.date().allow(null)
+      actualEndDate: Joi.date().allow(null),
+      scheduledStartDate: Joi.date().allow(null),
+      constraints: Joi.array().items(Joi.object().keys({
+        name: Joi.string(),
+        value: Joi.number().integer().min(0)
+      }).optional()).optional()
     }).unknown(true)),
     prizeSets: Joi.array().items(Joi.object().keys({
       type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
@@ -2345,7 +2352,12 @@ partiallyUpdateChallenge.schema = {
       phaseId: Joi.id(),
       duration: Joi.number().integer().min(0),
       isOpen: Joi.boolean(),
-      actualEndDate: Joi.date().allow(null)
+      actualEndDate: Joi.date().allow(null),
+      scheduledStartDate: Joi.date().allow(null),
+      constraints: Joi.array().items(Joi.object().keys({
+        name: Joi.string(),
+        value: Joi.number().integer().min(0)
+      }).optional()).optional()
     }).unknown(true)).min(1),
     events: Joi.array().items(Joi.object().keys({
       id: Joi.number().required(),
