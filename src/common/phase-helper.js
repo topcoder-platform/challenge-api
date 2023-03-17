@@ -159,6 +159,8 @@ class ChallengePhaseHelper {
         p.isOpen = false;
       }
     }
+
+    console.log('Phases', JSON.stringify(phases, null, 2));
   }
 
   async validatePhases(phases) {
