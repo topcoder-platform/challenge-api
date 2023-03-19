@@ -916,6 +916,33 @@ async function listChallengesByMember(memberId) {
 }
 
 /**
+ * Lists resources that given member has in the given challenge.
+ * @param {Number} memberId the member id
+ * @param {String} id the challenge id
+ * @returns {Promise<Array>} an array of resources.
+ */
+async function listResourcesByMemberAndChallenge(memberId, challengeId) {
+  const token = await getM2MToken();
+  let response = {};
+  try {
+    response = await axios.get(config.RESOURCES_API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        memberId,
+        challengeId,
+      },
+    });
+  } catch (e) {
+    logger.debug(
+      `Failed to get resources on challenge ${challengeId} that memberId ${memberId} has`,
+      e
+    );
+  }
+  const result = response.data || [];
+  return result;
+}
+
+/**
  * Check if ES refresh method is valid.
  *
  * @param {String} method method to be tested
@@ -1041,20 +1068,17 @@ async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
  * @param {Object} challenge the challenge to check
  */
 async function _ensureAccessibleForTaskChallenge(currentUser, challenge) {
-  let challengeResourceIds;
+  let memberResources;
   // Check if challenge is task and apply security rules
   if (_.get(challenge, "task.isTask", false) && _.get(challenge, "task.isAssigned", false)) {
     if (currentUser) {
       if (!currentUser.isMachine) {
-        const challengeResources = await getChallengeResources(challenge.id);
-        challengeResourceIds = _.map(challengeResources, (r) => _.toString(r.memberId));
+        memberResources = await listResourcesByMemberAndChallenge(currentUser.userId, challenge.id);
       }
     }
     const canAccesChallenge = _.isUndefined(currentUser)
       ? false
-      : currentUser.isMachine ||
-        hasAdminRole(currentUser) ||
-        _.includes(challengeResourceIds || [], _.toString(currentUser.userId));
+      : currentUser.isMachine || hasAdminRole(currentUser) || !_.isEmpty(memberResources);
     if (!canAccesChallenge) {
       throw new errors.ForbiddenError(`You don't have access to view this challenge`);
     }
@@ -1295,6 +1319,7 @@ module.exports = {
   getESClient,
   calculateChallengeEndDate,
   listChallengesByMember,
+  listResourcesByMemberAndChallenge,
   validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
