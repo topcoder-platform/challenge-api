@@ -126,7 +126,7 @@ async function fullyUpdateChallengeTrack(id, data) {
       criteria: getScanCriteria({ name: data.name }),
     });
     if (existingByName.length > 0)
-      throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`);
+      throw new errors.ConflictError(`Challenge Track with name ${data.name} already exists`);
   }
   if (type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
     const { items: existingByAbbr } = await challengeTrackDomain.scan({
@@ -183,7 +183,7 @@ async function partiallyUpdateChallengeTrack(id, data) {
       criteria: getScanCriteria({ name: data.name }),
     });
     if (existingByName.length > 0)
-      throw new errors.ConflictError(`Challenge Type with name ${data.name} already exists`);
+      throw new errors.ConflictError(`Challenge Track with name ${data.name} already exists`);
   }
   if (data.abbreviation && type.abbreviation.toLowerCase() !== data.abbreviation.toLowerCase()) {
     const { items: existingByAbbr } = await challengeTrackDomain.scan({
