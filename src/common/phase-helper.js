@@ -158,6 +158,10 @@ class ChallengePhaseHelper {
         delete p.actualEndDate;
         p.isOpen = false;
       }
+
+      if (p.constraints == null) {
+        p.constraints = [];
+      }
     }
 
     console.log("Phases", JSON.stringify(phases, null, 2));

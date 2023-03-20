@@ -1197,11 +1197,12 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.metadata == null) challenge.metadata = [];
   if (challenge.groups == null) challenge.groups = [];
   if (challenge.tags == null) challenge.tags = [];
-
   if (challenge.startDate != null) challenge.startDate = challenge.startDate.getTime();
   if (challenge.endDate != null) challenge.endDate = challenge.endDate.getTime();
 
   const ret = await challengeDomain.create(challenge);
+
+  console.log("Created Challenge", JSON.stringify(ret, null, 2));
 
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
