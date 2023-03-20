@@ -1234,6 +1234,15 @@ async function createChallenge(currentUser, challenge, userToken) {
     ret.type = type.name;
   }
 
+  ret.metadata = ret.metadata.map((m) => {
+    try {
+      m.value = JSON.parse(m.value);
+    } catch (err) {
+      // do nothing
+    }
+    return m;
+  });
+
   // Create in ES
   await esClient.create({
     index: config.get("ES.ES_INDEX"),
