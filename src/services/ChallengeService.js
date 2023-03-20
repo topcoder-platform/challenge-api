@@ -1236,7 +1236,7 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   ret.metadata = ret.metadata.map((m) => {
     try {
-      m.value = JSON.parse(m.value);
+      m.value = JSON.stringify(JSON.parse(m.value)); // when we update how we index data, make this a JSON field
     } catch (err) {
       // do nothing
     }
