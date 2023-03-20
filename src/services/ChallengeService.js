@@ -2276,7 +2276,7 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   try {
-    await challengeDomain.update({
+    const { items } = await challengeDomain.update({
       filterCriteria: getScanCriteria({
         id: challengeId,
       }),
@@ -2284,6 +2284,11 @@ async function update(currentUser, challengeId, data, isFull) {
         ...challenge,
       },
     });
+    if (items.length > 0) {
+      if (!challenge.legacyId) {
+        challenge.legacyId = items[0].legacyId;
+      }
+    }
   } catch (e) {
     throw e;
   }
