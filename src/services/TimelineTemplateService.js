@@ -145,6 +145,8 @@ async function update(timelineTemplateId, data, isFull) {
   if (isFull) {
     // description is optional field, can be undefined
     timelineTemplate.description = data.description;
+  } else {
+    data = { ...timelineTemplate, ...data };
   }
 
   const { items } = await timelineTemplateDomain.update({
