@@ -31,6 +31,44 @@ class ChallengeHelper {
 
     return { type: challengeType, track: challengeTrack };
   }
+
+  /**
+   * Ensure project exist
+   * @param {String} projectId the project id
+   * @param {String} currentUser the user
+   */
+  async ensureProjectExist(projectId, currentUser) {
+    let token = await getM2MToken();
+    const url = `${config.PROJECTS_API_URL}/${projectId}`;
+    try {
+      const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (currentUser.isMachine || hasAdminRole(currentUser)) {
+        return res.data;
+      }
+      if (
+        _.get(res, "data.type") === "self-service" &&
+        _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase())
+      ) {
+        return res.data;
+      }
+      if (
+        !_.find(
+          _.get(res, "data.members", []),
+          (m) => _.toString(m.userId) === _.toString(currentUser.userId)
+        )
+      ) {
+        throw new errors.ForbiddenError(`You don't have access to project with ID: ${projectId}`);
+      }
+      return res.data;
+    } catch (err) {
+      if (_.get(err, "response.status") === HttpStatus.NOT_FOUND) {
+        throw new errors.BadRequestError(`Project with id: ${projectId} doesn't exist`);
+      } else {
+        // re-throw other error
+        throw err;
+      }
+    }
+  }
 }
 
 module.exports = new ChallengeHelper();

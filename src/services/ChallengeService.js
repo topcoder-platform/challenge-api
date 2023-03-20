@@ -1619,7 +1619,7 @@ async function update(currentUser, challengeId, data, isFull) {
     _.set(data, "legacy.reviewType", _.toUpper(_.get(data, "legacy.reviewType")));
   }
   if (data.projectId) {
-    await helper.ensureProjectExist(data.projectId, currentUser);
+    await challengeHelper.ensureProjectExist(data.projectId, currentUser);
   }
 
   helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
