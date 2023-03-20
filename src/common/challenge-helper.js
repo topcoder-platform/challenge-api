@@ -2,6 +2,10 @@ const challengeTypeService = require("../services/ChallengeTypeService");
 const challengeTrackService = require("../services/ChallengeTrackService");
 const timelineTemplateService = require("../services/TimelineTemplateService");
 const errors = require("./errors");
+const config = require("config");
+const axios = require("axios");
+const { getM2MToken } = require("./m2m-helper");
+const { hasAdminRole } = require("./role-helper");
 
 class ChallengeHelper {
   /**
