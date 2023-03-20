@@ -24,7 +24,7 @@ class ChallengeHelper {
 
       if (!template.isActive) {
         throw new errors.BadRequestError(
-          `The timeline template with id: ${challenge.timelineTemplateId} is inactive`
+          `The timeline template with id: ${timelineTemplateId} is inactive`
         );
       }
     }
