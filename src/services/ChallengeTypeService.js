@@ -33,7 +33,6 @@ async function searchChallengeTypes(criteria) {
   const perPage = criteria.perPage || 50;
 
   const cacheKey = `ChallengeType_${page}_${perPage}_${JSON.stringify(criteria)}`;
-  console.log("cache-key", cacheKey);
 
   // TODO - move this to ES
   let records = helper.getFromInternalCache(cacheKey);
