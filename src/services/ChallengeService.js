@@ -1453,7 +1453,7 @@ async function getChallenge(currentUser, id, checkIfExists) {
 
   // Remove privateDescription for unregistered users
   if (currentUser) {
-    if (!currentUser.isMachine && !helper.hasAdminRole(currentUser)) {
+    if (!currentUser.isMachine && !hasAdminRole(currentUser)) {
       _.unset(challenge, "billing");
       if (_.isEmpty(challenge.privateDescription)) {
         _.unset(challenge, "privateDescription");
