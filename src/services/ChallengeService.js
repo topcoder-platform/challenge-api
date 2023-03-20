@@ -1318,11 +1318,15 @@ createChallenge.schema = {
         Joi.object().keys({
           phaseId: Joi.id(),
           duration: Joi.number().integer().min(0),
-          constraints: Joi.object()
-            .keys({
-              name: Joi.string(),
-              value: Joi.number().integer().min(0),
-            })
+          constraints: Joi.array()
+            .items(
+              Joi.object()
+                .keys({
+                  name: Joi.string(),
+                  value: Joi.number().integer().min(0),
+                })
+                .optional()
+            )
             .optional(),
         })
       ),
