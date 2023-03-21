@@ -80,7 +80,7 @@ workflows:
         filters:
           branches:
             only:
-            - dev
+            - refactor/domain-challenge-dev
 
     - "build-qa":
         context: org-global
