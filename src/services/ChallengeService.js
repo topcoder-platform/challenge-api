@@ -237,7 +237,7 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
       },
     };
   }
-  const ids = _.map(docs.hits, (item) => item._source.id);
+  const ids = _.map(docs.hits.hits, (item) => item._source.id);
   const result = [];
   for (const id of ids) {
     try {
@@ -932,7 +932,7 @@ async function searchChallenges(currentUser, criteria) {
   }
   // Extract data from hits
   const total = docs.hits.total;
-  let result = _.map(docs.hits, (item) => item._source);
+  let result = _.map(docs.hits.hits, (item) => item._source);
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
