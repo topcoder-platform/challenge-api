@@ -56,6 +56,8 @@ searchChallengeTimelineTemplates.schema = {
     trackId: Joi.optionalId(),
     timelineTemplateId: Joi.optionalId(),
     isDefault: Joi.boolean(),
+    page: Joi.page(),
+    perPage: Joi.perPage(),
   }),
 };
 
