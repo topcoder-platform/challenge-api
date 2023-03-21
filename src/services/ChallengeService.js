@@ -32,7 +32,7 @@ const challengeHelper = require("../common/challenge-helper");
 
 const esClient = helper.getESClient();
 
-const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+const { ChallengeDomain, Challenge } = require("@topcoder-framework/domain-challenge");
 const { hasAdminRole } = require("../common/role-helper");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
@@ -1933,7 +1933,7 @@ async function update(currentUser, challengeId, data, isFull) {
     challenge.phases = [];
   }
 
-  if (data.prizeSets) {
+  if (data.prizeSets && data.prizeSets.length > 0) {
     if (
       isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) &&
       finalStatus === constants.challengeStatuses.Completed
