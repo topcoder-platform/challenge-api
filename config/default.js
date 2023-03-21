@@ -42,7 +42,9 @@ module.exports = {
     // above AWS_REGION is used if we use AWS ES
     HOST: process.env.ES_HOST || "localhost:9200",
     API_VERSION: process.env.ES_API_VERSION || "6.8",
+    OPENSEARCH: process.env.OPENSEARCH || "false",
     ES_INDEX: process.env.ES_INDEX || "challenge",
+    ES_TYPE: process.env.ES_TYPE || "_doc",
     ES_REFRESH: process.env.ES_REFRESH || "true",
     TEMP_REINDEXING: process.env.TEMP_REINDEXING || true, // if true, it won't delete the existing index when reindexing data
   },

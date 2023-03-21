@@ -52,6 +52,7 @@
     "cors": "^2.7.1",
     "dotenv": "^8.2.0",
     "dynamoose": "^1.11.1",
+    "elasticsearch": "^16.7.3",
     "express": "^4.15.4",
     "express-fileupload": "^1.1.6",
     "express-interceptor": "^1.2.0",

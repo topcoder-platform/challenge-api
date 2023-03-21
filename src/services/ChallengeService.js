@@ -237,7 +237,7 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
       },
     };
   }
-  const ids = _.map(docs.hits.hits, (item) => item._source.id);
+  const ids = _.map(docs.hits, (item) => item._source.id);
   const result = [];
   for (const id of ids) {
     try {
@@ -916,7 +916,10 @@ async function searchChallenges(currentUser, criteria) {
   // Search with constructed query
   let docs;
   try {
-    docs = (await esClient.search(esQuery)).body;
+    docs =
+      config.get("ES.OPENSEARCH") == "false"
+        ? await esClient.search(esQuery)
+        : (await esClient.search(esQuery)).body;
   } catch (e) {
     // Catch error when the ES is fresh and has no data
     logger.error(`Query Error from ES ${JSON.stringify(e, null, 4)}`);
@@ -929,7 +932,7 @@ async function searchChallenges(currentUser, criteria) {
   }
   // Extract data from hits
   const total = docs.hits.total;
-  let result = _.map(docs.hits.hits, (item) => item._source);
+  let result = _.map(docs.hits, (item) => item._source);
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
@@ -1247,6 +1250,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   // Create in ES
   await esClient.create({
     index: config.get("ES.ES_INDEX"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
     refresh: config.get("ES.ES_REFRESH"),
     id: ret.id,
     body: ret,
@@ -1422,6 +1426,7 @@ async function getChallenge(currentUser, id, checkIfExists) {
     challenge = (
       await esClient.getSource({
         index: config.get("ES.ES_INDEX"),
+        type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
         id,
       })
     ).body;
@@ -2276,7 +2281,9 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   try {
-    logger.debug(`ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(challenge)}`)
+    logger.debug(
+      `ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(challenge)}`
+    );
     const { items } = await challengeDomain.update({
       filterCriteria: getScanCriteria({
         id: challengeId,
@@ -2331,6 +2338,7 @@ async function update(currentUser, challengeId, data, isFull) {
   // Update ES
   await esClient.update({
     index: config.get("ES.ES_INDEX"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
     refresh: config.get("ES.ES_REFRESH"),
     id: challengeId,
     body: {

@@ -19,6 +19,7 @@ const xss = require("xss");
 const logger = require("./logger");
 
 const { Client: ESClient } = require("@opensearch-project/opensearch");
+const elasticsearch = require("elasticsearch");
 
 const projectHelper = require("./project-helper");
 const m2mHelper = require("./m2m-helper");
@@ -838,12 +839,31 @@ function getESClient() {
   }
   const esHost = config.get("ES.HOST");
 
-  esClient = new ESClient({
-    node: esHost,
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  });
+  if (config.get("ES.OPENSEARCH") == "false") {
+    if (/.*amazonaws.*/.test(esHost)) {
+      esClient = elasticsearch.Client({
+        apiVersion: config.get("ES.API_VERSION"),
+        hosts: esHost,
+        connectionClass: require("http-aws-es"), // eslint-disable-line global-require
+        amazonES: {
+          region: config.get("AMAZON.AWS_REGION"),
+          credentials: new AWS.EnvironmentCredentials("AWS"),
+        },
+      });
+    } else {
+      esClient = new elasticsearch.Client({
+        apiVersion: config.get("ES.API_VERSION"),
+        hosts: esHost,
+      });
+    }
+  } else {
+    esClient = new ESClient({
+      node: esHost,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
+  }
 
   return esClient;
 }
