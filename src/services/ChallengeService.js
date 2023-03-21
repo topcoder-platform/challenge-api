@@ -224,7 +224,7 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
       },
     },
   };
-
+  1493;
   logger.debug(`es Query ${JSON.stringify(esQuery)}`);
   let docs;
   try {
@@ -1423,13 +1423,20 @@ async function getChallenge(currentUser, id, checkIfExists) {
   //   _id: id
   // }))
   try {
-    challenge = (
-      await esClient.getSource({
+    if (config.get("ES.OPENSEARCH") == "true") {
+      challenge = (
+        await esClient.getSource({
+          index: config.get("ES.ES_INDEX"),
+          id,
+        })
+      ).body;
+    } else {
+      challenge = await esClient.getSource({
         index: config.get("ES.ES_INDEX"),
-        type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+        type: config.get("ES.ES_TYPE"),
         id,
-      })
-    ).body;
+      });
+    }
   } catch (e) {
     if (e.statusCode === HttpStatus.NOT_FOUND) {
       throw new errors.NotFoundError(`Challenge of id ${id} is not found.`);
