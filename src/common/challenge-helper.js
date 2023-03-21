@@ -5,6 +5,7 @@ const HttpStatus = require("http-status-codes");
 const _ = require("lodash");
 const errors = require("./errors");
 const config = require("config");
+const helper = require("./helper");
 const axios = require("axios");
 const { getM2MToken } = require("./m2m-helper");
 const { hasAdminRole } = require("./role-helper");
@@ -74,6 +75,27 @@ class ChallengeHelper {
         throw err;
       }
     }
+  }
+
+  async validateCreateChallengeRequest(currentUser, challenge) {
+    // projectId is required for non self-service challenges
+    if (challenge.legacy.selfService == null && challenge.projectId == null) {
+      throw new errors.BadRequestError("projectId is required for non self-service challenges.");
+    }
+
+    if (challenge.status === constants.challengeStatuses.Active) {
+      throw new errors.BadRequestError(
+        "You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active."
+      );
+    }
+
+    helper.ensureNoDuplicateOrNullElements(challenge.tags, "tags");
+    helper.ensureNoDuplicateOrNullElements(challenge.groups, "groups");
+    // helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
+    // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
+
+    // check groups authorization
+    await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
   }
 }
 

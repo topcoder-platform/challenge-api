@@ -32,7 +32,7 @@ const challengeHelper = require("../common/challenge-helper");
 
 const esClient = helper.getESClient();
 
-const { ChallengeDomain, Challenge } = require("@topcoder-framework/domain-challenge");
+const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 const { hasAdminRole } = require("../common/role-helper");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
@@ -980,7 +980,6 @@ async function searchChallenges(currentUser, criteria) {
 
   return { total, page, perPage, result };
 }
-
 searchChallenges.schema = {
   currentUser: Joi.any(),
   criteria: Joi.object()
@@ -1051,27 +1050,6 @@ searchChallenges.schema = {
     .unknown(true),
 };
 
-async function validateCreateChallengeRequest(currentUser, challenge) {
-  // projectId is required for non self-service challenges
-  if (challenge.legacy.selfService == null && challenge.projectId == null) {
-    throw new errors.BadRequestError("projectId is required for non self-service challenges.");
-  }
-
-  if (challenge.status === constants.challengeStatuses.Active) {
-    throw new errors.BadRequestError(
-      "You cannot create an Active challenge. Please create a Draft challenge and then change the status to Active."
-    );
-  }
-
-  helper.ensureNoDuplicateOrNullElements(challenge.tags, "tags");
-  helper.ensureNoDuplicateOrNullElements(challenge.groups, "groups");
-  // helper.ensureNoDuplicateOrNullElements(challenge.terms, 'terms')
-  // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
-
-  // check groups authorization
-  await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
-}
-
 /**
  * Create challenge.
  * @param {Object} currentUser the user who perform operation
@@ -1125,7 +1103,9 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   if (!challenge.startDate) {
     challenge.startDate = new Date();
-  } else challenge.startDate = new Date(challenge.startDate);
+  } else {
+    challenge.startDate = new Date(challenge.startDate);
+  }
 
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
 
@@ -1164,10 +1144,8 @@ async function createChallenge(currentUser, challenge, userToken) {
     } else {
       throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`);
     }
-  }
-
-  if (challenge.timelineTemplateId) {
-    if (!challenge.phases) {
+  } else {
+    if (challenge.phases == null) {
       challenge.phases = [];
     }
 
@@ -1202,10 +1180,12 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.tags == null) challenge.tags = [];
   if (challenge.startDate != null) challenge.startDate = challenge.startDate.getTime();
   if (challenge.endDate != null) challenge.endDate = challenge.endDate.getTime();
+  if (challenge.discussions == null) challenge.discussions = [];
 
-  const ret = await challengeDomain.create(challenge);
-
-  console.log("Created Challenge", JSON.stringify(ret, null, 2));
+  const ret = await challengeDomain.create(challenge, {
+    handle: currentUser.handle,
+    userId: currentUser.userId,
+  });
 
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
@@ -1229,6 +1209,11 @@ async function createChallenge(currentUser, challenge, userToken) {
       ret.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate;
     }
   }
+
+  ret.created = new Date(ret.created).toISOString();
+  ret.updated = new Date(ret.updated).toISOString();
+  ret.startDate = new Date(ret.startDate).toISOString();
+  ret.endDate = new Date(ret.endDate).toISOString();
 
   if (track) {
     ret.track = track.name;
@@ -1258,22 +1243,15 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
-
-  /** Disable Creating Resources locally (because challenge is not being indexed in ES and will result in challenge NOT FOUND error)
   if (challenge.legacy.selfService) {
     if (currentUser.handle) {
       await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
     }
   } else {
-    // if created by a user, add user as a manager, but only if *not* a self-service challenge
     if (currentUser.handle) {
-      // logger.debug(`Adding user as manager ${currentUser.handle}`)
       await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
-    } else {
-      // logger.debug(`Not adding manager ${currentUser.sub} ${JSON.stringify(currentUser)}`)
     }
   }
-  */
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
@@ -1547,7 +1525,6 @@ async function getChallengeStatistics(currentUser, id) {
   }
   return _.map(_.keys(map), (userId) => map[userId]);
 }
-
 getChallengeStatistics.schema = {
   currentUser: Joi.any(),
   id: Joi.id(),
@@ -1622,11 +1599,13 @@ async function validateWinners(winners, challengeId) {
  */
 async function update(currentUser, challengeId, data, isFull) {
   const cancelReason = _.cloneDeep(data.cancelReason);
+  delete data.cancelReason;
+
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
   let sendCompletedEmail = false;
   let sendRejectedEmail = false;
-  delete data.cancelReason;
+
   if (!_.isUndefined(_.get(data, "legacy.reviewType"))) {
     _.set(data, "legacy.reviewType", _.toUpper(_.get(data, "legacy.reviewType")));
   }
@@ -1639,7 +1618,9 @@ async function update(currentUser, challengeId, data, isFull) {
   // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
 
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
   let dynamicDescription = _.cloneDeep(data.description || challenge.description);
+
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
       const regexp = new RegExp(`{{${entry.name}}}`, "g");

@@ -163,8 +163,6 @@ class ChallengePhaseHelper {
         p.constraints = [];
       }
     }
-
-    console.log("Phases", JSON.stringify(phases, null, 2));
   }
 
   async validatePhases(phases) {
