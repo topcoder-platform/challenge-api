@@ -2276,6 +2276,7 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   try {
+    logger.debug(`ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(challenge)}`)
     const { items } = await challengeDomain.update({
       filterCriteria: getScanCriteria({
         id: challengeId,
