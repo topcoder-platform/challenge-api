@@ -30,6 +30,8 @@ const phaseHelper = require("../common/phase-helper");
 const projectHelper = require("../common/project-helper");
 const challengeHelper = require("../common/challenge-helper");
 
+const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
+
 const esClient = helper.getESClient();
 
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
@@ -1187,10 +1189,12 @@ async function createChallenge(currentUser, challenge, userToken) {
     value: typeof m.value === "string" ? m.value : JSON.stringify(m.value),
   }));
 
-  const ret = await challengeDomain.create(challenge, {
-    handle: currentUser.handle,
-    userId: currentUser.userId,
-  });
+  const grpcMetadata = new GrpcMetadata();
+
+  grpcMetadata.set("handle", currentUser.handle);
+  grpcMetadata.set("userId", currentUser.userId);
+
+  const ret = await challengeDomain.create(challenge, grpcMetadata);
 
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
@@ -1238,25 +1242,26 @@ async function createChallenge(currentUser, challenge, userToken) {
   });
 
   // Create in ES
-  await esClient.create({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: ret.id,
-    body: ret,
-  });
+  // await esClient.create({
+  //   index: config.get("ES.ES_INDEX"),
+  //   type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+  //   refresh: config.get("ES.ES_REFRESH"),
+  //   id: ret.id,
+  //   body: ret,
+  // });
 
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
-  if (challenge.legacy.selfService) {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
-    }
-  } else {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
-    }
-  }
+
+  // if (challenge.legacy.selfService) {
+  //   if (currentUser.handle) {
+  //     await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
+  //   }
+  // } else {
+  //   if (currentUser.handle) {
+  //     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+  //   }
+  // }
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);

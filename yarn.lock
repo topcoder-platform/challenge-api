@@ -125,7 +125,7 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@grpc/grpc-js@^1.8.0":
+"@grpc/grpc-js@^1.8.0", "@grpc/grpc-js@^1.8.12":
   version "1.8.12"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.12.tgz#bc0120859e8b153db764b473cc019ddf6bb2b414"
   integrity sha512-MbUMvpVvakeKhdYux6gbSIPJaFMLNSY8jw4PqLI+FFztGrQRrYYAnHlR94+ncBQQewkpXQaW449m3tpH/B/ZnQ==

@@ -40,6 +40,7 @@
     "prettier": "^2.8.1"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.8.12",
     "@opensearch-project/opensearch": "^2.2.0",
     "@topcoder-framework/domain-challenge": "^0.7.3",
     "@topcoder-framework/lib-common": "^0.7.3",
