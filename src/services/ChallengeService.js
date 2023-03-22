@@ -1971,6 +1971,7 @@ async function update(currentUser, challengeId, data, isFull) {
       newPhases = await phaseHelper.populatePhasesForChallengeUpdate(
         challenge.phases,
         data.phases,
+        challenge.timelineTemplateId,
         isChallengeBeingActivated
       );
     }

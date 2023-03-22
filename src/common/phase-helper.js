@@ -214,7 +214,12 @@ class ChallengePhaseHelper {
     return finalPhases;
   }
 
-  async populatePhasesForChallengeUpdate(challengePhases, newPhases, isBeingActivated) {
+  async populatePhasesForChallengeUpdate(
+    challengePhases,
+    newPhases,
+    timelineTemplateId,
+    isBeingActivated
+  ) {
     const { timelineTempate, timelineTemplateMap } = await this.getTemplateAndTemplateMap(
       timelineTemplateId
     );
