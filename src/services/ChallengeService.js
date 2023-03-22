@@ -1182,6 +1182,11 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.endDate != null) challenge.endDate = challenge.endDate.getTime();
   if (challenge.discussions == null) challenge.discussions = [];
 
+  challenge.metadata = challenge.metadata.map((m) => ({
+    name: m.name,
+    value: typeof m.value === "string" ? m.value : JSON.stringify(m.value),
+  }));
+
   const ret = await challengeDomain.create(challenge, {
     handle: currentUser.handle,
     userId: currentUser.userId,
