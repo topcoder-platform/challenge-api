@@ -160,6 +160,125 @@ class ChallengePhaseHelper {
     }
   }
 
+  async populatePhasesForChallengeCreation(phases, startDate, timelineTemplateId) {
+    if (_.isUndefined(timelineTemplateId)) {
+      throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`);
+    }
+    const { timelineTempate } = await this.getTemplateAndTemplateMap(timelineTemplateId);
+    const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
+    const finalPhases = _.map(timelineTempate, (phaseFromTemplate) => {
+      const phaseDefinition = phaseDefinitionMap.get(phaseFromTemplate.phaseId);
+      const phaseFromInput = _.find(phases, (p) => p.phaseId === phaseFromTemplate.phaseId);
+      const phase = {
+        id: uuid(),
+        phaseId: phaseFromTemplate.phaseId,
+        name: phaseDefinition.name,
+        description: phaseDefinition.description,
+        duration: _.defaultTo(_.get(phaseFromInput, "duration"), phaseFromTemplate.defaultDuration),
+        isOpen: false,
+        predecessor: phaseFromTemplate.predecessor,
+        constraints: _.defaultTo(_.get(phaseFromInput, "constraints"), []),
+        scheduledStartDate: undefined,
+        scheduledEndDate: undefined,
+        actualStartDate: undefined,
+        actualEndDate: undefined,
+      };
+      if (_.isUndefined(phase.predecessor)) {
+        if (_.isUndefined(_.get(phaseFromInput, "scheduledStartDate"))) {
+          phase.scheduledStartDate = moment(startDate).toDate();
+        } else {
+          phase.scheduledStartDate = moment(_.get(phaseFromInput, "scheduledStartDate")).toDate();
+        }
+        phase.scheduledEndDate = moment(phase.scheduledStartDate)
+          .add(phase.duration, "seconds")
+          .toDate();
+      }
+      return phase;
+    });
+    for (let phase of finalPhases) {
+      if (_.isUndefined(phase.predecessor)) {
+        continue;
+      }
+      const precedecessorPhase = _.find(finalPhases, {
+        phaseId: phase.predecessor,
+      });
+      if (phase.name === "Iterative Review Phase") {
+        phase.scheduledStartDate = precedecessorPhase.scheduledStartDate;
+      } else {
+        phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
+      }
+      phase.scheduledEndDate = moment(phase.scheduledStartDate)
+        .add(phase.duration, "seconds")
+        .toDate();
+    }
+    return finalPhases;
+  }
+
+  async populatePhasesForChallengeUpdate(challengePhases, newPhases, isBeingActivated) {
+    const { timelineTempate, timelineTemplateMap } = await this.getTemplateAndTemplateMap(
+      timelineTemplateId
+    );
+    const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
+
+    const updatedPhases = _.map(challengePhases, (phase) => {
+      const phaseFromTemplate = timelineTemplateMap.get(phase.phaseId);
+      const phaseDefinition = phaseDefinitionMap.get(phase.phaseId);
+      const updatedPhase = {
+        ...phase,
+        predecessor: phaseFromTemplate.predecessor,
+        description: phaseDefinition.description,
+      };
+      if (!_.isUndefined(phase.actualEndDate)) {
+        return updatedPhase;
+      }
+      if (phase.name === "Iterative Review Phase") {
+        return updatedPhase;
+      }
+      const newPhase = _.find(newPhases, (p) => p.phaseId === phase.phaseId);
+      if (_.isUndefined(newPhase) && !isBeingActivated) {
+        return updatedPhase;
+      }
+      phase.duration = _.defaultTo(_.get(newPhase, "duration"), phase.duration);
+      if (_.isUndefined(phase.predecessor)) {
+        if (
+          isBeingActivated &&
+          moment(
+            _.defaultTo(_.get(newPhase, "scheduledStartDate"), phase.scheduledStartDate)
+          ).isSameOrBefore(moment())
+        ) {
+          phase.isOpen = true;
+          phase.scheduledStartDate = moment().toDate();
+          phase.actualStartDate = phase.scheduledStartDate;
+        } else if (phase.isOpen === false && !_.isUndefined(newPhase.scheduledStartDate)) {
+          phase.scheduledStartDate = moment(newPhase.scheduledStartDate).toDate();
+        }
+        phase.scheduledEndDate = moment(phase.scheduledStartDate)
+          .add(phase.duration, "seconds")
+          .toDate();
+      }
+      if (!_.isUndefined(newPhase) && !_.isUndefined(newPhase.constraints)) {
+        phase.constraints = newPhase.constraints;
+      }
+      return updatedPhase;
+    });
+    for (let phase of updatedPhases) {
+      if (_.isUndefined(phase.predecessor)) {
+        continue;
+      }
+      if (phase.name === "Iterative Review Phase") {
+        continue;
+      }
+      const precedecessorPhase = _.find(updatedPhases, {
+        phaseId: phase.predecessor,
+      });
+      phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
+      phase.scheduledEndDate = moment(phase.scheduledStartDate)
+        .add(phase.duration, "seconds")
+        .toDate();
+    }
+    return updatedPhases;
+  }
+
   async validatePhases(phases) {
     if (!phases || phases.length === 0) {
       return;

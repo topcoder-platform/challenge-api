@@ -1146,17 +1146,12 @@ async function createChallenge(currentUser, challenge, userToken) {
     } else {
       throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`);
     }
-  } else {
-    if (challenge.phases == null) {
-      challenge.phases = [];
-    }
-
-    await phaseHelper.populatePhases(
-      challenge.phases,
-      challenge.startDate,
-      challenge.timelineTemplateId
-    );
   }
+  challenge.phases = await phaseHelper.populatePhasesForChallengeCreation(
+    challenge.phases,
+    challenge.startDate,
+    challenge.timelineTemplateId
+  );
 
   // populate challenge terms
   // const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
@@ -1708,6 +1703,7 @@ async function update(currentUser, challengeId, data, isFull) {
       });
     }
   }
+  let isChallengeBeingActivated = false;
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
       if (
@@ -1727,6 +1723,9 @@ async function update(currentUser, challengeId, data, isFull) {
         throw new errors.BadRequestError(
           "Cannot Activate this project, it has no active billing account."
         );
+      }
+      if (challenge.status === constants.challengeStatuses.Draft) {
+        isChallengeBeingActivated = true;
       }
     }
     if (
@@ -1910,6 +1909,7 @@ async function update(currentUser, challengeId, data, isFull) {
   // TODO: Fix this Tech Debt once legacy is turned off
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
+  const timelineTemplateChanged = false;
   if (!_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
     if (
       finalStatus !== constants.challengeStatuses.New &&
@@ -1922,6 +1922,7 @@ async function update(currentUser, challengeId, data, isFull) {
   } else if (finalTimelineTemplateId !== challenge.timelineTemplateId) {
     // make sure there are no previous phases if the timeline template has changed
     challenge.phases = [];
+    timelineTemplateChanged = true;
   }
 
   if (data.prizeSets && data.prizeSets.length > 0) {
@@ -1949,7 +1950,7 @@ async function update(currentUser, challengeId, data, isFull) {
     }
   }
 
-  if (data.phases || data.startDate) {
+  if (data.phases || data.startDate || timelineTemplateChanged) {
     if (
       challenge.status === constants.challengeStatuses.Completed ||
       challenge.status.indexOf(constants.challengeStatuses.Cancelled) > -1
@@ -1958,33 +1959,22 @@ async function update(currentUser, challengeId, data, isFull) {
         `Challenge phase/start date can not be modified for Completed or Cancelled challenges.`
       );
     }
-
-    if (data.phases && data.phases.length > 0) {
-      for (let i = 0; i < challenge.phases.length; i += 1) {
-        const updatedPhaseInfo = _.find(
-          data.phases,
-          (p) => p.phaseId === challenge.phases[i].phaseId
-        );
-        if (updatedPhaseInfo) {
-          _.extend(challenge.phases[i], updatedPhaseInfo);
-        }
-      }
-      if (challenge.phases.length === 0 && data.phases && data.phases.length > 0) {
-        challenge.phases = data.phases;
-      }
+    const newStartDate = data.startDate || challenge.startDate;
+    let newPhases;
+    if (timelineTemplateChanged) {
+      newPhases = await phaseHelper.populatePhasesForChallengeCreation(
+        data.phases,
+        newStartDate,
+        finalTimelineTemplateId
+      );
+    } else if (data.startDate || (data.phases && data.phases.length > 0)) {
+      newPhases = await phaseHelper.populatePhasesForChallengeUpdate(
+        challenge.phases,
+        data.phases,
+        isChallengeBeingActivated
+      );
     }
 
-    const newPhases = _.cloneDeep(challenge.phases) || [];
-    const newStartDate = data.startDate || challenge.startDate;
-
-    await PhaseService.validatePhases(newPhases);
-
-    // populate phases
-    await phaseHelper.populatePhases(
-      newPhases,
-      newStartDate,
-      data.timelineTemplateId || challenge.timelineTemplateId
-    );
     data.phases = newPhases;
     challenge.phases = newPhases;
     data.startDate = newStartDate;
