@@ -1058,7 +1058,7 @@ searchChallenges.schema = {
  * @returns {Object} the created challenge
  */
 async function createChallenge(currentUser, challenge, userToken) {
-  await validateCreateChallengeRequest(currentUser, challenge);
+  await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
 
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
@@ -2885,4 +2885,5 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
 };
+
 logger.buildService(module.exports);
