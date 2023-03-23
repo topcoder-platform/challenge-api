@@ -50,6 +50,7 @@ module.exports = (app) => {
               next(new errors.ForbiddenError("You are not allowed to perform this action!"));
             } else {
               req.authUser.handle = config.M2M_AUDIT_HANDLE;
+              req.authUser.userId = config.M2M_AUDIT_USERID;
               req.userToken = req.headers.authorization.split(" ")[1];
               next();
             }
