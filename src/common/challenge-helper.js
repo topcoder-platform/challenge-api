@@ -187,6 +187,59 @@ class ChallengeHelper {
       );
     }
   }
+
+  enrichChallengeForResponse(challenge) {
+    if (challenge.phases && challenge.phases.length > 0) {
+      const registrationPhase = _.find(challenge.phases, (p) => p.name === "Registration");
+      const submissionPhase = _.find(challenge.phases, (p) => p.name === "Submission");
+
+      challenge.currentPhase = challenge.phases
+        .slice()
+        .reverse()
+        .find((phase) => phase.isOpen);
+
+      challenge.currentPhaseNames = _.map(
+        _.filter(ret.phases, (p) => p.isOpen === true),
+        "name"
+      );
+
+      if (registrationPhase) {
+        challenge.registrationStartDate =
+          registrationPhase.actualStartDate || registrationPhase.scheduledStartDate;
+        challenge.registrationEndDate =
+          registrationPhase.actualEndDate || registrationPhase.scheduledEndDate;
+      }
+      if (submissionPhase) {
+        challenge.submissionStartDate =
+          submissionPhase.actualStartDate || submissionPhase.scheduledStartDate;
+
+        challenge.submissionEndDate =
+          submissionPhase.actualEndDate || submissionPhase.scheduledEndDate;
+      }
+    }
+
+    challenge.created = new Date(challenge.created).toISOString();
+    challenge.updated = new Date(challenge.updated).toISOString();
+    challenge.startDate = new Date(challenge.startDate).toISOString();
+    challenge.endDate = new Date(challenge.endDate).toISOString();
+
+    if (track) {
+      challenge.track = track.name;
+    }
+
+    if (type) {
+      challenge.type = type.name;
+    }
+
+    challenge.metadata = challenge.metadata.map((m) => {
+      try {
+        m.value = JSON.stringify(JSON.parse(m.value)); // when we update how we index data, make this a JSON field
+      } catch (err) {
+        // do nothing
+      }
+      return m;
+    });
+  }
 }
 
 module.exports = new ChallengeHelper();

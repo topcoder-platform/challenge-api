@@ -36,59 +36,12 @@ const esClient = helper.getESClient();
 
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 const { hasAdminRole } = require("../common/role-helper");
-const { ensureAcessibilityToModifiedGroups } = require("../common/group-helper");
-const { validateChallengeUpdateRequest } = require("../common/challenge-helper");
+const {
+  validateChallengeUpdateRequest,
+  enrichChallengeForResponse,
+} = require("../common/challenge-helper");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
-
-/**
- * Validate the challenge data.
- * @param {Object} challenge the challenge data
- */
-async function validateChallengeData(challenge) {
-  let type;
-  let track;
-  if (challenge.typeId) {
-    try {
-      type = await ChallengeTypeService.getChallengeType(challenge.typeId);
-    } catch (e) {
-      if (e.name === "NotFoundError") {
-        const error = new errors.BadRequestError(
-          `No challenge type found with id: ${challenge.typeId}.`
-        );
-        throw error;
-      } else {
-        throw e;
-      }
-    }
-  }
-  if (challenge.trackId) {
-    try {
-      track = await ChallengeTrackService.getChallengeTrack(challenge.trackId);
-    } catch (e) {
-      if (e.name === "NotFoundError") {
-        const error = new errors.BadRequestError(
-          `No challenge track found with id: ${challenge.trackId}.`
-        );
-        throw error;
-      } else {
-        throw e;
-      }
-    }
-  }
-  if (challenge.timelineTemplateId) {
-    const template = await TimelineTemplateService.getTimelineTemplate(
-      challenge.timelineTemplateId
-    );
-    if (!template.isActive) {
-      const error = new errors.BadRequestError(
-        `The timeline template with id: ${challenge.timelineTemplateId} is inactive`
-      );
-      throw error;
-    }
-  }
-  return { type, track };
-}
 
 /**
  * Check if user can perform modification/deletion to a challenge
@@ -1168,47 +1121,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
 
-  if (ret.phases && ret.phases.length > 0) {
-    const registrationPhase = _.find(ret.phases, (p) => p.name === "Registration");
-    const submissionPhase = _.find(ret.phases, (p) => p.name === "Submission");
-    ret.currentPhaseNames = _.map(
-      _.filter(ret.phases, (p) => p.isOpen === true),
-      "name"
-    );
-    if (registrationPhase) {
-      ret.registrationStartDate =
-        registrationPhase.actualStartDate || registrationPhase.scheduledStartDate;
-      ret.registrationEndDate =
-        registrationPhase.actualEndDate || registrationPhase.scheduledEndDate;
-    }
-    if (submissionPhase) {
-      ret.submissionStartDate =
-        submissionPhase.actualStartDate || submissionPhase.scheduledStartDate;
-      ret.submissionEndDate = submissionPhase.actualEndDate || submissionPhase.scheduledEndDate;
-    }
-  }
-
-  ret.created = new Date(ret.created).toISOString();
-  ret.updated = new Date(ret.updated).toISOString();
-  ret.startDate = new Date(ret.startDate).toISOString();
-  ret.endDate = new Date(ret.endDate).toISOString();
-
-  if (track) {
-    ret.track = track.name;
-  }
-
-  if (type) {
-    ret.type = type.name;
-  }
-
-  ret.metadata = ret.metadata.map((m) => {
-    try {
-      m.value = JSON.stringify(JSON.parse(m.value)); // when we update how we index data, make this a JSON field
-    } catch (err) {
-      // do nothing
-    }
-    return m;
-  });
+  enrichChallengeForResponse(ret);
 
   // Create in ES
   await esClient.create({
@@ -1580,10 +1493,7 @@ async function update(currentUser, challengeId, data) {
   validateChallengeUpdateRequest(currentUser, challenge, data);
 
   const projectId = _.get(challenge, "projectId");
-  const cancelReason = _.cloneDeep(data.cancelReason);
-  delete data.cancelReason;
 
-  let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
   let sendCompletedEmail = false;
@@ -1597,72 +1507,75 @@ async function update(currentUser, challengeId, data) {
   }
 
   /* BEGIN self-service stuffs */
-  if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
-    for (const entry of data.metadata) {
-      const regexp = new RegExp(`{{${entry.name}}}`, "g");
-      dynamicDescription = dynamicDescription.replace(regexp, entry.value);
-    }
-  }
-  if (
-    challenge.legacy.selfService &&
-    data.status === constants.challengeStatuses.Draft &&
-    challenge.status !== constants.challengeStatuses.Draft
-  ) {
-    sendSubmittedEmail = true;
-  }
-  // check if it's a self service challenge and project needs to be activated first
-  if (
-    challenge.legacy.selfService &&
-    (data.status === constants.challengeStatuses.Approved ||
-      data.status === constants.challengeStatuses.Active) &&
-    challenge.status !== constants.challengeStatuses.Active
-  ) {
-    try {
-      const selfServiceProjectName = `Self service - ${challenge.createdBy} - ${challenge.name}`;
-      const workItemSummary = _.get(
-        _.find(_.get(challenge, "metadata", []), (m) => m.name === "websitePurpose.description"),
-        "value",
-        "N/A"
-      );
-      await helper.activateProject(
-        challenge.projectId,
-        currentUser,
-        selfServiceProjectName,
-        workItemSummary
-      );
-      if (data.status === constants.challengeStatuses.Active) {
-        sendActivationEmail = true;
+
+  // TODO: At some point in the future this should be moved to a Self-Service Challenge Helper
+
+  if (challenge.legacy.selfService) {
+    // prettier-ignore
+    sendSubmittedEmail = data.status === constants.challengeStatuses.Draft && challenge.status !== constants.challengeStatuses.Draft;
+
+    if (data.metadata && data.metadata.length > 0) {
+      let dynamicDescription = _.cloneDeep(data.description || challenge.description);
+      for (const entry of data.metadata) {
+        const regexp = new RegExp(`{{${entry.name}}}`, "g");
+        dynamicDescription = dynamicDescription.replace(regexp, entry.value);
       }
-    } catch (e) {
-      await update(
-        currentUser,
-        challengeId,
-        {
-          ...data,
-          status: constants.challengeStatuses.CancelledPaymentFailed,
-          cancelReason: `Failed to activate project. Error: ${e.message}. JSON: ${JSON.stringify(
-            e
-          )}`,
-        },
-        false
-      );
-      throw new errors.BadRequestError(
-        "Failed to activate the challenge! The challenge has been canceled!"
-      );
+      data.description = dynamicDescription;
+    }
+
+    // check if it's a self service challenge and project needs to be activated first
+    if (
+      (data.status === constants.challengeStatuses.Approved ||
+        data.status === constants.challengeStatuses.Active) &&
+      challenge.status !== constants.challengeStatuses.Active
+    ) {
+      try {
+        const selfServiceProjectName = `Self service - ${challenge.createdBy} - ${challenge.name}`;
+        const workItemSummary = _.get(
+          _.find(_.get(challenge, "metadata", []), (m) => m.name === "websitePurpose.description"),
+          "value",
+          "N/A"
+        );
+        await helper.activateProject(
+          projectId,
+          currentUser,
+          selfServiceProjectName,
+          workItemSummary
+        );
+
+        sendActivationEmail = data.status === constants.challengeStatuses.Active;
+      } catch (e) {
+        await update(
+          currentUser,
+          challengeId,
+          {
+            ...data,
+            status: constants.challengeStatuses.CancelledPaymentFailed,
+            cancelReason: `Failed to activate project. Error: ${e.message}. JSON: ${JSON.stringify(
+              e
+            )}`,
+          },
+          false
+        );
+        throw new errors.BadRequestError(
+          "Failed to activate the challenge! The challenge has been canceled!"
+        );
+      }
+    }
+
+    if (data.status === constants.challengeStatuses.Draft) {
+      try {
+        await helper.updateSelfServiceProjectInfo(
+          projectId,
+          data.endDate || challenge.endDate,
+          currentUser
+        );
+      } catch (e) {
+        logger.debug(`There was an error trying to update the project: ${e.message}`);
+      }
     }
   }
 
-  if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Draft) {
-    try {
-      await helper.updateSelfServiceProjectInfo(
-        challenge.projectId,
-        data.endDate || challenge.endDate,
-        currentUser
-      );
-    } catch (e) {
-      logger.debug(`There was an error trying to update the project: ${e.message}`);
-    }
-  }
   /* END self-service stuffs */
 
   let isChallengeBeingActivated = false;
@@ -1690,6 +1603,7 @@ async function update(currentUser, challengeId, data) {
         isChallengeBeingActivated = true;
       }
     }
+
     if (
       data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
       data.status === constants.challengeStatuses.CancelledPaymentFailed
@@ -1701,6 +1615,7 @@ async function update(currentUser, challengeId, data) {
       }
       sendRejectedEmail = true;
     }
+
     if (data.status === constants.challengeStatuses.Completed) {
       if (
         !_.get(challenge, "legacy.pureV5Task") &&
@@ -1747,8 +1662,6 @@ async function update(currentUser, challengeId, data) {
     }
   }
 
-  await challengeHelper.validateAndGetChallengeTypeAndTrack(data);
-
   // TODO: Fix this Tech Debt once legacy is turned off
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
@@ -1767,14 +1680,6 @@ async function update(currentUser, challengeId, data) {
     challenge.phases = [];
     timelineTemplateChanged = true;
   }
-  /*
-      1) create draft challenge -> challenge.legacy is FULLY populated
-      2) Create new challenge -> mark challenge as draft -> challenge.legacy WILL BE populdated db DC
-  */
-
-  if (data.legacy.xyz) {
-    challenge.legacy.xyz = data.legacy.xyz;
-  }
 
   if (data.prizeSets && data.prizeSets.length > 0) {
     if (
@@ -1791,13 +1696,13 @@ async function update(currentUser, challengeId, data) {
       _.get(challenge, "overview.totalPrizes")
     ) {
       // remove the totalPrizes if challenge prizes are empty
-      challenge.overview = _.omit(challenge.overview, ["totalPrizes"]);
+      data.overview = challenge.overview = _.omit(challenge.overview, ["totalPrizes"]);
     } else {
       const totalPrizes = helper.sumOfPrizes(
         prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes
       );
-      logger.debug(`re-calculate total prizes, current value is ${totalPrizes.value}`);
       _.assign(challenge, { overview: { totalPrizes } });
+      _.assign(data, { overview: { totalPrizes } });
     }
   }
 
@@ -1885,10 +1790,11 @@ async function update(currentUser, challengeId, data) {
     logger.info(`${challengeId} is not a pureV5 challenge or has no winners set yet.`);
   }
 
-  data.updated = moment().utc();
-  data.updatedBy = currentUser.handle || currentUser.sub;
-
-  const { track, type } = await validateChallengeData(_.pick(challenge, ["trackId", "typeId"]));
+  const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack({
+    typeId: challenge.typeId,
+    trackId: challenge.trackId,
+    timelineTemplateId: challenge.timelineTemplateId,
+  });
 
   if (_.get(type, "isTask")) {
     if (!_.isEmpty(_.get(data, "task.memberId"))) {
@@ -1913,115 +1819,59 @@ async function update(currentUser, challengeId, data) {
     }
   }
 
-  let newAttachments = isFull ? data.attachments : challenge.attachments || [];
-  // if (isFull || !_.isUndefined(data.attachments)) {
-  //   newAttachments = data.attachments;
-  // }
-
-  // Validate the challenge terms
-  let newTermsOfUse;
   if (!_.isUndefined(data.terms)) {
-    // helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
-
-    // Get the project default terms
-    const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId);
-
-    if (defaultTerms) {
-      // Make sure that the default project terms were not removed
-      // TODO - there are no default terms returned by v5
-      // the terms array is objects with a roleId now, so this _.difference won't work
-      // const removedTerms = _.difference(defaultTerms, data.terms)
-      // if (removedTerms.length !== 0) {
-      //   throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
-      // }
-    }
-    // newTermsOfUse = await helper.validateChallengeTerms(_.union(data.terms, defaultTerms))
-    newTermsOfUse = await helper.validateChallengeTerms(data.terms);
+    await helper.validateChallengeTerms(data.terms);
   }
 
-  delete data.attachments;
-  delete data.terms;
-
-  _.assign(challenge, data);
-  if (!_.isUndefined(newAttachments)) {
-    challenge.attachments = newAttachments;
-    data.attachments = newAttachments;
-  }
-
-  if (!_.isUndefined(newTermsOfUse)) {
-    challenge.terms = newTermsOfUse;
-    data.terms = newTermsOfUse;
-  }
-
-  if (challenge.phases && challenge.phases.length > 0) {
-    await getPhasesAndPopulate(challenge);
+  if (data.phases && data.phases.length > 0) {
+    await getPhasesAndPopulate(data);
   }
 
   // Populate challenge.track and challenge.type based on the track/type IDs
   if (track) {
-    challenge.track = track.name;
+    data.track = track.name;
   }
   if (type) {
-    challenge.type = type.name;
+    data.type = type.name;
   }
 
   try {
     logger.debug(
-      `ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(challenge)}`
+      `ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(data, null, 2)}`
     );
-    const { items } = await challengeDomain.update({
-      filterCriteria: getScanCriteria({
-        id: challengeId,
-      }),
-      updateInput: {
-        ...challenge,
+
+    const grpcMetadata = new GrpcMetadata();
+
+    grpcMetadata.set("handle", currentUser.handle);
+    grpcMetadata.set("userId", currentUser.userId);
+
+    const { items } = await challengeDomain.update(
+      {
+        filterCriteria: getScanCriteria({
+          id: challengeId,
+        }),
+        updateInput: {
+          ...data,
+        },
       },
-    });
-    if (items.length > 0) {
-      if (!challenge.legacyId) {
-        challenge.legacyId = items[0].legacyId;
-      }
-    }
+      grpcMetadata
+    );
+
+    console.log("Items", items);
   } catch (e) {
     throw e;
   }
 
+  challenge = await challengeDomain.lookup({ id: challengeId });
+
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`);
-  const options = {};
-  if (challenge.status === "Completed") {
-    options.key = `${challenge.id}:${challenge.status}`;
-  }
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, options);
 
-  if (challenge.phases && challenge.phases.length > 0) {
-    challenge.currentPhase = challenge.phases
-      .slice()
-      .reverse()
-      .find((phase) => phase.isOpen);
-    challenge.endDate = helper.calculateChallengeEndDate(challenge);
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, {
+    key: challenge.status === "Completed" ? `${challenge.id}:${challenge.status}` : undefined,
+  });
 
-    const registrationPhase = _.find(challenge.phases, (p) => p.name === "Registration");
-    const submissionPhase = _.find(challenge.phases, (p) => p.name === "Submission");
-
-    challenge.currentPhaseNames = _.map(
-      _.filter(challenge.phases, (p) => p.isOpen === true),
-      "name"
-    );
-
-    if (registrationPhase) {
-      challenge.registrationStartDate =
-        registrationPhase.actualStartDate || registrationPhase.scheduledStartDate;
-      challenge.registrationEndDate =
-        registrationPhase.actualEndDate || registrationPhase.scheduledEndDate;
-    }
-    if (submissionPhase) {
-      challenge.submissionStartDate =
-        submissionPhase.actualStartDate || submissionPhase.scheduledStartDate;
-      challenge.submissionEndDate =
-        submissionPhase.actualEndDate || submissionPhase.scheduledEndDate;
-    }
-  }
+  enrichChallengeForResponse(challenge);
 
   // Update ES
   await esClient.update({
