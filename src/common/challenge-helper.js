@@ -10,6 +10,7 @@ const constants = require("../../app-constants");
 const axios = require("axios");
 const { getM2MToken } = require("./m2m-helper");
 const { hasAdminRole } = require("./role-helper");
+const { ensureAcessibilityToModifiedGroups } = require("./group-helper");
 
 class ChallengeHelper {
   /**
@@ -112,6 +113,78 @@ class ChallengeHelper {
     // check groups access to be updated group values
     if (data.groups) {
       await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
+    }
+
+    // Ensure unchangeable fields are not changed
+    if (
+      _.get(challenge, "legacy.track") &&
+      _.get(data, "legacy.track") &&
+      _.get(challenge, "legacy.track") !== _.get(data, "legacy.track")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.track");
+    }
+
+    if (
+      _.get(challenge, "trackId") &&
+      _.get(data, "trackId") &&
+      _.get(challenge, "trackId") !== _.get(data, "trackId")
+    ) {
+      throw new errors.ForbiddenError("Cannot change trackId");
+    }
+
+    if (
+      _.get(challenge, "typeId") &&
+      _.get(data, "typeId") &&
+      _.get(challenge, "typeId") !== _.get(data, "typeId")
+    ) {
+      throw new errors.ForbiddenError("Cannot change typeId");
+    }
+
+    if (
+      _.get(challenge, "legacy.pureV5Task") &&
+      _.get(data, "legacy.pureV5Task") &&
+      _.get(challenge, "legacy.pureV5Task") !== _.get(data, "legacy.pureV5Task")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.pureV5Task");
+    }
+
+    if (
+      _.get(challenge, "legacy.pureV5") &&
+      _.get(data, "legacy.pureV5") &&
+      _.get(challenge, "legacy.pureV5") !== _.get(data, "legacy.pureV5")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.pureV5");
+    }
+
+    if (
+      _.get(challenge, "legacy.selfService") &&
+      _.get(data, "legacy.selfService") &&
+      _.get(challenge, "legacy.selfService") !== _.get(data, "legacy.selfService")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.selfService");
+    }
+
+    if (
+      (challenge.status === constants.challengeStatuses.Completed ||
+        challenge.status === constants.challengeStatuses.Cancelled) &&
+      data.status &&
+      data.status !== challenge.status &&
+      data.status !== constants.challengeStatuses.CancelledClientRequest
+    ) {
+      throw new errors.BadRequestError(
+        `Cannot change ${challenge.status} challenge status to ${data.status} status`
+      );
+    }
+
+    if (
+      data.winners &&
+      data.winners.length > 0 &&
+      challenge.status !== constants.challengeStatuses.Completed &&
+      data.status !== constants.challengeStatuses.Completed
+    ) {
+      throw new errors.BadRequestError(
+        `Cannot set winners for challenge with non-completed ${challenge.status} status`
+      );
     }
   }
 }

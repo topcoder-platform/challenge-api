@@ -450,16 +450,19 @@ axiosRetry(axios, {
  * @param {String} token The token
  * @returns
  */
-async function createSelfServiceProject(name, description, type, token) {
+async function createSelfServiceProject(name, description, type) {
   const projectObj = {
     name,
     description,
     type,
   };
+
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.PROJECTS_API_URL}`;
   const res = await axios.post(url, projectObj, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return _.get(res, "data.id");
 }
 

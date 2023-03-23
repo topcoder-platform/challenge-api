@@ -36,6 +36,8 @@ const esClient = helper.getESClient();
 
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 const { hasAdminRole } = require("../common/role-helper");
+const { ensureAcessibilityToModifiedGroups } = require("../common/group-helper");
+const { validateChallengeUpdateRequest } = require("../common/challenge-helper");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
@@ -174,33 +176,6 @@ async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
       Challenge: ${JSON.stringify(challenge)}
       Filtered: ${JSON.stringify(filtered)}
     `);
-  }
-}
-
-/**
- * Ensure the user can access the groups being updated to
- * @param {Object} currentUser the user who perform operation
- * @param {Object} data the challenge data to be updated
- * @param {String} challenge the original challenge data
- */
-async function ensureAcessibilityToModifiedGroups(currentUser, data, challenge) {
-  const needToCheckForGroupAccess = !currentUser
-    ? true
-    : !currentUser.isMachine && !hasAdminRole(currentUser);
-  if (!needToCheckForGroupAccess) {
-    return;
-  }
-  const userGroups = await helper.getUserGroups(currentUser.userId);
-  const userGroupsIds = _.map(userGroups, (group) => group.id);
-  const updatedGroups = _.difference(
-    _.union(challenge.groups, data.groups),
-    _.intersection(challenge.groups, data.groups)
-  );
-  const filtered = updatedGroups.filter((g) => !userGroupsIds.includes(g));
-  if (filtered.length > 0) {
-    throw new errors.ForbiddenError(
-      "ensureAcessibilityToModifiedGroups :: You don't have access to this group!"
-    );
   }
 }
 
@@ -1069,8 +1044,7 @@ async function createChallenge(currentUser, challenge, userToken) {
       challenge.projectId = await helper.createSelfServiceProject(
         selfServiceProjectName,
         "N/A",
-        config.NEW_SELF_SERVICE_PROJECT_TYPE,
-        userToken
+        config.NEW_SELF_SERVICE_PROJECT_TYPE
       );
     }
 
@@ -1263,7 +1237,6 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   return ret;
 }
-
 createChallenge.schema = {
   currentUser: Joi.any(),
   challenge: Joi.object()
@@ -1480,7 +1453,6 @@ async function getChallenge(currentUser, id, checkIfExists) {
 
   return challenge;
 }
-
 getChallenge.schema = {
   currentUser: Joi.any(),
   id: Joi.id(),
@@ -1602,36 +1574,34 @@ async function validateWinners(winners, challengeId) {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update(currentUser, challengeId, data, isFull) {
+async function update(currentUser, challengeId, data) {
+  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
+  validateChallengeUpdateRequest(currentUser, challenge, data);
+
+  const projectId = _.get(challenge, "projectId");
   const cancelReason = _.cloneDeep(data.cancelReason);
   delete data.cancelReason;
 
+  let dynamicDescription = _.cloneDeep(data.description || challenge.description);
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
   let sendCompletedEmail = false;
   let sendRejectedEmail = false;
 
-  if (!_.isUndefined(_.get(data, "legacy.reviewType"))) {
-    _.set(data, "legacy.reviewType", _.toUpper(_.get(data, "legacy.reviewType")));
+  const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId);
+
+  if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
+    _.set(data, "billing.billingAccountId", billingAccountId);
+    _.set(data, "billing.markup", markup || 0);
   }
-  if (data.projectId) {
-    await challengeHelper.ensureProjectExist(data.projectId, currentUser);
-  }
 
-  helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
-  helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
-  // helper.ensureNoDuplicateOrNullElements(data.gitRepoURLs, 'gitRepoURLs')
-
-  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-
-  let dynamicDescription = _.cloneDeep(data.description || challenge.description);
-
+  /* BEGIN self-service stuffs */
   if (challenge.legacy.selfService && data.metadata && data.metadata.length > 0) {
     for (const entry of data.metadata) {
       const regexp = new RegExp(`{{${entry.name}}}`, "g");
       dynamicDescription = dynamicDescription.replace(regexp, entry.value);
     }
-    data.description = dynamicDescription;
   }
   if (
     challenge.legacy.selfService &&
@@ -1682,27 +1652,19 @@ async function update(currentUser, challengeId, data, isFull) {
     }
   }
 
-  const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
-    _.get(challenge, "projectId")
-  );
-  if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
-    _.set(data, "billing.billingAccountId", billingAccountId);
-    _.set(data, "billing.markup", markup || 0);
-  }
-  if (
-    billingAccountId &&
-    _.includes(config.TOPGEAR_BILLING_ACCOUNTS_ID, _.toString(billingAccountId))
-  ) {
-    if (_.isEmpty(data.metadata)) {
-      data.metadata = [];
-    }
-    if (!_.find(data.metadata, (e) => e.name === "postMortemRequired")) {
-      data.metadata.push({
-        name: "postMortemRequired",
-        value: "false",
-      });
+  if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Draft) {
+    try {
+      await helper.updateSelfServiceProjectInfo(
+        challenge.projectId,
+        data.endDate || challenge.endDate,
+        currentUser
+      );
+    } catch (e) {
+      logger.debug(`There was an error trying to update the project: ${e.message}`);
     }
   }
+  /* END self-service stuffs */
+
   let isChallengeBeingActivated = false;
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
@@ -1751,81 +1713,6 @@ async function update(currentUser, challengeId, data, isFull) {
     }
   }
 
-  // FIXME: Tech Debt
-  if (
-    _.get(challenge, "legacy.track") &&
-    _.get(data, "legacy.track") &&
-    _.get(challenge, "legacy.track") !== _.get(data, "legacy.track")
-  ) {
-    throw new errors.ForbiddenError("Cannot change legacy.track");
-  }
-  if (
-    _.get(challenge, "trackId") &&
-    _.get(data, "trackId") &&
-    _.get(challenge, "trackId") !== _.get(data, "trackId")
-  ) {
-    throw new errors.ForbiddenError("Cannot change trackId");
-  }
-  if (
-    _.get(challenge, "typeId") &&
-    _.get(data, "typeId") &&
-    _.get(challenge, "typeId") !== _.get(data, "typeId")
-  ) {
-    throw new errors.ForbiddenError("Cannot change typeId");
-  }
-
-  if (
-    _.get(challenge, "legacy.useSchedulingAPI") &&
-    _.get(data, "legacy.useSchedulingAPI") &&
-    _.get(challenge, "legacy.useSchedulingAPI") !== _.get(data, "legacy.useSchedulingAPI")
-  ) {
-    throw new errors.ForbiddenError("Cannot change legacy.useSchedulingAPI");
-  }
-  if (
-    _.get(challenge, "legacy.pureV5Task") &&
-    _.get(data, "legacy.pureV5Task") &&
-    _.get(challenge, "legacy.pureV5Task") !== _.get(data, "legacy.pureV5Task")
-  ) {
-    throw new errors.ForbiddenError("Cannot change legacy.pureV5Task");
-  }
-  if (
-    _.get(challenge, "legacy.pureV5") &&
-    _.get(data, "legacy.pureV5") &&
-    _.get(challenge, "legacy.pureV5") !== _.get(data, "legacy.pureV5")
-  ) {
-    throw new errors.ForbiddenError("Cannot change legacy.pureV5");
-  }
-  if (
-    _.get(challenge, "legacy.selfService") &&
-    _.get(data, "legacy.selfService") &&
-    _.get(challenge, "legacy.selfService") !== _.get(data, "legacy.selfService")
-  ) {
-    throw new errors.ForbiddenError("Cannot change legacy.selfService");
-  }
-
-  if (!_.isUndefined(challenge.legacy) && !_.isUndefined(data.legacy)) {
-    _.extend(challenge.legacy, data.legacy);
-  }
-
-  if (!_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
-    _.extend(challenge.billing, data.billing);
-  } else if (_.isUndefined(challenge.billing) && !_.isUndefined(data.billing)) {
-    challenge.billing = data.billing;
-  }
-
-  await helper.ensureUserCanModifyChallenge(currentUser, challenge);
-
-  // check groups access to be updated group values
-  if (data.groups) {
-    await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
-  }
-  let newAttachments;
-  if (isFull || !_.isUndefined(data.attachments)) {
-    newAttachments = data.attachments;
-  }
-
-  await ensureAccessibleForChallenge(currentUser, challenge);
-
   // Only M2M can update url and options of discussions
   if (data.discussions && data.discussions.length > 0) {
     if (challenge.discussions && challenge.discussions.length > 0) {
@@ -1860,51 +1747,7 @@ async function update(currentUser, challengeId, data, isFull) {
     }
   }
 
-  // Validate the challenge terms
-  let newTermsOfUse;
-  if (!_.isUndefined(data.terms)) {
-    // helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
-
-    // Get the project default terms
-    const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId);
-
-    if (defaultTerms) {
-      // Make sure that the default project terms were not removed
-      // TODO - there are no default terms returned by v5
-      // the terms array is objects with a roleId now, so this _.difference won't work
-      // const removedTerms = _.difference(defaultTerms, data.terms)
-      // if (removedTerms.length !== 0) {
-      //   throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
-      // }
-    }
-    // newTermsOfUse = await helper.validateChallengeTerms(_.union(data.terms, defaultTerms))
-    newTermsOfUse = await helper.validateChallengeTerms(data.terms);
-  }
-
   await challengeHelper.validateAndGetChallengeTypeAndTrack(data);
-
-  if (
-    (challenge.status === constants.challengeStatuses.Completed ||
-      challenge.status === constants.challengeStatuses.Cancelled) &&
-    data.status &&
-    data.status !== challenge.status &&
-    data.status !== constants.challengeStatuses.CancelledClientRequest
-  ) {
-    throw new errors.BadRequestError(
-      `Cannot change ${challenge.status} challenge status to ${data.status} status`
-    );
-  }
-
-  if (
-    data.winners &&
-    data.winners.length > 0 &&
-    challenge.status !== constants.challengeStatuses.Completed &&
-    data.status !== constants.challengeStatuses.Completed
-  ) {
-    throw new errors.BadRequestError(
-      `Cannot set winners for challenge with non-completed ${challenge.status} status`
-    );
-  }
 
   // TODO: Fix this Tech Debt once legacy is turned off
   const finalStatus = data.status || challenge.status;
@@ -1923,6 +1766,14 @@ async function update(currentUser, challengeId, data, isFull) {
     // make sure there are no previous phases if the timeline template has changed
     challenge.phases = [];
     timelineTemplateChanged = true;
+  }
+  /*
+      1) create draft challenge -> challenge.legacy is FULLY populated
+      2) Create new challenge -> mark challenge as draft -> challenge.legacy WILL BE populdated db DC
+  */
+
+  if (data.legacy.xyz) {
+    challenge.legacy.xyz = data.legacy.xyz;
   }
 
   if (data.prizeSets && data.prizeSets.length > 0) {
@@ -1982,21 +1833,6 @@ async function update(currentUser, challengeId, data, isFull) {
     data.endDate = helper.calculateChallengeEndDate(challenge, data);
   }
 
-  // PUT HERE
-  if (data.status) {
-    if (challenge.legacy.selfService && data.status === constants.challengeStatuses.Draft) {
-      try {
-        await helper.updateSelfServiceProjectInfo(
-          challenge.projectId,
-          data.endDate || challenge.endDate,
-          currentUser
-        );
-      } catch (e) {
-        logger.debug(`There was an error trying to update the project: ${e.message}`);
-      }
-    }
-  }
-
   if (data.winners && data.winners.length && data.winners.length > 0) {
     await validateWinners(data.winners, challengeId);
   }
@@ -2051,170 +1887,6 @@ async function update(currentUser, challengeId, data, isFull) {
 
   data.updated = moment().utc();
   data.updatedBy = currentUser.handle || currentUser.sub;
-  const updateDetails = {};
-  let phasesHaveBeenModified = false;
-  _.each(data, (value, key) => {
-    let op;
-    if (key === "metadata") {
-      if (
-        _.isUndefined(challenge[key]) ||
-        challenge[key].length !== value.length ||
-        _.differenceWith(challenge[key], value, _.isEqual).length !== 0
-      ) {
-        op = "$PUT";
-      }
-    } else if (key === "phases") {
-      // always consider a modification if the property exists
-      phasesHaveBeenModified = true;
-      logger.info("update phases");
-      op = "$PUT";
-    } else if (key === "prizeSets") {
-      if (isDifferentPrizeSets(challenge[key], value)) {
-        logger.info("update prize sets");
-        op = "$PUT";
-      }
-    } else if (key === "tags") {
-      if (
-        _.isUndefined(challenge[key]) ||
-        challenge[key].length !== value.length ||
-        _.intersection(challenge[key], value).length !== value.length
-      ) {
-        op = "$PUT";
-      }
-    } else if (key === "attachments") {
-      const oldIds = _.map(challenge.attachments || [], (a) => a.id);
-      if (
-        oldIds.length !== value.length ||
-        _.intersection(
-          oldIds,
-          _.map(value, (a) => a.id)
-        ).length !== value.length
-      ) {
-        op = "$PUT";
-      }
-    } else if (key === "groups") {
-      if (
-        _.isUndefined(challenge[key]) ||
-        challenge[key].length !== value.length ||
-        _.intersection(challenge[key], value).length !== value.length
-      ) {
-        op = "$PUT";
-      }
-      // } else if (key === 'gitRepoURLs') {
-      //   if (_.isUndefined(challenge[key]) || challenge[key].length !== value.length ||
-      //     _.intersection(challenge[key], value).length !== value.length) {
-      //     op = '$PUT'
-      //   }
-    } else if (key === "winners") {
-      if (
-        _.isUndefined(challenge[key]) ||
-        challenge[key].length !== value.length ||
-        _.intersectionWith(challenge[key], value, _.isEqual).length !== value.length
-      ) {
-        op = "$PUT";
-      }
-    } else if (key === "terms") {
-      const oldIds = _.map(challenge.terms || [], (t) => t.id);
-      const newIds = _.map(value || [], (t) => t.id);
-      if (
-        oldIds.length !== newIds.length ||
-        _.intersection(oldIds, newIds).length !== value.length
-      ) {
-        op = "$PUT";
-      }
-    } else if (key === "billing" || key === "legacy") {
-      // make sure that's always being udpated
-      op = "$PUT";
-    } else if (_.isUndefined(challenge[key]) || challenge[key] !== value) {
-      op = "$PUT";
-    } else if (_.get(challenge, "legacy.pureV5Task") && key === "task") {
-      // always update task for pureV5 challenges
-      op = "$PUT";
-    }
-
-    if (op) {
-      if (_.isUndefined(updateDetails[op])) {
-        updateDetails[op] = {};
-      }
-      if (key === "attachments") {
-        updateDetails[op].attachments = newAttachments;
-      } else if (key === "terms") {
-        updateDetails[op].terms = newTermsOfUse;
-      } else {
-        updateDetails[op][key] = value;
-      }
-      if (key !== "updated" && key !== "updatedBy") {
-        let oldValue;
-        let newValue;
-        if (key === "attachments") {
-          oldValue = challenge.attachments ? JSON.stringify(challenge.attachments) : "NULL";
-          newValue = JSON.stringify(newAttachments);
-        } else if (key === "terms") {
-          oldValue = challenge.terms ? JSON.stringify(challenge.terms) : "NULL";
-          newValue = JSON.stringify(newTermsOfUse);
-        } else {
-          oldValue = challenge[key] ? JSON.stringify(challenge[key]) : "NULL";
-          newValue = JSON.stringify(value);
-        }
-      }
-    }
-  });
-
-  if (isFull && _.isUndefined(data.metadata) && challenge.metadata) {
-    updateDetails["$DELETE"] = { metadata: null };
-    delete challenge.metadata;
-    // send null to Elasticsearch to clear the field
-    data.metadata = null;
-  }
-  if (isFull && _.isUndefined(data.attachments) && challenge.attachments) {
-    if (!updateDetails["$DELETE"]) {
-      updateDetails["$DELETE"] = {};
-    }
-    updateDetails["$DELETE"].attachments = null;
-    delete challenge.attachments;
-    // send null to Elasticsearch to clear the field
-    data.attachments = null;
-  }
-  if (isFull && _.isUndefined(data.groups) && challenge.groups) {
-    if (!updateDetails["$DELETE"]) {
-      updateDetails["$DELETE"] = {};
-    }
-    updateDetails["$DELETE"].groups = null;
-    delete challenge.groups;
-    // send null to Elasticsearch to clear the field
-    data.groups = null;
-  }
-  // if (isFull && _.isUndefined(data.gitRepoURLs) && challenge.gitRepoURLs) {
-  //   if (!updateDetails['$DELETE']) {
-  //     updateDetails['$DELETE'] = {}
-  //   }
-  //   updateDetails['$DELETE'].gitRepoURLs = null
-  //   auditLogs.push({
-  //     id: uuid(),
-  //     challengeId,
-  //     fieldName: 'gitRepoURLs',
-  //     oldValue: JSON.stringify(challenge.gitRepoURLs),
-  //     newValue: 'NULL',
-  //     created: moment().utc(),
-  //     createdBy: currentUser.handle || currentUser.sub,
-  //     memberId: currentUser.userId || null
-  //   })
-  //   delete challenge.gitRepoURLs
-  //   // send null to Elasticsearch to clear the field
-  //   data.gitRepoURLs = null
-  // }
-  if (isFull && _.isUndefined(data.legacyId) && challenge.legacyId) {
-    data.legacyId = challenge.legacyId;
-  }
-  if (isFull && _.isUndefined(data.winners) && challenge.winners) {
-    if (!updateDetails["$DELETE"]) {
-      updateDetails["$DELETE"] = {};
-    }
-    updateDetails["$DELETE"].winners = null;
-    delete challenge.winners;
-    // send null to Elasticsearch to clear the field
-    data.winners = null;
-  }
 
   const { track, type } = await validateChallengeData(_.pick(challenge, ["trackId", "typeId"]));
 
@@ -2241,10 +1913,35 @@ async function update(currentUser, challengeId, data, isFull) {
     }
   }
 
-  logger.debug(`Challenge.update id: ${challengeId} Details:  ${JSON.stringify(updateDetails)}`);
+  let newAttachments = isFull ? data.attachments : challenge.attachments || [];
+  // if (isFull || !_.isUndefined(data.attachments)) {
+  //   newAttachments = data.attachments;
+  // }
+
+  // Validate the challenge terms
+  let newTermsOfUse;
+  if (!_.isUndefined(data.terms)) {
+    // helper.ensureNoDuplicateOrNullElements(data.terms, 'terms')
+
+    // Get the project default terms
+    const defaultTerms = await helper.getProjectDefaultTerms(challenge.projectId);
+
+    if (defaultTerms) {
+      // Make sure that the default project terms were not removed
+      // TODO - there are no default terms returned by v5
+      // the terms array is objects with a roleId now, so this _.difference won't work
+      // const removedTerms = _.difference(defaultTerms, data.terms)
+      // if (removedTerms.length !== 0) {
+      //   throw new errors.BadRequestError(`Default project terms ${removedTerms} should not be removed`)
+      // }
+    }
+    // newTermsOfUse = await helper.validateChallengeTerms(_.union(data.terms, defaultTerms))
+    newTermsOfUse = await helper.validateChallengeTerms(data.terms);
+  }
 
   delete data.attachments;
   delete data.terms;
+
   _.assign(challenge, data);
   if (!_.isUndefined(newAttachments)) {
     challenge.attachments = newAttachments;
@@ -2261,7 +1958,6 @@ async function update(currentUser, challengeId, data, isFull) {
   }
 
   // Populate challenge.track and challenge.type based on the track/type IDs
-
   if (track) {
     challenge.track = track.name;
   }
@@ -2289,6 +1985,7 @@ async function update(currentUser, challengeId, data, isFull) {
   } catch (e) {
     throw e;
   }
+
   // post bus event
   logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`);
   const options = {};
@@ -2296,21 +1993,22 @@ async function update(currentUser, challengeId, data, isFull) {
     options.key = `${challenge.id}:${challenge.status}`;
   }
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, options);
-  if (phasesHaveBeenModified === true && _.get(challenge, "legacy.useSchedulingAPI")) {
-    await helper.postBusEvent(config.SCHEDULING_TOPIC, { id: challengeId });
-  }
+
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.currentPhase = challenge.phases
       .slice()
       .reverse()
       .find((phase) => phase.isOpen);
     challenge.endDate = helper.calculateChallengeEndDate(challenge);
+
     const registrationPhase = _.find(challenge.phases, (p) => p.name === "Registration");
     const submissionPhase = _.find(challenge.phases, (p) => p.name === "Submission");
+
     challenge.currentPhaseNames = _.map(
       _.filter(challenge.phases, (p) => p.isOpen === true),
       "name"
     );
+
     if (registrationPhase) {
       challenge.registrationStartDate =
         registrationPhase.actualStartDate || registrationPhase.scheduledStartDate;
@@ -2324,6 +2022,7 @@ async function update(currentUser, challengeId, data, isFull) {
         submissionPhase.actualEndDate || submissionPhase.scheduledEndDate;
     }
   }
+
   // Update ES
   await esClient.update({
     index: config.get("ES.ES_INDEX"),
@@ -2381,6 +2080,7 @@ async function update(currentUser, challengeId, data, isFull) {
       );
     }
   }
+
   return challenge;
 }
 
