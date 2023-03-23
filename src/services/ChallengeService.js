@@ -1124,26 +1124,26 @@ async function createChallenge(currentUser, challenge, userToken) {
   enrichChallengeForResponse(ret, track, type);
 
   // Create in ES
-  await esClient.create({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: ret.id,
-    body: ret,
-  });
+  // await esClient.create({
+  //   index: config.get("ES.ES_INDEX"),
+  //   type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+  //   refresh: config.get("ES.ES_REFRESH"),
+  //   id: ret.id,
+  //   body: ret,
+  // });
 
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
 
-  if (challenge.legacy.selfService) {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
-    }
-  } else {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
-    }
-  }
+  // if (challenge.legacy.selfService) {
+  //   if (currentUser.handle) {
+  //     await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
+  //   }
+  // } else {
+  //   if (currentUser.handle) {
+  //     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+  //   }
+  // }
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
@@ -1739,7 +1739,8 @@ async function update(currentUser, challengeId, data) {
   }
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
-    await validateWinners(data.winners, challengeId);
+    console.log("Request to validate winners", data.winners, challengeId);
+    // await validateWinners(data.winners, challengeId);
   }
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
@@ -1797,6 +1798,8 @@ async function update(currentUser, challengeId, data) {
   });
 
   if (_.get(type, "isTask")) {
+    console.log("Type is task - how come", challengeId, type, track);
+    /*
     if (!_.isEmpty(_.get(data, "task.memberId"))) {
       const challengeResources = await helper.getChallengeResources(challengeId);
       const registrants = _.filter(
@@ -1817,6 +1820,7 @@ async function update(currentUser, challengeId, data) {
         );
       }
     }
+    */
   }
 
   if (!_.isUndefined(data.terms)) {
