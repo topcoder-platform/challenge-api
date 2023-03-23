@@ -254,7 +254,10 @@ class ChallengePhaseHelper {
           phase.isOpen = true;
           phase.scheduledStartDate = moment().toDate();
           phase.actualStartDate = phase.scheduledStartDate;
-        } else if (phase.isOpen === false && !_.isUndefined(newPhase.scheduledStartDate)) {
+        } else if (
+          phase.isOpen === false &&
+          !_.isUndefined(_.get(newPhase, "scheduledStartDate"))
+        ) {
           phase.scheduledStartDate = moment(newPhase.scheduledStartDate).toDate();
         }
         phase.scheduledEndDate = moment(phase.scheduledStartDate)
