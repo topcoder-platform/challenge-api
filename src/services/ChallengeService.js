@@ -1124,26 +1124,26 @@ async function createChallenge(currentUser, challenge, userToken) {
   enrichChallengeForResponse(ret, track, type);
 
   // Create in ES
-  // await esClient.create({
-  //   index: config.get("ES.ES_INDEX"),
-  //   type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-  //   refresh: config.get("ES.ES_REFRESH"),
-  //   id: ret.id,
-  //   body: ret,
-  // });
+  await esClient.create({
+    index: config.get("ES.ES_INDEX"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+    refresh: config.get("ES.ES_REFRESH"),
+    id: ret.id,
+    body: ret,
+  });
 
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
 
-  // if (challenge.legacy.selfService) {
-  //   if (currentUser.handle) {
-  //     await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
-  //   }
-  // } else {
-  //   if (currentUser.handle) {
-  //     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
-  //   }
-  // }
+  if (challenge.legacy.selfService) {
+    if (currentUser.handle) {
+      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
+    }
+  } else {
+    if (currentUser.handle) {
+      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+    }
+  }
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
