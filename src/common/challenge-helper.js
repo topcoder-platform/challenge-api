@@ -188,7 +188,7 @@ class ChallengeHelper {
     }
   }
 
-  enrichChallengeForResponse(challenge) {
+  enrichChallengeForResponse(challenge, track, type) {
     if (challenge.phases && challenge.phases.length > 0) {
       const registrationPhase = _.find(challenge.phases, (p) => p.name === "Registration");
       const submissionPhase = _.find(challenge.phases, (p) => p.name === "Submission");
@@ -199,7 +199,7 @@ class ChallengeHelper {
         .find((phase) => phase.isOpen);
 
       challenge.currentPhaseNames = _.map(
-        _.filter(ret.phases, (p) => p.isOpen === true),
+        _.filter(challenge.phases, (p) => p.isOpen === true),
         "name"
       );
 
