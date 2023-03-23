@@ -98,6 +98,22 @@ class ChallengeHelper {
     // check groups authorization
     await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
   }
+
+  async validateChallengeUpdateRequest(currentUser, challenge, data) {
+    await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+
+    helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
+    helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
+
+    if (data.projectId) {
+      await ensureProjectExist(data.projectId, currentUser);
+    }
+
+    // check groups access to be updated group values
+    if (data.groups) {
+      await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
+    }
+  }
 }
 
 module.exports = new ChallengeHelper();

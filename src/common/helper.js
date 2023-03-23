@@ -1123,7 +1123,7 @@ async function ensureUserCanViewChallenge(currentUser, challenge) {
  *
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to check
- * @returns {undefined}
+ * @returns {Promise}
  */
 async function ensureUserCanModifyChallenge(currentUser, challenge) {
   // check groups authorization
