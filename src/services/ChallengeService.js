@@ -1826,7 +1826,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   if (!_.isUndefined(data.terms)) {
-    await helper.validateChallengeTerms(data.terms);
+    await helper.validateChallengeTerms(data.terms.map((t) => t.id));
   }
 
   if (data.phases && data.phases.length > 0) {
@@ -1968,7 +1968,7 @@ updateChallenge.schema = {
       task: Joi.object().keys({
         isTask: Joi.boolean().default(false),
         isAssigned: Joi.boolean().default(false),
-        memberId: Joi.string().allow(null),
+        memberId: Joi.alternatives().try(Joi.string().allow(null), Joi.number().allow(null)),
       }),
       billing: Joi.object()
         .keys({
@@ -2070,7 +2070,7 @@ updateChallenge.schema = {
           description: Joi.string(),
         })
       ),
-      groups: Joi.array().items(Joi.id()), // group names
+      groups: Joi.array().items(Joi.optionalId()).unique(),
       // gitRepoURLs: Joi.array().items(Joi.string().uri()),
       winners: Joi.array()
         .items(
@@ -2086,7 +2086,12 @@ updateChallenge.schema = {
             .unknown(true)
         )
         .min(1),
-      terms: Joi.array().items(Joi.id().optional()).optional().allow([]),
+      terms: Joi.array().items(
+        Joi.object().keys({
+          id: Joi.id(),
+          roleId: Joi.id(),
+        })
+      ),
       overview: Joi.any().forbidden(),
     })
     .unknown(true)
