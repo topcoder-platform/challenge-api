@@ -191,13 +191,7 @@ class ChallengeHelper {
   sanitizeRepeatedFieldsInUpdateRequest(data) {
     if (data.winners != null) {
       data.winnerUpdate = {
-        winners: [
-          {
-            handle: "ansary",
-            placement: 1,
-            userId: 123,
-          },
-        ], // data.winners,
+        winners: data.winners,
       };
       delete data.winners;
     }
