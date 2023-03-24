@@ -1033,9 +1033,9 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   if (!challenge.startDate) {
-    challenge.startDate = new Date();
+    challenge.startDate = new Date().toISOString();
   } else {
-    challenge.startDate = new Date(challenge.startDate);
+    challenge.startDate = new Date(challenge.startDate).toISOString();
   }
 
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
@@ -1104,8 +1104,8 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.metadata == null) challenge.metadata = [];
   if (challenge.groups == null) challenge.groups = [];
   if (challenge.tags == null) challenge.tags = [];
-  if (challenge.startDate != null) challenge.startDate = challenge.startDate.getTime();
-  if (challenge.endDate != null) challenge.endDate = challenge.endDate.getTime();
+  if (challenge.startDate != null) challenge.startDate = challenge.startDate;
+  if (challenge.endDate != null) challenge.endDate = challenge.endDate;
   if (challenge.discussions == null) challenge.discussions = [];
 
   challenge.metadata = challenge.metadata.map((m) => ({
@@ -1125,25 +1125,28 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   enrichChallengeForResponse(ret, track, type);
 
-  // Create in ES
-  await esClient.create({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: ret.id,
-    body: ret,
-  });
+  const isLocal = process.env.LOCAL == "true";
+  if (!isLocal) {
+    // Create in ES
+    await esClient.create({
+      index: config.get("ES.ES_INDEX"),
+      type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+      refresh: config.get("ES.ES_REFRESH"),
+      id: ret.id,
+      body: ret,
+    });
 
-  // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
-  // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
+    // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
+    // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
 
-  if (challenge.legacy.selfService) {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
-    }
-  } else {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+    if (challenge.legacy.selfService) {
+      if (currentUser.handle) {
+        await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
+      }
+    } else {
+      if (currentUser.handle) {
+        await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+      }
     }
   }
 
@@ -1251,7 +1254,7 @@ createChallenge.schema = {
       tags: Joi.array().items(Joi.string()), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
-      startDate: Joi.date(),
+      startDate: Joi.date().iso(),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
       groups: Joi.array().items(Joi.optionalId()).unique(),
       // gitRepoURLs: Joi.array().items(Joi.string().uri()),
@@ -1494,7 +1497,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Remove fields from data that are not allowed to be updated and that match the existing challenge
   data = sanitizeData(sanitizeChallenge(data), challenge);
-  console.debug('Sanitized Data:', data);
+  console.debug("Sanitized Data:", data);
 
   validateChallengeUpdateRequest(currentUser, challenge, data);
 
@@ -1739,7 +1742,7 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
 
     data.phases = newPhases;
-    data.startDate = newStartDate;
+    data.startDate = new Date(newStartDate).toISOString();
     data.endDate = helper.calculateChallengeEndDate(challenge, data);
   }
 
@@ -1850,6 +1853,7 @@ async function updateChallenge(currentUser, challengeId, data) {
       grpcMetadata.set("handle", currentUser.handle);
       grpcMetadata.set("userId", currentUser.userId);
 
+      console.log("Calling update", updateInput);
       await challengeDomain.update(
         {
           filterCriteria: getScanCriteria({ id: challengeId }),
@@ -1878,62 +1882,64 @@ async function updateChallenge(currentUser, challengeId, data) {
         : undefined,
   });
 
-  // Update ES
-  // TODO: Uncomment
-  await esClient.update({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: challengeId,
-    body: {
-      doc: updatedChallenge,
-    },
-  });
+  const isLocal = process.env.LOCAL == "true";
+  if (!isLocal) {
+    // Update ES
+    await esClient.update({
+      index: config.get("ES.ES_INDEX"),
+      type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+      refresh: config.get("ES.ES_REFRESH"),
+      id: challengeId,
+      body: {
+        doc: updatedChallenge,
+      },
+    });
 
-  if (updatedChallenge.legacy.selfService) {
-    const creator = await helper.getMemberByHandle(updatedChallenge.createdBy);
-    if (sendSubmittedEmail) {
-      await helper.sendSelfServiceNotification(
-        constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
-        [{ email: creator.email }],
-        {
-          handle: creator.handle,
-          workItemName: updatedChallenge.name,
-        }
-      );
-    }
-    if (sendActivationEmail) {
-      await helper.sendSelfServiceNotification(
-        constants.SelfServiceNotificationTypes.WORK_REQUEST_STARTED,
-        [{ email: creator.email }],
-        {
-          handle: creator.handle,
-          workItemName: updatedChallenge.name,
-          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${updatedChallenge.id}`,
-        }
-      );
-    }
-    if (sendCompletedEmail) {
-      await helper.sendSelfServiceNotification(
-        constants.SelfServiceNotificationTypes.WORK_COMPLETED,
-        [{ email: creator.email }],
-        {
-          handle: creator.handle,
-          workItemName: updatedChallenge.name,
-          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${updatedChallenge.id}?tab=solutions`,
-        }
-      );
-    }
-    if (sendRejectedEmail || cancelReason) {
-      logger.debug("Should send redirected email");
-      await helper.sendSelfServiceNotification(
-        constants.SelfServiceNotificationTypes.WORK_REQUEST_REDIRECTED,
-        [{ email: creator.email }],
-        {
-          handle: creator.handle,
-          workItemName: updatedChallenge.name,
-        }
-      );
+    if (updatedChallenge.legacy.selfService) {
+      const creator = await helper.getMemberByHandle(updatedChallenge.createdBy);
+      if (sendSubmittedEmail) {
+        await helper.sendSelfServiceNotification(
+          constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
+          [{ email: creator.email }],
+          {
+            handle: creator.handle,
+            workItemName: updatedChallenge.name,
+          }
+        );
+      }
+      if (sendActivationEmail) {
+        await helper.sendSelfServiceNotification(
+          constants.SelfServiceNotificationTypes.WORK_REQUEST_STARTED,
+          [{ email: creator.email }],
+          {
+            handle: creator.handle,
+            workItemName: updatedChallenge.name,
+            workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${updatedChallenge.id}`,
+          }
+        );
+      }
+      if (sendCompletedEmail) {
+        await helper.sendSelfServiceNotification(
+          constants.SelfServiceNotificationTypes.WORK_COMPLETED,
+          [{ email: creator.email }],
+          {
+            handle: creator.handle,
+            workItemName: updatedChallenge.name,
+            workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${updatedChallenge.id}?tab=solutions`,
+          }
+        );
+      }
+      if (sendRejectedEmail || cancelReason) {
+        logger.debug("Should send redirected email");
+        await helper.sendSelfServiceNotification(
+          constants.SelfServiceNotificationTypes.WORK_REQUEST_REDIRECTED,
+          [{ email: creator.email }],
+          {
+            handle: creator.handle,
+            workItemName: updatedChallenge.name,
+          }
+        );
+      }
     }
   }
 
@@ -1982,7 +1988,7 @@ updateChallenge.schema = {
       typeId: Joi.optionalId(),
       name: Joi.string().optional(),
       description: Joi.string().optional(),
-      privateDescription: Joi.string().allow('').optional(),
+      privateDescription: Joi.string().allow("").optional(),
       descriptionFormat: Joi.string().optional(),
       metadata: Joi.array()
         .items(
@@ -2041,7 +2047,7 @@ updateChallenge.schema = {
           })
         )
         .optional(),
-      startDate: Joi.date(),
+      startDate: Joi.date().iso(),
       prizeSets: Joi.array()
         .items(
           Joi.object()
@@ -2185,12 +2191,7 @@ function sanitizeChallenge(challenge) {
   }
   if (challenge.phases) {
     sanitized.phases = _.map(challenge.phases, (phase) =>
-      _.pick(phase, [
-        "phaseId",
-        "duration",
-        "scheduledStartDate",
-        "constraints",
-      ])
+      _.pick(phase, ["phaseId", "duration", "scheduledStartDate", "constraints"])
     );
   }
   if (challenge.prizeSets) {
@@ -2221,6 +2222,7 @@ function sanitizeChallenge(challenge) {
       _.pick(attachment, ["id", "name", "url", "fileSize", "description", "challengeId"])
     );
   }
+
   return sanitized;
 }
 

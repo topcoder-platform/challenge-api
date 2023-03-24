@@ -245,35 +245,35 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@topcoder-framework/client-relational@^0.9.1":
-  version "0.9.1"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.9.1.tgz#6f87c8ddb8d2c19799ca51d220340ab0c0f67bd9"
-  integrity sha512-42sZAY60oSve8QmLL7eyrmZx7C5YAvbKZt77CiLTfUGBmURxwzlADbJKrCKBw+R0VSmtBxZ6oHdvBnXhSPjPHA==
+"@topcoder-framework/client-relational@^0.10.3":
+  version "0.10.3"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.10.3.tgz#80ceef15ea3092a5087627d1de6d6d62ee530cd8"
+  integrity sha512-WH5YZenKVJOxracuhcG14jiWTvs094LvePXew9vwYrXCaKS+ao9krrLghz11vJ+wcd3bcGF9PEIbnGfmHvnirg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/lib-common" "^0.9.1"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.33"
+    "@topcoder-framework/lib-common" "^0.10.3"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.37"
     tslib "^2.4.1"
 
-"@topcoder-framework/domain-challenge@^0.9.1":
-  version "0.9.1"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.9.1.tgz#cfec41a1403c6f744a83f21d0ddc9d29a7b23f69"
-  integrity sha512-m5lcWumHWJUVvB+39ddKH+dn8MOFPHsDpxFdWepD4jw6Vo2GZhJINpp3ZQWLA2UQUAYSaQp8kwOa93wdvzE7eg==
+"@topcoder-framework/domain-challenge@^0.10.3":
+  version "0.10.3"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.10.3.tgz#fbaa82388c33b3e7131f9ba3a2e6eb7e02a8078d"
+  integrity sha512-IoouiTPgVKKbZn9kqcVHygD3XqXwMvw7ktWFx72gEl9iNS36YH6lgMXb9WQa3OJHdfNqj9vh5Vx7LDdEN85+3w==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/client-relational" "^0.9.1"
-    "@topcoder-framework/lib-common" "^0.9.1"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.33"
+    "@topcoder-framework/client-relational" "^0.10.3"
+    "@topcoder-framework/lib-common" "^0.10.3"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.37"
     tslib "^2.4.1"
 
-"@topcoder-framework/lib-common@^0.9.1":
-  version "0.9.1"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.9.1.tgz#59ee523d05a8da4cab7866bd9ba24dd714c713a1"
-  integrity sha512-4W5Oz3XN6n3dsEZwmSiDxVuQtkuAxPJc9PyivIatyLB5HSAva/OuQbBcCWhFl2ORRywVxEBJz2cWFme+a6vEPw==
+"@topcoder-framework/lib-common@^0.10.3":
+  version "0.10.3"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.10.3.tgz#c0ede7b39a53bba6d9092c5aca7d16a98abe31c5"
+  integrity sha512-gvIJ47NFIEuBfqDTDH2GA7hPilpMbUgj4At7zbSpIAiTRhiMt3qKaDcSniSbR3RJ/8AP8BYoAFkMZlRJwcaA6g==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.33"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.37"
     tslib "^2.4.1"
 
 "@types/body-parser@*":
@@ -3677,9 +3677,9 @@ topcoder-bus-api-wrapper@topcoder-platform/tc-bus-api-wrapper.git:
     superagent "^3.8.3"
     tc-core-library-js appirio-tech/tc-core-library-js.git#v2.6.4
 
-"topcoder-interface@github:topcoder-platform/plat-interface-definition#v0.0.33":
+"topcoder-interface@github:topcoder-platform/plat-interface-definition#v0.0.37":
   version "1.0.0"
-  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/8d53fb22968e3801d3d77c7c9333b18775eae282"
+  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/0b08d4b07a016028c1d8e97d95fb1a2a3974acc1"
 
 topo@3.x.x:
   version "3.0.3"
