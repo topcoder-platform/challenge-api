@@ -126,17 +126,17 @@
     kuler "^2.0.0"
 
 "@grpc/grpc-js@^1.8.0", "@grpc/grpc-js@^1.8.12":
-  version "1.8.12"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.12.tgz#bc0120859e8b153db764b473cc019ddf6bb2b414"
-  integrity sha512-MbUMvpVvakeKhdYux6gbSIPJaFMLNSY8jw4PqLI+FFztGrQRrYYAnHlR94+ncBQQewkpXQaW449m3tpH/B/ZnQ==
+  version "1.8.13"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.13.tgz#e775685962909b76f8d4b813833c3d123867165b"
+  integrity sha512-iY3jsdfbc0ARoCLFvbvUB8optgyb0r1XLPb142u+QtgBcKJYkCIFt3Fd/881KqjLYWjsBJF57N3b8Eop9NDfUA==
   dependencies:
     "@grpc/proto-loader" "^0.7.0"
     "@types/node" ">=12.12.47"
 
 "@grpc/proto-loader@^0.7.0":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.7.5.tgz#ee9e7488fa585dc6b0f7fe88cd39723a3e64c906"
-  integrity sha512-mfcTuMbFowq1wh/Rn5KQl6qb95M21Prej3bewD9dUQMurYGVckGO/Pbe2Ocwto6sD05b/mxZLspvqwx60xO2Rg==
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.7.6.tgz#b71fdf92b184af184b668c4e9395a5ddc23d61de"
+  integrity sha512-QyAXR8Hyh7uMDmveWxDSUcJr9NAWaZ2I6IXgAYvQmfflwouTM+rArE2eEaCtLlRqO81j7pRLCt81IefUei6Zbw==
   dependencies:
     "@types/long" "^4.0.1"
     lodash.camelcase "^4.3.0"
@@ -245,35 +245,35 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@topcoder-framework/client-relational@^0.8.0":
-  version "0.8.0"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.8.0.tgz#66725c1b82498297aac911298a2cf1aeaed991c8"
-  integrity sha512-jSyyqDQuBC5PQ/QOh9amaqNmrnztnDp/zMC7MAhSAUa5mSJdoJcn7t3fTpi6wJ5BHT8hkOOAQbsFb4NkhYNhkw==
+"@topcoder-framework/client-relational@^0.9.1":
+  version "0.9.1"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.9.1.tgz#6f87c8ddb8d2c19799ca51d220340ab0c0f67bd9"
+  integrity sha512-42sZAY60oSve8QmLL7eyrmZx7C5YAvbKZt77CiLTfUGBmURxwzlADbJKrCKBw+R0VSmtBxZ6oHdvBnXhSPjPHA==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/lib-common" "^0.8.0"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.31"
+    "@topcoder-framework/lib-common" "^0.9.1"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.33"
     tslib "^2.4.1"
 
-"@topcoder-framework/domain-challenge@^0.8.0":
-  version "0.8.0"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.8.0.tgz#67074caf11edbf48e9cef29313b3ceb2b21ee757"
-  integrity sha512-IWgyGBlMOBl48CsmE37Z7dghvtfjcfGyo0PJVpRsYzdlnvHd6nY+tlq/bEKY2c9JasnlMeni/i4rUWeXG8JZyw==
+"@topcoder-framework/domain-challenge@^0.9.1":
+  version "0.9.1"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.9.1.tgz#cfec41a1403c6f744a83f21d0ddc9d29a7b23f69"
+  integrity sha512-m5lcWumHWJUVvB+39ddKH+dn8MOFPHsDpxFdWepD4jw6Vo2GZhJINpp3ZQWLA2UQUAYSaQp8kwOa93wdvzE7eg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/client-relational" "^0.8.0"
-    "@topcoder-framework/lib-common" "^0.8.0"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.31"
+    "@topcoder-framework/client-relational" "^0.9.1"
+    "@topcoder-framework/lib-common" "^0.9.1"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.33"
     tslib "^2.4.1"
 
-"@topcoder-framework/lib-common@^0.8.0":
-  version "0.8.0"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.8.0.tgz#3f29daace074734d74c638e860204011d5e83a21"
-  integrity sha512-xuyU3kQGiNOPPzwZLXzrTbu6o9FC2SVei7FWBwzL4HraD6aj3fDqME7dappY32QWB/lFxqyTm00SeekmkbCr1w==
+"@topcoder-framework/lib-common@^0.9.1":
+  version "0.9.1"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com:443/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.9.1.tgz#59ee523d05a8da4cab7866bd9ba24dd714c713a1"
+  integrity sha512-4W5Oz3XN6n3dsEZwmSiDxVuQtkuAxPJc9PyivIatyLB5HSAva/OuQbBcCWhFl2ORRywVxEBJz2cWFme+a6vEPw==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
-    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.31"
+    topcoder-interface "github:topcoder-platform/plat-interface-definition#v0.0.33"
     tslib "^2.4.1"
 
 "@types/body-parser@*":
@@ -346,9 +346,9 @@
   integrity sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==
 
 "@types/node@*", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
-  version "18.15.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.3.tgz#f0b991c32cfc6a4e7f3399d6cb4b8cf9a0315014"
-  integrity sha512-p6ua9zBxz5otCmbpb5D3U4B5Nanw6Pk3PPyX05xnxbB/fRv71N7CPmORg7uAD5P70T0xmx1pzAx/FUfa5X+3cw==
+  version "18.15.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.6.tgz#af98ef4a36e7ac5f2d03040f3109fcce972bf6cb"
+  integrity sha512-YErOafCZpK4g+Rp3Q/PBgZNAsWKGunQTm9FA3/Pbcm0VCriTEzcrutQ/SxSc0rytAp0NoFWue669jmKhEtd0sA==
 
 "@types/node@11.11.0":
   version "11.11.0"
@@ -566,9 +566,9 @@ aws-sdk@2.395.0:
     xml2js "0.4.19"
 
 aws-sdk@^2.1145.0:
-  version "2.1338.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1338.0.tgz#e9272a0563940ceebed5910d271c944f31dbae00"
-  integrity sha512-apxv53ABuvi87UQHAUqRrJOaGNMiPXAe6bizzJhOnsaNqasg2KjDDit7QSCi6HlLNG44n1ApIvMtR/k+NnxU4Q==
+  version "2.1342.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1342.0.tgz#2ddb60e7480b6f3a3b1ec5cfba4c6beed7cfc024"
+  integrity sha512-RknStRPY+ohgOhuuDYEkAWuBcU9841EjtelZn4J2VubhaS7ZFQ2lmiYqm4P5Tw8Kwq6GuUqISBB8RCp8cO2qfA==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -2693,9 +2693,9 @@ node-environment-flags@1.0.5:
     semver "^5.7.0"
 
 nodemon@^2.0.20:
-  version "2.0.21"
-  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-2.0.21.tgz#267edff25578da91075d6aa54346ef77ecb7b302"
-  integrity sha512-djN/n2549DUtY33S7o1djRCd7dEm0kBnj9c7S9XVXqRUbuggN1MZH/Nqa+5RFQr63Fbefq37nFXAE9VU86yL1A==
+  version "2.0.22"
+  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-2.0.22.tgz#182c45c3a78da486f673d6c1702e00728daf5258"
+  integrity sha512-B8YqaKMmyuCO7BowF1Z1/mkPqLk6cs/l63Ojtd6otKjMx47Dq1utxfRxcavH1I7VSaL8n5BUaoutadnsX3AAVQ==
   dependencies:
     chokidar "^3.5.2"
     debug "^3.2.7"
@@ -2957,9 +2957,9 @@ precond@0.2:
   integrity sha512-QCYG84SgGyGzqJ/vlMsxeXd/pgL/I94ixdNFyh1PusWmTCyVfPJjZ1K1jvHtsbfnXQs2TSkEP2fR7QiMZAnKFQ==
 
 prettier@^2.8.1:
-  version "2.8.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.4.tgz#34dd2595629bfbb79d344ac4a91ff948694463c3"
-  integrity sha512-vIS4Rlc2FNh0BySk3Wkd6xmwxB0FpOndW5fisM5H8hsZSxU2VWVB5CWIkIjWvrHjIhxk2g3bfMKM87zNTrZddw==
+  version "2.8.6"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.6.tgz#5c174b29befd507f14b83e3c19f83fdc0e974b71"
+  integrity sha512-mtuzdiBbHwPEgl7NxWlqOkithPyp4VN93V7VeHVWBF+ad3I5avc0RVDT4oImXQy9H/AqxA2NSQH8pSxHW6FYbQ==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
@@ -3677,9 +3677,9 @@ topcoder-bus-api-wrapper@topcoder-platform/tc-bus-api-wrapper.git:
     superagent "^3.8.3"
     tc-core-library-js appirio-tech/tc-core-library-js.git#v2.6.4
 
-"topcoder-interface@github:topcoder-platform/plat-interface-definition#v0.0.31":
+"topcoder-interface@github:topcoder-platform/plat-interface-definition#v0.0.33":
   version "1.0.0"
-  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/8fde0bf4ab310b887383c7b37b6ae919cd407388"
+  resolved "https://codeload.github.com/topcoder-platform/plat-interface-definition/tar.gz/8d53fb22968e3801d3d77c7c9333b18775eae282"
 
 topo@3.x.x:
   version "3.0.3"

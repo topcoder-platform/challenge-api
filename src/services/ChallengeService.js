@@ -34,11 +34,12 @@ const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
 
 const esClient = helper.getESClient();
 
-const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+const { ChallengeDomain, UpdateChallengeInput } = require("@topcoder-framework/domain-challenge");
 const { hasAdminRole } = require("../common/role-helper");
 const {
   validateChallengeUpdateRequest,
   enrichChallengeForResponse,
+  sanitizeRepeatedFieldsInUpdateRequest,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 
@@ -1125,26 +1126,26 @@ async function createChallenge(currentUser, challenge, userToken) {
   enrichChallengeForResponse(ret, track, type);
 
   // Create in ES
-  // await esClient.create({
-  //   index: config.get("ES.ES_INDEX"),
-  //   type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-  //   refresh: config.get("ES.ES_REFRESH"),
-  //   id: ret.id,
-  //   body: ret,
-  // });
+  await esClient.create({
+    index: config.get("ES.ES_INDEX"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+    refresh: config.get("ES.ES_REFRESH"),
+    id: ret.id,
+    body: ret,
+  });
 
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
 
-  // if (challenge.legacy.selfService) {
-  //   if (currentUser.handle) {
-  //     await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
-  //   }
-  // } else {
-  //   if (currentUser.handle) {
-  //     await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
-  //   }
-  // }
+  if (challenge.legacy.selfService) {
+    if (currentUser.handle) {
+      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
+    }
+  } else {
+    if (currentUser.handle) {
+      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+    }
+  }
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
@@ -1744,8 +1745,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
     console.log("Request to validate winners", data.winners, challengeId);
-    // TODO: PUT THIS BACK BEFORE DEPLOYMENT
-    // await validateWinners(data.winners, challengeId);
+    await validateWinners(data.winners, challengeId);
   }
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
@@ -1842,59 +1842,63 @@ async function updateChallenge(currentUser, challengeId, data) {
       `ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(data, null, 2)}`
     );
 
-    const grpcMetadata = new GrpcMetadata();
+    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(data);
 
-    grpcMetadata.set("handle", currentUser.handle);
-    grpcMetadata.set("userId", currentUser.userId);
+    if (!_.isEmpty(updateInput)) {
+      const grpcMetadata = new GrpcMetadata();
 
-    const { items } = await challengeDomain.update(
-      {
-        filterCriteria: getScanCriteria({
-          id: challengeId,
-        }),
-        updateInput: {
-          ...data,
+      grpcMetadata.set("handle", currentUser.handle);
+      grpcMetadata.set("userId", currentUser.userId);
+
+      await challengeDomain.update(
+        {
+          filterCriteria: getScanCriteria({ id: challengeId }),
+          updateInput,
         },
-      },
-      grpcMetadata
-    );
-
-    console.log("Items", items);
+        grpcMetadata
+      );
+    }
   } catch (e) {
     throw e;
   }
 
-  challenge = await challengeDomain.lookup({ id: challengeId });
+  const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
 
   // post bus event
-  logger.debug(`Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(challenge)}`);
+  logger.debug(
+    `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
+  );
 
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, challenge, {
-    key: challenge.status === "Completed" ? `${challenge.id}:${challenge.status}` : undefined,
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
+    key:
+      updatedChallenge.status === "Completed"
+        ? `${updatedChallenge.id}:${updatedChallenge.status}`
+        : undefined,
   });
 
-  enrichChallengeForResponse(challenge, track, type);
+  enrichChallengeForResponse(updatedChallenge, track, type);
 
   // Update ES
+  // TODO: Uncomment
   await esClient.update({
     index: config.get("ES.ES_INDEX"),
     type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
     refresh: config.get("ES.ES_REFRESH"),
     id: challengeId,
     body: {
-      doc: challenge,
+      doc: updatedChallenge,
     },
   });
 
-  if (challenge.legacy.selfService) {
-    const creator = await helper.getMemberByHandle(challenge.createdBy);
+  if (updatedChallenge.legacy.selfService) {
+    const creator = await helper.getMemberByHandle(updatedChallenge.createdBy);
     if (sendSubmittedEmail) {
       await helper.sendSelfServiceNotification(
         constants.SelfServiceNotificationTypes.WORK_REQUEST_SUBMITTED,
         [{ email: creator.email }],
         {
           handle: creator.handle,
-          workItemName: challenge.name,
+          workItemName: updatedChallenge.name,
         }
       );
     }
@@ -1904,8 +1908,8 @@ async function updateChallenge(currentUser, challengeId, data) {
         [{ email: creator.email }],
         {
           handle: creator.handle,
-          workItemName: challenge.name,
-          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}`,
+          workItemName: updatedChallenge.name,
+          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${updatedChallenge.id}`,
         }
       );
     }
@@ -1915,8 +1919,8 @@ async function updateChallenge(currentUser, challengeId, data) {
         [{ email: creator.email }],
         {
           handle: creator.handle,
-          workItemName: challenge.name,
-          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}?tab=solutions`,
+          workItemName: updatedChallenge.name,
+          workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${updatedChallenge.id}?tab=solutions`,
         }
       );
     }
@@ -1927,13 +1931,13 @@ async function updateChallenge(currentUser, challengeId, data) {
         [{ email: creator.email }],
         {
           handle: creator.handle,
-          workItemName: challenge.name,
+          workItemName: updatedChallenge.name,
         }
       );
     }
   }
 
-  return challenge;
+  return updatedChallenge;
 }
 
 updateChallenge.schema = {

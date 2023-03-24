@@ -101,7 +101,7 @@ class ChallengeHelper {
   }
 
   async validateChallengeUpdateRequest(currentUser, challenge, data) {
-    // await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+    await helper.ensureUserCanModifyChallenge(currentUser, challenge);
 
     helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
     helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
@@ -186,6 +186,86 @@ class ChallengeHelper {
         `Cannot set winners for challenge with non-completed ${challenge.status} status`
       );
     }
+  }
+
+  sanitizeRepeatedFieldsInUpdateRequest(data) {
+    if (data.winners != null) {
+      data.winnerUpdate = {
+        winners: [
+          {
+            handle: "ansary",
+            placement: 1,
+            userId: 123,
+          },
+        ], // data.winners,
+      };
+      delete data.winners;
+    }
+
+    if (data.discussions != null) {
+      data.discussionUpdate = {
+        discussions: data.discussions,
+      };
+      delete data.discussions;
+    }
+
+    if (data.metadata != null) {
+      data.metadataUpdate = {
+        metadata: data.metadata,
+      };
+      delete data.metadata;
+    }
+
+    if (data.phases != null) {
+      data.phaseUpdate = {
+        phases: data.phases,
+      };
+      delete data.phases;
+    }
+
+    if (data.events != null) {
+      data.eventUpdate = {
+        events: data.events,
+      };
+      delete data.events;
+    }
+
+    if (data.terms != null) {
+      data.termUpdate = {
+        terms: data.terms,
+      };
+      delete data.terms;
+    }
+
+    if (data.prizeSets != null) {
+      data.prizeSetUpdate = {
+        prizeSets: data.prizeSets,
+      };
+      delete data.prizeSets;
+    }
+
+    if (data.tags != null) {
+      data.tagUpdate = {
+        tags: data.tags,
+      };
+      delete data.tags;
+    }
+
+    if (data.attachments != null) {
+      data.attachmentUpdate = {
+        attachments: data.attachments,
+      };
+      delete data.attachments;
+    }
+
+    if (data.groups != null) {
+      data.groupUpdate = {
+        groups: data.groups,
+      };
+      delete data.groups;
+    }
+
+    return data;
   }
 
   enrichChallengeForResponse(challenge, track, type) {
