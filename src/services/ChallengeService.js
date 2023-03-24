@@ -1982,7 +1982,7 @@ updateChallenge.schema = {
       typeId: Joi.optionalId(),
       name: Joi.string().optional(),
       description: Joi.string().optional(),
-      privateDescription: Joi.string().optional(),
+      privateDescription: Joi.string().allow('').optional(),
       descriptionFormat: Joi.string().optional(),
       metadata: Joi.array()
         .items(
