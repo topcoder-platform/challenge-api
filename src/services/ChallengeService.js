@@ -40,6 +40,7 @@ const {
   validateChallengeUpdateRequest,
   enrichChallengeForResponse,
 } = require("../common/challenge-helper");
+const deepEqual = require("deep-equal");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
@@ -1487,8 +1488,11 @@ async function validateWinners(winners, challengeId) {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
-async function update(currentUser, challengeId, data) {
+async function updateChallenge(currentUser, challengeId, data) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
+  // Remove fields from data that are not allowed to be updated and that match the existing challenge
+  data = sanitizeData(sanitizeChallenge(data), challenge);
 
   validateChallengeUpdateRequest(currentUser, challenge, data);
 
@@ -1545,7 +1549,7 @@ async function update(currentUser, challengeId, data) {
 
         sendActivationEmail = data.status === constants.challengeStatuses.Active;
       } catch (e) {
-        await update(
+        await updateChallenge(
           currentUser,
           challengeId,
           {
@@ -1740,6 +1744,7 @@ async function update(currentUser, challengeId, data) {
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
     console.log("Request to validate winners", data.winners, challengeId);
+    // TODO: PUT THIS BACK BEFORE DEPLOYMENT
     // await validateWinners(data.winners, challengeId);
   }
 
@@ -1798,8 +1803,6 @@ async function update(currentUser, challengeId, data) {
   });
 
   if (_.get(type, "isTask")) {
-    console.log("Type is task - how come", challengeId, type, track);
-    /*
     if (!_.isEmpty(_.get(data, "task.memberId"))) {
       const challengeResources = await helper.getChallengeResources(challengeId);
       const registrants = _.filter(
@@ -1820,7 +1823,6 @@ async function update(currentUser, challengeId, data) {
         );
       }
     }
-    */
   }
 
   if (!_.isUndefined(data.terms)) {
@@ -1829,14 +1831,10 @@ async function update(currentUser, challengeId, data) {
 
   if (data.phases && data.phases.length > 0) {
     await getPhasesAndPopulate(data);
-  }
 
-  // Populate challenge.track and challenge.type based on the track/type IDs
-  if (track) {
-    data.track = track.name;
-  }
-  if (type) {
-    data.type = type.name;
+    if (deepEqual(data.phases, challenge.phases)) {
+      delete data.phases;
+    }
   }
 
   try {
@@ -1938,310 +1936,7 @@ async function update(currentUser, challengeId, data) {
   return challenge;
 }
 
-/**
- * Send notifications
- * @param {Object} currentUser the current use
- * @param {String} challengeId the challenge id
- */
-async function sendNotifications(currentUser, challengeId) {
-  const challenge = await getChallenge(currentUser, challengeId);
-  const creator = await helper.getMemberByHandle(challenge.createdBy);
-  if (challenge.status === constants.challengeStatuses.Completed) {
-    await helper.sendSelfServiceNotification(
-      constants.SelfServiceNotificationTypes.WORK_COMPLETED,
-      [{ email: creator.email }],
-      {
-        handle: creator.handle,
-        workItemName: challenge.name,
-        workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}?tab=solutions`,
-      }
-    );
-    return { type: constants.SelfServiceNotificationTypes.WORK_COMPLETED };
-  }
-}
-
-sendNotifications.schema = {
-  currentUser: Joi.any(),
-  challengeId: Joi.id(),
-};
-
-/**
- * Remove unwanted properties from the challenge object
- * @param {Object} challenge the challenge object
- */
-function sanitizeChallenge(challenge) {
-  const sanitized = _.pick(challenge, [
-    "trackId",
-    "typeId",
-    "name",
-    "description",
-    "privateDescription",
-    "descriptionFormat",
-    "timelineTemplateId",
-    "tags",
-    "projectId",
-    "legacyId",
-    "startDate",
-    "status",
-    "task",
-    "groups",
-    "cancelReason",
-  ]);
-  if (!_.isUndefined(sanitized.name)) {
-    sanitized.name = xss(sanitized.name);
-  }
-  if (!_.isUndefined(sanitized.description)) {
-    sanitized.description = xss(sanitized.description);
-  }
-  if (challenge.legacy) {
-    sanitized.legacy = _.pick(challenge.legacy, [
-      "track",
-      "subTrack",
-      "reviewType",
-      "confidentialityType",
-      "forumId",
-      "directProjectId",
-      "screeningScorecardId",
-      "reviewScorecardId",
-      "isTask",
-      "useSchedulingAPI",
-      "pureV5Task",
-      "pureV5",
-      "selfService",
-      "selfServiceCopilot",
-    ]);
-  }
-  if (challenge.billing) {
-    sanitized.billing = _.pick(challenge.billing, ["billingAccountId", "markup"]);
-  }
-  if (challenge.metadata) {
-    sanitized.metadata = _.map(challenge.metadata, (meta) => _.pick(meta, ["name", "value"]));
-  }
-  if (challenge.phases) {
-    sanitized.phases = _.map(challenge.phases, (phase) =>
-      _.pick(phase, [
-        "phaseId",
-        "duration",
-        "isOpen",
-        "actualEndDate",
-        "scheduledStartDate",
-        "constraints",
-      ])
-    );
-  }
-  if (challenge.prizeSets) {
-    sanitized.prizeSets = _.map(challenge.prizeSets, (prizeSet) => ({
-      ..._.pick(prizeSet, ["type", "description"]),
-      prizes: _.map(prizeSet.prizes, (prize) => _.pick(prize, ["description", "type", "value"])),
-    }));
-  }
-  if (challenge.events) {
-    sanitized.events = _.map(challenge.events, (event) => _.pick(event, ["id", "name", "key"]));
-  }
-  if (challenge.winners) {
-    sanitized.winners = _.map(challenge.winners, (winner) =>
-      _.pick(winner, ["userId", "handle", "placement", "type"])
-    );
-  }
-  if (challenge.discussions) {
-    sanitized.discussions = _.map(challenge.discussions, (discussion) => ({
-      ..._.pick(discussion, ["id", "provider", "name", "type", "url", "options"]),
-      name: _.get(discussion, "name", "").substring(0, config.FORUM_TITLE_LENGTH_LIMIT),
-    }));
-  }
-  if (challenge.terms) {
-    sanitized.terms = _.map(challenge.terms, (term) => _.pick(term, ["id", "roleId"]));
-  }
-  if (challenge.attachments) {
-    sanitized.attachments = _.map(challenge.attachments, (attachment) =>
-      _.pick(attachment, ["id", "name", "url", "fileSize", "description", "challengeId"])
-    );
-  }
-  return sanitized;
-}
-
-/**
- * Fully update challenge.
- * @param {Object} currentUser the user who perform operation
- * @param {String} challengeId the challenge id
- * @param {Object} data the challenge data to be updated
- * @returns {Object} the updated challenge
- */
-async function fullyUpdateChallenge(currentUser, challengeId, data) {
-  return update(currentUser, challengeId, sanitizeChallenge(data), true);
-}
-
-fullyUpdateChallenge.schema = {
-  currentUser: Joi.any(),
-  challengeId: Joi.id(),
-  data: Joi.object()
-    .keys({
-      legacy: Joi.object()
-        .keys({
-          reviewType: Joi.string()
-            .valid(_.values(constants.reviewTypes))
-            .insensitive()
-            .default(constants.reviewTypes.Internal),
-          confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
-          forumId: Joi.number().integer(),
-          directProjectId: Joi.number().integer(),
-          screeningScorecardId: Joi.number().integer(),
-          reviewScorecardId: Joi.number().integer(),
-          isTask: Joi.boolean(),
-          useSchedulingAPI: Joi.boolean(),
-          pureV5Task: Joi.boolean(),
-          pureV5: Joi.boolean(),
-          selfService: Joi.boolean(),
-          selfServiceCopilot: Joi.string().allow(null),
-        })
-        .unknown(true),
-      cancelReason: Joi.string(),
-      billing: Joi.object()
-        .keys({
-          billingAccountId: Joi.string(),
-          markup: Joi.number().min(0).max(100),
-        })
-        .unknown(true),
-      task: Joi.object().keys({
-        isTask: Joi.boolean().default(false),
-        isAssigned: Joi.boolean().default(false),
-        memberId: Joi.string().allow(null),
-      }),
-      trackId: Joi.optionalId(),
-      typeId: Joi.optionalId(),
-      name: Joi.string().required(),
-      description: Joi.string(),
-      privateDescription: Joi.string(),
-      descriptionFormat: Joi.string(),
-      metadata: Joi.array()
-        .items(
-          Joi.object()
-            .keys({
-              name: Joi.string().required(),
-              value: Joi.required(),
-            })
-            .unknown(true)
-        )
-        .unique((a, b) => a.name === b.name),
-      timelineTemplateId: Joi.string(), // Joi.optionalId(),
-      phases: Joi.array().items(
-        Joi.object()
-          .keys({
-            phaseId: Joi.id(),
-            duration: Joi.number().integer().min(0),
-            isOpen: Joi.boolean(),
-            actualEndDate: Joi.date().allow(null),
-            scheduledStartDate: Joi.date().allow(null),
-            constraints: Joi.array()
-              .items(
-                Joi.object()
-                  .keys({
-                    name: Joi.string(),
-                    value: Joi.number().integer().min(0),
-                  })
-                  .optional()
-              )
-              .optional(),
-          })
-          .unknown(true)
-      ),
-      prizeSets: Joi.array().items(
-        Joi.object()
-          .keys({
-            type: Joi.string().valid(_.values(constants.prizeSetTypes)).required(),
-            description: Joi.string(),
-            prizes: Joi.array()
-              .items(
-                Joi.object().keys({
-                  description: Joi.string(),
-                  type: Joi.string().required(),
-                  value: Joi.number().min(0).required(),
-                })
-              )
-              .min(1)
-              .required(),
-          })
-          .unknown(true)
-      ),
-      events: Joi.array().items(
-        Joi.object()
-          .keys({
-            id: Joi.number().required(),
-            name: Joi.string(),
-            key: Joi.string(),
-          })
-          .unknown(true)
-      ),
-      discussions: Joi.array().items(
-        Joi.object().keys({
-          id: Joi.optionalId(),
-          name: Joi.string().required(),
-          type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
-          provider: Joi.string().required(),
-          url: Joi.string(),
-          options: Joi.array().items(Joi.object()),
-        })
-      ),
-      tags: Joi.array().items(Joi.string()), // tag names
-      projectId: Joi.number().integer().positive().required(),
-      legacyId: Joi.number().integer().positive(),
-      startDate: Joi.date(),
-      status: Joi.string().valid(_.values(constants.challengeStatuses)).required(),
-      attachments: Joi.array().items(
-        Joi.object().keys({
-          id: Joi.id(),
-          challengeId: Joi.id(),
-          name: Joi.string().required(),
-          url: Joi.string().uri().required(),
-          fileSize: Joi.fileSize(),
-          description: Joi.string(),
-        })
-      ),
-      groups: Joi.array().items(Joi.optionalId()),
-      // gitRepoURLs: Joi.array().items(Joi.string().uri()),
-      winners: Joi.array()
-        .items(
-          Joi.object()
-            .keys({
-              userId: Joi.number().integer().positive().required(),
-              handle: Joi.string().required(),
-              placement: Joi.number().integer().positive().required(),
-              type: Joi.string()
-                .valid(_.values(constants.prizeSetTypes))
-                .default(constants.prizeSetTypes.ChallengePrizes),
-            })
-            .unknown(true)
-        )
-        .min(1),
-      terms: Joi.array()
-        .items(
-          Joi.object()
-            .keys({
-              id: Joi.id(),
-              roleId: Joi.id(),
-            })
-            .unknown(true)
-        )
-        .optional()
-        .allow([]),
-      overview: Joi.any().forbidden(),
-    })
-    .unknown(true)
-    .required(),
-};
-
-/**
- * Partially update challenge.
- * @param {Object} currentUser the user who perform operation
- * @param {String} challengeId the challenge id
- * @param {Object} data the challenge data to be updated
- * @returns {Object} the updated challenge
- */
-async function partiallyUpdateChallenge(currentUser, challengeId, data) {
-  return update(currentUser, challengeId, sanitizeChallenge(data));
-}
-
-partiallyUpdateChallenge.schema = {
+updateChallenge.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
   data: Joi.object()
@@ -2395,6 +2090,156 @@ partiallyUpdateChallenge.schema = {
 };
 
 /**
+ * Send notifications
+ * @param {Object} currentUser the current use
+ * @param {String} challengeId the challenge id
+ */
+async function sendNotifications(currentUser, challengeId) {
+  const challenge = await getChallenge(currentUser, challengeId);
+  const creator = await helper.getMemberByHandle(challenge.createdBy);
+  if (challenge.status === constants.challengeStatuses.Completed) {
+    await helper.sendSelfServiceNotification(
+      constants.SelfServiceNotificationTypes.WORK_COMPLETED,
+      [{ email: creator.email }],
+      {
+        handle: creator.handle,
+        workItemName: challenge.name,
+        workItemUrl: `${config.SELF_SERVICE_APP_URL}/work-items/${challenge.id}?tab=solutions`,
+      }
+    );
+    return { type: constants.SelfServiceNotificationTypes.WORK_COMPLETED };
+  }
+}
+
+sendNotifications.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+};
+
+/**
+ * Remove unwanted properties from the challenge object
+ * @param {Object} challenge the challenge object
+ */
+function sanitizeChallenge(challenge) {
+  const sanitized = _.pick(challenge, [
+    "trackId",
+    "typeId",
+    "name",
+    "description",
+    "privateDescription",
+    "descriptionFormat",
+    "timelineTemplateId",
+    "tags",
+    "projectId",
+    "legacyId",
+    "startDate",
+    "status",
+    "task",
+    "groups",
+    "cancelReason",
+  ]);
+  if (!_.isUndefined(sanitized.name)) {
+    sanitized.name = xss(sanitized.name);
+  }
+  if (!_.isUndefined(sanitized.description)) {
+    sanitized.description = xss(sanitized.description);
+  }
+  if (challenge.legacy) {
+    sanitized.legacy = _.pick(challenge.legacy, [
+      "track",
+      "subTrack",
+      "reviewType",
+      "confidentialityType",
+      "forumId",
+      "directProjectId",
+      "screeningScorecardId",
+      "reviewScorecardId",
+      "isTask",
+      "useSchedulingAPI",
+      "pureV5Task",
+      "pureV5",
+      "selfService",
+      "selfServiceCopilot",
+    ]);
+  }
+  if (challenge.billing) {
+    sanitized.billing = _.pick(challenge.billing, ["billingAccountId", "markup"]);
+  }
+  if (challenge.metadata) {
+    sanitized.metadata = _.map(challenge.metadata, (meta) => _.pick(meta, ["name", "value"]));
+  }
+  if (challenge.phases) {
+    sanitized.phases = _.map(challenge.phases, (phase) =>
+      _.pick(phase, [
+        "phaseId",
+        "duration",
+        "isOpen",
+        "actualEndDate",
+        "scheduledStartDate",
+        "constraints",
+      ])
+    );
+  }
+  if (challenge.prizeSets) {
+    sanitized.prizeSets = _.map(challenge.prizeSets, (prizeSet) => ({
+      ..._.pick(prizeSet, ["type", "description"]),
+      prizes: _.map(prizeSet.prizes, (prize) => _.pick(prize, ["description", "type", "value"])),
+    }));
+  }
+  if (challenge.events) {
+    sanitized.events = _.map(challenge.events, (event) => _.pick(event, ["id", "name", "key"]));
+  }
+  if (challenge.winners) {
+    sanitized.winners = _.map(challenge.winners, (winner) =>
+      _.pick(winner, ["userId", "handle", "placement", "type"])
+    );
+  }
+  if (challenge.discussions) {
+    sanitized.discussions = _.map(challenge.discussions, (discussion) => ({
+      ..._.pick(discussion, ["id", "provider", "name", "type", "url", "options"]),
+      name: _.get(discussion, "name", "").substring(0, config.FORUM_TITLE_LENGTH_LIMIT),
+    }));
+  }
+  if (challenge.terms) {
+    sanitized.terms = _.map(challenge.terms, (term) => _.pick(term, ["id", "roleId"]));
+  }
+  if (challenge.attachments) {
+    sanitized.attachments = _.map(challenge.attachments, (attachment) =>
+      _.pick(attachment, ["id", "name", "url", "fileSize", "description", "challengeId"])
+    );
+  }
+  return sanitized;
+}
+/*
+  metadata = [ { }, {  }, { }] -> in database
+  metadata = [ {} ]
+
+  final state: [ {} ]
+*/
+
+function sanitizeData(data, challenge) {
+  for (const key in data) {
+    if (key === "phases") continue;
+
+    if (challenge.hasOwnProperty(key)) {
+      if (
+        (typeof data[key] === "object" || Array.isArray(data[key])) &&
+        deepEqual(data[key], challenge[key])
+      ) {
+        delete data[key];
+      } else if (
+        typeof data[key] !== "object" &&
+        !Array.isArray(data[key]) &&
+        data[key] === challenge[key]
+      ) {
+        delete data[key];
+      }
+    }
+  }
+  return data;
+}
+
+/**
  * Delete challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -2434,8 +2279,7 @@ module.exports = {
   searchChallenges,
   createChallenge,
   getChallenge,
-  fullyUpdateChallenge,
-  partiallyUpdateChallenge,
+  updateChallenge,
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,
