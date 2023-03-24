@@ -2204,12 +2204,10 @@ function sanitizeChallenge(challenge) {
   if (challenge.events) {
     sanitized.events = _.map(challenge.events, (event) => _.pick(event, ["id", "name", "key"]));
   }
-  if (challenge.legacy != null && challenge.legacy.pureV5Task === true && challenge.winners) {
+  if (challenge.winners) {
     sanitized.winners = _.map(challenge.winners, (winner) =>
       _.pick(winner, ["userId", "handle", "placement", "type"])
     );
-  } else {
-    delete challenge.winners;
   }
   if (challenge.discussions) {
     sanitized.discussions = _.map(challenge.discussions, (discussion) => ({
