@@ -945,7 +945,7 @@ async function listChallengesByMember(memberId) {
  * @returns {Promise<Array>} an array of resources.
  */
 async function listResourcesByMemberAndChallenge(memberId, challengeId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   let response = {};
   try {
     response = await axios.get(config.RESOURCES_API_URL, {
