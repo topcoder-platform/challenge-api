@@ -185,13 +185,13 @@ class ChallengePhaseHelper {
       };
       if (_.isUndefined(phase.predecessor)) {
         if (_.isUndefined(_.get(phaseFromInput, "scheduledStartDate"))) {
-          phase.scheduledStartDate = moment(startDate).toDate();
+          phase.scheduledStartDate = moment(startDate).toDate().toISOString();
         } else {
-          phase.scheduledStartDate = moment(_.get(phaseFromInput, "scheduledStartDate")).toDate();
+          phase.scheduledStartDate = moment(_.get(phaseFromInput, "scheduledStartDate")).toDate().toISOString();
         }
         phase.scheduledEndDate = moment(phase.scheduledStartDate)
           .add(phase.duration, "seconds")
-          .toDate();
+          .toDate().toISOString();
       }
       return phase;
     });
@@ -209,7 +209,7 @@ class ChallengePhaseHelper {
       }
       phase.scheduledEndDate = moment(phase.scheduledStartDate)
         .add(phase.duration, "seconds")
-        .toDate();
+        .toDate().toISOString();
     }
     return finalPhases;
   }
@@ -236,36 +236,36 @@ class ChallengePhaseHelper {
       if (!_.isUndefined(phase.actualEndDate)) {
         return updatedPhase;
       }
-      if (phase.name === "Iterative Review Phase") {
+      if (updatedPhase.name === "Iterative Review Phase") {
         return updatedPhase;
       }
-      const newPhase = _.find(newPhases, (p) => p.phaseId === phase.phaseId);
+      const newPhase = _.find(newPhases, (p) => p.phaseId === updatedPhase.phaseId);
       if (_.isUndefined(newPhase) && !isBeingActivated) {
         return updatedPhase;
       }
-      phase.duration = _.defaultTo(_.get(newPhase, "duration"), phase.duration);
-      if (_.isUndefined(phase.predecessor)) {
+      updatedPhase.duration = _.defaultTo(_.get(newPhase, "duration"), updatedPhase.duration);
+      if (_.isUndefined(updatedPhase.predecessor)) {
         if (
           isBeingActivated &&
           moment(
-            _.defaultTo(_.get(newPhase, "scheduledStartDate"), phase.scheduledStartDate)
+            _.defaultTo(_.get(newPhase, "scheduledStartDate"), updatedPhase.scheduledStartDate)
           ).isSameOrBefore(moment())
         ) {
-          phase.isOpen = true;
-          phase.scheduledStartDate = moment().toDate();
-          phase.actualStartDate = phase.scheduledStartDate;
+          updatedPhase.isOpen = true;
+          updatedPhase.scheduledStartDate = moment().toDate().toISOString();
+          updatedPhase.actualStartDate = updatedPhase.scheduledStartDate;
         } else if (
-          phase.isOpen === false &&
+          updatedPhase.isOpen === false &&
           !_.isUndefined(_.get(newPhase, "scheduledStartDate"))
         ) {
-          phase.scheduledStartDate = moment(newPhase.scheduledStartDate).toDate();
+          updatedPhase.scheduledStartDate = moment(newPhase.scheduledStartDate).toDate().toISOString();
         }
-        phase.scheduledEndDate = moment(phase.scheduledStartDate)
-          .add(phase.duration, "seconds")
-          .toDate();
+        updatedPhase.scheduledEndDate = moment(updatedPhase.scheduledStartDate)
+          .add(updatedPhase.duration, "seconds")
+          .toDate().toISOString();
       }
       if (!_.isUndefined(newPhase) && !_.isUndefined(newPhase.constraints)) {
-        phase.constraints = newPhase.constraints;
+        updatedPhase.constraints = newPhase.constraints;
       }
       return updatedPhase;
     });
@@ -282,7 +282,7 @@ class ChallengePhaseHelper {
       phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
       phase.scheduledEndDate = moment(phase.scheduledStartDate)
         .add(phase.duration, "seconds")
-        .toDate();
+        .toDate().toISOString();
     }
     return updatedPhases;
   }
