@@ -1494,6 +1494,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Remove fields from data that are not allowed to be updated and that match the existing challenge
   data = sanitizeData(sanitizeChallenge(data), challenge);
+  console.debug('Sanitized Data:', data);
 
   validateChallengeUpdateRequest(currentUser, challenge, data);
 
@@ -1738,7 +1739,6 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
 
     data.phases = newPhases;
-    challenge.phases = newPhases;
     data.startDate = newStartDate;
     data.endDate = helper.calculateChallengeEndDate(challenge, data);
   }
@@ -1982,7 +1982,7 @@ updateChallenge.schema = {
       typeId: Joi.optionalId(),
       name: Joi.string().optional(),
       description: Joi.string().optional(),
-      privateDescription: Joi.string().optional(),
+      privateDescription: Joi.string().allow('').optional(),
       descriptionFormat: Joi.string().optional(),
       metadata: Joi.array()
         .items(
@@ -2188,8 +2188,6 @@ function sanitizeChallenge(challenge) {
       _.pick(phase, [
         "phaseId",
         "duration",
-        "isOpen",
-        "actualEndDate",
         "scheduledStartDate",
         "constraints",
       ])
