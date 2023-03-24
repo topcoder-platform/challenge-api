@@ -1869,14 +1869,14 @@ async function updateChallenge(currentUser, challengeId, data) {
     `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
   );
 
+  enrichChallengeForResponse(updatedChallenge, track, type);
+
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
     key:
       updatedChallenge.status === "Completed"
         ? `${updatedChallenge.id}:${updatedChallenge.status}`
         : undefined,
   });
-
-  enrichChallengeForResponse(updatedChallenge, track, type);
 
   // Update ES
   // TODO: Uncomment
@@ -1964,12 +1964,14 @@ updateChallenge.schema = {
           selfServiceCopilot: Joi.string().allow(null),
         })
         .unknown(true),
-      cancelReason: Joi.string(),
-      task: Joi.object().keys({
-        isTask: Joi.boolean().default(false),
-        isAssigned: Joi.boolean().default(false),
-        memberId: Joi.alternatives().try(Joi.string().allow(null), Joi.number().allow(null)),
-      }),
+      cancelReason: Joi.string().optional(),
+      task: Joi.object()
+        .keys({
+          isTask: Joi.boolean().default(false),
+          isAssigned: Joi.boolean().default(false),
+          memberId: Joi.alternatives().try(Joi.string().allow(null), Joi.number().allow(null)),
+        })
+        .optional(),
       billing: Joi.object()
         .keys({
           billingAccountId: Joi.string(),
@@ -1978,10 +1980,10 @@ updateChallenge.schema = {
         .unknown(true),
       trackId: Joi.optionalId(),
       typeId: Joi.optionalId(),
-      name: Joi.string(),
-      description: Joi.string(),
-      privateDescription: Joi.string(),
-      descriptionFormat: Joi.string(),
+      name: Joi.string().optional(),
+      description: Joi.string().optional(),
+      privateDescription: Joi.string().optional(),
+      descriptionFormat: Joi.string().optional(),
       metadata: Joi.array()
         .items(
           Joi.object()
@@ -1992,7 +1994,7 @@ updateChallenge.schema = {
             .unknown(true)
         )
         .unique((a, b) => a.name === b.name),
-      timelineTemplateId: Joi.string(), // changing this to update migrated challenges
+      timelineTemplateId: Joi.string().optional(), // changing this to update migrated challenges
       phases: Joi.array()
         .items(
           Joi.object()
@@ -2015,7 +2017,8 @@ updateChallenge.schema = {
             })
             .unknown(true)
         )
-        .min(1),
+        .min(1)
+        .optional(),
       events: Joi.array().items(
         Joi.object()
           .keys({
@@ -2024,17 +2027,20 @@ updateChallenge.schema = {
             key: Joi.string(),
           })
           .unknown(true)
+          .optional()
       ),
-      discussions: Joi.array().items(
-        Joi.object().keys({
-          id: Joi.optionalId(),
-          name: Joi.string().required(),
-          type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
-          provider: Joi.string().required(),
-          url: Joi.string(),
-          options: Joi.array().items(Joi.object()),
-        })
-      ),
+      discussions: Joi.array()
+        .items(
+          Joi.object().keys({
+            id: Joi.optionalId(),
+            name: Joi.string().required(),
+            type: Joi.string().required().valid(_.values(constants.DiscussionTypes)),
+            provider: Joi.string().required(),
+            url: Joi.string(),
+            options: Joi.array().items(Joi.object()),
+          })
+        )
+        .optional(),
       startDate: Joi.date(),
       prizeSets: Joi.array()
         .items(
@@ -2085,7 +2091,7 @@ updateChallenge.schema = {
             })
             .unknown(true)
         )
-        .min(1),
+        .optional(),
       terms: Joi.array().items(
         Joi.object().keys({
           id: Joi.id(),
@@ -2198,10 +2204,12 @@ function sanitizeChallenge(challenge) {
   if (challenge.events) {
     sanitized.events = _.map(challenge.events, (event) => _.pick(event, ["id", "name", "key"]));
   }
-  if (challenge.winners) {
+  if (challenge.legacy != null && challenge.legacy.pureV5Task === true && challenge.winners) {
     sanitized.winners = _.map(challenge.winners, (winner) =>
       _.pick(winner, ["userId", "handle", "placement", "type"])
     );
+  } else {
+    delete challenge.winners;
   }
   if (challenge.discussions) {
     sanitized.discussions = _.map(challenge.discussions, (discussion) => ({
@@ -2219,12 +2227,6 @@ function sanitizeChallenge(challenge) {
   }
   return sanitized;
 }
-/*
-  metadata = [ { }, {  }, { }] -> in database
-  metadata = [ {} ]
-
-  final state: [ {} ]
-*/
 
 function sanitizeData(data, challenge) {
   for (const key in data) {
