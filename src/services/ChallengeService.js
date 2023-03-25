@@ -1517,9 +1517,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Make sure the user cannot change the direct project ID
   if (data.legacy && data.legacy.directProjectId) {
-    const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
-
-    _.set(challenge, "legacy.directProjectId", directProjectId);
+    _.unset(data, "legacy.directProjectId", directProjectId);
   }
 
   /* BEGIN self-service stuffs */
