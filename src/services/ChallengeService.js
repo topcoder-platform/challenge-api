@@ -1515,6 +1515,13 @@ async function updateChallenge(currentUser, challengeId, data) {
     _.set(data, "billing.markup", markup || 0);
   }
 
+  // Make sure the user cannot change the direct project ID
+  if (data.legacy && data.legacy.directProjectId) {
+    const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
+
+    _.set(challenge, "legacy.directProjectId", directProjectId);
+  }
+
   /* BEGIN self-service stuffs */
 
   // TODO: At some point in the future this should be moved to a Self-Service Challenge Helper

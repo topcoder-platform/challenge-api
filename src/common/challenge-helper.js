@@ -117,6 +117,11 @@ class ChallengeHelper {
       await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
     }
 
+    // Ensure descriptionFormat is either 'markdown' or 'html'
+    if (data.descriptionFormat && !_.includes(["markdown", "html"], data.descriptionFormat)) {
+      throw new errors.BadRequestError("The property 'descriptionFormat' must be either 'markdown' or 'html'");
+    }
+
     // Ensure unchangeable fields are not changed
     if (
       _.get(challenge, "legacy.track") &&
