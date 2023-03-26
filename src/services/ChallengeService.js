@@ -158,7 +158,6 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
       },
     },
   };
-  logger.debug(`es Query ${JSON.stringify(esQuery)}`);
   let docs;
   try {
     docs =
@@ -847,8 +846,6 @@ async function searchChallenges(currentUser, criteria) {
       ],
     },
   };
-
-  logger.debug(`es Query ${JSON.stringify(esQuery, null, 4)}`);
   // Search with constructed query
   let docs;
   try {
@@ -858,7 +855,6 @@ async function searchChallenges(currentUser, criteria) {
         : (await esClient.search(esQuery)).body;
   } catch (e) {
     // Catch error when the ES is fresh and has no data
-    logger.error(`Query Error from ES ${JSON.stringify(e, null, 4)}`);
     docs = {
       hits: {
         total: 0,
@@ -1758,7 +1754,6 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
-    console.log("Request to validate winners", data.winners, challengeId);
     await validateWinners(data.winners, challengeId);
   }
 
