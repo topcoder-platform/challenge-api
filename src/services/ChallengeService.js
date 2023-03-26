@@ -1835,7 +1835,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   if (!_.isUndefined(data.terms)) {
-    await helper.validateChallengeTerms(data.terms.map((t) => t.id));
+    await helper.validateChallengeTerms(data.terms);
   }
 
   if (data.phases && data.phases.length > 0) {
