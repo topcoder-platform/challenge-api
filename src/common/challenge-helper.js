@@ -10,6 +10,7 @@ const constants = require("../../app-constants");
 const axios = require("axios");
 const { getM2MToken } = require("./m2m-helper");
 const { hasAdminRole } = require("./role-helper");
+const { ensureAcessibilityToModifiedGroups } = require("./group-helper");
 
 class ChallengeHelper {
   /**
@@ -45,7 +46,7 @@ class ChallengeHelper {
    * @param {String} projectId the project id
    * @param {String} currentUser the user
    */
-  async ensureProjectExist(projectId, currentUser) {
+  static async ensureProjectExist(projectId, currentUser) {
     let token = await getM2MToken();
     const url = `${config.PROJECTS_API_URL}/${projectId}`;
     try {
@@ -97,6 +98,252 @@ class ChallengeHelper {
 
     // check groups authorization
     await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
+  }
+
+  async validateChallengeUpdateRequest(currentUser, challenge, data) {
+    if (process.env.LOCAL != "true") {
+      await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+    }
+
+    helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
+    helper.ensureNoDuplicateOrNullElements(data.groups, "groups");
+
+    if (data.projectId) {
+      await ChallengeHelper.ensureProjectExist(data.projectId, currentUser);
+    }
+
+    // check groups access to be updated group values
+    if (data.groups) {
+      await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
+    }
+
+    // Ensure descriptionFormat is either 'markdown' or 'html'
+    if (data.descriptionFormat && !_.includes(["markdown", "html"], data.descriptionFormat)) {
+      throw new errors.BadRequestError("The property 'descriptionFormat' must be either 'markdown' or 'html'");
+    }
+
+    // Ensure unchangeable fields are not changed
+    if (
+      _.get(challenge, "legacy.track") &&
+      _.get(data, "legacy.track") &&
+      _.get(challenge, "legacy.track") !== _.get(data, "legacy.track")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.track");
+    }
+
+    if (
+      _.get(challenge, "trackId") &&
+      _.get(data, "trackId") &&
+      _.get(challenge, "trackId") !== _.get(data, "trackId")
+    ) {
+      throw new errors.ForbiddenError("Cannot change trackId");
+    }
+
+    if (
+      _.get(challenge, "typeId") &&
+      _.get(data, "typeId") &&
+      _.get(challenge, "typeId") !== _.get(data, "typeId")
+    ) {
+      throw new errors.ForbiddenError("Cannot change typeId");
+    }
+
+    if (
+      _.get(challenge, "legacy.pureV5Task") &&
+      _.get(data, "legacy.pureV5Task") &&
+      _.get(challenge, "legacy.pureV5Task") !== _.get(data, "legacy.pureV5Task")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.pureV5Task");
+    }
+
+    if (
+      _.get(challenge, "legacy.pureV5") &&
+      _.get(data, "legacy.pureV5") &&
+      _.get(challenge, "legacy.pureV5") !== _.get(data, "legacy.pureV5")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.pureV5");
+    }
+
+    if (
+      _.get(challenge, "legacy.selfService") &&
+      _.get(data, "legacy.selfService") &&
+      _.get(challenge, "legacy.selfService") !== _.get(data, "legacy.selfService")
+    ) {
+      throw new errors.ForbiddenError("Cannot change legacy.selfService");
+    }
+
+    if (
+      (challenge.status === constants.challengeStatuses.Completed ||
+        challenge.status === constants.challengeStatuses.Cancelled) &&
+      data.status &&
+      data.status !== challenge.status &&
+      data.status !== constants.challengeStatuses.CancelledClientRequest
+    ) {
+      throw new errors.BadRequestError(
+        `Cannot change ${challenge.status} challenge status to ${data.status} status`
+      );
+    }
+
+    if (
+      data.winners &&
+      data.winners.length > 0 &&
+      challenge.status !== constants.challengeStatuses.Completed &&
+      data.status !== constants.challengeStatuses.Completed
+    ) {
+      throw new errors.BadRequestError(
+        `Cannot set winners for challenge with non-completed ${challenge.status} status`
+      );
+    }
+  }
+
+  sanitizeRepeatedFieldsInUpdateRequest(data) {
+    if (data.winners != null) {
+      data.winnerUpdate = {
+        winners: data.winners,
+      };
+      delete data.winners;
+    }
+
+    if (data.discussions != null) {
+      data.discussionUpdate = {
+        discussions: data.discussions,
+      };
+      delete data.discussions;
+    }
+
+    if (data.metadata != null) {
+      data.metadataUpdate = {
+        metadata: data.metadata,
+      };
+      delete data.metadata;
+    }
+
+    if (data.phases != null) {
+      data.phaseUpdate = {
+        phases: data.phases,
+      };
+      delete data.phases;
+    }
+
+    if (data.events != null) {
+      data.eventUpdate = {
+        events: data.events,
+      };
+      delete data.events;
+    }
+
+    if (data.terms != null) {
+      data.termUpdate = {
+        terms: data.terms,
+      };
+      delete data.terms;
+    }
+
+    if (data.prizeSets != null) {
+      data.prizeSetUpdate = {
+        prizeSets: data.prizeSets,
+      };
+      delete data.prizeSets;
+    }
+
+    if (data.tags != null) {
+      data.tagUpdate = {
+        tags: data.tags,
+      };
+      delete data.tags;
+    }
+
+    if (data.attachments != null) {
+      data.attachmentUpdate = {
+        attachments: data.attachments,
+      };
+      delete data.attachments;
+    }
+
+    if (data.groups != null) {
+      data.groupUpdate = {
+        groups: data.groups,
+      };
+      delete data.groups;
+    }
+
+    return data;
+  }
+
+  enrichChallengeForResponse(challenge, track, type) {
+    if (challenge.phases && challenge.phases.length > 0) {
+      const registrationPhase = _.find(challenge.phases, (p) => p.name === "Registration");
+      const submissionPhase = _.find(challenge.phases, (p) => p.name === "Submission");
+
+      challenge.currentPhase = challenge.phases
+        .slice()
+        .reverse()
+        .find((phase) => phase.isOpen);
+
+      challenge.currentPhaseNames = _.map(
+        _.filter(challenge.phases, (p) => p.isOpen === true),
+        "name"
+      );
+
+      if (registrationPhase) {
+        challenge.registrationStartDate =
+          registrationPhase.actualStartDate || registrationPhase.scheduledStartDate;
+        challenge.registrationEndDate =
+          registrationPhase.actualEndDate || registrationPhase.scheduledEndDate;
+      }
+      if (submissionPhase) {
+        challenge.submissionStartDate =
+          submissionPhase.actualStartDate || submissionPhase.scheduledStartDate;
+
+        challenge.submissionEndDate =
+          submissionPhase.actualEndDate || submissionPhase.scheduledEndDate;
+      }
+    }
+
+    challenge.created = new Date(challenge.created).toISOString();
+    challenge.updated = new Date(challenge.updated).toISOString();
+    challenge.startDate = new Date(challenge.startDate).toISOString();
+    challenge.endDate = new Date(challenge.endDate).toISOString();
+
+    if (track) {
+      challenge.track = track.name;
+    }
+
+    if (type) {
+      challenge.type = type.name;
+    }
+
+    challenge.metadata = challenge.metadata.map((m) => {
+      try {
+        m.value = JSON.stringify(JSON.parse(m.value)); // when we update how we index data, make this a JSON field
+      } catch (err) {
+        // do nothing
+      }
+      return m;
+    });
+  }
+
+  convertPrizeSetValuesToCents(prizeSets) {
+    prizeSets.forEach((prizeSet) => {
+      prizeSet.prizes.forEach((prize) => {
+        prize.amountInCents = prize.value * 100;
+        delete prize.value;
+      });
+    });
+  }
+
+  convertPrizeSetValuesToDollars(prizeSets, overview) {
+    prizeSets.forEach((prizeSet) => {
+      prizeSet.prizes.forEach((prize) => {
+        if (prize.amountInCents != null) {
+          prize.value = prize.amountInCents / 100;
+          delete prize.amountInCents;
+        }
+      });
+    });
+    if (overview && overview.totalPrizesInCents) {
+      overview.totalPrizes = overview.totalPrizesInCents / 100;
+      delete overview.totalPrizesInCents;
+    }
   }
 }
 

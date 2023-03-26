@@ -55,7 +55,7 @@ module.exports = {
     },
     put: {
       controller: "ChallengeController",
-      method: "fullyUpdateChallenge",
+      method: "updateChallenge",
       auth: "jwt",
       access: [
         constants.UserRoles.Admin,
@@ -68,12 +68,12 @@ module.exports = {
     },
     patch: {
       controller: "ChallengeController",
-      method: "partiallyUpdateChallenge",
+      method: "updateChallenge",
       auth: "jwt",
       access: [
         constants.UserRoles.Admin,
-        constants.UserRoles.Copilot,
         constants.UserRoles.SelfServiceCustomer,
+        constants.UserRoles.Copilot,
         constants.UserRoles.Manager,
         constants.UserRoles.User,
       ],

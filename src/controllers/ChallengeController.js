@@ -48,15 +48,9 @@ async function searchChallenges(req, res) {
  */
 async function createChallenge(req, res) {
   logger.debug(
-    `createChallenge User: ${JSON.stringify(
-      req.authUser
-    )} - Body: ${JSON.stringify(req.body)}`
+    `createChallenge User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`
   );
-  const result = await service.createChallenge(
-    req.authUser,
-    req.body,
-    req.userToken
-  );
+  const result = await service.createChallenge(req.authUser, req.body, req.userToken);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -66,10 +60,7 @@ async function createChallenge(req, res) {
  * @param {Object} res the response
  */
 async function sendNotifications(req, res) {
-  const result = await service.sendNotifications(
-    req.authUser,
-    req.params.challengeId
-  );
+  const result = await service.sendNotifications(req.authUser, req.params.challengeId);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -93,31 +84,7 @@ async function getChallenge(req, res) {
  * @param {Object} res the response
  */
 async function getChallengeStatistics(req, res) {
-  const result = await service.getChallengeStatistics(
-    req.authUser,
-    req.params.challengeId
-  );
-  res.send(result);
-}
-
-/**
- * Fully update challenge
- * @param {Object} req the request
- * @param {Object} res the response
- */
-async function fullyUpdateChallenge(req, res) {
-  logger.debug(
-    `fullyUpdateChallenge User: ${JSON.stringify(
-      req.authUser
-    )} - ChallengeID: ${req.params.challengeId} - Body: ${JSON.stringify(
-      req.body
-    )}`
-  );
-  const result = await service.fullyUpdateChallenge(
-    req.authUser,
-    req.params.challengeId,
-    req.body
-  );
+  const result = await service.getChallengeStatistics(req.authUser, req.params.challengeId);
   res.send(result);
 }
 
@@ -126,19 +93,13 @@ async function fullyUpdateChallenge(req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function partiallyUpdateChallenge(req, res) {
+async function updateChallenge(req, res) {
   logger.debug(
-    `partiallyUpdateChallenge User: ${JSON.stringify(
-      req.authUser
-    )} - ChallengeID: ${req.params.challengeId} - Body: ${JSON.stringify(
-      req.body
-    )}`
+    `updateChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${
+      req.params.challengeId
+    } - Body: ${JSON.stringify(req.body)}`
   );
-  const result = await service.partiallyUpdateChallenge(
-    req.authUser,
-    req.params.challengeId,
-    req.body
-  );
+  const result = await service.updateChallenge(req.authUser, req.params.challengeId, req.body);
   res.send(result);
 }
 
@@ -149,14 +110,9 @@ async function partiallyUpdateChallenge(req, res) {
  */
 async function deleteChallenge(req, res) {
   logger.debug(
-    `deleteChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${
-      req.params.challengeId
-    }`
+    `deleteChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${req.params.challengeId}`
   );
-  const result = await service.deleteChallenge(
-    req.authUser,
-    req.params.challengeId
-  );
+  const result = await service.deleteChallenge(req.authUser, req.params.challengeId);
   res.send(result);
 }
 
@@ -164,8 +120,7 @@ module.exports = {
   searchChallenges,
   createChallenge,
   getChallenge,
-  fullyUpdateChallenge,
-  partiallyUpdateChallenge,
+  updateChallenge,
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,

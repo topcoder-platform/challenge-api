@@ -450,16 +450,19 @@ axiosRetry(axios, {
  * @param {String} token The token
  * @returns
  */
-async function createSelfServiceProject(name, description, type, token) {
+async function createSelfServiceProject(name, description, type) {
   const projectObj = {
     name,
     description,
     type,
   };
+
+  const token = await m2mHelper.getM2MToken();
   const url = `${config.PROJECTS_API_URL}`;
   const res = await axios.post(url, projectObj, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return _.get(res, "data.id");
 }
 
@@ -942,7 +945,7 @@ async function listChallengesByMember(memberId) {
  * @returns {Promise<Array>} an array of resources.
  */
 async function listResourcesByMemberAndChallenge(memberId, challengeId) {
-  const token = await getM2MToken();
+  const token = await m2mHelper.getM2MToken();
   let response = {};
   try {
     response = await axios.get(config.RESOURCES_API_URL, {
@@ -1123,7 +1126,7 @@ async function ensureUserCanViewChallenge(currentUser, challenge) {
  *
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to check
- * @returns {undefined}
+ * @returns {Promise}
  */
 async function ensureUserCanModifyChallenge(currentUser, challenge) {
   // check groups authorization
