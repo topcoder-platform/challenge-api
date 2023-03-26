@@ -102,7 +102,6 @@ async function update(phaseId, data, isFull) {
     const { items } = await phaseDomain.scan({
       criteria: getScanCriteria({ name: data.name }),
     });
-    console.log("items", items);
     if (items.length > 0)
       throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
   }
