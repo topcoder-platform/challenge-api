@@ -40,6 +40,8 @@ const {
   validateChallengeUpdateRequest,
   enrichChallengeForResponse,
   sanitizeRepeatedFieldsInUpdateRequest,
+  convertPrizeSetValuesToCents,
+  convertPrizeSetValuesToDollars,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 
@@ -1118,7 +1120,9 @@ async function createChallenge(currentUser, challenge, userToken) {
   grpcMetadata.set("handle", currentUser.handle);
   grpcMetadata.set("userId", currentUser.userId);
 
+  convertPrizeSetValuesToCents(challenge.prizeSets);
   const ret = await challengeDomain.create(challenge, grpcMetadata);
+  convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
 
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
@@ -1841,10 +1845,6 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   try {
-    logger.debug(
-      `ChallengeDomain.update id: ${challengeId} Details:  ${JSON.stringify(data, null, 2)}`
-    );
-
     const updateInput = sanitizeRepeatedFieldsInUpdateRequest(data);
 
     if (!_.isEmpty(updateInput)) {
@@ -1853,7 +1853,9 @@ async function updateChallenge(currentUser, challengeId, data) {
       grpcMetadata.set("handle", currentUser.handle);
       grpcMetadata.set("userId", currentUser.userId);
 
-      console.log("Calling update", updateInput);
+      if (updateInput.prizeSetUpdate != null) {
+        convertPrizeSetValuesToCents(updateInput.prizeSetUpdate.prizeSets);
+      }
       await challengeDomain.update(
         {
           filterCriteria: getScanCriteria({ id: challengeId }),
@@ -1867,6 +1869,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
 
   // post bus event
   logger.debug(

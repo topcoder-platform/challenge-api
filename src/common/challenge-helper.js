@@ -316,6 +316,30 @@ class ChallengeHelper {
       return m;
     });
   }
+
+  convertPrizeSetValuesToCents(prizeSets) {
+    prizeSets.forEach((prizeSet) => {
+      prizeSet.prizes.forEach((prize) => {
+        prize.amountInCents = prize.value * 100;
+        delete prize.value;
+      });
+    });
+  }
+
+  convertPrizeSetValuesToDollars(prizeSets, overview) {
+    prizeSets.forEach((prizeSet) => {
+      prizeSet.prizes.forEach((prize) => {
+        if (prize.amountInCents != null) {
+          prize.value = prize.amountInCents / 100;
+          delete prize.amountInCents;
+        }
+      });
+    });
+    if (overview && overview.totalPrizesInCents) {
+      overview.totalPrizes = overview.totalPrizesInCents / 100;
+      delete overview.totalPrizesInCents;
+    }
+  }
 }
 
 module.exports = new ChallengeHelper();
