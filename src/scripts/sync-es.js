@@ -15,6 +15,7 @@ async function indexChallenge(challenge) {
   try {
     await esClient.update({
       index: config.get("ES.ES_INDEX"),
+      type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
       id: challenge.id,
       body: { doc: challenge, doc_as_upsert: true },
     });

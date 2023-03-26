@@ -42,7 +42,9 @@ module.exports = {
     // above AWS_REGION is used if we use AWS ES
     HOST: process.env.ES_HOST || "localhost:9200",
     API_VERSION: process.env.ES_API_VERSION || "6.8",
+    OPENSEARCH: process.env.OPENSEARCH || "false",
     ES_INDEX: process.env.ES_INDEX || "challenge",
+    ES_TYPE: process.env.ES_TYPE || "_doc",
     ES_REFRESH: process.env.ES_REFRESH || "true",
     TEMP_REINDEXING: process.env.TEMP_REINDEXING || true, // if true, it won't delete the existing index when reindexing data
   },
@@ -95,6 +97,7 @@ module.exports = {
   DEFAULT_CONFIDENTIALITY_TYPE: process.env.DEFAULT_CONFIDENTIALITY_TYPE || "public",
 
   M2M_AUDIT_HANDLE: process.env.M2M_AUDIT_HANDLE || "tcwebservice",
+  M2M_AUDIT_USERID: process.env.M2M_AUDIT_USERID || 22838965,
 
   FORUM_TITLE_LENGTH_LIMIT: process.env.FORUM_TITLE_LENGTH_LIMIT || 90,
 

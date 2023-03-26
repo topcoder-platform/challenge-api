@@ -5,6 +5,7 @@ const config = require("config");
 const HttpStatus = require("http-status-codes");
 const m2mHelper = require("./m2m-helper");
 const { hasAdminRole } = require("./role-helper");
+const errors = require("./errors");
 
 class ProjectHelper {
   /**
