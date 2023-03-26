@@ -147,7 +147,7 @@ async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
 async function searchByLegacyId(currentUser, legacyId, page, perPage) {
   const esQuery = {
     index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.ES_TYPE"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
     size: perPage,
     from: (page - 1) * perPage,
     body: {
@@ -158,11 +158,13 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
       },
     },
   };
-  1493;
   logger.debug(`es Query ${JSON.stringify(esQuery)}`);
   let docs;
   try {
-    docs = await esClient.search(esQuery);
+    docs =
+      config.get("ES.OPENSEARCH") == "false"
+        ? await esClient.search(esQuery)
+        : (await esClient.search(esQuery)).body;
   } catch (e) {
     logger.error(`Query Error from ES ${JSON.stringify(e)}`);
     docs = {
