@@ -58,7 +58,6 @@ The following parameters can be set in config files or in env variables:
 - ES.HOST: Elasticsearch host
 - ES.API_VERSION: Elasticsearch API version
 - ES.ES_INDEX: Elasticsearch index name
-- ES.ES_TYPE: Elasticsearch index type
 - ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
 - RESOURCES_API_URL: TC resources API base URL
