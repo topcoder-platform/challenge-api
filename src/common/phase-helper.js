@@ -187,11 +187,14 @@ class ChallengePhaseHelper {
         if (_.isUndefined(_.get(phaseFromInput, "scheduledStartDate"))) {
           phase.scheduledStartDate = moment(startDate).toDate().toISOString();
         } else {
-          phase.scheduledStartDate = moment(_.get(phaseFromInput, "scheduledStartDate")).toDate().toISOString();
+          phase.scheduledStartDate = moment(_.get(phaseFromInput, "scheduledStartDate"))
+            .toDate()
+            .toISOString();
         }
         phase.scheduledEndDate = moment(phase.scheduledStartDate)
           .add(phase.duration, "seconds")
-          .toDate().toISOString();
+          .toDate()
+          .toISOString();
       }
       return phase;
     });
@@ -202,14 +205,15 @@ class ChallengePhaseHelper {
       const precedecessorPhase = _.find(finalPhases, {
         phaseId: phase.predecessor,
       });
-      if (phase.name === "Iterative Review Phase") {
+      if (phase.name === "Iterative Review") {
         phase.scheduledStartDate = precedecessorPhase.scheduledStartDate;
       } else {
         phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
       }
       phase.scheduledEndDate = moment(phase.scheduledStartDate)
         .add(phase.duration, "seconds")
-        .toDate().toISOString();
+        .toDate()
+        .toISOString();
     }
     return finalPhases;
   }
@@ -224,19 +228,25 @@ class ChallengePhaseHelper {
       timelineTemplateId
     );
     const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
-
+    const updatedRegistrationPhase = undefined;
     const updatedPhases = _.map(challengePhases, (phase) => {
       const phaseFromTemplate = timelineTemplateMap.get(phase.phaseId);
       const phaseDefinition = phaseDefinitionMap.get(phase.phaseId);
       const updatedPhase = {
         ...phase,
-        predecessor: phaseFromTemplate.predecessor,
+        predecessor: phaseFromTemplate && phaseFromTemplate.predecessor,
         description: phaseDefinition.description,
       };
+      if (updatedPhase.name === "Post-Mortem") {
+        updatedPhase.predecessor = "a93544bc-c165-4af4-b55e-18f3593b457a";
+      }
+      if (updatedPhase.name === "Registration") {
+        updatedRegistrationPhase = updatedPhase;
+      }
       if (!_.isUndefined(phase.actualEndDate)) {
         return updatedPhase;
       }
-      if (updatedPhase.name === "Iterative Review Phase") {
+      if (updatedPhase.name === "Iterative Review") {
         return updatedPhase;
       }
       const newPhase = _.find(newPhases, (p) => p.phaseId === updatedPhase.phaseId);
@@ -245,44 +255,65 @@ class ChallengePhaseHelper {
       }
       updatedPhase.duration = _.defaultTo(_.get(newPhase, "duration"), updatedPhase.duration);
       if (_.isUndefined(updatedPhase.predecessor)) {
+        const finalScheduledStartDate = _.defaultTo(
+          _.get(newPhase, "scheduledStartDate"),
+          updatedPhase.scheduledStartDate
+        );
         if (
-          isBeingActivated &&
-          moment(
-            _.defaultTo(_.get(newPhase, "scheduledStartDate"), updatedPhase.scheduledStartDate)
-          ).isSameOrBefore(moment())
+          updatedPhase.name === "Submission" &&
+          moment(finalScheduledStartDate).isBefore(
+            moment(updatedRegistrationPhase && updatedRegistrationPhase.scheduledStartDate)
+          )
         ) {
+          finalScheduledStartDate = updatedRegistrationPhase.scheduledStartDate;
+        }
+        if (isBeingActivated && moment(finalScheduledStartDate).isSameOrBefore(moment())) {
           updatedPhase.isOpen = true;
           updatedPhase.scheduledStartDate = moment().toDate().toISOString();
           updatedPhase.actualStartDate = updatedPhase.scheduledStartDate;
-        } else if (
-          updatedPhase.isOpen === false &&
-          !_.isUndefined(_.get(newPhase, "scheduledStartDate"))
-        ) {
-          updatedPhase.scheduledStartDate = moment(newPhase.scheduledStartDate).toDate().toISOString();
+        } else if (updatedPhase.isOpen === false) {
+          updatedPhase.scheduledStartDate = moment(finalScheduledStartDate).toDate().toISOString();
         }
         updatedPhase.scheduledEndDate = moment(updatedPhase.scheduledStartDate)
           .add(updatedPhase.duration, "seconds")
-          .toDate().toISOString();
+          .toDate()
+          .toISOString();
       }
       if (!_.isUndefined(newPhase) && !_.isUndefined(newPhase.constraints)) {
         updatedPhase.constraints = newPhase.constraints;
       }
+      if (updatedPhase.name === "Registration") {
+        updatedRegistrationPhase = updatedPhase;
+      }
       return updatedPhase;
     });
+    let lastIterative = undefined;
     for (let phase of updatedPhases) {
       if (_.isUndefined(phase.predecessor)) {
         continue;
       }
-      if (phase.name === "Iterative Review Phase") {
-        continue;
+      let predecessorPhase = undefined;
+      if (phase.name === "Iterative Review") {
+        if (!_.isUndefined(lastIterative)) {
+          predecessorPhase = lastIterative;
+        } else {
+          predecessorPhase = _.find(updatedPhases, {
+            phaseId: phase.predecessor,
+          });
+        }
+      } else {
+        predecessorPhase = _.find(updatedPhases, {
+          phaseId: phase.predecessor,
+        });
       }
-      const precedecessorPhase = _.find(updatedPhases, {
-        phaseId: phase.predecessor,
-      });
-      phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
+      phase.scheduledStartDate = predecessorPhase.scheduledEndDate;
       phase.scheduledEndDate = moment(phase.scheduledStartDate)
         .add(phase.duration, "seconds")
-        .toDate().toISOString();
+        .toDate()
+        .toISOString();
+      if (phase.name === "Iterative Review") {
+        lastIterative = phase;
+      }
     }
     return updatedPhases;
   }
