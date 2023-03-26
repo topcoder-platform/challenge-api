@@ -69,6 +69,7 @@ jobs:
       DEPLOY_ENV: "PROD"
       LOGICAL_ENV: "prod"
       APPNAME: "challenge-api"
+      CODEARTIFACT_ENV: "PROD"
     steps: *builddeploy_steps
 
 workflows:
