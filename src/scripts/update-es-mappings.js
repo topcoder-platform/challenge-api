@@ -1,68 +1,70 @@
-const config = require('config')
-const logger = require('../common/logger')
-const helper = require('../common/helper')
+const config = require("config");
+const logger = require("../common/logger");
+const helper = require("../common/helper");
 
-const esClient = helper.getESClient()
+const esClient = helper.getESClient();
 
-function sleep (ms) {
+function sleep(ms) {
   return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
+    setTimeout(resolve, ms);
+  });
 }
 
-function createIndex (indexName) {
-  const body = { mappings: {} }
-  body.mappings[config.get('ES.ES_TYPE')] = {
+function createIndex(indexName) {
+  const body = { mappings: {} };
+  body.mappings[config.get("ES.ES_TYPE")] = {
     properties: {
-      id: { type: 'keyword' },
+      id: { type: "keyword" },
       name: {
-        type: 'keyword',
-        normalizer: 'custom_sort_normalizer'
+        type: "keyword",
+        normalizer: "custom_sort_normalizer",
       },
       prizeSets: {
         properties: {
-          type: { type: 'text' },
+          type: { type: "text" },
           prizes: {
             properties: {
-              type: { type: 'text' },
-              value: { type: 'float' }
-            }
-          }
-        }
-      }
+              type: { type: "text" },
+              value: { type: "float" },
+            },
+          },
+        },
+      },
     },
-    dynamic_templates: [{
-      metadata: {
-        path_match: 'metadata.*',
-        mapping: {
-          type: 'text'
-        }
-      }
-    }]
-  }
+    dynamic_templates: [
+      {
+        metadata: {
+          path_match: "metadata.*",
+          mapping: {
+            type: "text",
+          },
+        },
+      },
+    ],
+  };
   body.settings = {
     analysis: {
       normalizer: {
         custom_sort_normalizer: {
-          type: 'custom',
+          type: "custom",
           char_filter: [],
-          filter: ['lowercase', 'asciifolding']
-        }
-      }
-    }
-  }
+          filter: ["lowercase", "asciifolding"],
+        },
+      },
+    },
+  };
 
   return esClient.indices.create({
     index: indexName,
-    body
-  })
+    body,
+  });
 }
 
-async function updateMappings () {
-  const tempReindexing = config.get('ES.TEMP_REINDEXING')
-  let indexName = config.get('ES.ES_INDEX')
-  let backupIndex = 'challenge_tmp_dont_use_for_querying_backup'
-  let newIndexName = 'challenge_tmp_dont_use_for_querying'
+async function updateMappings() {
+  const tempReindexing = config.get("ES.TEMP_REINDEXING");
+  let indexName = config.get("ES.ES_INDEX");
+  let backupIndex = "challenge_tmp_dont_use_for_querying_backup";
+  let newIndexName = "challenge_tmp_dont_use_for_querying";
 
   // if (tempReindexing) {
   //   try {
@@ -132,10 +134,10 @@ async function updateMappings () {
 
 updateMappings()
   .then(() => {
-    logger.info('Done')
-    process.exit()
+    logger.info("Done");
+    process.exit();
   })
   .catch((err) => {
-    logger.logFullError(err)
-    process.exit(1)
-  })
+    logger.logFullError(err);
+    process.exit(1);
+  });

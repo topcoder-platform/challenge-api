@@ -1,19 +1,19 @@
 /**
  * Controller for challenge phase endpoints
  */
-const HttpStatus = require('http-status-codes')
-const service = require('../services/TimelineTemplateService')
-const helper = require('../common/helper')
+const HttpStatus = require("http-status-codes");
+const service = require("../services/TimelineTemplateService");
+const helper = require("../common/helper");
 
 /**
  * Search timeline templates.
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function searchTimelineTemplates (req, res) {
-  const result = await service.searchTimelineTemplates(req.query)
-  helper.setResHeaders(req, res, result)
-  res.send(result.result)
+async function searchTimelineTemplates(req, res) {
+  const result = await service.searchTimelineTemplates(req.query);
+  helper.setResHeaders(req, res, result);
+  res.send(result.result);
 }
 
 /**
@@ -21,9 +21,9 @@ async function searchTimelineTemplates (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function createTimelineTemplate (req, res) {
-  const result = await service.createTimelineTemplate(req.body)
-  res.status(HttpStatus.CREATED).send(result)
+async function createTimelineTemplate(req, res) {
+  const result = await service.createTimelineTemplate(req.body);
+  res.status(HttpStatus.CREATED).send(result);
 }
 
 /**
@@ -31,9 +31,11 @@ async function createTimelineTemplate (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function getTimelineTemplate (req, res) {
-  const result = await service.getTimelineTemplate(req.params.timelineTemplateId)
-  res.send(result)
+async function getTimelineTemplate(req, res) {
+  const result = await service.getTimelineTemplate(
+    req.params.timelineTemplateId
+  );
+  res.send(result);
 }
 
 /**
@@ -41,9 +43,12 @@ async function getTimelineTemplate (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function fullyUpdateTimelineTemplate (req, res) {
-  const result = await service.fullyUpdateTimelineTemplate(req.params.timelineTemplateId, req.body)
-  res.send(result)
+async function fullyUpdateTimelineTemplate(req, res) {
+  const result = await service.fullyUpdateTimelineTemplate(
+    req.params.timelineTemplateId,
+    req.body
+  );
+  res.send(result);
 }
 
 /**
@@ -51,9 +56,12 @@ async function fullyUpdateTimelineTemplate (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function partiallyUpdateTimelineTemplate (req, res) {
-  const result = await service.partiallyUpdateTimelineTemplate(req.params.timelineTemplateId, req.body)
-  res.send(result)
+async function partiallyUpdateTimelineTemplate(req, res) {
+  const result = await service.partiallyUpdateTimelineTemplate(
+    req.params.timelineTemplateId,
+    req.body
+  );
+  res.send(result);
 }
 
 /**
@@ -61,9 +69,11 @@ async function partiallyUpdateTimelineTemplate (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function deleteTimelineTemplate (req, res) {
-  const result = await service.deleteTimelineTemplate(req.params.timelineTemplateId)
-  res.send(result)
+async function deleteTimelineTemplate(req, res) {
+  const result = await service.deleteTimelineTemplate(
+    req.params.timelineTemplateId
+  );
+  res.send(result);
 }
 
 module.exports = {
@@ -72,5 +82,5 @@ module.exports = {
   getTimelineTemplate,
   fullyUpdateTimelineTemplate,
   partiallyUpdateTimelineTemplate,
-  deleteTimelineTemplate
-}
+  deleteTimelineTemplate,
+};

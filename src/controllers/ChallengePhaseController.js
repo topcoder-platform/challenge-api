@@ -1,19 +1,19 @@
 /**
  * Controller for challenge phase endpoints
  */
-const HttpStatus = require('http-status-codes')
-const service = require('../services/PhaseService')
-const helper = require('../common/helper')
+const HttpStatus = require("http-status-codes");
+const service = require("../services/PhaseService");
+const helper = require("../common/helper");
 
 /**
  * Search phases
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function searchPhases (req, res) {
-  const result = await service.searchPhases(req.query)
-  helper.setResHeaders(req, res, result)
-  res.send(result.result)
+async function searchPhases(req, res) {
+  const result = await service.searchPhases(req.query);
+  helper.setResHeaders(req, res, result);
+  res.send(result.result);
 }
 
 /**
@@ -21,9 +21,9 @@ async function searchPhases (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function createPhase (req, res) {
-  const result = await service.createPhase(req.body)
-  res.status(HttpStatus.CREATED).send(result)
+async function createPhase(req, res) {
+  const result = await service.createPhase(req.body);
+  res.status(HttpStatus.CREATED).send(result);
 }
 
 /**
@@ -31,9 +31,9 @@ async function createPhase (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function getPhase (req, res) {
-  const result = await service.getPhase(req.params.challengePhaseId)
-  res.send(result)
+async function getPhase(req, res) {
+  const result = await service.getPhase(req.params.challengePhaseId);
+  res.send(result);
 }
 
 /**
@@ -41,9 +41,12 @@ async function getPhase (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function fullyUpdatePhase (req, res) {
-  const result = await service.fullyUpdatePhase(req.params.challengePhaseId, req.body)
-  res.send(result)
+async function fullyUpdatePhase(req, res) {
+  const result = await service.fullyUpdatePhase(
+    req.params.challengePhaseId,
+    req.body
+  );
+  res.send(result);
 }
 
 /**
@@ -51,9 +54,12 @@ async function fullyUpdatePhase (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function partiallyUpdatePhase (req, res) {
-  const result = await service.partiallyUpdatePhase(req.params.challengePhaseId, req.body)
-  res.send(result)
+async function partiallyUpdatePhase(req, res) {
+  const result = await service.partiallyUpdatePhase(
+    req.params.challengePhaseId,
+    req.body
+  );
+  res.send(result);
 }
 
 /**
@@ -61,9 +67,9 @@ async function partiallyUpdatePhase (req, res) {
  * @param {Object} req the request
  * @param {Object} res the response
  */
-async function deletePhase (req, res) {
-  const result = await service.deletePhase(req.params.challengePhaseId)
-  res.send(result)
+async function deletePhase(req, res) {
+  const result = await service.deletePhase(req.params.challengePhaseId);
+  res.send(result);
 }
 
 module.exports = {
@@ -72,5 +78,5 @@ module.exports = {
   getPhase,
   fullyUpdatePhase,
   partiallyUpdatePhase,
-  deletePhase
-}
+  deletePhase,
+};
