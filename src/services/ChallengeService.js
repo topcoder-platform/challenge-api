@@ -1523,7 +1523,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Make sure the user cannot change the direct project ID
   if (data.legacy && data.legacy.directProjectId) {
-    _.unset(data, "legacy.directProjectId", directProjectId);
+    _.unset(data, "legacy.directProjectId");
   }
 
   /* BEGIN self-service stuffs */
