@@ -18,12 +18,9 @@ const logger = require("../common/logger");
 const errors = require("../common/errors");
 const constants = require("../../app-constants");
 const HttpStatus = require("http-status-codes");
-const moment = require("moment");
-const PhaseService = require("./PhaseService");
 const ChallengeTypeService = require("./ChallengeTypeService");
 const ChallengeTrackService = require("./ChallengeTrackService");
 const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateService");
-const TimelineTemplateService = require("./TimelineTemplateService");
 const { BadRequestError } = require("../common/errors");
 
 const phaseHelper = require("../common/phase-helper");
@@ -34,7 +31,7 @@ const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
 
 const esClient = helper.getESClient();
 
-const { ChallengeDomain, UpdateChallengeInput } = require("@topcoder-framework/domain-challenge");
+const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 const { hasAdminRole } = require("../common/role-helper");
 const {
   validateChallengeUpdateRequest,
@@ -1054,7 +1051,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   if (challenge.phases && challenge.phases.length > 0) {
-    await PhaseService.validatePhases(challenge.phases);
+    await phaseHelper.validatePhases(challenge.phases);
   }
 
   // populate phases
@@ -1274,7 +1271,7 @@ createChallenge.schema = {
  */
 async function getPhasesAndPopulate(data) {
   _.each(data.phases, async (p) => {
-    const phase = await PhaseService.getPhase(p.phaseId);
+    const phase = await phaseHelper.getPhase(p.phaseId);
     p.name = phase.name;
     if (phase.description) {
       p.description = phase.description;
@@ -1758,10 +1755,10 @@ async function updateChallenge(currentUser, challengeId, data) {
     data.phases = newPhases;
   }
   if (phasesUpdated || data.startDate) {
-    data.startDate = convertToISOString(data.phases[0].scheduledStartDate);
+    data.startDate = convertToISOString(_.min(_.map(data.phases, "scheduledStartDate")));
   }
   if (phasesUpdated || data.endDate) {
-    data.endDate = convertToISOString(data.phases[data.phases.length - 1].scheduledEndDate);
+    data.endDate = convertToISOString(_.max(_.map(data.phases, "scheduledEndDate")));
   }
 
   if (data.winners && data.winners.length && data.winners.length > 0) {

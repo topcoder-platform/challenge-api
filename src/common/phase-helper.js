@@ -1,10 +1,10 @@
 const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
 
 const {
-  DomainHelper: { getLookupCriteria, getScanCriteria },
+  DomainHelper: { getScanCriteria },
 } = require("@topcoder-framework/lib-common");
 
-const { PhaseDomain, TimelineTemplateDomain } = require("@topcoder-framework/domain-challenge");
+const { PhaseDomain } = require("@topcoder-framework/domain-challenge");
 
 const _ = require("lodash");
 
@@ -13,153 +13,13 @@ const moment = require("moment");
 
 const errors = require("./errors");
 
-const phaseService = require("../services/PhaseService");
 const timelineTemplateService = require("../services/TimelineTemplateService");
 
 const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
 class ChallengePhaseHelper {
-  /**
-   * Populate challenge phases.
-   * @param {Array} phases the phases to populate
-   * @param {Date} startDate the challenge start date
-   * @param {String} timelineTemplateId the timeline template id
-   */
-  async populatePhases(phases, startDate, timelineTemplateId) {
-    if (_.isUndefined(timelineTemplateId)) {
-      throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`);
-    }
-
-    const { timelineTempate, timelineTemplateMap } = await this.getTemplateAndTemplateMap(
-      timelineTemplateId
-    );
-    const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
-
-    if (!phases || phases.length === 0) {
-      // auto populate phases
-      for (const p of timelineTempate) {
-        phases.push({ ...p });
-      }
-    }
-
-    for (const p of phases) {
-      const phaseDefinition = phaseDefinitionMap.get(p.phaseId);
-
-      // TODO: move to domain-challenge
-      p.id = uuid();
-      p.name = phaseDefinition.name;
-      p.description = phaseDefinition.description;
-
-      // set p.open based on current phase
-      const phaseTemplate = timelineTemplateMap.get(p.phaseId);
-      if (phaseTemplate) {
-        if (!p.duration) {
-          p.duration = phaseTemplate.defaultDuration;
-        }
-
-        if (phaseTemplate.predecessor) {
-          const predecessor = _.find(phases, {
-            phaseId: phaseTemplate.predecessor,
-          });
-          if (!predecessor) {
-            throw new errors.BadRequestError(
-              `Predecessor ${phaseTemplate.predecessor} not found in given phases.`
-            );
-          }
-          p.predecessor = phaseTemplate.predecessor;
-          console.log("Setting predecessor", p.predecessor, "for phase", p.phaseId);
-        }
-      }
-    }
-
-    // calculate dates
-    if (!startDate) {
-      return;
-    }
-
-    // sort phases by predecessor
-    phases.sort((a, b) => {
-      if (a.predecessor === b.phaseId) {
-        return 1;
-      }
-      if (b.predecessor === a.phaseId) {
-        return -1;
-      }
-      return 0;
-    });
-
-    let isSubmissionPhaseOpen = false;
-
-    for (let p of phases) {
-      const predecessor = timelineTemplateMap.get(p.predecessor);
-
-      if (predecessor == null) {
-        if (p.name === "Registration") {
-          p.scheduledStartDate = moment(startDate).toDate();
-        }
-        if (p.name === "Submission") {
-          p.scheduledStartDate = moment(startDate).add(5, "minutes").toDate();
-        }
-
-        if (moment(p.scheduledStartDate).isSameOrBefore(moment())) {
-          p.actualStartDate = p.scheduledStartDate;
-        } else {
-          delete p.actualStartDate;
-        }
-
-        p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, "seconds").toDate();
-        if (moment(p.scheduledEndDate).isBefore(moment())) {
-          delete p.actualEndDate;
-        } else {
-          p.actualEndDate = p.scheduledEndDate;
-        }
-      } else {
-        const precedecessorPhase = _.find(phases, {
-          phaseId: predecessor.phaseId,
-        });
-        if (precedecessorPhase == null) {
-          throw new errors.BadRequestError(
-            `Predecessor ${predecessor.phaseId} not found in given phases.`
-          );
-        }
-        let phaseEndDate = moment(precedecessorPhase.scheduledEndDate);
-        if (
-          precedecessorPhase.actualEndDate != null &&
-          moment(precedecessorPhase.actualEndDate).isAfter(phaseEndDate)
-        ) {
-          phaseEndDate = moment(precedecessorPhase.actualEndDate);
-        } else {
-          phaseEndDate = moment(precedecessorPhase.scheduledEndDate);
-        }
-
-        p.scheduledStartDate = phaseEndDate.toDate();
-        p.scheduledEndDate = moment(p.scheduledStartDate).add(p.duration, "seconds").toDate();
-      }
-      p.isOpen = moment().isBetween(p.scheduledStartDate, p.scheduledEndDate);
-      if (p.isOpen) {
-        if (p.name === "Submission") {
-          isSubmissionPhaseOpen = true;
-        }
-        delete p.actualEndDate;
-      }
-
-      if (moment(p.scheduledStartDate).isAfter(moment())) {
-        delete p.actualStartDate;
-        delete p.actualEndDate;
-      }
-
-      if (p.name === "Post-Mortem" && isSubmissionPhaseOpen) {
-        delete p.actualStartDate;
-        delete p.actualEndDate;
-        p.isOpen = false;
-      }
-
-      if (p.constraints == null) {
-        p.constraints = [];
-      }
-    }
-  }
-
+  phaseDefinitionMap = {};
+  timelineTemplateMap = {};
   async populatePhasesForChallengeCreation(phases, startDate, timelineTemplateId) {
     if (_.isUndefined(timelineTemplateId)) {
       throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`);
@@ -232,9 +92,7 @@ class ChallengePhaseHelper {
     timelineTemplateId,
     isBeingActivated
   ) {
-    const { timelineTempate, timelineTemplateMap } = await this.getTemplateAndTemplateMap(
-      timelineTemplateId
-    );
+    const { timelineTemplateMap } = await this.getTemplateAndTemplateMap(timelineTemplateId);
     const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
     let fixedStartDate = undefined;
     const updatedPhases = _.map(challengePhases, (phase) => {
@@ -303,9 +161,9 @@ class ChallengePhaseHelper {
       }
       if (_.isUndefined(phase.actualEndDate)) {
         phase.scheduledEndDate = moment(phase.scheduledStartDate)
-        .add(phase.duration, "seconds")
-        .toDate()
-        .toISOString();
+          .add(phase.duration, "seconds")
+          .toDate()
+          .toISOString();
       }
     }
     return updatedPhases;
@@ -315,12 +173,8 @@ class ChallengePhaseHelper {
     if (!phases || phases.length === 0) {
       return;
     }
-    const { items: records } = await phaseDomain.scan({ criteria: getScanCriteria({}) });
-    const map = new Map();
-    _.each(records, (r) => {
-      map.set(r.id, r);
-    });
-    const invalidPhases = _.filter(phases, (p) => !map.has(p.phaseId));
+    const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
+    const invalidPhases = _.filter(phases, (p) => !phaseDefinitionMap.has(p.phaseId));
     if (invalidPhases.length > 0) {
       throw new errors.BadRequestError(
         `The following phases are invalid: ${toString(invalidPhases)}`
@@ -328,28 +182,37 @@ class ChallengePhaseHelper {
     }
   }
 
-  async getPhaseDefinitionsAndMap() {
-    const { result: records } = await phaseService.searchPhases();
+  async getPhase(phaseId) {
+    const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
+    return phaseDefinitionMap.get(phaseId);
+  }
 
-    const map = new Map();
-    _.each(records, (r) => {
-      map.set(r.id, r);
-    });
-    return { phaseDefinitions: records, phaseDefinitionMap: map };
+  async getPhaseDefinitionsAndMap() {
+    if (_.isEmpty(this.phaseDefinitionMap)) {
+      const { items: records } = await phaseDomain.scan({ criteria: getScanCriteria({}) });
+
+      const map = new Map();
+      _.each(records, (r) => {
+        map.set(r.id, r);
+      });
+
+      this.phaseDefinitionMap = { phaseDefinitions: records, phaseDefinitionMap: map };
+    }
+    return this.phaseDefinitionMap;
   }
 
   async getTemplateAndTemplateMap(timelineTemplateId) {
-    const records = await timelineTemplateService.getTimelineTemplate(timelineTemplateId);
+    if (_.isEmpty(this.timelineTemplateMap)) {
+      const records = await timelineTemplateService.getTimelineTemplate(timelineTemplateId);
 
-    const map = new Map();
-    _.each(records.phases, (r) => {
-      map.set(r.phaseId, r);
-    });
+      const map = new Map();
+      _.each(records.phases, (r) => {
+        map.set(r.phaseId, r);
+      });
 
-    return {
-      timelineTempate: records.phases,
-      timelineTemplateMap: map,
-    };
+      this.timelineTemplateMap = { timelineTempate: records.phases, timelineTemplateMap: map };
+    }
+    return this.timelineTemplateMap;
   }
 }
 
