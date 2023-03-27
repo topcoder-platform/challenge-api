@@ -249,7 +249,7 @@ class ChallengePhaseHelper {
       if (updatedPhase.name === "Post-Mortem") {
         updatedPhase.predecessor = "a93544bc-c165-4af4-b55e-18f3593b457a";
       }
-      if (_.undefined(updatedPhase.actualEndDate) && updatedPhase.name !== "Iterative Review") {
+      if (_.isUndefined(updatedPhase.actualEndDate) && updatedPhase.name !== "Iterative Review") {
         updatedPhase.duration = _.defaultTo(_.get(newPhase, "duration"), updatedPhase.duration);
       }
       if (_.isUndefined(updatedPhase.predecessor)) {
