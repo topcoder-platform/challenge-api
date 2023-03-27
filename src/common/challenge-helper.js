@@ -119,7 +119,9 @@ class ChallengeHelper {
 
     // Ensure descriptionFormat is either 'markdown' or 'html'
     if (data.descriptionFormat && !_.includes(["markdown", "html"], data.descriptionFormat)) {
-      throw new errors.BadRequestError("The property 'descriptionFormat' must be either 'markdown' or 'html'");
+      throw new errors.BadRequestError(
+        "The property 'descriptionFormat' must be either 'markdown' or 'html'"
+      );
     }
 
     // Ensure unchangeable fields are not changed
@@ -299,10 +301,10 @@ class ChallengeHelper {
       }
     }
 
-    challenge.created = new Date(challenge.created).toISOString();
-    challenge.updated = new Date(challenge.updated).toISOString();
-    challenge.startDate = new Date(challenge.startDate).toISOString();
-    challenge.endDate = new Date(challenge.endDate).toISOString();
+    if (challenge.created) challenge.created = new Date(challenge.created).toISOString();
+    if (challenge.updated) challenge.updated = new Date(challenge.updated).toISOString();
+    if (challenge.startDate) challenge.startDate = new Date(challenge.startDate).toISOString();
+    if (challenge.endDate) challenge.endDate = new Date(challenge.endDate).toISOString();
 
     if (track) {
       challenge.track = track.name;
