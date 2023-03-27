@@ -42,6 +42,7 @@ const {
   sanitizeRepeatedFieldsInUpdateRequest,
   convertPrizeSetValuesToCents,
   convertPrizeSetValuesToDollars,
+  convertDateToISOString,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 
@@ -1035,7 +1036,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (!challenge.startDate) {
     challenge.startDate = new Date().toISOString();
   } else {
-    challenge.startDate = new Date(challenge.startDate).toISOString();
+    challenge.startDate = convertDateToISOString(challenge.startDate);
   }
 
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
@@ -1750,7 +1751,7 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
 
     data.phases = newPhases;
-    data.startDate = new Date(newStartDate).toISOString();
+    data.startDate = convertDateToISOString(newStartDate);
     data.endDate = helper.calculateChallengeEndDate(challenge, data);
   }
 

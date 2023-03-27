@@ -301,10 +301,10 @@ class ChallengeHelper {
       }
     }
 
-    if (challenge.created) challenge.created = new Date(challenge.created).toISOString();
-    if (challenge.updated) challenge.updated = new Date(challenge.updated).toISOString();
-    if (challenge.startDate) challenge.startDate = new Date(challenge.startDate).toISOString();
-    if (challenge.endDate) challenge.endDate = new Date(challenge.endDate).toISOString();
+    if (challenge.created) challenge.created = convertDateToISOString(challenge.created);
+    if (challenge.updated) challenge.updated = convertDateToISOString(challenge.updated);
+    if (challenge.startDate) challenge.startDate = convertDateToISOString(challenge.startDate);
+    if (challenge.endDate) challenge.endDate = convertDateToISOString(challenge.endDate);
 
     if (track) {
       challenge.track = track.name;
@@ -322,6 +322,18 @@ class ChallengeHelper {
       }
       return m;
     });
+  }
+
+  convertDateToISOString(startDate) {
+    if (typeof startDate === "string" && !isNaN(startDate)) {
+      startDate = parseInt(startDate);
+    }
+    if (typeof startDate === "number") {
+      const date = new Date(startDate);
+      return date.toISOString();
+    } else {
+      return startDate;
+    }
   }
 
   convertPrizeSetValuesToCents(prizeSets) {
