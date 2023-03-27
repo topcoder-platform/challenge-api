@@ -340,6 +340,10 @@ class ChallengeHelper {
     }
   }
 
+  convertToISOString(startDate) {
+    return ChallengeHelper.convertDateToISOString(startDate);
+  }
+
   convertPrizeSetValuesToCents(prizeSets) {
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
