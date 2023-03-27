@@ -1724,7 +1724,12 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
   }
 
-  if (data.phases || data.startDate || timelineTemplateChanged) {
+  let phasesUpdated = false;
+  if (
+    (data.phases && data.phases.length > 0) ||
+    isChallengeBeingActivated ||
+    timelineTemplateChanged
+  ) {
     if (
       challenge.status === constants.challengeStatuses.Completed ||
       challenge.status.indexOf(constants.challengeStatuses.Cancelled) > -1
@@ -1741,7 +1746,7 @@ async function updateChallenge(currentUser, challengeId, data) {
         newStartDate,
         finalTimelineTemplateId
       );
-    } else if (data.startDate || (data.phases && data.phases.length > 0)) {
+    } else {
       newPhases = await phaseHelper.populatePhasesForChallengeUpdate(
         challenge.phases,
         data.phases,
@@ -1749,10 +1754,14 @@ async function updateChallenge(currentUser, challengeId, data) {
         isChallengeBeingActivated
       );
     }
-
+    phasesUpdated = true;
     data.phases = newPhases;
-    data.startDate = convertToISOString(newStartDate);
-    data.endDate = helper.calculateChallengeEndDate(challenge, data);
+  }
+  if (phasesUpdated || data.startDate) {
+    data.startDate = convertToISOString(data.phases[0].scheduledStartDate);
+  }
+  if (phasesUpdated || data.endDate) {
+    data.endDate = convertToISOString(data.phases[data.phases.length - 1].scheduledEndDate);
   }
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
