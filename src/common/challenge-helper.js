@@ -301,10 +301,14 @@ class ChallengeHelper {
       }
     }
 
-    if (challenge.created) challenge.created = convertDateToISOString(challenge.created);
-    if (challenge.updated) challenge.updated = convertDateToISOString(challenge.updated);
-    if (challenge.startDate) challenge.startDate = convertDateToISOString(challenge.startDate);
-    if (challenge.endDate) challenge.endDate = convertDateToISOString(challenge.endDate);
+    if (challenge.created)
+      challenge.created = ChallengeHelper.convertDateToISOString(challenge.created);
+    if (challenge.updated)
+      challenge.updated = ChallengeHelper.convertDateToISOString(challenge.updated);
+    if (challenge.startDate)
+      challenge.startDate = ChallengeHelper.convertDateToISOString(challenge.startDate);
+    if (challenge.endDate)
+      challenge.endDate = ChallengeHelper.convertDateToISOString(challenge.endDate);
 
     if (track) {
       challenge.track = track.name;
@@ -324,7 +328,7 @@ class ChallengeHelper {
     });
   }
 
-  convertDateToISOString(startDate) {
+  static convertDateToISOString(startDate) {
     if (typeof startDate === "string" && !isNaN(startDate)) {
       startDate = parseInt(startDate);
     }
