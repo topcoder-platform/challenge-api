@@ -298,13 +298,15 @@ class ChallengePhaseHelper {
           }
           iterativeReviewSet = true;
         }
-      } else {
+      } else if (_.isUndefined(phase.actualStartDate)) {
         phase.scheduledStartDate = predecessorPhase.scheduledEndDate;
       }
-      phase.scheduledEndDate = moment(phase.scheduledStartDate)
+      if (_.isUndefined(phase.actualEndDate)) {
+        phase.scheduledEndDate = moment(phase.scheduledStartDate)
         .add(phase.duration, "seconds")
         .toDate()
         .toISOString();
+      }
     }
     return updatedPhases;
   }
