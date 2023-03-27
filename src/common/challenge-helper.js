@@ -329,6 +329,9 @@ class ChallengeHelper {
   }
 
   static convertDateToISOString(startDate) {
+    if (startDate instanceof Date) {
+      return startDate.toISOString();
+    }
     if (typeof startDate === "string" && !isNaN(startDate)) {
       startDate = parseInt(startDate);
     }
