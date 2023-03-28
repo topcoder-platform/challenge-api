@@ -199,7 +199,7 @@ class ChallengePhaseHelper {
 
       this.phaseDefinitionMap = { phaseDefinitions: records, phaseDefinitionMap: map };
     }
-    return this.phaseDefinitionMap;
+    return _.cloneDeep(this.phaseDefinitionMap);
   }
 
   async getTemplateAndTemplateMap(timelineTemplateId) {
@@ -213,8 +213,8 @@ class ChallengePhaseHelper {
 
       this.timelineTemplateMap = { timelineTempate: records.phases, timelineTemplateMap: map };
     }
-    
-    return this.timelineTemplateMap;
+    console.log("All timeline templates", JSON.stringify(this.timelineTemplateMap));
+    return _.cloneDeep(this.timelineTemplateMap);
   }
 }
 
