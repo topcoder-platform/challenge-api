@@ -199,22 +199,23 @@ class ChallengePhaseHelper {
 
       this.phaseDefinitionMap = { phaseDefinitions: records, phaseDefinitionMap: map };
     }
-    return _.cloneDeep(this.phaseDefinitionMap);
+    return this.phaseDefinitionMap;
   }
 
   async getTemplateAndTemplateMap(timelineTemplateId) {
-    if (_.isEmpty(this.timelineTemplateMap)) {
+    if (_.isEmpty(this.timelineTemplateMap[timelineTemplateId])) {
       const records = await timelineTemplateService.getTimelineTemplate(timelineTemplateId);
-      console.log("Returned timeline templates", JSON.stringify(records));
       const map = new Map();
       _.each(records.phases, (r) => {
         map.set(r.phaseId, r);
       });
 
-      this.timelineTemplateMap = { timelineTempate: records.phases, timelineTemplateMap: map };
+      this.timelineTemplateMap[timelineTemplateId] = {
+        timelineTempate: records.phases,
+        timelineTemplateMap: map,
+      };
     }
-    console.log("All timeline templates", JSON.stringify(this.timelineTemplateMap));
-    return _.cloneDeep(this.timelineTemplateMap);
+    return this.timelineTemplateMap[timelineTemplateId];
   }
 }
 
