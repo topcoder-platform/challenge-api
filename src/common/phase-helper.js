@@ -25,6 +25,7 @@ class ChallengePhaseHelper {
       throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`);
     }
     const { timelineTempate } = await this.getTemplateAndTemplateMap(timelineTemplateId);
+    console.log("Selected timeline template", JSON.stringify(timelineTempate));
     const { phaseDefinitionMap } = await this.getPhaseDefinitionsAndMap();
     let fixedStartDate = undefined;
     const finalPhases = _.map(timelineTempate, (phaseFromTemplate) => {
@@ -204,7 +205,7 @@ class ChallengePhaseHelper {
   async getTemplateAndTemplateMap(timelineTemplateId) {
     if (_.isEmpty(this.timelineTemplateMap)) {
       const records = await timelineTemplateService.getTimelineTemplate(timelineTemplateId);
-
+      console.log("Returned timeline templates", JSON.stringify(records));
       const map = new Map();
       _.each(records.phases, (r) => {
         map.set(r.phaseId, r);
@@ -212,6 +213,7 @@ class ChallengePhaseHelper {
 
       this.timelineTemplateMap = { timelineTempate: records.phases, timelineTemplateMap: map };
     }
+    
     return this.timelineTemplateMap;
   }
 }
