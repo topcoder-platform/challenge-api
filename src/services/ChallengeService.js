@@ -1589,6 +1589,18 @@ async function updateChallenge(currentUser, challengeId, data) {
         logger.debug(`There was an error trying to update the project: ${e.message}`);
       }
     }
+
+    if (
+      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
+      data.status === constants.challengeStatuses.CancelledPaymentFailed
+    ) {
+      try {
+        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
+      } catch (e) {
+        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
+      }
+      sendRejectedEmail = true;
+    }
   }
 
   /* END self-service stuffs */
@@ -1617,18 +1629,6 @@ async function updateChallenge(currentUser, challengeId, data) {
       if (challenge.status === constants.challengeStatuses.Draft) {
         isChallengeBeingActivated = true;
       }
-    }
-
-    if (
-      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
-      data.status === constants.challengeStatuses.CancelledPaymentFailed
-    ) {
-      try {
-        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
-      } catch (e) {
-        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
-      }
-      sendRejectedEmail = true;
     }
 
     if (data.status === constants.challengeStatuses.Completed) {
