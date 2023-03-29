@@ -42,6 +42,7 @@ const {
   convertToISOString,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
+const { cloneDeep } = require("lodash");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 

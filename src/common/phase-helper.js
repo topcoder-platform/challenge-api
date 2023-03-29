@@ -172,13 +172,12 @@ class ChallengePhaseHelper {
 
   handlePhasesAfterCancelling(phases) {
     return _.map(phases, (phase) => {
-      if (_.includes(["Registration", "Submission", "Checkpoint Submission"], phase.name)) {
-        phase.isOpen = false;
-        if (!_.isUndefined(phase.actualStartDate)) {
-          phase.actualEndDate = moment().toDate().toISOString();
-        }
-      }
-      return phase;
+      const shouldClosePhase = _.includes(["Registration", "Submission", "Checkpoint Submission"], phase.name);
+      return {
+        ...phase,
+        isOpen: shouldClosePhase ? false : phase.isOpen,
+        actualEndDate: shouldClosePhase ? moment().toDate().toISOString() : phase.actualEndDate,
+      };
     });
   }
 
