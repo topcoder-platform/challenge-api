@@ -178,6 +178,7 @@ class ChallengePhaseHelper {
           phase.actualEndDate = moment().toDate().toISOString();
         }
       }
+      return phase;
     });
   }
 
