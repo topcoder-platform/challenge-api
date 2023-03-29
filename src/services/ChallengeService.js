@@ -1589,6 +1589,18 @@ async function updateChallenge(currentUser, challengeId, data) {
         logger.debug(`There was an error trying to update the project: ${e.message}`);
       }
     }
+
+    if (
+      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
+      data.status === constants.challengeStatuses.CancelledPaymentFailed
+    ) {
+      try {
+        await helper.cancelProject(challenge.projectId, data.cancelReason, currentUser);
+      } catch (e) {
+        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
+      }
+      sendRejectedEmail = true;
+    }
   }
 
   /* END self-service stuffs */
@@ -1632,18 +1644,6 @@ async function updateChallenge(currentUser, challengeId, data) {
       constants.challengeStatuses.CancelledZeroRegistrations,
     ], data.status)) {
       isChallengeBeingCancelled = true;
-    }
-
-    if (
-      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
-      data.status === constants.challengeStatuses.CancelledPaymentFailed
-    ) {
-      try {
-        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
-      } catch (e) {
-        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
-      }
-      sendRejectedEmail = true;
     }
 
     if (data.status === constants.challengeStatuses.Completed) {
@@ -1769,7 +1769,7 @@ async function updateChallenge(currentUser, challengeId, data) {
     phasesUpdated = true;
     data.phases = newPhases;
   }
-  if (isChallengeBeingCancelled) {
+  if (isChallengeBeingCancelled && challenge.phases && challenge.phases.length > 0) {
     data.phases = await phaseHelper.handlePhasesAfterCancelling(challenge.phases);
     phasesUpdated = true;
   }
@@ -1874,8 +1874,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   try {
-    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(data);
-
+    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ['cancelReason']));
     if (!_.isEmpty(updateInput)) {
       const grpcMetadata = new GrpcMetadata();
 
