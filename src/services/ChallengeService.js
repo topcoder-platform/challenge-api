@@ -1606,6 +1606,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   /* END self-service stuffs */
 
   let isChallengeBeingActivated = false;
+  let isChallengeBeingCancelled = false;
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
       if (
@@ -1629,6 +1630,32 @@ async function updateChallenge(currentUser, challengeId, data) {
       if (challenge.status === constants.challengeStatuses.Draft) {
         isChallengeBeingActivated = true;
       }
+    }
+
+    if (_.includes([
+      constants.challengeStatuses.Cancelled,
+      constants.challengeStatuses.CancelledRequirementsInfeasible,
+      constants.challengeStatuses.CancelledPaymentFailed,
+      constants.challengeStatuses.CancelledFailedReview,
+      constants.challengeStatuses.CancelledFailedScreening,
+      constants.challengeStatuses.CancelledZeroSubmissions,
+      constants.challengeStatuses.CancelledWinnerUnresponsive,
+      constants.challengeStatuses.CancelledClientRequest,
+      constants.challengeStatuses.CancelledZeroRegistrations,
+    ], data.status)) {
+      isChallengeBeingCancelled = true;
+    }
+
+    if (
+      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
+      data.status === constants.challengeStatuses.CancelledPaymentFailed
+    ) {
+      try {
+        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
+      } catch (e) {
+        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
+      }
+      sendRejectedEmail = true;
     }
 
     if (data.status === constants.challengeStatuses.Completed) {
@@ -1723,9 +1750,9 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   let phasesUpdated = false;
   if (
-    (data.phases && data.phases.length > 0) ||
+    ((data.phases && data.phases.length > 0) ||
     isChallengeBeingActivated ||
-    timelineTemplateChanged
+    timelineTemplateChanged) && !isChallengeBeingCancelled
   ) {
     if (
       challenge.status === constants.challengeStatuses.Completed ||
@@ -1753,6 +1780,10 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
     phasesUpdated = true;
     data.phases = newPhases;
+  }
+  if (isChallengeBeingCancelled) {
+    data.phases = await phaseHelper.handlePhasesAfterCancelling(challenge.phases);
+    phasesUpdated = true;
   }
   if (phasesUpdated || data.startDate) {
     data.startDate = convertToISOString(_.min(_.map(data.phases, "scheduledStartDate")));
