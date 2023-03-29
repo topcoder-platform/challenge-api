@@ -1769,7 +1769,7 @@ async function updateChallenge(currentUser, challengeId, data) {
     phasesUpdated = true;
     data.phases = newPhases;
   }
-  if (isChallengeBeingCancelled) {
+  if (isChallengeBeingCancelled && challenge.phases && challenge.phases.length > 0) {
     data.phases = await phaseHelper.handlePhasesAfterCancelling(challenge.phases);
     phasesUpdated = true;
   }
