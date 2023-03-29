@@ -1595,7 +1595,7 @@ async function updateChallenge(currentUser, challengeId, data) {
       data.status === constants.challengeStatuses.CancelledPaymentFailed
     ) {
       try {
-        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
+        await helper.cancelProject(challenge.projectId, data.cancelReason, currentUser);
       } catch (e) {
         logger.debug(`There was an error trying to cancel the project: ${e.message}`);
       }
@@ -1874,8 +1874,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   try {
-    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(data);
-
+    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ['cancelReason']));
     if (!_.isEmpty(updateInput)) {
       const grpcMetadata = new GrpcMetadata();
 
