@@ -170,6 +170,17 @@ class ChallengePhaseHelper {
     return updatedPhases;
   }
 
+  handlePhasesAfterCancelling(phases) {
+    return _.map(phases, (phase) => {
+      if (_.includes(["Registration", "Submission", "Checkpoint Submission"], phase.name)) {
+        phase.isOpen = false;
+        if (!_.isUndefined(phase.actualStartDate)) {
+          phase.actualEndDate = moment().toDate().toISOString();
+        }
+      }
+    });
+  }
+
   async validatePhases(phases) {
     if (!phases || phases.length === 0) {
       return;
