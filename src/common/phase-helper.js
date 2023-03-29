@@ -172,6 +172,7 @@ class ChallengePhaseHelper {
 
   handlePhasesAfterCancelling(phases) {
     return _.map(phases, (phase) => {
+      console.log(JSON.stringify(phase))
       if (_.includes(["Registration", "Submission", "Checkpoint Submission"], phase.name)) {
         phase.isOpen = false;
         if (!_.isUndefined(phase.actualStartDate)) {
