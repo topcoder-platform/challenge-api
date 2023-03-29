@@ -1646,18 +1646,6 @@ async function updateChallenge(currentUser, challengeId, data) {
       isChallengeBeingCancelled = true;
     }
 
-    if (
-      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
-      data.status === constants.challengeStatuses.CancelledPaymentFailed
-    ) {
-      try {
-        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
-      } catch (e) {
-        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
-      }
-      sendRejectedEmail = true;
-    }
-
     if (data.status === constants.challengeStatuses.Completed) {
       if (
         !_.get(challenge, "legacy.pureV5Task") &&
