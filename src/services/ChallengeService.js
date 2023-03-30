@@ -68,74 +68,6 @@ async function ensureAccessibleForChallenge(user, challenge) {
 }
 
 /**
- * Filter challenges by groups access
- * @param {Object} currentUser the user who perform operation
- * @param {Array} challenges the challenges to filter
- * @returns {Array} the challenges that can be accessed by current user
- */
-async function filterChallengesByGroupsAccess(currentUser, challenges) {
-  const res = [];
-  let userGroups;
-  const needToCheckForGroupAccess = !currentUser
-    ? true
-    : !currentUser.isMachine && !hasAdminRole(currentUser);
-  const subGroupsMap = {};
-  for (const challenge of challenges) {
-    challenge.groups = _.filter(
-      challenge.groups,
-      (g) => !_.includes(["null", "undefined"], _.toString(g).toLowerCase())
-    );
-    let expandedGroups = [];
-    if (
-      !challenge.groups ||
-      _.get(challenge, "groups.length", 0) === 0 ||
-      !needToCheckForGroupAccess
-    ) {
-      res.push(challenge);
-    } else if (currentUser) {
-      // get user groups if not yet
-      if (_.isNil(userGroups)) {
-        userGroups = await helper.getUserGroups(currentUser.userId);
-      }
-      // Expand challenge groups by subGroups
-      // results are being saved on a hashmap for efficiency
-      for (const group of challenge.groups) {
-        let subGroups;
-        if (subGroupsMap[group]) {
-          subGroups = subGroupsMap[group];
-        } else {
-          subGroups = await helper.expandWithSubGroups(group);
-          subGroupsMap[group] = subGroups;
-        }
-        expandedGroups = [..._.concat(expandedGroups, subGroups)];
-      }
-      // check if there is matched group
-      // logger.debug('Groups', challenge.groups, userGroups)
-      if (_.find(expandedGroups, (group) => !!_.find(userGroups, (ug) => ug.id === group))) {
-        res.push(challenge);
-      }
-    }
-  }
-  return res;
-}
-
-/**
- * Ensure the user can access the challenge by groups access
- * @param {Object} currentUser the user who perform operation
- * @param {Object} challenge the challenge to check
- */
-async function ensureAccessibleByGroupsAccess(currentUser, challenge) {
-  const filtered = await filterChallengesByGroupsAccess(currentUser, [challenge]);
-  if (filtered.length === 0) {
-    throw new errors.ForbiddenError(`ensureAccessibleByGroupsAccess :: You don't have access to this group!
-      Current User: ${JSON.stringify(currentUser)}
-      Challenge: ${JSON.stringify(challenge)}
-      Filtered: ${JSON.stringify(filtered)}
-    `);
-  }
-}
-
-/**
  * Search challenges by legacyId
  * @param {Object} currentUser the user who perform operation
  * @param {Number} legacyId the legacyId
@@ -2288,10 +2220,8 @@ async function deleteChallenge(currentUser, challengeId) {
   if (!challenge) {
     throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist or is not in New status`);
   }
-  // check groups authorization
-  await ensureAccessibleByGroupsAccess(currentUser, challenge);
-  // check if user are allowed to delete the challenge
-  await ensureAccessibleForChallenge(currentUser, challenge);
+  // ensure user can modify challenge
+  await helper.ensureUserCanModifyChallenge(currentUser, challenge);
   // delete DB record
   const { items: deletedItems } = await challengeDomain.delete(getLookupCriteria("id", challengeId));
   if (!_.find(deletedItems, { id: challengeId })) {
