@@ -84,6 +84,7 @@ workflows:
             only:
             - dev
             - fix/template
+            - fix/PLAT-2584
 
     - "build-qa":
         context: org-global

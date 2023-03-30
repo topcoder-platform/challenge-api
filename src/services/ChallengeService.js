@@ -2297,6 +2297,7 @@ async function deleteChallenge(currentUser, challengeId) {
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
     refresh: config.get("ES.ES_REFRESH"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
     id: challengeId,
   });
   await helper.postBusEvent(constants.Topics.ChallengeDeleted, {
