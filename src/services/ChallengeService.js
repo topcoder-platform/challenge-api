@@ -2282,6 +2282,9 @@ function sanitizeData(data, challenge) {
  */
 async function deleteChallenge(currentUser, challengeId) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+  if (!challenge) {
+    throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist`);
+  }
   if (challenge.status !== constants.challengeStatuses.New) {
     throw new errors.BadRequestError(
       `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`
@@ -2292,7 +2295,10 @@ async function deleteChallenge(currentUser, challengeId) {
   // check if user are allowed to delete the challenge
   await ensureAccessibleForChallenge(currentUser, challenge);
   // delete DB record
-  await challengeDomain.delete(getLookupCriteria("id", challengeId));
+  const { items } = await challengeDomain.delete(getLookupCriteria("id", challengeId));
+  if (!_.find(items, { id: challengeId })) {
+    throw new errors.Internal(`There was an error deleting the challenge with id: ${challengeId} from dynamo`);
+  }
   // delete ES document
   await esClient.delete({
     index: config.get("ES.ES_INDEX"),
