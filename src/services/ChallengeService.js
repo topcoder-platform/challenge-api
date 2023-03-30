@@ -1493,22 +1493,7 @@ async function validateWinners(winners, challengeId) {
 async function updateChallenge(currentUser, challengeId, data) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
 
-  // Remove fields from data that are not allowed to be updated and that match the existing challenge
-  data = sanitizeData(sanitizeChallenge(data), challenge);
-  console.debug("Sanitized Data:", data);
-
-  if (data.phases != null && data.startDate == null) {
-    data.startDate = challenge.startDate;
-  }
-
-  validateChallengeUpdateRequest(currentUser, challenge, data);
-
   const projectId = _.get(challenge, "projectId");
-
-  let sendActivationEmail = false;
-  let sendSubmittedEmail = false;
-  let sendCompletedEmail = false;
-  let sendRejectedEmail = false;
 
   const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId);
 
@@ -1518,9 +1503,21 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   // Make sure the user cannot change the direct project ID
-  if (data.legacy && data.legacy.directProjectId) {
-    _.unset(data, "legacy.directProjectId");
+  if (data.legacy) {
+    data.legacy = _.assign({},challenge.legacy, data.legacy)
+    _.set(data, "legacy.directProjectId", challenge.legacy.directProjectId);
   }
+
+  // Remove fields from data that are not allowed to be updated and that match the existing challenge
+  data = sanitizeData(sanitizeChallenge(data), challenge);
+  console.debug("Sanitized Data:", data);
+
+  validateChallengeUpdateRequest(currentUser, challenge, data);
+
+  let sendActivationEmail = false;
+  let sendSubmittedEmail = false;
+  let sendCompletedEmail = false;
+  let sendRejectedEmail = false;
 
   /* BEGIN self-service stuffs */
 
@@ -1988,7 +1985,7 @@ updateChallenge.schema = {
             .valid(_.values(constants.reviewTypes))
             .insensitive()
             .default(constants.reviewTypes.Internal),
-          confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+          confidentialityType: Joi.string().allow(null,'').empty(null,'').default(config.DEFAULT_CONFIDENTIALITY_TYPE),
           directProjectId: Joi.number(),
           forumId: Joi.number().integer(),
           isTask: Joi.boolean(),
