@@ -42,6 +42,7 @@ const {
   convertToISOString,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
+const { cloneDeep } = require("lodash");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
@@ -1492,22 +1493,7 @@ async function validateWinners(winners, challengeId) {
 async function updateChallenge(currentUser, challengeId, data) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
 
-  // Remove fields from data that are not allowed to be updated and that match the existing challenge
-  data = sanitizeData(sanitizeChallenge(data), challenge);
-  console.debug("Sanitized Data:", data);
-
-  if (data.phases != null && data.startDate == null) {
-    data.startDate = challenge.startDate;
-  }
-
-  validateChallengeUpdateRequest(currentUser, challenge, data);
-
   const projectId = _.get(challenge, "projectId");
-
-  let sendActivationEmail = false;
-  let sendSubmittedEmail = false;
-  let sendCompletedEmail = false;
-  let sendRejectedEmail = false;
 
   const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId);
 
@@ -1517,9 +1503,21 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   // Make sure the user cannot change the direct project ID
-  if (data.legacy && data.legacy.directProjectId) {
-    _.unset(data, "legacy.directProjectId");
+  if (data.legacy) {
+    data.legacy = _.assign({},challenge.legacy, data.legacy)
+    _.set(data, "legacy.directProjectId", challenge.legacy.directProjectId);
   }
+
+  // Remove fields from data that are not allowed to be updated and that match the existing challenge
+  data = sanitizeData(sanitizeChallenge(data), challenge);
+  console.debug("Sanitized Data:", data);
+
+  validateChallengeUpdateRequest(currentUser, challenge, data);
+
+  let sendActivationEmail = false;
+  let sendSubmittedEmail = false;
+  let sendCompletedEmail = false;
+  let sendRejectedEmail = false;
 
   /* BEGIN self-service stuffs */
 
@@ -1589,11 +1587,24 @@ async function updateChallenge(currentUser, challengeId, data) {
         logger.debug(`There was an error trying to update the project: ${e.message}`);
       }
     }
+
+    if (
+      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
+      data.status === constants.challengeStatuses.CancelledPaymentFailed
+    ) {
+      try {
+        await helper.cancelProject(challenge.projectId, data.cancelReason, currentUser);
+      } catch (e) {
+        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
+      }
+      sendRejectedEmail = true;
+    }
   }
 
   /* END self-service stuffs */
 
   let isChallengeBeingActivated = false;
+  let isChallengeBeingCancelled = false;
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
       if (
@@ -1619,16 +1630,18 @@ async function updateChallenge(currentUser, challengeId, data) {
       }
     }
 
-    if (
-      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
-      data.status === constants.challengeStatuses.CancelledPaymentFailed
-    ) {
-      try {
-        await helper.cancelProject(challenge.projectId, cancelReason, currentUser);
-      } catch (e) {
-        logger.debug(`There was an error trying to cancel the project: ${e.message}`);
-      }
-      sendRejectedEmail = true;
+    if (_.includes([
+      constants.challengeStatuses.Cancelled,
+      constants.challengeStatuses.CancelledRequirementsInfeasible,
+      constants.challengeStatuses.CancelledPaymentFailed,
+      constants.challengeStatuses.CancelledFailedReview,
+      constants.challengeStatuses.CancelledFailedScreening,
+      constants.challengeStatuses.CancelledZeroSubmissions,
+      constants.challengeStatuses.CancelledWinnerUnresponsive,
+      constants.challengeStatuses.CancelledClientRequest,
+      constants.challengeStatuses.CancelledZeroRegistrations,
+    ], data.status)) {
+      isChallengeBeingCancelled = true;
     }
 
     if (data.status === constants.challengeStatuses.Completed) {
@@ -1723,9 +1736,9 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   let phasesUpdated = false;
   if (
-    (data.phases && data.phases.length > 0) ||
+    ((data.phases && data.phases.length > 0) ||
     isChallengeBeingActivated ||
-    timelineTemplateChanged
+    timelineTemplateChanged) && !isChallengeBeingCancelled
   ) {
     if (
       challenge.status === constants.challengeStatuses.Completed ||
@@ -1753,6 +1766,10 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
     phasesUpdated = true;
     data.phases = newPhases;
+  }
+  if (isChallengeBeingCancelled && challenge.phases && challenge.phases.length > 0) {
+    data.phases = phaseHelper.handlePhasesAfterCancelling(challenge.phases);
+    phasesUpdated = true;
   }
   if (phasesUpdated || data.startDate) {
     data.startDate = convertToISOString(_.min(_.map(data.phases, "scheduledStartDate")));
@@ -1855,8 +1872,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   try {
-    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(data);
-
+    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ['cancelReason']));
     if (!_.isEmpty(updateInput)) {
       const grpcMetadata = new GrpcMetadata();
 
@@ -1969,7 +1985,7 @@ updateChallenge.schema = {
             .valid(_.values(constants.reviewTypes))
             .insensitive()
             .default(constants.reviewTypes.Internal),
-          confidentialityType: Joi.string().default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+          confidentialityType: Joi.string().allow(null,'').empty(null,'').default(config.DEFAULT_CONFIDENTIALITY_TYPE),
           directProjectId: Joi.number(),
           forumId: Joi.number().integer(),
           isTask: Joi.boolean(),

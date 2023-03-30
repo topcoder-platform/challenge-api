@@ -52,9 +52,9 @@ class ChallengePhaseHelper {
         );
         if (
           !_.isUndefined(fixedStartDate) &&
-          moment(scheduledStartDate).isBefore(moment(fixedStartDate))
+          moment(scheduledStartDate).isSameOrBefore(moment(fixedStartDate))
         ) {
-          scheduledStartDate = fixedStartDate;
+          scheduledStartDate = moment(fixedStartDate).add(5, "minutes").toDate().toISOString();
         }
         phase.scheduledStartDate = moment(scheduledStartDate).toDate().toISOString();
         phase.scheduledEndDate = moment(phase.scheduledStartDate)
@@ -108,7 +108,7 @@ class ChallengePhaseHelper {
       if (updatedPhase.name === "Post-Mortem") {
         updatedPhase.predecessor = "a93544bc-c165-4af4-b55e-18f3593b457a";
       }
-      if (_.isUndefined(updatedPhase.actualEndDate) && updatedPhase.name !== "Iterative Review") {
+      if (_.isUndefined(updatedPhase.actualEndDate)) {
         updatedPhase.duration = _.defaultTo(_.get(newPhase, "duration"), updatedPhase.duration);
       }
       if (_.isUndefined(updatedPhase.predecessor)) {
@@ -118,9 +118,9 @@ class ChallengePhaseHelper {
         );
         if (
           !_.isUndefined(fixedStartDate) &&
-          moment(scheduledStartDate).isBefore(moment(fixedStartDate))
+          moment(scheduledStartDate).isSameOrBefore(moment(fixedStartDate))
         ) {
-          scheduledStartDate = fixedStartDate;
+          scheduledStartDate = moment(fixedStartDate).add(5, "minutes").toDate().toISOString();
         }
         if (isBeingActivated && moment(scheduledStartDate).isSameOrBefore(moment())) {
           updatedPhase.isOpen = true;
@@ -134,7 +134,11 @@ class ChallengePhaseHelper {
           .toDate()
           .toISOString();
       }
-      if (!_.isUndefined(newPhase) && !_.isUndefined(newPhase.constraints)) {
+      if (
+        _.isUndefined(phase.actualEndDate) &&
+        !_.isUndefined(newPhase) &&
+        !_.isUndefined(newPhase.constraints)
+      ) {
         updatedPhase.constraints = newPhase.constraints;
       }
       if (_.isUndefined(fixedStartDate)) {
@@ -168,6 +172,17 @@ class ChallengePhaseHelper {
       }
     }
     return updatedPhases;
+  }
+
+  handlePhasesAfterCancelling(phases) {
+    return _.map(phases, (phase) => {
+      const shouldClosePhase = _.includes(["Registration", "Submission", "Checkpoint Submission"], phase.name);
+      return {
+        ...phase,
+        isOpen: shouldClosePhase ? false : phase.isOpen,
+        actualEndDate: shouldClosePhase ? moment().toDate().toISOString() : phase.actualEndDate,
+      };
+    });
   }
 
   async validatePhases(phases) {
