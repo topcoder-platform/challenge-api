@@ -2281,22 +2281,20 @@ function sanitizeData(data, challenge) {
  * @returns {Object} the deleted challenge
  */
 async function deleteChallenge(currentUser, challengeId) {
-  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+  const { items } = await challengeDomain.scan({
+    criteria: getScanCriteria({ id: challengeId, status: constants.challengeStatuses.New }),
+  });
+  const challenge = _.first(items);
   if (!challenge) {
-    throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist`);
-  }
-  if (challenge.status !== constants.challengeStatuses.New) {
-    throw new errors.BadRequestError(
-      `Challenge with status other than "${constants.challengeStatuses.New}" cannot be removed`
-    );
+    throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist or is not in New status`);
   }
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge);
   // check if user are allowed to delete the challenge
   await ensureAccessibleForChallenge(currentUser, challenge);
   // delete DB record
-  const { items } = await challengeDomain.delete(getLookupCriteria("id", challengeId));
-  if (!_.find(items, { id: challengeId })) {
+  const { items: deletedItems } = await challengeDomain.delete(getLookupCriteria("id", challengeId));
+  if (!_.find(deletedItems, { id: challengeId })) {
     throw new errors.Internal(`There was an error deleting the challenge with id: ${challengeId} from dynamo`);
   }
   // delete ES document
