@@ -2225,7 +2225,7 @@ async function deleteChallenge(currentUser, challengeId) {
   // delete DB record
   const { items: deletedItems } = await challengeDomain.delete(getLookupCriteria("id", challengeId));
   if (!_.find(deletedItems, { id: challengeId })) {
-    throw new errors.Internal(`There was an error deleting the challenge with id: ${challengeId} from dynamo`);
+    throw new errors.Internal(`There was an error deleting the challenge with id: ${challengeId}`);
   }
   // delete ES document
   await esClient.delete({
