@@ -1298,6 +1298,7 @@ async function getChallenge(currentUser, id, checkIfExists) {
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, "winners");
   }
+  convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
 
   return challenge;
 }
