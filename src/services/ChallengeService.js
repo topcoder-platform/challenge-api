@@ -1632,7 +1632,7 @@ async function updateChallenge(currentUser, challengeId, data) {
     timelineTemplateChanged = true;
   }
 
-  if (data.prizeSets && data.prizeSets.length > 0) {
+  if (data.prizeSets) {
     if (
       isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) &&
       finalStatus === constants.challengeStatuses.Completed
@@ -1640,6 +1640,13 @@ async function updateChallenge(currentUser, challengeId, data) {
       throw new errors.BadRequestError(
         `Cannot update prizeSets for challenges with status: ${finalStatus}!`
       );
+    }
+    const prizeSetsGroup = _.groupBy(data.prizeSets, "type");
+    if (prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes]) {
+      const totalPrizes = helper.sumOfPrizes(
+        prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes
+      );
+      _.assign(data, { overview: { totalPrizes } });
     }
   }
 
