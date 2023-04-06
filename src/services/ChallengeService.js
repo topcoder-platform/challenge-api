@@ -42,7 +42,6 @@ const {
   convertToISOString,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
-const { cloneDeep } = require("lodash");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 
@@ -1253,20 +1252,6 @@ async function getChallenge(currentUser, id, checkIfExists) {
   }
   await helper.ensureUserCanViewChallenge(currentUser, challenge);
 
-  // // FIXME: Temporarily hard coded as the migrad
-  // // populate type property based on the typeId
-  // if (challenge.typeId) {
-  //   try {
-  //     const type = await helper.getById('ChallengeType', challenge.typeId)
-  //     challenge.type = type.name
-  //   } catch (e) {
-  //     challenge.typeId = '45415132-79fa-4d13-a9ac-71f50020dc10' // TODO Fix HardCode
-  //     const type = await helper.getById('ChallengeType', challenge.typeId)
-  //     challenge.type = type.name
-  //   }
-  // }
-  // delete challenge.typeId
-
   // Remove privateDescription for unregistered users
   if (currentUser) {
     if (!currentUser.isMachine && !hasAdminRole(currentUser)) {
@@ -1437,7 +1422,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Make sure the user cannot change the direct project ID
   if (data.legacy) {
-    data.legacy = _.assign({},challenge.legacy, data.legacy)
+    data.legacy = _.assign({}, challenge.legacy, data.legacy);
     _.set(data, "legacy.directProjectId", challenge.legacy.directProjectId);
   }
 
@@ -1563,17 +1548,22 @@ async function updateChallenge(currentUser, challengeId, data) {
       }
     }
 
-    if (_.includes([
-      constants.challengeStatuses.Cancelled,
-      constants.challengeStatuses.CancelledRequirementsInfeasible,
-      constants.challengeStatuses.CancelledPaymentFailed,
-      constants.challengeStatuses.CancelledFailedReview,
-      constants.challengeStatuses.CancelledFailedScreening,
-      constants.challengeStatuses.CancelledZeroSubmissions,
-      constants.challengeStatuses.CancelledWinnerUnresponsive,
-      constants.challengeStatuses.CancelledClientRequest,
-      constants.challengeStatuses.CancelledZeroRegistrations,
-    ], data.status)) {
+    if (
+      _.includes(
+        [
+          constants.challengeStatuses.Cancelled,
+          constants.challengeStatuses.CancelledRequirementsInfeasible,
+          constants.challengeStatuses.CancelledPaymentFailed,
+          constants.challengeStatuses.CancelledFailedReview,
+          constants.challengeStatuses.CancelledFailedScreening,
+          constants.challengeStatuses.CancelledZeroSubmissions,
+          constants.challengeStatuses.CancelledWinnerUnresponsive,
+          constants.challengeStatuses.CancelledClientRequest,
+          constants.challengeStatuses.CancelledZeroRegistrations,
+        ],
+        data.status
+      )
+    ) {
       isChallengeBeingCancelled = true;
     }
 
@@ -1670,8 +1660,9 @@ async function updateChallenge(currentUser, challengeId, data) {
   let phasesUpdated = false;
   if (
     ((data.phases && data.phases.length > 0) ||
-    isChallengeBeingActivated ||
-    timelineTemplateChanged) && !isChallengeBeingCancelled
+      isChallengeBeingActivated ||
+      timelineTemplateChanged) &&
+    !isChallengeBeingCancelled
   ) {
     if (
       challenge.status === constants.challengeStatuses.Completed ||
@@ -1805,7 +1796,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   try {
-    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ['cancelReason']));
+    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ["cancelReason"]));
     if (!_.isEmpty(updateInput)) {
       const grpcMetadata = new GrpcMetadata();
 
@@ -1918,7 +1909,10 @@ updateChallenge.schema = {
             .valid(_.values(constants.reviewTypes))
             .insensitive()
             .default(constants.reviewTypes.Internal),
-          confidentialityType: Joi.string().allow(null,'').empty(null,'').default(config.DEFAULT_CONFIDENTIALITY_TYPE),
+          confidentialityType: Joi.string()
+            .allow(null, "")
+            .empty(null, "")
+            .default(config.DEFAULT_CONFIDENTIALITY_TYPE),
           directProjectId: Joi.number(),
           forumId: Joi.number().integer(),
           isTask: Joi.boolean(),
@@ -2219,12 +2213,16 @@ async function deleteChallenge(currentUser, challengeId) {
   });
   const challenge = _.first(items);
   if (!challenge) {
-    throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist or is not in New status`);
+    throw new errors.NotFoundError(
+      `Challenge with id: ${challengeId} doesn't exist or is not in New status`
+    );
   }
   // ensure user can modify challenge
   await helper.ensureUserCanModifyChallenge(currentUser, challenge);
   // delete DB record
-  const { items: deletedItems } = await challengeDomain.delete(getLookupCriteria("id", challengeId));
+  const { items: deletedItems } = await challengeDomain.delete(
+    getLookupCriteria("id", challengeId)
+  );
   if (!_.find(deletedItems, { id: challengeId })) {
     throw new errors.Internal(`There was an error deleting the challenge with id: ${challengeId}`);
   }

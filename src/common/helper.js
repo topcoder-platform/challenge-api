@@ -5,7 +5,6 @@ const Joi = require("joi");
 const _ = require("lodash");
 const querystring = require("querystring");
 const constants = require("../../app-constants");
-const models = require("../models");
 const errors = require("./errors");
 const util = require("util");
 const AWS = require("aws-sdk");
@@ -182,155 +181,6 @@ function checkIfExists(source, term) {
   }
 
   return false;
-}
-
-/**
- * Get Data by model id
- * @param {String} modelName The dynamoose model name
- * @param {String} id The id value
- * @returns {Promise<void>}
- */
-async function getById(modelName, id) {
-  return new Promise((resolve, reject) => {
-    models[modelName]
-      .query("id")
-      .eq(id)
-      .exec((err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        if (result.length > 0) {
-          return resolve(result[0]);
-        } else {
-          return reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`));
-        }
-      });
-  });
-}
-
-/**
- * Get Data by model ids
- * @param {String} modelName The dynamoose model name
- * @param {Array} ids The ids
- * @returns {Promise<Array>} the found entities
- */
-async function getByIds(modelName, ids) {
-  const entities = [];
-  const theIds = ids || [];
-  for (const id of theIds) {
-    entities.push(await getById(modelName, id));
-  }
-  return entities;
-}
-
-/**
- * Validate the data to ensure no duplication
- * @param {Object} modelName The dynamoose model name
- * @param {String} name The attribute name of dynamoose model
- * @param {String} value The attribute value to be validated
- * @returns {Promise<void>}
- */
-async function validateDuplicate(modelName, name, value) {
-  const list = await scan(modelName);
-  for (let i = 0; i < list.length; i++) {
-    if (list[i][name] && String(list[i][name]).toLowerCase() === String(value).toLowerCase()) {
-      throw new errors.ConflictError(`${modelName} with ${name}: ${value} already exist`);
-    }
-  }
-}
-
-/**
- * Create item in database
- * @param {Object} modelName The dynamoose model name
- * @param {Object} data The create data object
- * @returns {Promise<void>}
- */
-async function create(modelName, data) {
-  return new Promise((resolve, reject) => {
-    const dbItem = new models[modelName](data);
-    dbItem.save((err) => {
-      if (err) {
-        return reject(err);
-      } else {
-        return resolve(dbItem);
-      }
-    });
-  });
-}
-
-/**
- * Update item in database
- * @param {Object} dbItem The Dynamo database item
- * @param {Object} data The updated data object
- * @returns {Promise<void>}
- */
-async function update(dbItem, data) {
-  Object.keys(data).forEach((key) => {
-    dbItem[key] = data[key];
-  });
-  return new Promise((resolve, reject) => {
-    dbItem.save((err) => {
-      if (err) {
-        return reject(err);
-      } else {
-        return resolve(dbItem);
-      }
-    });
-  });
-}
-
-/**
- * Get data collection by scan parameters
- * @param {Object} modelName The dynamoose model name
- * @param {Object} scanParams The scan parameters object
- * @returns {Promise<void>}
- */
-async function scan(modelName, scanParams) {
-  return new Promise((resolve, reject) => {
-    models[modelName].scan(scanParams).exec((err, result) => {
-      if (err) {
-        return reject(err);
-      } else {
-        return resolve(result.count === 0 ? [] : result);
-      }
-    });
-  });
-}
-
-/**
- * Get all data collection (avoid default page limit of DynamoDB) by scan parameters
- * @param {Object} modelName The dynamoose model name
- * @param {Object} scanParams The scan parameters object
- * @returns {Array}
- */
-async function scanAll(modelName, scanParams) {
-  let results = await models[modelName].scan(scanParams).exec();
-  let lastKey = results.lastKey;
-  while (!_.isUndefined(results.lastKey)) {
-    const newResult = await models[modelName].scan(scanParams).startAt(lastKey).exec();
-    results = [...results, ...newResult];
-    lastKey = newResult.lastKey;
-  }
-  return results;
-}
-
-/**
- * Test whether the given value is partially match the filter.
- * @param {String} filter the filter
- * @param {String} value the value to test
- * @returns {Boolean} the match result
- */
-function partialMatch(filter, value) {
-  if (filter) {
-    if (value) {
-      const filtered = xss(filter);
-      return _.toLower(value).includes(_.toLower(filtered));
-    } else {
-      return false;
-    }
-  } else {
-    return true;
-  }
 }
 
 /**
@@ -1322,14 +1172,6 @@ module.exports = {
   setResHeaders,
   checkIfExists,
   toString,
-  getById,
-  getByIds,
-  create,
-  update,
-  scan,
-  scanAll,
-  validateDuplicate,
-  partialMatch,
   downloadFromFileStack,
   downloadFromS3,
   deleteFromS3,
