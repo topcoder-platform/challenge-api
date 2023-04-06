@@ -1298,7 +1298,6 @@ async function getChallenge(currentUser, id, checkIfExists) {
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, "winners");
   }
-  convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
 
   return challenge;
 }
@@ -1425,6 +1424,7 @@ async function validateWinners(winners, challengeId) {
  */
 async function updateChallenge(currentUser, challengeId, data) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+  convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
 
   const projectId = _.get(challenge, "projectId");
 
@@ -1650,20 +1650,6 @@ async function updateChallenge(currentUser, challengeId, data) {
       throw new errors.BadRequestError(
         `Cannot update prizeSets for challenges with status: ${finalStatus}!`
       );
-    }
-    const prizeSetsGroup = _.groupBy(data.prizeSets, "type");
-    if (
-      !prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes] &&
-      _.get(challenge, "overview.totalPrizes")
-    ) {
-      // remove the totalPrizes if challenge prizes are empty
-      data.overview = challenge.overview = _.omit(challenge.overview, ["totalPrizes"]);
-    } else {
-      const totalPrizes = helper.sumOfPrizes(
-        prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes][0].prizes
-      );
-      _.assign(challenge, { overview: { totalPrizes } });
-      _.assign(data, { overview: { totalPrizes } });
     }
   }
 
