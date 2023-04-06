@@ -365,7 +365,7 @@ class ChallengeHelper {
         }
       });
     });
-    if (overview && overview.totalPrizesInCents) {
+    if (overview && !_.isUndefined(overview.totalPrizesInCents)) {
       overview.totalPrizes = overview.totalPrizesInCents / 100;
       delete overview.totalPrizesInCents;
     }
