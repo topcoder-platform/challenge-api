@@ -601,10 +601,10 @@ async function searchChallenges(currentUser, criteria) {
         match_phrase: { "task.isAssigned": criteria.taskIsAssigned },
       });
     }
-    if (criteria.taskMemberId || criteria.memberId) {
+    if (criteria.taskMemberId) {
       boolQuery.push({
         match_phrase: {
-          "task.memberId": criteria.taskMemberId || criteria.memberId,
+          "task.memberId": criteria.taskMemberId,
         },
       });
     }
