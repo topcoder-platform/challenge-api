@@ -149,7 +149,6 @@ async function searchChallenges(currentUser, criteria) {
       _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()));
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : [];
-
   const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : [];
 
   if (criteria.type) {
@@ -168,7 +167,6 @@ async function searchChallenges(currentUser, criteria) {
       criteria.trackId = _.get(trackSearchRes, "result[0].id");
     }
   }
-
   if (criteria.types) {
     for (const t of criteria.types) {
       const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t });
@@ -187,7 +185,6 @@ async function searchChallenges(currentUser, criteria) {
       }
     }
   }
-
   if (criteria.typeId) {
     includedTypeIds.push(criteria.typeId);
   }
