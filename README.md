@@ -1,10 +1,13 @@
 # Topcoder Challenge API
 
 This microservice provides access and interaction with all sorts of Challenge data.
+
 ## Devlopment status
+
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/topcoder-platform/challenge-api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/topcoder-platform/challenge-api/alerts/)[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/topcoder-platform/challenge-api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/topcoder-platform/challenge-api/context:javascript)
 
 ### Deployment status
+
 Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/develop) Prod: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master.svg?style=svg)](https://circleci.com/gh/topcoder-platform/challenge-api/tree/master)
 
 ## Swagger definition
@@ -12,6 +15,7 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 - [Swagger](https://api.topcoder.com/v5/challenges/docs/)
 
 ## Intended use
+
 - Production API
 
 ## Related repos
@@ -23,8 +27,8 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 - [Frontend App](https://github.com/topcoder-platform/challenge-engine-ui)
 
 ## Prerequisites
+
 - [NodeJS](https://nodejs.org/en/) (v10)
-- [DynamoDB](https://aws.amazon.com/dynamodb/)
 - [AWS S3](https://aws.amazon.com/s3/)
 - [Elasticsearch v6](https://www.elastic.co/)
 - [Docker](https://www.docker.com/)
@@ -74,6 +78,7 @@ The following parameters can be set in config files or in env variables:
 You can find sample `.env` files inside the `/docs` directory.
 
 ## Available commands
+
 1. Drop/delete tables: `npm run drop-tables`
 2. Creating tables: `npm run create-tables`
 3. Seed/Insert data to tables: `npm run seed-tables`
@@ -87,11 +92,12 @@ You can find sample `.env` files inside the `/docs` directory.
 11. Initialize the local environments: `npm run local:init`
 12. Reset the local environments: `npm run local:reset`
 
-
 ### Notes
+
 - The seed data are located in `src/scripts/seed`
 
 ## Local Deployment
+
 0. Make sure to use Node v10+ by command `node -v`. We recommend using [NVM](https://github.com/nvm-sh/nvm) to quickly switch to the right version:
 
    ```bash
@@ -104,31 +110,33 @@ You can find sample `.env` files inside the `/docs` directory.
    yarn install
    ```
 
-2. ⚙ Local config   
-  In the `challenge-api` root directory create `.env` file with the next environment variables. Values for **Auth0 config** should be shared with you on the forum.<br>
-     ```bash
-     # Auth0 config
-     AUTH0_URL=
-     AUTH0_PROXY_SERVER_URL=
-     AUTH0_AUDIENCE=
-     AUTH0_CLIENT_ID=
-     AUTH0_CLIENT_SECRET=
+2. ⚙ Local config  
+   In the `challenge-api` root directory create `.env` file with the next environment variables. Values for **Auth0 config** should be shared with you on the forum.<br>
 
-     # Locally deployed services (via docker-compose)
-     IS_LOCAL_DB=true
-     DYNAMODB_URL=http://localhost:8000
-     ```
+   ```bash
+   # Auth0 config
+   AUTH0_URL=
+   AUTH0_PROXY_SERVER_URL=
+   AUTH0_AUDIENCE=
+   AUTH0_CLIENT_ID=
+   AUTH0_CLIENT_SECRET=
 
-    - Values from this file would be automatically used by many `npm` commands.
-    - ⚠️ Never commit this file or its copy to the repository!
+   # Locally deployed services (via docker-compose)
+   IS_LOCAL_DB=true
+   DYNAMODB_URL=http://localhost:8000
+   ```
+
+   - Values from this file would be automatically used by many `npm` commands.
+   - ⚠️ Never commit this file or its copy to the repository!
 
 3. 🚢 Start docker-compose with services which are required to start Topcoder Challenges API locally
 
    ```bash
    npm run services:up
    ```
-   
+
 4. ♻ Update following two parts:
+
 - https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116
   `throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
 - https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
@@ -147,15 +155,17 @@ You can find sample `.env` files inside the `/docs` directory.
    ```
 
    This command will do 3 things:
-  - create Elasticsearch indexes (drop if exists)
-  - Initialize the database by cleaning all the records.
-  - Import the data to the local database and index it to ElasticSearch
+
+- create Elasticsearch indexes (drop if exists)
+- Initialize the database by cleaning all the records.
+- Import the data to the local database and index it to ElasticSearch
 
 7. 🚀 Start Topcoder Challenge API
 
    ```bash
    npm start
    ```
+
    The Topcoder Challenge API will be served on `http://localhost:3000`
 
 ## Production deployment
@@ -180,6 +190,7 @@ The following test parameters can be set in config file or in env variables:
 - S3_ENDPOINT: endpoint of AWS S3 API, for unit and e2e test only; default to `localhost:9000`
 
 ### Prepare
+
 - Start Local services in docker.
 - Create DynamoDB tables.
 - Initialize ES index.
@@ -188,6 +199,7 @@ The following test parameters can be set in config file or in env variables:
 Seeding db data is not needed.
 
 ### Running unit tests
+
 To run unit tests alone
 
 ```bash
@@ -201,6 +213,7 @@ npm run test:cov
 ```
 
 ### Running integration tests
+
 To run integration tests alone
 
 ```bash
@@ -214,6 +227,7 @@ npm run e2e:cov
 ```
 
 ## Verification
+
 Refer to the verification document `Verification.md`
 
 ## Notes

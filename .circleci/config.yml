@@ -83,7 +83,7 @@ workflows:
           branches:
             only:
             - dev
-            - fix/template
+            - fix/schema
 
     - "build-qa":
         context: org-global
