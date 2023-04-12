@@ -1184,7 +1184,7 @@ createChallenge.schema = {
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
       startDate: Joi.date().iso(),
-      status: Joi.string().valid(_.values(constants.challengeStatuses)),
+      status: Joi.string().valid([constants.challengeStatuses.Active, constants.challengeStatuses.New, constants.challengeStatuses.Draft, constants.challengeStatuses.Approved]),
       groups: Joi.array().items(Joi.optionalId()).unique(),
       // gitRepoURLs: Joi.array().items(Joi.string().uri()),
       terms: Joi.array().items(
