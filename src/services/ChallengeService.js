@@ -1616,7 +1616,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   // TODO: Fix this Tech Debt once legacy is turned off
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
-  const timelineTemplateChanged = false;
+  let timelineTemplateChanged = false;
   // if (!_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
   //   if (
   //     finalStatus !== constants.challengeStatuses.New &&
