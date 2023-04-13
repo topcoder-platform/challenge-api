@@ -1617,16 +1617,17 @@ async function updateChallenge(currentUser, challengeId, data) {
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
   const timelineTemplateChanged = false;
-  if (!_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
-    if (
-      finalStatus !== constants.challengeStatuses.New &&
-      finalTimelineTemplateId !== challenge.timelineTemplateId
-    ) {
-      throw new errors.BadRequestError(
-        `Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`
-      );
-    }
-  } else if (finalTimelineTemplateId !== challenge.timelineTemplateId) {
+  // if (!_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
+  //   if (
+  //     finalStatus !== constants.challengeStatuses.New &&
+  //     finalTimelineTemplateId !== challenge.timelineTemplateId
+  //   ) {
+  //     throw new errors.BadRequestError(
+  //       `Cannot change the timelineTemplateId for challenges with status: ${finalStatus}`
+  //     );
+  //   }
+  // } else
+  if (finalTimelineTemplateId !== challenge.timelineTemplateId) {
     // make sure there are no previous phases if the timeline template has changed
     challenge.phases = [];
     timelineTemplateChanged = true;
