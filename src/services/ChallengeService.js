@@ -1616,8 +1616,8 @@ async function updateChallenge(currentUser, challengeId, data) {
   // TODO: Fix this Tech Debt once legacy is turned off
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
-  const timelineTemplateChanged = false;
-  if (!_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
+  let timelineTemplateChanged = false;
+  if (!currentUser.isMachine && !hasAdminRole(currentUser) && !_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
     if (
       finalStatus !== constants.challengeStatuses.New &&
       finalTimelineTemplateId !== challenge.timelineTemplateId
@@ -1750,7 +1750,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack({
     typeId: challenge.typeId,
     trackId: challenge.trackId,
-    timelineTemplateId: challenge.timelineTemplateId,
+    timelineTemplateId: timelineTemplateChanged ? finalTimelineTemplateId : challenge.timelineTemplateId,
   });
 
   if (_.get(type, "isTask")) {
