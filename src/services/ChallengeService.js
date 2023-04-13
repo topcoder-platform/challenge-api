@@ -1618,6 +1618,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
   let timelineTemplateChanged = false;
   if (!currentUser.isMachine && !hasAdminRole(currentUser) && !_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
+  if (!_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
     if (
       finalStatus !== constants.challengeStatuses.New &&
       finalTimelineTemplateId !== challenge.timelineTemplateId
