@@ -83,14 +83,14 @@ workflows:
           branches:
             only:
             - dev
-            - fix/schema
+            - fix/floating-point-arhithmetic
 
     - "build-qa":
         context: org-global
         filters:
           branches:
             only:
-            - refactor/domain-challenge
+            - qa
 
     # Production builds are exectuted only on tagged commits to the
     # master branch.

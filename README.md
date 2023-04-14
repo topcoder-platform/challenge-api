@@ -22,13 +22,11 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 
 - [Resources API](https://github.com/topcoder-platform/resources-api)
 - [ES Processor](https://github.com/topcoder-platform/challenge-processor-es) - Updates data in ElasticSearch
-- [Legacy Processor](https://github.com/topcoder-platform/legacy-challenge-processor) - Moves data from DynamoDB back to Informix
-- [Legacy Migration Script](https://github.com/topcoder-platform/legacy-challenge-migration-script) - Moves data from Informix to DynamoDB
-- [Frontend App](https://github.com/topcoder-platform/challenge-engine-ui)
+- [Domain Challenge](https://github.com/topcoder-platform/domain-challenge) - Domain Challenge
 
 ## Prerequisites
 
-- [NodeJS](https://nodejs.org/en/) (v10)
+- [NodeJS](https://nodejs.org/en/) (v18+)
 - [AWS S3](https://aws.amazon.com/s3/)
 - [Elasticsearch v6](https://www.elastic.co/)
 - [Docker](https://www.docker.com/)
