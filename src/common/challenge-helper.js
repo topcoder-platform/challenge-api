@@ -351,10 +351,7 @@ class ChallengeHelper {
   convertPrizeSetValuesToCents(prizeSets) {
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
-        prize.amountInCents = new Decimal(prize.value)
-          .mul(100)
-          .round(0, Decimal.ROUND_DOWN)
-          .toNumber();
+        prize.amountInCents = new Decimal(prize.value).mul(100).toNumber();
         delete prize.value;
       });
     });
