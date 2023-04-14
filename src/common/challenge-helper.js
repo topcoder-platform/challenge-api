@@ -8,6 +8,7 @@ const config = require("config");
 const helper = require("./helper");
 const constants = require("../../app-constants");
 const axios = require("axios");
+const Decimal = require("decimal.js");
 const { getM2MToken } = require("./m2m-helper");
 const { hasAdminRole } = require("./role-helper");
 const { ensureAcessibilityToModifiedGroups } = require("./group-helper");
@@ -350,7 +351,7 @@ class ChallengeHelper {
   convertPrizeSetValuesToCents(prizeSets) {
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
-        prize.amountInCents = prize.value * 100;
+        prize.amountInCents = new Decimal(prize.value).mul(100).toNumber();
         delete prize.value;
       });
     });
@@ -360,13 +361,17 @@ class ChallengeHelper {
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
         if (prize.amountInCents != null) {
-          prize.value = prize.amountInCents / 100;
+          prize.value = parseFloat(new Decimal(prize.amountInCents).div(100).toFixed(2));
+
           delete prize.amountInCents;
         }
       });
     });
     if (overview && !_.isUndefined(overview.totalPrizesInCents)) {
-      overview.totalPrizes = overview.totalPrizesInCents / 100;
+      overview.totalPrizes = parseFloat(
+        new Decimal(overview.totalPrizesInCents).div(100).toFixed(2)
+      );
+
       delete overview.totalPrizesInCents;
     }
   }

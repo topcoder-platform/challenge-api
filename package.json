@@ -51,6 +51,7 @@
     "body-parser": "^1.15.1",
     "config": "^3.0.1",
     "cors": "^2.7.1",
+    "decimal.js": "^10.4.3",
     "deep-equal": "^2.2.0",
     "dotenv": "^8.2.0",
     "elasticsearch": "^16.7.3",
