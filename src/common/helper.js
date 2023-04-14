@@ -754,36 +754,21 @@ function calculateChallengeEndDate(challenge, data) {
 async function listChallengesByMember(memberId) {
   const token = await m2mHelper.getM2MToken();
   let allIds = [];
-  // get search is paginated, we need to get all pages' data
-  let page = 1;
-  while (true) {
-    let result = {};
-    try {
-      result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          page,
-          perPage: 10000,
-        },
-      });
-    } catch (e) {
-      // only log the error but don't throw it, so the following logic can still be executed.
-      logger.debug(`Failed to get challenges that accessible to the memberId ${memberId}`, e);
-    }
-    const ids = result.data || [];
-    if (ids.length === 0) {
-      break;
-    }
-    allIds = allIds.concat(ids);
-    page += 1;
-    if (
-      result.headers &&
-      result.headers["x-total-pages"] &&
-      page > Number(result.headers["x-total-pages"])
-    ) {
-      break;
-    }
+
+  try {
+    const result = await axios.get(`${config.RESOURCES_API_URL}/${memberId}/challenges`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        useScroll: true,
+      },
+    });
+
+    allIds = result.data || [];
+  } catch (e) {
+    // only log the error but don't throw it, so the following logic can still be executed.
+    logger.debug(`Failed to get challenges that accessible to the memberId ${memberId}`, e);
   }
+
   return allIds;
 }
 
