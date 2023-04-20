@@ -926,7 +926,8 @@ async function createChallenge(currentUser, challenge, userToken) {
       challenge.projectId = await helper.createSelfServiceProject(
         selfServiceProjectName,
         "N/A",
-        config.NEW_SELF_SERVICE_PROJECT_TYPE
+        config.NEW_SELF_SERVICE_PROJECT_TYPE,
+        userToken
       );
     }
 
