@@ -1871,7 +1871,7 @@ async function updateChallenge(currentUser, challengeId, data) {
         }
       );
     }
-    if (sendRejectedEmail || cancelReason) {
+    if (sendRejectedEmail || data.cancelReason) {
       logger.debug("Should send redirected email");
       await helper.sendSelfServiceNotification(
         constants.SelfServiceNotificationTypes.WORK_REQUEST_REDIRECTED,
