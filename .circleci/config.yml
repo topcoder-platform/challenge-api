@@ -83,7 +83,7 @@ workflows:
           branches:
             only:
             - dev
-            - fix/floating-point-arhithmetic
+            - feature/edit-task-payment
 
     - "build-qa":
         context: org-global

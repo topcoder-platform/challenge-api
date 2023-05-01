@@ -1182,7 +1182,12 @@ createChallenge.schema = {
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
       startDate: Joi.date().iso(),
-      status: Joi.string().valid([constants.challengeStatuses.Active, constants.challengeStatuses.New, constants.challengeStatuses.Draft, constants.challengeStatuses.Approved]),
+      status: Joi.string().valid([
+        constants.challengeStatuses.Active,
+        constants.challengeStatuses.New,
+        constants.challengeStatuses.Draft,
+        constants.challengeStatuses.Approved,
+      ]),
       groups: Joi.array().items(Joi.optionalId()).unique(),
       // gitRepoURLs: Joi.array().items(Joi.string().uri()),
       terms: Joi.array().items(
@@ -1615,7 +1620,12 @@ async function updateChallenge(currentUser, challengeId, data) {
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
   let timelineTemplateChanged = false;
-  if (!currentUser.isMachine && !hasAdminRole(currentUser) && !_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
+  if (
+    !currentUser.isMachine &&
+    !hasAdminRole(currentUser) &&
+    !_.get(data, "legacy.pureV5") &&
+    !_.get(challenge, "legacy.pureV5")
+  ) {
     if (
       finalStatus !== constants.challengeStatuses.New &&
       finalTimelineTemplateId !== challenge.timelineTemplateId
@@ -1635,10 +1645,14 @@ async function updateChallenge(currentUser, challengeId, data) {
       isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) &&
       finalStatus === constants.challengeStatuses.Completed
     ) {
-      throw new errors.BadRequestError(
-        `Cannot update prizeSets for challenges with status: ${finalStatus}!`
-      );
+      // Allow only M2M to update prizeSets for completed challenges
+      if (!currentUser.isMachine || (challenge.task != null && challenge.task.isTask !== true)) {
+        throw new errors.BadRequestError(
+          `Cannot update prizeSets for challenges with status: ${finalStatus}!`
+        );
+      }
     }
+
     const prizeSetsGroup = _.groupBy(data.prizeSets, "type");
     if (prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes]) {
       const totalPrizes = helper.sumOfPrizes(
@@ -1748,7 +1762,9 @@ async function updateChallenge(currentUser, challengeId, data) {
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack({
     typeId: challenge.typeId,
     trackId: challenge.trackId,
-    timelineTemplateId: timelineTemplateChanged ? finalTimelineTemplateId : challenge.timelineTemplateId,
+    timelineTemplateId: timelineTemplateChanged
+      ? finalTimelineTemplateId
+      : challenge.timelineTemplateId,
   });
 
   if (_.get(type, "isTask")) {
@@ -2106,7 +2122,10 @@ function sanitizeChallenge(challenge) {
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name);
   }
-  if (!_.isUndefined(sanitized.description)) {
+  // Only Sanitize description if it is in HTML format
+  // Otherwise, it is in Markdown format and we don't want to sanitize it - a future enhancement can be
+  // using a markdown sanitizer
+  if (challenge.descriptionFormat === "html" && !_.isUndefined(sanitized.description)) {
     sanitized.description = xss(sanitized.description);
   }
   if (challenge.legacy) {
