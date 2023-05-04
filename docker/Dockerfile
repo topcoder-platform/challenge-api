@@ -8,6 +8,6 @@ COPY . /challenge-api
 WORKDIR /challenge-api
 
 # Install the dependencies from package.json
-RUN yarn install
+RUN HOME=$(pwd) yarn install
 
 CMD yarn start
