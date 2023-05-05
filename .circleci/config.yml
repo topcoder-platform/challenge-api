@@ -13,10 +13,11 @@ install_dependency: &install_dependency
 install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
   command: |
-    git clone --branch v1.4.14 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
+    git clone --branch dev https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
     cp ./../buildscript/master_deploy.sh .
     cp ./../buildscript/buildenv.sh .
     cp ./../buildscript/awsconfiguration.sh .
+
 restore_cache_settings_for_build: &restore_cache_settings_for_build
   key: docker-node-modules-{{ checksum "yarn.lock" }}
 
@@ -33,7 +34,7 @@ builddeploy_steps: &builddeploy_steps
 - restore_cache: *restore_cache_settings_for_build
 - run:
     name: "Authenticate with CodeArtifact and build docker image"
-    command: "./awsconfiguration.sh ${CODEARTIFACT_ENV}\nsource awsenvconf\naws codeartifact login --tool npm --repository topcoder-framework --domain topcoder --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --namespace @topcoder-framework\ncp ~/.npmrc .\nrm -f awsenvconf            \n./build.sh ${APPNAME}\n"
+    command: "./awsconfiguration.sh ${CODEARTIFACT_ENV}\nsource awsenvconf\naws codeartifact login --tool npm --repository topcoder-framework --domain topcoder --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --namespace @topcoder-framework\ncp ~/.npmrc .\nrm -f awsenvconf            \n./build.sh ${APPNAME}"
 - save_cache: *save_cache_settings
 - deploy:
     name: Running MasterScript.
