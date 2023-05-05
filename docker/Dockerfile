@@ -10,4 +10,4 @@ WORKDIR /challenge-api
 # Install the dependencies from package.json
 RUN yarn install
 
-CMD yarn start
+CMD node /challenge-api/app.js
