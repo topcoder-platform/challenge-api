@@ -93,6 +93,15 @@ module.exports = {
       scopes: [DELETE, ALL],
     },
   },
+  "/challenges/:challengeId/advance-phase": {
+    post: {
+      controller: "ChallengeController",
+      method: "advancePhase",
+      auth: "jwt",
+      access: [constants.UserRoles.Admin],
+      scopes: [UPDATE, ALL],
+    },
+  },
   "/challenges/:challengeId/statistics": {
     get: {
       controller: "ChallengeController",

@@ -43,28 +43,8 @@ const {
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 
+const phaseAdvancer = require("../phase-management/PhaseAdvancer");
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
-
-/**
- * Check if user can perform modification/deletion to a challenge
- *
- * @param {Object} user the JwT user object
- * @param {Object} challenge the challenge object
- * @returns {undefined}
- */
-async function ensureAccessibleForChallenge(user, challenge) {
-  const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId);
-  if (
-    !user.isMachine &&
-    !hasAdminRole(user) &&
-    challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() &&
-    !userHasFullAccess
-  ) {
-    throw new errors.ForbiddenError(
-      `Only M2M, admin, challenge's copilot or users with full access can perform modification.`
-    );
-  }
-}
 
 /**
  * Search challenges by legacyId
@@ -2254,6 +2234,44 @@ deleteChallenge.schema = {
   challengeId: Joi.id(),
 };
 
+async function advancePhase(currentUser, challengeId, data) {
+  if (currentUser && (currentUser.isMachine || hasAdminRole(currentUser))) {
+    const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
+    if (!challenge) {
+      throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist.`);
+    }
+    if (challenge.status !== constants.challengeStatuses.Active) {
+      throw new errors.BadRequestError(
+        `Challenge with id: ${challengeId} is not in Active status.`
+      );
+    }
+
+    return phaseAdvancer.advancePhase(
+      currentUser,
+      challenge.id,
+      challenge.phases,
+      data.operation,
+      data.phase
+    );
+  }
+
+  throw new errors.ForbiddenError(
+    `Admin role or an M2M token is required to advance the challenge phase.`
+  );
+}
+
+advancePhase.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  data: Joi.object()
+    .keys({
+      phase: Joi.string().required(),
+      operation: Joi.string().lowercase().valid("open", "close").required(),
+    })
+    .required(),
+};
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -2262,6 +2280,7 @@ module.exports = {
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,
+  advancePhase,
 };
 
 logger.buildService(module.exports);
