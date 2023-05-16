@@ -4,7 +4,6 @@ const { Engine } = require("json-rules-engine");
 const rulesJSON = require("./phase-rules.json");
 const errors = require("../common/errors");
 
-const challengeService = require("../services/ChallengeService");
 const helper = require("../common/helper");
 
 // Helper functions
@@ -75,7 +74,7 @@ class PhaseAdvancer {
     return facts;
   }
 
-  async advancePhase(user, challengeId, phases, operation, phaseName) {
+  async advancePhase(challengeId, phases, operation, phaseName) {
     const phase = phases.find((phase) => phase.name === phaseName);
 
     if (!phase) {
@@ -122,9 +121,9 @@ class PhaseAdvancer {
     }
 
     if (operation === "open") {
-      await this.#open(user, challengeId, phases, phase);
+      await this.#open(challengeId, phases, phase);
     } else if (operation === "close") {
-      await this.#close(user, challengeId, phases, phase);
+      await this.#close(challengeId, phases, phase);
     }
 
     const next = operation === "close" ? phases.filter((p) => p.predecessor === phase.phaseId) : [];
@@ -132,11 +131,12 @@ class PhaseAdvancer {
     return {
       success: true,
       message: `Successfully ${operation}d phase ${phase.name} for challenge ${challengeId}`,
+      updatedPhases: phases,
       next,
     };
   }
 
-  async #open(user, challengeId, phases, phase) {
+  async #open(challengeId, phases, phase) {
     console.log(`Opening phase ${phase.name} for challenge ${challengeId}`);
 
     phase.isOpen = true;
@@ -154,10 +154,9 @@ class PhaseAdvancer {
     }
 
     console.log(`Updated phases: ${JSON.stringify(phases, null, 2)}`);
-    await challengeService.updateChallenge(user, challengeId, { phases });
   }
 
-  async #close(user, challengeId, phases, phase) {
+  async #close(challengeId, phases, phase) {
     console.log(`Closing phase ${phase.name} for challenge ${challengeId}`);
 
     phase.isOpen = false;
@@ -172,7 +171,6 @@ class PhaseAdvancer {
     }
 
     console.log(`Updated phases: ${JSON.stringify(phases, null, 2)}`);
-    await challengeService.updateChallenge(user, challengeId, { phases });
   }
 
   #isPastTime(dateString) {

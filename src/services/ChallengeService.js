@@ -2247,13 +2247,23 @@ async function advancePhase(currentUser, challengeId, data) {
       );
     }
 
-    return phaseAdvancer.advancePhase(
-      currentUser,
+    const phaseAdvancerResult = await phaseAdvancer.advancePhase(
       challenge.id,
       challenge.phases,
       data.operation,
       data.phase
     );
+
+    if (success) {
+      await updateChallenge(currentUser, challengeId, { phases: updatedPhases });
+      return {
+        success: true,
+        message: phaseAdvancerResult.message,
+        next: phaseAdvancerResult.next,
+      };
+    }
+
+    return phaseAdvancerResult;
   }
 
   throw new errors.ForbiddenError(
