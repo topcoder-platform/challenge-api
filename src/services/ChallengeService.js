@@ -2311,7 +2311,7 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
     index: config.get("ES.ES_INDEX"),
     type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
     refresh: config.get("ES.ES_REFRESH"),
-    id: challengeId,
+    id: updatedChallenge.id,
     body: {
       doc: updatedChallenge,
     },
