@@ -2248,7 +2248,7 @@ async function advancePhase(currentUser, challengeId, data) {
       );
 
       const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-      await indexChallengeAndPostToKafka(updatedChallenge, track, type);
+      await indexChallengeAndPostToKafka(updatedChallenge);
 
       return {
         success: true,
