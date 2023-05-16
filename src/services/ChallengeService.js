@@ -2255,7 +2255,9 @@ async function advancePhase(currentUser, challengeId, data) {
     );
 
     if (phaseAdvancerResult.success) {
-      await updateChallenge(currentUser, challengeId, { phases: updatedPhases });
+      await updateChallenge(currentUser, challengeId, {
+        phases: phaseAdvancerResult.updatedPhases,
+      });
       return {
         success: true,
         message: phaseAdvancerResult.message,
