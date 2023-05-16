@@ -195,6 +195,11 @@
         "conditions": {
           "all": [
             {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
               "fact": "isPastScheduledEndTime",
               "operator": "equal",
               "value": true
@@ -224,6 +229,11 @@
             {
               "fact": "isClosed",
               "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "equal",
               "value": true
             },
             {
@@ -262,6 +272,11 @@
         "conditions": {
           "all": [
             {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
               "fact": "isPastScheduledEndTime",
               "operator": "equal",
               "value": true
@@ -289,6 +304,11 @@
         "conditions": {
           "all": [
             {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
               "fact": "hasActiveUnreviewedSubmissions",
               "operator": "equal",
               "value": false
@@ -311,6 +331,11 @@
         "conditions": {
           "all": [
             {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
               "fact": "isPastScheduledEndTime",
               "operator": "equal",
               "value": true
@@ -332,6 +357,11 @@
         "name": "Appeals Response Close",
         "conditions": {
           "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
             {
               "fact": "isPastScheduledEndTime",
               "operator": "equal",

@@ -208,7 +208,7 @@ class PhaseAdvancer {
 
   async #hasActiveUnreviewedSubmissions(challengeId) {
     console.log(`Checking if there are active unreviewed submissions for challenge ${challengeId}`);
-    return Promise.resolve(true);
+    return Promise.resolve(false);
   }
 
   async #executeRule(rule, facts) {
