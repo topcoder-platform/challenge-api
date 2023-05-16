@@ -1806,32 +1806,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
-
-  // post bus event
-  logger.debug(
-    `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
-  );
-
-  enrichChallengeForResponse(updatedChallenge, track, type);
-
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
-    key:
-      updatedChallenge.status === "Completed"
-        ? `${updatedChallenge.id}:${updatedChallenge.status}`
-        : undefined,
-  });
-
-  // Update ES
-  await esClient.update({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: challengeId,
-    body: {
-      doc: updatedChallenge,
-    },
-  });
+  await indexChallengeAndPostToKafka(updatedChallenge, track, type);
 
   if (updatedChallenge.legacy.selfService) {
     const creator = await helper.getMemberByHandle(updatedChallenge.createdBy);
@@ -2255,9 +2230,26 @@ async function advancePhase(currentUser, challengeId, data) {
     );
 
     if (phaseAdvancerResult.success) {
-      await updateChallenge(currentUser, challengeId, {
-        phases: phaseAdvancerResult.updatedPhases,
-      });
+      const grpcMetadata = new GrpcMetadata();
+
+      grpcMetadata.set("handle", currentUser.handle);
+      grpcMetadata.set("userId", currentUser.userId);
+
+      await challengeDomain.update(
+        {
+          filterCriteria: getScanCriteria({ id: challengeId }),
+          updateInput: {
+            phaseUpdate: {
+              phases: phaseAdvancerResult.updatedPhases,
+            },
+          },
+        },
+        grpcMetadata
+      );
+
+      const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+      await indexChallengeAndPostToKafka(updatedChallenge, track, type);
+
       return {
         success: true,
         message: phaseAdvancerResult.message,
@@ -2283,6 +2275,48 @@ advancePhase.schema = {
     })
     .required(),
 };
+
+async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
+  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
+
+  if (track == null || type == null) {
+    const trackAndTypeData = await challengeHelper.validateAndGetChallengeTypeAndTrack({
+      typeId: updatedChallenge.typeId,
+      trackId: updatedChallenge.trackId,
+      timelineTemplateId: updatedChallenge.timelineTemplateId,
+    });
+
+    if (trackAndTypeData != null) {
+      track = trackAndTypeData.track;
+      type = trackAndTypeData.type;
+    }
+  }
+
+  // post bus event
+  logger.debug(
+    `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
+  );
+
+  enrichChallengeForResponse(updatedChallenge, track, type);
+
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
+    key:
+      updatedChallenge.status === "Completed"
+        ? `${updatedChallenge.id}:${updatedChallenge.status}`
+        : undefined,
+  });
+
+  // Update ES
+  await esClient.update({
+    index: config.get("ES.ES_INDEX"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+    refresh: config.get("ES.ES_REFRESH"),
+    id: challengeId,
+    body: {
+      doc: updatedChallenge,
+    },
+  });
+}
 
 module.exports = {
   searchChallenges,
