@@ -63,3 +63,4 @@ typings/
 .next
 ecr-login.sh
 .npmrc
+test.js
