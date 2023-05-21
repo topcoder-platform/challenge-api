@@ -132,7 +132,10 @@ class PhaseAdvancer {
       success: true,
       message: `Successfully ${operation}d phase ${phase.name} for challenge ${challengeId}`,
       updatedPhases: phases,
-      next,
+      next: {
+        operation: operation === "close" && next.length > 0 ? "open" : undefined,
+        phases: next,
+      },
     };
   }
 
