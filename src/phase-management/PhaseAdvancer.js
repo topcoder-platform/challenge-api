@@ -66,7 +66,7 @@ class PhaseAdvancer {
       nextPhase: phases.find((p) => p.predecessor === phase.phaseId)?.name,
     };
 
-    if (operation === "close" && this.#factGenerators[normalizeName(phase.name)]) {
+    if (this.#factGenerators[normalizeName(phase.name)]) {
       const additionalFacts = await this.#factGenerators[normalizeName(phase.name)](challengeId);
       Object.assign(facts, additionalFacts);
     }
