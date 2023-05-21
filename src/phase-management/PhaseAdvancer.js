@@ -42,10 +42,10 @@ class PhaseAdvancer {
     Review: async (challengeId) => ({
       allSubmissionsReviewed: await this.#areAllSubmissionsReviewed(challengeId),
     }),
-    "Iterative Review": async (challengeId) => ({
+    IterativeReview: async (challengeId) => ({
       hasActiveUnreviewedSubmissions: await this.#hasActiveUnreviewedSubmissions(challengeId),
     }),
-    "Appeals Response": async (challengeId) => ({
+    AppealsResponse: async (challengeId) => ({
       allAppealsResolved: await this.#areAllAppealsResolved(challengeId),
     }),
   };
