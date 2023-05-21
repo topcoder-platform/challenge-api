@@ -17,7 +17,7 @@ const shouldCheckConstraint = (operation, phase, constraintName, rules) => {
   return (
     operation === "close" &&
     phase.constraints &&
-    rules.constraintRules[phase.name]?.includes(normalizedConstraintName)
+    rules.constraintRules[normalizeName(phase.name)]?.includes(normalizedConstraintName)
   );
 };
 
@@ -66,8 +66,8 @@ class PhaseAdvancer {
       nextPhase: phases.find((p) => p.predecessor === phase.phaseId)?.name,
     };
 
-    if (operation === "close" && this.#factGenerators[phase.name]) {
-      const additionalFacts = await this.#factGenerators[phase.name](challengeId);
+    if (operation === "close" && this.#factGenerators[normalizeName(phase.name)]) {
+      const additionalFacts = await this.#factGenerators[normalizeName(phase.name)](challengeId);
       Object.assign(facts, additionalFacts);
     }
 
