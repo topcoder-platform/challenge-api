@@ -237,27 +237,9 @@
               "value": true
             },
             {
-              "any": [
-                {
-                  "fact": "isPastScheduledEndTime",
-                  "operator": "equal",
-                  "value": true
-                },
-                {
-                  "all": [
-                    {
-                      "fact": "nextPhase",
-                      "operator": "equal",
-                      "value": "Iterative Review"
-                    },
-                    {
-                      "fact": "hasActiveUnreviewedSubmissions",
-                      "operator": "equal",
-                      "value": true
-                    }
-                  ]
-                }
-              ]
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
             }
           ]
         },
