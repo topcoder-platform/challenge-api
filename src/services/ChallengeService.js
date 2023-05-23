@@ -1413,7 +1413,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   data = sanitizeData(sanitizeChallenge(data), challenge);
   console.debug("Sanitized Data:", data);
 
-  validateChallengeUpdateRequest(currentUser, challenge, data);
+  await validateChallengeUpdateRequest(currentUser, challenge, data);
 
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
