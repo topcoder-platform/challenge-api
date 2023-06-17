@@ -5,6 +5,7 @@ const rulesJSON = require("./phase-rules.json");
 const errors = require("../common/errors");
 
 const helper = require("../common/helper");
+const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 
 // Helper functions
 
@@ -30,6 +31,11 @@ const parseDate = (dateString) => {
 
 class PhaseAdvancer {
   #rules = rulesJSON;
+  #challengeDomain;
+
+  constructor(challengeDomain) {
+    this.#challengeDomain = challengeDomain;
+  }
 
   #factGenerators = {
     Registration: async (challengeId) => ({
@@ -249,4 +255,4 @@ class PhaseAdvancer {
   }
 }
 
-module.exports = new PhaseAdvancer();
+module.exports = PhaseAdvancer;

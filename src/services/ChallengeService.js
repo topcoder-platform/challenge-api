@@ -32,6 +32,8 @@ const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
 const esClient = helper.getESClient();
 
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+const PhaseAdvancer = require("../phase-management/PhaseAdvancer");
+
 const { hasAdminRole } = require("../common/role-helper");
 const {
   validateChallengeUpdateRequest,
@@ -43,8 +45,8 @@ const {
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 
-const phaseAdvancer = require("../phase-management/PhaseAdvancer");
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const phaseAdvancer = new PhaseAdvancer();
 
 /**
  * Search challenges by legacyId
