@@ -1182,7 +1182,12 @@ createChallenge.schema = {
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
       startDate: Joi.date().iso(),
-      status: Joi.string().valid([constants.challengeStatuses.Active, constants.challengeStatuses.New, constants.challengeStatuses.Draft, constants.challengeStatuses.Approved]),
+      status: Joi.string().valid([
+        constants.challengeStatuses.Active,
+        constants.challengeStatuses.New,
+        constants.challengeStatuses.Draft,
+        constants.challengeStatuses.Approved,
+      ]),
       groups: Joi.array().items(Joi.optionalId()).unique(),
       // gitRepoURLs: Joi.array().items(Joi.string().uri()),
       terms: Joi.array().items(
@@ -1428,7 +1433,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   data = sanitizeData(sanitizeChallenge(data), challenge);
   console.debug("Sanitized Data:", data);
 
-  validateChallengeUpdateRequest(currentUser, challenge, data);
+  await validateChallengeUpdateRequest(currentUser, challenge, data);
 
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
@@ -1615,7 +1620,12 @@ async function updateChallenge(currentUser, challengeId, data) {
   const finalStatus = data.status || challenge.status;
   const finalTimelineTemplateId = data.timelineTemplateId || challenge.timelineTemplateId;
   let timelineTemplateChanged = false;
-  if (!currentUser.isMachine && !hasAdminRole(currentUser) && !_.get(data, "legacy.pureV5") && !_.get(challenge, "legacy.pureV5")) {
+  if (
+    !currentUser.isMachine &&
+    !hasAdminRole(currentUser) &&
+    !_.get(data, "legacy.pureV5") &&
+    !_.get(challenge, "legacy.pureV5")
+  ) {
     if (
       finalStatus !== constants.challengeStatuses.New &&
       finalTimelineTemplateId !== challenge.timelineTemplateId
@@ -1748,7 +1758,9 @@ async function updateChallenge(currentUser, challengeId, data) {
   const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack({
     typeId: challenge.typeId,
     trackId: challenge.trackId,
-    timelineTemplateId: timelineTemplateChanged ? finalTimelineTemplateId : challenge.timelineTemplateId,
+    timelineTemplateId: timelineTemplateChanged
+      ? finalTimelineTemplateId
+      : challenge.timelineTemplateId,
   });
 
   if (_.get(type, "isTask")) {
