@@ -83,7 +83,7 @@ workflows:
           branches:
             only:
             - dev
-            - fix/floating-point-arhithmetic
+            - fix/plat-2985
 
     - "build-qa":
         context: org-global
