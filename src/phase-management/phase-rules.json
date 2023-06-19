@@ -105,11 +105,6 @@
               "fact": "isOpen",
               "operator": "notEqual",
               "value": true
-            },
-            {
-              "fact": "isPredecessorPhaseClosed",
-              "operator": "equal",
-              "value": true
             }
           ]
         },
@@ -291,9 +286,9 @@
               "value": true
             },
             {
-              "fact": "hasActiveUnreviewedSubmissions",
+              "fact": "wasSubmissionReviewedInCurrentOpenIterativeReviewPhase",
               "operator": "equal",
-              "value": false
+              "value": true
             },
             {
               "fact": "isClosed",

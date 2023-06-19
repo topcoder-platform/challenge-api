@@ -1,11 +1,12 @@
 const config = require("config");
+const uuid = require("uuid/v4");
 const { Engine } = require("json-rules-engine");
 
 const rulesJSON = require("./phase-rules.json");
 const errors = require("../common/errors");
 
 const helper = require("../common/helper");
-const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+const { PhaseFact } = require("@topcoder-framework/lib-common");
 
 // Helper functions
 
@@ -38,25 +39,43 @@ class PhaseAdvancer {
   }
 
   #factGenerators = {
-    Registration: async (challengeId) => ({
+    Registration: async (challengeId, phaseSpecificFacts) => ({
       registrantCount: await this.#getRegistrantCount(challengeId),
     }),
-    Submission: async (challengeId) => ({
+    Submission: async (challengeId, phaseSpecificFacts) => ({
       submissionCount: await this.#getSubmissionCount(challengeId),
-      hasActiveUnreviewedSubmissions: await this.#hasActiveUnreviewedSubmissions(challengeId),
     }),
-    Review: async (challengeId) => ({
+    Review: async (challengeId, phaseSpecificFacts) => ({
       allSubmissionsReviewed: await this.#areAllSubmissionsReviewed(challengeId),
     }),
-    IterativeReview: async (challengeId) => ({
-      hasActiveUnreviewedSubmissions: await this.#hasActiveUnreviewedSubmissions(challengeId),
+    IterativeReview: async (challengeId, phaseSpecificFacts, phases) => ({
+      hasActiveUnreviewedSubmissions: await this.#hasActiveUnreviewedSubmissions(
+        challengeId,
+        phaseSpecificFacts,
+        phases
+      ),
+      wasSubmissionReviewedInCurrentOpenIterativeReviewPhase:
+        await this.#wasSubmissionReviewedInCurrentOpenIterativeReviewPhase(
+          challengeId,
+          phaseSpecificFacts
+        ),
+      hasWinningSubmission: await this.#hasWinningSubmission(phaseSpecificFacts),
+      insertIterativeReviewPhaseOnCloseWithoutWinningSubmission: true,
     }),
     AppealsResponse: async (challengeId) => ({
       allAppealsResolved: await this.#areAllAppealsResolved(challengeId),
     }),
   };
 
-  async #generateFacts(challengeId, phases, phase, operation) {
+  async #generateFacts(challengeId, legacyId, phases, phase, operation) {
+    const phaseSpecificFactRequest = {
+      legacyId,
+      facts: this.#getPhaseFactName(phase.name),
+    };
+
+    const phaseSpecificFacts = await this.#challengeDomain.getPhaseFacts(phaseSpecificFactRequest);
+    console.log("phase-specific-facts", JSON.stringify(phaseSpecificFacts, null, 2));
+
     const facts = {
       name: phase.name,
       isOpen: phase.isOpen,
@@ -73,15 +92,19 @@ class PhaseAdvancer {
     };
 
     if (this.#factGenerators[normalizeName(phase.name)]) {
-      const additionalFacts = await this.#factGenerators[normalizeName(phase.name)](challengeId);
+      const additionalFacts = await this.#factGenerators[normalizeName(phase.name)](
+        challengeId,
+        phaseSpecificFacts,
+        phases
+      );
       Object.assign(facts, additionalFacts);
     }
 
     return facts;
   }
 
-  async advancePhase(challengeId, phases, operation, phaseName) {
-    const phase = phases.find((phase) => phase.name === phaseName);
+  async advancePhase(challengeId, legacyId, phases, operation, phaseName) {
+    const phase = phases.filter((phase) => phase.name === phaseName).pop();
 
     if (!phase) {
       throw new errors.BadRequestError(`Phase ${phaseName} not found`);
@@ -108,10 +131,7 @@ class PhaseAdvancer {
         })) || [];
 
     const rules = [...essentialRules, ...constraintRules];
-    const facts = await this.#generateFacts(challengeId, phases, phase, operation);
-
-    console.log("rules", JSON.stringify(rules, null, 2));
-    console.log("facts", JSON.stringify(facts, null, 2));
+    const facts = await this.#generateFacts(challengeId, legacyId, phases, phase, operation);
 
     for (const rule of rules) {
       const ruleExecutionResult = await this.#executeRule(rule, facts);
@@ -126,13 +146,27 @@ class PhaseAdvancer {
       }
     }
 
+    let next = [];
+
     if (operation === "open") {
       await this.#open(challengeId, phases, phase);
     } else if (operation === "close") {
       await this.#close(challengeId, phases, phase);
-    }
 
-    const next = operation === "close" ? phases.filter((p) => p.predecessor === phase.phaseId) : [];
+      if (facts.hasWinningSubmission) {
+        console.log("Challenge has a winning submission. Close the challenge.");
+      } else {
+        console.log("Checking if inserting a phase is required");
+        const insertedPhase = this.#insertPhaseIfRequired(phases, phase, facts);
+
+        if (insertedPhase) {
+          next.push(insertedPhase);
+        }
+      }
+      if (next.length == 0) {
+        next = phases.filter((p) => p.predecessor === phase.phaseId);
+      }
+    }
 
     return {
       success: true,
@@ -182,6 +216,35 @@ class PhaseAdvancer {
     console.log(`Updated phases: ${JSON.stringify(phases, null, 2)}`);
   }
 
+  #insertPhaseIfRequired(phases, phase, facts) {
+    // Check if inserting Iterative Review phase is required
+    if (
+      !facts.hasWinningSubmission &&
+      facts.insertIterativeReviewPhaseOnCloseWithoutWinningSubmission
+    ) {
+      const phaseToAdd = {
+        id: uuid(),
+        phaseId: phase.phaseId,
+        name: phase.name,
+        duration: 24 * 60 * 60, // 24 hours
+        scheduledStartDate: phase.actualEndDate,
+        scheduledEndDate: new Date(
+          parseDate(phase.actualEndDate) + phase.duration * 1000
+        ).toISOString(),
+        actualStartDate: null,
+        actualEndDate: null,
+        isOpen: false,
+        constraints: phase.constraints,
+        description: phase.description,
+        predecessor: phase.phaseId,
+      };
+      phases.push(phaseToAdd);
+
+      return phaseToAdd;
+    }
+    return null;
+  }
+
   #isPastTime(dateString) {
     if (dateString == null) {
       return false;
@@ -215,9 +278,61 @@ class PhaseAdvancer {
     return Promise.resolve(false);
   }
 
-  async #hasActiveUnreviewedSubmissions(challengeId) {
-    console.log(`Checking if there are active unreviewed submissions for challenge ${challengeId}`);
+  async #wasSubmissionReviewedInCurrentOpenIterativeReviewPhase(challengeId, phaseSpecificFacts) {
+    const { factResponses } = phaseSpecificFacts;
+    if (!factResponses || factResponses.length === 0) {
+      return false;
+    }
+    const [
+      { response: { wasSubmissionReviewedInCurrentOpenIterativeReviewPhase = false } } = {
+        response: { wasSubmissionReviewedInCurrentOpenIterativeReviewPhase: false },
+      },
+    ] = factResponses;
+
+    return wasSubmissionReviewedInCurrentOpenIterativeReviewPhase;
+  }
+
+  async #hasActiveUnreviewedSubmissions(challengeId, phaseSpecificFacts, phases) {
+    console.log(
+      `Checking if there are active unreviewed submissions for challenge ${challengeId} using phaseSpecificFacts: ${JSON.stringify(
+        phaseSpecificFacts,
+        null,
+        2
+      )}`
+    );
+
+    if (phaseSpecificFacts.factResponses.length > 0) {
+      const [
+        { response: { submissionCount = 0, reviewCount = 0 } } = {
+          response: { submissionCount: 0, reviewCount: 0 },
+        },
+      ] = phaseSpecificFacts.factResponses;
+
+      const numClosedIterativeReviewPhases = phases.filter(
+        (phase) => phase.phaseType === "Iterative Review" && !phase.isOpen
+      ).length;
+
+      console.log(
+        `numClosedIterativeReviewPhases: ${numClosedIterativeReviewPhases}; submissionCount: ${submissionCount}; reviewCount: ${reviewCount}`
+      );
+
+      return submissionCount > reviewCount + numClosedIterativeReviewPhases;
+    }
     return Promise.resolve(false);
+  }
+
+  async #hasWinningSubmission(phaseSpecificFacts) {
+    const { factResponses } = phaseSpecificFacts;
+    if (!factResponses || factResponses.length === 0) {
+      return false;
+    }
+    const [
+      { response: { hasWinningSubmission = false } } = {
+        response: { hasWinningSubmission: false },
+      },
+    ] = factResponses;
+
+    return hasWinningSubmission;
   }
 
   async #executeRule(rule, facts) {
@@ -252,6 +367,23 @@ class PhaseAdvancer {
       nextPhase.scheduledEndDate = new Date(new Date(nextPhase.scheduledEndDate).getTime() + delta).toISOString();
       nextPhase = phases.find((phase) => phase.predecessor === nextPhase.phaseId);
     }
+  }
+
+  #getPhaseFactName(phaseName) {
+    if (phaseName === "Submission") {
+      return [PhaseFact.PHASE_FACT_SUBMISSION];
+    }
+    if (phaseName === "Review") {
+      return [PhaseFact.PHASE_FACT_REVIEW];
+    }
+    if (phaseName === "Iterative Review") {
+      return [PhaseFact.PHASE_FACT_ITERATIVE_REVIEW];
+    }
+    if (phaseName === "Appeals") {
+      return [PhaseFact.PHASE_FACT_APPEALS];
+    }
+
+    return [];
   }
 }
 

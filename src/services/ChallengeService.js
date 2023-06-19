@@ -46,7 +46,7 @@ const {
 const deepEqual = require("deep-equal");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
-const phaseAdvancer = new PhaseAdvancer();
+const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
 /**
  * Search challenges by legacyId
@@ -2226,6 +2226,7 @@ async function advancePhase(currentUser, challengeId, data) {
 
     const phaseAdvancerResult = await phaseAdvancer.advancePhase(
       challenge.id,
+      challenge.legacyId,
       challenge.phases,
       data.operation,
       data.phase
@@ -2250,7 +2251,7 @@ async function advancePhase(currentUser, challengeId, data) {
       );
 
       const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-      await indexChallengeAndPostToKafka(updatedChallenge);
+      // await indexChallengeAndPostToKafka(updatedChallenge);
 
       return {
         success: true,
