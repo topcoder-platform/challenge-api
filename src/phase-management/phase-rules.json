@@ -363,7 +363,7 @@
     ]
   },
   "constraintRules": {
-    "Registration": ["Number of Registrants"],
-    "Submissionn": ["Number of Submissions"]
+    "Registration": ["NumberofRegistrants"],
+    "Submissionn": ["NumberofSubmissions"]
   }
 }

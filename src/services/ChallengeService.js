@@ -31,8 +31,8 @@ const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
 
 const esClient = helper.getESClient();
 
-const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 const PhaseAdvancer = require("../phase-management/PhaseAdvancer");
+const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 
 const { hasAdminRole } = require("../common/role-helper");
 const {
@@ -2251,7 +2251,7 @@ async function advancePhase(currentUser, challengeId, data) {
       );
 
       const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-      // await indexChallengeAndPostToKafka(updatedChallenge);
+      await indexChallengeAndPostToKafka(updatedChallenge);
 
       return {
         success: true,

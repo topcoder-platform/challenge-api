@@ -104,11 +104,15 @@ class PhaseAdvancer {
   }
 
   async advancePhase(challengeId, legacyId, phases, operation, phaseName) {
-    const phase = phases.filter((phase) => phase.name === phaseName).pop();
+    const matchedPhases = phases
+      .filter((phase) => phase.actualEndDate == null && phase.name === phaseName)
+      .sort((a, b) => new Date(a.scheduledStartDate) - new Date(b.scheduledStartDate));
 
-    if (!phase) {
-      throw new errors.BadRequestError(`Phase ${phaseName} not found`);
+    if (matchedPhases.length === 0) {
+      throw new errors.BadRequestError(`Phase ${phaseName} not found or already closed`);
     }
+
+    const phase = matchedPhases[0]; // We only advance the earliest phase
 
     const essentialRules = this.#rules[`${operation}Rules`][normalizeName(phase.name)]
       ? this.#rules[`${operation}Rules`][normalizeName(phase.name)].map((rule) => ({
@@ -132,6 +136,9 @@ class PhaseAdvancer {
 
     const rules = [...essentialRules, ...constraintRules];
     const facts = await this.#generateFacts(challengeId, legacyId, phases, phase, operation);
+
+    console.log("rules", JSON.stringify(rules, null, 2));
+    console.log("facts", JSON.stringify(facts, null, 2));
 
     for (const rule of rules) {
       const ruleExecutionResult = await this.#executeRule(rule, facts);
