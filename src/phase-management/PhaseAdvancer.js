@@ -61,6 +61,9 @@ class PhaseAdvancer {
         ),
       hasWinningSubmission: await this.#hasWinningSubmission(phaseSpecificFacts),
       insertIterativeReviewPhaseOnCloseWithoutWinningSubmission: true,
+      shouldOpenNextIterativeReviewPhase: await this.#shouldOpenNextIterativeReviewPhase(
+        phaseSpecificFacts
+      ),
     }),
     AppealsResponse: async (challengeId) => ({
       allAppealsResolved: await this.#areAllAppealsResolved(challengeId),
@@ -188,7 +191,8 @@ class PhaseAdvancer {
 
   async #open(challengeId, phases, phase) {
     console.log(`Opening phase ${phase.name} for challenge ${challengeId}`);
-
+    console.log("Phases", phases);
+    console.log("Phase", phase);
     phase.isOpen = true;
     const actualStartDate = new Date();
     phase.actualStartDate = actualStartDate.toISOString();
@@ -200,6 +204,7 @@ class PhaseAdvancer {
     const delta = scheduledStartDate - actualStartDate; // in milliseconds
 
     if (delta !== 0) {
+      console.log("Updating subsequent phases");
       this.#updateSubsequentPhases(phases, phase, -delta);
     }
 
@@ -238,12 +243,13 @@ class PhaseAdvancer {
         scheduledEndDate: new Date(
           parseDate(phase.actualEndDate) + phase.duration * 1000
         ).toISOString(),
-        actualStartDate: null,
-        actualEndDate: null,
-        isOpen: false,
+        actualStartDate:
+          facts.shouldOpenNextIterativeReviewPhase == true ? phase.actualEndDate : undefined,
+        actualEndDate: undefined,
+        isOpen: facts.shouldOpenNextIterativeReviewPhase == true,
         constraints: phase.constraints,
         description: phase.description,
-        predecessor: phase.phaseId,
+        predecessor: phase.id,
       };
       phases.push(phaseToAdd);
 
@@ -297,6 +303,20 @@ class PhaseAdvancer {
     ] = factResponses;
 
     return wasSubmissionReviewedInCurrentOpenIterativeReviewPhase;
+  }
+
+  async #shouldOpenNextIterativeReviewPhase(phaseSpecificFacts) {
+    const { factResponses } = phaseSpecificFacts;
+    if (!factResponses || factResponses.length === 0) {
+      return false;
+    }
+    const [
+      { response: { submissionCount = 0, reviewCount = 0 } } = {
+        response: { submissionCount: 0, reviewCount: 0 },
+      },
+    ] = factResponses;
+
+    return submissionCount > reviewCount + 1; // are there pending reviews after the current one?
   }
 
   async #hasActiveUnreviewedSubmissions(challengeId, phaseSpecificFacts, phases) {
@@ -368,6 +388,7 @@ class PhaseAdvancer {
   // prettier-ignore
   #updateSubsequentPhases(phases, currentPhase, delta) {
     let nextPhase = phases.find((phase) => phase.predecessor === currentPhase.phaseId);
+    console.log('next-phase');
 
     while (nextPhase) {
       nextPhase.scheduledStartDate = new Date(new Date(nextPhase.scheduledStartDate).getTime() + delta).toISOString();
