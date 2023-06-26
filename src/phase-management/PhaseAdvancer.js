@@ -77,8 +77,6 @@ class PhaseAdvancer {
     };
 
     const phaseSpecificFacts = await this.#challengeDomain.getPhaseFacts(phaseSpecificFactRequest);
-    console.log("phase-specific-facts", JSON.stringify(phaseSpecificFacts, null, 2));
-
     const facts = {
       name: phase.name,
       isOpen: phase.isOpen,
@@ -108,7 +106,7 @@ class PhaseAdvancer {
 
   async advancePhase(challengeId, legacyId, phases, operation, phaseName) {
     const matchedPhases = phases
-      .filter((phase) => phase.actualEndDate == null && phase.name === phaseName)
+      // .filter((phase) => phase.actualEndDate == null && phase.name === phaseName)
       .sort((a, b) => new Date(a.scheduledStartDate) - new Date(b.scheduledStartDate));
 
     if (matchedPhases.length === 0) {
@@ -132,16 +130,22 @@ class PhaseAdvancer {
         )
         .map((constraint) => ({
           name: `Constraint: ${constraint.name}`,
-          fact: normalizeName(constraint.name),
-          operator: "greaterOrEqual",
-          value: constraint.value,
+          conditions: {
+            all: [
+              {
+                fact: this.#rules.constraintNameFactMap[normalizeName(constraint.name)],
+                operator: "greaterThanInclusive",
+                value: constraint.value,
+              },
+            ],
+          },
+          event: {
+            type: `can${operation.toLowerCase()}`,
+          },
         })) || [];
 
     const rules = [...essentialRules, ...constraintRules];
     const facts = await this.#generateFacts(challengeId, legacyId, phases, phase, operation);
-
-    console.log("rules", JSON.stringify(rules, null, 2));
-    console.log("facts", JSON.stringify(facts, null, 2));
 
     for (const rule of rules) {
       const ruleExecutionResult = await this.#executeRule(rule, facts);
@@ -190,9 +194,6 @@ class PhaseAdvancer {
   }
 
   async #open(challengeId, phases, phase) {
-    console.log(`Opening phase ${phase.name} for challenge ${challengeId}`);
-    console.log("Phases", phases);
-    console.log("Phase", phase);
     phase.isOpen = true;
     const actualStartDate = new Date();
     phase.actualStartDate = actualStartDate.toISOString();
@@ -365,7 +366,6 @@ class PhaseAdvancer {
   async #executeRule(rule, facts) {
     const ruleEngine = new Engine();
     ruleEngine.addRule(rule);
-
     const result = await ruleEngine.run(facts);
 
     const failureReasons = result.failureResults.map((failureResult) => ({
