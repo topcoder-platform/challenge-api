@@ -2256,7 +2256,7 @@ async function advancePhase(currentUser, challengeId, data) {
       // TODO: This is a temporary solution to update the challenge status to Completed; We currently do not have a way to get winner list using v5 data
       // TODO: With the implementation of v5 review API we'll develop a mechanism to maintain the winner list in v5 data that challenge-api can use to create the winners list
       if (phaseAdvancerResult.hasWinningSubmission === true) {
-        challengeDomain.update(
+        await challengeDomain.update(
           {
             filterCriteria: getScanCriteria({ id: challengeId }),
             updateInput: {
@@ -2265,6 +2265,7 @@ async function advancePhase(currentUser, challengeId, data) {
           },
           grpcMetadata
         );
+        // Indexing in Kafka is not necessary here since domain-challenge will do it
       }
 
       return {
