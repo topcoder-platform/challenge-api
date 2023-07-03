@@ -2253,6 +2253,18 @@ async function advancePhase(currentUser, challengeId, data) {
       const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
       await indexChallengeAndPostToKafka(updatedChallenge);
 
+      if (phaseAdvancerResult.hasWinningSubmission === true) {
+        challengeDomain.update(
+          {
+            filterCriteria: getScanCriteria({ id: challengeId }),
+            updateInput: {
+              status: constants.challengeStatuses.Completed,
+            },
+          },
+          grpcMetadata
+        );
+      }
+
       return {
         success: true,
         message: phaseAdvancerResult.message,

@@ -186,6 +186,7 @@ class PhaseAdvancer {
 
     return {
       success: true,
+      hasWinningSubmission: facts.hasWinningSubmission,
       message: `Successfully ${operation}d phase ${phase.name} for challenge ${challengeId}`,
       updatedPhases: phases,
       next: {
