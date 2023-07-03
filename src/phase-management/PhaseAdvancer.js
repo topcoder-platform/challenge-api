@@ -105,6 +105,8 @@ class PhaseAdvancer {
   }
 
   async advancePhase(challengeId, legacyId, phases, operation, phaseName) {
+    phaseName = phaseName.replace(/-/g, " ");
+
     const matchedPhases = phases
       .filter((phase) => phase.actualEndDate == null && phase.name === phaseName)
       .sort((a, b) => new Date(a.scheduledStartDate) - new Date(b.scheduledStartDate));
