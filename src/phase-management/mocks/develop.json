@@ -1,0 +1,79 @@
+[
+  {
+    "duration": 1800,
+    "scheduledEndDate": "2023-05-14T22:05:00.000Z",
+    "isOpen": false,
+    "name": "Registration",
+    "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "description": "Registration Phase",
+    "id": "c15fb03f-9fc0-40b2-ad1a-f88583f7b5bf",
+    "constraints": [
+      {
+        "name": "Number of Registrants",
+        "value": 1
+      }
+    ],
+    "scheduledStartDate": "2023-05-14T21:35:00.000Z"
+  },
+  {
+    "duration": 1800,
+    "scheduledEndDate": "2023-05-14T22:08:00.000Z",
+    "isOpen": false,
+    "name": "Submission",
+    "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+    "description": "Submission Phase",
+    "id": "5c3ddfaa-9bac-4efc-8382-78bf43da8235",
+    "constraints": [],
+    "scheduledStartDate": "2023-05-14T21:30:00.000Z"
+  },
+  {
+    "duration": 172800,
+    "scheduledEndDate": "2023-05-16T22:08:00.000Z",
+    "isOpen": false,
+    "name": "Review",
+    "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+    "description": "Review Phase",
+    "id": "b677110f-83ab-4d9c-8fb5-fa32919fbb7f",
+    "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+    "constraints": [
+      {
+        "name": "Scorecard",
+        "value": 30002133
+      },
+      {
+        "name": "Number of Reviewers",
+        "value": 2
+      }
+    ],
+    "scheduledStartDate": "2023-05-14T22:08:00.000Z"
+  },
+  {
+    "duration": 86400,
+    "scheduledEndDate": "2023-05-17T22:08:00.000Z",
+    "isOpen": false,
+    "name": "Appeals",
+    "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+    "description": "Appeals Phase",
+    "id": "fb24215a-4e6e-4ac7-9cb8-e985fed5e37e",
+    "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+    "constraints": [
+      {
+        "name": "View Response During Appeals",
+        "value": 0
+      }
+    ],
+    "scheduledStartDate": "2023-05-16T22:08:00.000Z"
+  },
+  {
+    "duration": 43200,
+    "scheduledEndDate": "2023-05-18T10:08:00.000Z",
+    "isOpen": false,
+    "name": "Appeals Response",
+    "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+    "description": "Appeals Response Phase",
+    "id": "3de1ff86-fa7d-4a72-b456-530da0b98e6c",
+    "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+    "constraints": [],
+    "scheduledStartDate": "2023-05-17T22:08:00.000Z"
+  }
+]

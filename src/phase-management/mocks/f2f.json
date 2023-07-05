@@ -1,0 +1,50 @@
+[
+  {
+    "duration": 600,
+    "scheduledStartDate": "2023-05-13T18:43:00.000Z",
+    "scheduledEndDate": "2023-05-13T18:53:00.000Z",
+    "name": "Registration",
+    "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+    "id": "1d5b61ad-fb3a-4395-b31c-45d97f29818f",
+    "isOpen": false,
+    "constraints": [
+      {
+        "name": "Number of Registrants",
+        "value": 1
+      }
+    ],
+    "description": "Registration Phase"
+  },
+  {
+    "duration": 720,
+    "scheduledStartDate": "2023-05-13T18:45:00.000Z",
+    "scheduledEndDate": "2023-05-13T18:57:00.000Z",
+    "name": "Submission",
+    "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+    "id": "23a3fec2-8ae0-4003-85e7-1ff9183a502f",
+    "isOpen": false,
+    "constraints": [],
+    "description": "Submission Phase"
+  },
+  {
+    "duration": 86400,
+    "scheduledStartDate": "2023-05-13T18:45:00.000Z",
+    "scheduledEndDate": "2023-05-14T18:45:00.000Z",
+    "name": "Iterative Review",
+    "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+    "id": "7fe16e5f-f780-4c60-898d-1437989e3344",
+    "isOpen": false,
+    "constraints": [
+      {
+        "name": "Scorecard",
+        "value": 30001551
+      },
+      {
+        "name": "Number of Reviewers",
+        "value": 1
+      }
+    ],
+    "description": "Iterative Review Phase",
+    "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49"
+  }
+]
