@@ -1,0 +1,373 @@
+{
+  "openRules": {
+    "Registration": [
+      {
+        "name": "Registration Open",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isPastScheduledStartTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ],
+    "Submission": [
+      {
+        "name": "Submission Open",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isPastScheduledStartTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ],
+    "Review": [
+      {
+        "name": "Review Open",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isPastScheduledStartTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "submissionCount",
+              "operator": "greaterThanInclusive",
+              "value": 1
+            },
+            {
+              "fact": "isPredecessorPhaseClosed",
+              "operator": "equal",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ],
+    "IterativeReview": [
+      {
+        "name": "Iterative Review Open",
+        "conditions": {
+          "all": [
+            {
+              "fact": "hasActiveUnreviewedSubmissions",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ],
+    "Appeals": [
+      {
+        "name": "Appeals Open",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isPastScheduledStartTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isPredecessorPhaseClosed",
+              "operator": "equal",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ],
+    "AppealsResponse": [
+      {
+        "name": "Appeals Response Open",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isPastScheduledStartTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isPredecessorPhaseClosed",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPostMortemOpen",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ]
+  },
+  "closeRules": {
+    "Registration": [
+      {
+        "name": "Registration Close",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "registrantCount",
+              "operator": "greaterThanInclusive",
+              "value": 1
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ],
+    "Submission": [
+      {
+        "name": "Submission Close",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ],
+    "Review": [
+      {
+        "name": "Review Close",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "allSubmissionsReviewed",
+              "operator": "equal",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ],
+    "IterativeReview": [
+      {
+        "name": "Iterative Review Close",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "wasSubmissionReviewedInCurrentOpenIterativeReviewPhase",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ],
+    "Appeals": [
+      {
+        "name": "Appeals Close",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ],
+    "AppealsResponse": [
+      {
+        "name": "Appeals Response Close",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "allAppealsResolved",
+              "operator": "equal",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ]
+  },
+  "constraintRules": {
+    "Registration": ["NumberofRegistrants"],
+    "Submission": ["NumberofSubmissions"]
+  },
+  "constraintNameFactMap": {
+    "NumberofRegistrants": "registrantCount",
+    "NumberofSubmissions": "submissionCount"
+  }
+}

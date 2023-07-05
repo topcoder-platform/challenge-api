@@ -20,6 +20,7 @@ const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_S
 class ChallengePhaseHelper {
   phaseDefinitionMap = {};
   timelineTemplateMap = {};
+
   async populatePhasesForChallengeCreation(phases, startDate, timelineTemplateId) {
     if (_.isUndefined(timelineTemplateId)) {
       throw new errors.BadRequestError(`Invalid timeline template ID: ${timelineTemplateId}`);
@@ -176,7 +177,10 @@ class ChallengePhaseHelper {
 
   handlePhasesAfterCancelling(phases) {
     return _.map(phases, (phase) => {
-      const shouldClosePhase = _.includes(["Registration", "Submission", "Checkpoint Submission"], phase.name);
+      const shouldClosePhase = _.includes(
+        ["Registration", "Submission", "Checkpoint Submission"],
+        phase.name
+      );
       return {
         ...phase,
         isOpen: shouldClosePhase ? false : phase.isOpen,

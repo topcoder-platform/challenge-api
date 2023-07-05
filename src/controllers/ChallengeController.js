@@ -116,6 +116,15 @@ async function deleteChallenge(req, res) {
   res.send(result);
 }
 
+/**
+ * Advance phase
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function advancePhase(req, res) {
+  res.send(await service.advancePhase(req.authUser, req.params.challengeId, req.body));
+}
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -124,4 +133,5 @@ module.exports = {
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,
+  advancePhase,
 };

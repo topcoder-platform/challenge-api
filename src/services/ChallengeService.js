@@ -31,7 +31,9 @@ const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
 
 const esClient = helper.getESClient();
 
+const PhaseAdvancer = require("../phase-management/PhaseAdvancer");
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+
 const { hasAdminRole } = require("../common/role-helper");
 const {
   validateChallengeUpdateRequest,
@@ -44,27 +46,7 @@ const {
 const deepEqual = require("deep-equal");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
-
-/**
- * Check if user can perform modification/deletion to a challenge
- *
- * @param {Object} user the JwT user object
- * @param {Object} challenge the challenge object
- * @returns {undefined}
- */
-async function ensureAccessibleForChallenge(user, challenge) {
-  const userHasFullAccess = await helper.userHasFullAccess(challenge.id, user.userId);
-  if (
-    !user.isMachine &&
-    !hasAdminRole(user) &&
-    challenge.createdBy.toLowerCase() !== user.handle.toLowerCase() &&
-    !userHasFullAccess
-  ) {
-    throw new errors.ForbiddenError(
-      `Only M2M, admin, challenge's copilot or users with full access can perform modification.`
-    );
-  }
-}
+const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
 /**
  * Search challenges by legacyId
@@ -1645,10 +1627,14 @@ async function updateChallenge(currentUser, challengeId, data) {
       isDifferentPrizeSets(data.prizeSets, challenge.prizeSets) &&
       finalStatus === constants.challengeStatuses.Completed
     ) {
-      throw new errors.BadRequestError(
-        `Cannot update prizeSets for challenges with status: ${finalStatus}!`
-      );
+      // Allow only M2M to update prizeSets for completed challenges
+      if (!currentUser.isMachine || (challenge.task != null && challenge.task.isTask !== true)) {
+        throw new errors.BadRequestError(
+          `Cannot update prizeSets for challenges with status: ${finalStatus}!`
+        );
+      }
     }
+
     const prizeSetsGroup = _.groupBy(data.prizeSets, "type");
     if (prizeSetsGroup[constants.prizeSetTypes.ChallengePrizes]) {
       const totalPrizes = helper.sumOfPrizes(
@@ -1822,32 +1808,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
-
-  // post bus event
-  logger.debug(
-    `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
-  );
-
-  enrichChallengeForResponse(updatedChallenge, track, type);
-
-  await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
-    key:
-      updatedChallenge.status === "Completed"
-        ? `${updatedChallenge.id}:${updatedChallenge.status}`
-        : undefined,
-  });
-
-  // Update ES
-  await esClient.update({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: challengeId,
-    body: {
-      doc: updatedChallenge,
-    },
-  });
+  await indexChallengeAndPostToKafka(updatedChallenge, track, type);
 
   if (updatedChallenge.legacy.selfService) {
     const creator = await helper.getMemberByHandle(updatedChallenge.createdBy);
@@ -2118,7 +2079,10 @@ function sanitizeChallenge(challenge) {
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name);
   }
-  if (!_.isUndefined(sanitized.description)) {
+  // Only Sanitize description if it is in HTML format
+  // Otherwise, it is in Markdown format and we don't want to sanitize it - a future enhancement can be
+  // using a markdown sanitizer
+  if (challenge.descriptionFormat === "html" && !_.isUndefined(sanitized.description)) {
     sanitized.description = xss(sanitized.description);
   }
   if (challenge.legacy) {
@@ -2247,6 +2211,131 @@ deleteChallenge.schema = {
   challengeId: Joi.id(),
 };
 
+async function advancePhase(currentUser, challengeId, data) {
+  if (currentUser && (currentUser.isMachine || hasAdminRole(currentUser))) {
+    const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
+    if (!challenge) {
+      throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist.`);
+    }
+    if (challenge.status !== constants.challengeStatuses.Active) {
+      throw new errors.BadRequestError(
+        `Challenge with id: ${challengeId} is not in Active status.`
+      );
+    }
+
+    const phaseAdvancerResult = await phaseAdvancer.advancePhase(
+      challenge.id,
+      challenge.legacyId,
+      challenge.phases,
+      data.operation,
+      data.phase
+    );
+
+    if (phaseAdvancerResult.success) {
+      const grpcMetadata = new GrpcMetadata();
+
+      grpcMetadata.set("handle", currentUser.handle);
+      grpcMetadata.set("userId", currentUser.userId);
+
+      await challengeDomain.update(
+        {
+          filterCriteria: getScanCriteria({ id: challengeId }),
+          updateInput: {
+            phaseUpdate: {
+              phases: phaseAdvancerResult.updatedPhases,
+            },
+          },
+        },
+        grpcMetadata
+      );
+
+      const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+      await indexChallengeAndPostToKafka(updatedChallenge);
+
+      // TODO: This is a temporary solution to update the challenge status to Completed; We currently do not have a way to get winner list using v5 data
+      // TODO: With the implementation of v5 review API we'll develop a mechanism to maintain the winner list in v5 data that challenge-api can use to create the winners list
+      if (phaseAdvancerResult.hasWinningSubmission === true) {
+        await challengeDomain.update(
+          {
+            filterCriteria: getScanCriteria({ id: challengeId }),
+            updateInput: {
+              status: constants.challengeStatuses.Completed,
+            },
+          },
+          grpcMetadata
+        );
+        // Indexing in Kafka is not necessary here since domain-challenge will do it
+      }
+
+      return {
+        success: true,
+        message: phaseAdvancerResult.message,
+        next: phaseAdvancerResult.next,
+      };
+    }
+
+    return phaseAdvancerResult;
+  }
+
+  throw new errors.ForbiddenError(
+    `Admin role or an M2M token is required to advance the challenge phase.`
+  );
+}
+
+advancePhase.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  data: Joi.object()
+    .keys({
+      phase: Joi.string().required(),
+      operation: Joi.string().lowercase().valid("open", "close").required(),
+    })
+    .required(),
+};
+
+async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
+  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
+
+  if (track == null || type == null) {
+    const trackAndTypeData = await challengeHelper.validateAndGetChallengeTypeAndTrack({
+      typeId: updatedChallenge.typeId,
+      trackId: updatedChallenge.trackId,
+      timelineTemplateId: updatedChallenge.timelineTemplateId,
+    });
+
+    if (trackAndTypeData != null) {
+      track = trackAndTypeData.track;
+      type = trackAndTypeData.type;
+    }
+  }
+
+  // post bus event
+  logger.debug(
+    `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
+  );
+
+  enrichChallengeForResponse(updatedChallenge, track, type);
+
+  await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
+    key:
+      updatedChallenge.status === "Completed"
+        ? `${updatedChallenge.id}:${updatedChallenge.status}`
+        : undefined,
+  });
+
+  // Update ES
+  await esClient.update({
+    index: config.get("ES.ES_INDEX"),
+    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+    refresh: config.get("ES.ES_REFRESH"),
+    id: updatedChallenge.id,
+    body: {
+      doc: updatedChallenge,
+    },
+  });
+}
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -2255,6 +2344,7 @@ module.exports = {
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,
+  advancePhase,
 };
 
 logger.buildService(module.exports);

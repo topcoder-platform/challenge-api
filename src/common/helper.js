@@ -226,13 +226,18 @@ async function deleteFromS3(bucket, key) {
  * @param {String} challengeId the challenge id
  * @returns {Promise<Array>} the challenge resources
  */
-async function getChallengeResources(challengeId) {
+async function getChallengeResources(challengeId, roleId = null) {
   const token = await m2mHelper.getM2MToken();
   const perPage = 100;
   let page = 1;
   let result = [];
   while (true) {
-    const url = `${config.RESOURCES_API_URL}?challengeId=${challengeId}&perPage=${perPage}&page=${page}`;
+    const url = `${
+      config.RESOURCES_API_URL
+    }?challengeId=${challengeId}&perPage=${perPage}&page=${page}${
+      roleId ? `&roleId=${roleId}` : ""
+    }`;
+
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -1020,7 +1025,7 @@ async function getGroupById(groupId) {
 /**
  * Get challenge submissions
  * @param {String} challengeId the challenge id
- * @returns {Array} the submission
+ * @returns {Promise<Array>} the submission
  */
 async function getChallengeSubmissions(challengeId) {
   const token = await m2mHelper.getM2MToken();
