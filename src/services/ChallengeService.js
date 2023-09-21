@@ -44,6 +44,7 @@ const {
   convertToISOString,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
+const { getM2MToken } = require("../common/m2m-helper");
 
 const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
 const phaseAdvancer = new PhaseAdvancer(challengeDomain);
@@ -1027,6 +1028,7 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   grpcMetadata.set("handle", currentUser.handle);
   grpcMetadata.set("userId", currentUser.userId);
+  grpcMetadata.set("token", await getM2MToken());
 
   convertPrizeSetValuesToCents(challenge.prizeSets);
   const ret = await challengeDomain.create(challenge, grpcMetadata);
@@ -1791,6 +1793,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
       grpcMetadata.set("handle", currentUser.handle);
       grpcMetadata.set("userId", currentUser.userId);
+      grpcMetadata.set("token", await getM2MToken());
 
       if (updateInput.prizeSetUpdate != null) {
         convertPrizeSetValuesToCents(updateInput.prizeSetUpdate.prizeSets);
