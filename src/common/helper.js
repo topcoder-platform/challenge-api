@@ -358,7 +358,7 @@ async function capturePayment(paymentId) {
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`;
   logger.info(`Calling: ${url} to capture payment`);
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
-  logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`);
+  logger.debug(`Payment API Response: ${JSON.stringify(res.data)}`);
   if (res.data.status !== "succeeded") {
     throw new Error(`Failed to charge payment. Current status: ${res.data.status}`);
   }
