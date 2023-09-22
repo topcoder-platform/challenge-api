@@ -1992,7 +1992,7 @@ updateChallenge.schema = {
       tags: Joi.array().items(Joi.string().required()).min(1), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
-      constraints: Joi.array().items(Joi.string()).min(1).optional(),
+      constraints: Joi.object({allowedRegistrants: Joi.array().items(Joi.string()).optional()}),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
       attachments: Joi.array().items(
         Joi.object().keys({
