@@ -1167,7 +1167,7 @@ createChallenge.schema = {
       legacyId: Joi.number().integer().positive(),
       constraints: Joi.object()
         .keys({
-          allowedRegistrants: Joi.array().items(Joi.string()).optional(),
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
         })
         .optional(),
       startDate: Joi.date().iso(),
@@ -1998,7 +1998,7 @@ updateChallenge.schema = {
       legacyId: Joi.number().integer().positive(),
       constraints: Joi.object()
         .keys({
-          allowedRegistrants: Joi.array().items(Joi.string()).optional(),
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
         })
         .optional(),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
