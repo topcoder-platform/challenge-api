@@ -101,7 +101,7 @@ class ChallengeHelper {
     await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
 
     if (challenge.constraints) {
-      await this.validateChallengeConstraints(data.constraints);
+      await this.validateChallengeConstraints(challenge.constraints);
     }
   }
 
