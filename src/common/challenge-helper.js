@@ -99,6 +99,10 @@ class ChallengeHelper {
 
     // check groups authorization
     await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
+
+    if (challenge.constraints) {
+      await this.validateChallengeConstraints(data.constraints);
+    }
   }
 
   async validateChallengeUpdateRequest(currentUser, challenge, data) {
@@ -194,6 +198,32 @@ class ChallengeHelper {
     ) {
       throw new errors.BadRequestError(
         `Cannot set winners for challenge with non-completed ${challenge.status} status`
+      );
+    }
+
+    if (data.constraints) {
+      await this.validateChallengeConstraints(data.constraints);
+    }
+  }
+
+  async validateChallengeConstraints(constraints) {
+    if (!_.isEmpty(constraints.allowedRegistrants)) {
+      await this.validateAllowedRegistrants(constraints.allowedRegistrants);
+    }
+  }
+
+  async validateAllowedRegistrants(allowedRegistrants) {
+    const members = await helper.getMembersByHandles(allowedRegistrants);
+    const incorrectHandles = _.difference(
+      allowedRegistrants,
+      _.map(members, (m) => _.lowerCase(m.handle))
+    );
+    if (incorrectHandles.length > 0) {
+      throw new errors.BadRequestError(
+        `Cannot create challenge with invalid handle in constraints. [${_.join(
+          incorrectHandles,
+          ","
+        )}]`
       );
     }
   }
