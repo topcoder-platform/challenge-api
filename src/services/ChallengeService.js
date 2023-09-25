@@ -26,6 +26,7 @@ const { BadRequestError } = require("../common/errors");
 const phaseHelper = require("../common/phase-helper");
 const projectHelper = require("../common/project-helper");
 const challengeHelper = require("../common/challenge-helper");
+const M2MHelper = require("../common/m2m-helper");
 
 const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
 
@@ -967,6 +968,18 @@ async function createChallenge(currentUser, challenge, userToken) {
     await phaseHelper.validatePhases(challenge.phases);
   }
 
+  const allowedRegistrants = _.get(challenge, 'constraints.allowedRegistrants')
+  if (_.isArray(allowedRegistrants) && !_.isEmpty(allowedRegistrants)) {
+    const token = await M2MHelper.getM2MToken();
+    const res = await axios.get(`${config.MEMBERS_API_URL}/?fields=userId,handle&handlesLower=["${_.join(allowedRegistrants, '","')}"]`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const handles= res.data.map(user => user.handle.toLowerCase());
+    if (_.difference(handles,allowedRegistrants) !== 0) {
+      throw new errors.BadRequestError(`Cannot create challenge with invalid handle in constraints.`);
+    }
+  }
+
   // populate phases
   if (!challenge.timelineTemplateId) {
     if (challenge.typeId && challenge.trackId) {
@@ -1167,7 +1180,7 @@ createChallenge.schema = {
       legacyId: Joi.number().integer().positive(),
       constraints: Joi.object()
         .keys({
-          allowedRegistrants: Joi.array().items(Joi.string()).optional(),
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
         })
         .optional(),
       startDate: Joi.date().iso(),
@@ -1815,6 +1828,18 @@ async function updateChallenge(currentUser, challengeId, data) {
     throw e;
   }
 
+  const allowedRegistrants = _.get(data, 'constraints.allowedRegistrants')
+  if (_.isArray(allowedRegistrants) && !_.isEmpty(allowedRegistrants)) {
+    const token = await M2MHelper.getM2MToken();
+    const res = await axios.get(`${config.MEMBERS_API_URL}/?fields=userId,handle&handlesLower=["${_.join(allowedRegistrants, '","')}"]`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const handles= res.data.map(user => user.handle.toLowerCase());
+    if (_.difference(handles,allowedRegistrants) !== 0) {
+      throw new errors.BadRequestError(`Cannot update challenge with invalid handle in constraints.`);
+    }
+  }
+
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
   await indexChallengeAndPostToKafka(updatedChallenge, track, type);
 
@@ -1998,7 +2023,7 @@ updateChallenge.schema = {
       legacyId: Joi.number().integer().positive(),
       constraints: Joi.object()
         .keys({
-          allowedRegistrants: Joi.array().items(Joi.string()).optional(),
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
         })
         .optional(),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
