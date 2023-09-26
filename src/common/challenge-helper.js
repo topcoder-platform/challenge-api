@@ -101,7 +101,7 @@ class ChallengeHelper {
     await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
 
     if (challenge.constraints) {
-      await this.validateChallengeConstraints(challenge.constraints);
+      await ChallengeHelper.validateChallengeConstraints(challenge.constraints);
     }
   }
 
@@ -202,17 +202,17 @@ class ChallengeHelper {
     }
 
     if (data.constraints) {
-      await this.validateChallengeConstraints(data.constraints);
+      await ChallengeHelper.validateChallengeConstraints(data.constraints);
     }
   }
 
-  async validateChallengeConstraints(constraints) {
+  static async validateChallengeConstraints(constraints) {
     if (!_.isEmpty(constraints.allowedRegistrants)) {
-      await this.validateAllowedRegistrants(constraints.allowedRegistrants);
+      await ChallengeHelper.validateAllowedRegistrants(constraints.allowedRegistrants);
     }
   }
 
-  async validateAllowedRegistrants(allowedRegistrants) {
+  static async validateAllowedRegistrants(allowedRegistrants) {
     const members = await helper.getMembersByHandles(allowedRegistrants);
     const incorrectHandles = _.difference(
       allowedRegistrants,
