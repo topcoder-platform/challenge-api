@@ -1165,6 +1165,11 @@ createChallenge.schema = {
       tags: Joi.array().items(Joi.string()), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
+      constraints: Joi.object()
+        .keys({
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
+        })
+        .optional(),
       startDate: Joi.date().iso(),
       status: Joi.string().valid([
         constants.challengeStatuses.Active,
@@ -1991,6 +1996,11 @@ updateChallenge.schema = {
       tags: Joi.array().items(Joi.string().required()).min(1), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
+      constraints: Joi.object()
+        .keys({
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
+        })
+        .optional(),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
       attachments: Joi.array().items(
         Joi.object().keys({
@@ -2078,6 +2088,7 @@ function sanitizeChallenge(challenge) {
     "task",
     "groups",
     "cancelReason",
+    "constraints",
   ]);
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name);

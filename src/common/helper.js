@@ -358,7 +358,7 @@ async function capturePayment(paymentId) {
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`;
   logger.info(`Calling: ${url} to capture payment`);
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
-  logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`);
+  logger.debug(`Payment API Response: ${JSON.stringify(res.data)}`);
   if (res.data.status !== "succeeded") {
     throw new Error(`Failed to charge payment. Current status: ${res.data.status}`);
   }
@@ -1081,6 +1081,22 @@ async function getMemberByHandle(handle) {
 }
 
 /**
+ * Get members by handles
+ * @param {Array<String>} handles the user handle
+ * @returns {Object}
+ */
+async function getMembersByHandles(handles) {
+  const token = await m2mHelper.getM2MToken();
+  const res = await axios.get(
+    `${config.MEMBERS_API_URL}/?fields=handle&handlesLower=["${_.join(handles, '","')}"]`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+}
+
+/**
  * Send self service notification
  * @param {String} type the notification type
  * @param {Array} recipients the array of recipients in { userId || email || handle } format
@@ -1199,6 +1215,7 @@ module.exports = {
   cancelPayment,
   sendSelfServiceNotification,
   getMemberByHandle,
+  getMembersByHandles,
   submitZendeskRequest,
   updateSelfServiceProjectInfo,
   getFromInternalCache,

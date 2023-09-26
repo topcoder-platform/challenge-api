@@ -212,7 +212,7 @@ class PhaseAdvancer {
       this.#updateSubsequentPhases(phases, phase, -delta);
     }
 
-    console.log(`Updated phases: ${JSON.stringify(phases, null, 2)}`);
+    console.log(`Updated phases: ${JSON.stringify(phases)}`);
   }
 
   async #close(challengeId, phases, phase) {
@@ -229,7 +229,7 @@ class PhaseAdvancer {
       this.#updateSubsequentPhases(phases, phase, -delta);
     }
 
-    console.log(`Updated phases: ${JSON.stringify(phases, null, 2)}`);
+    console.log(`Updated phases: ${JSON.stringify(phases)}`);
   }
 
   #insertPhaseIfRequired(phases, phase, facts) {
@@ -326,9 +326,7 @@ class PhaseAdvancer {
   async #hasActiveUnreviewedSubmissions(challengeId, phaseSpecificFacts, phases) {
     console.log(
       `Checking if there are active unreviewed submissions for challenge ${challengeId} using phaseSpecificFacts: ${JSON.stringify(
-        phaseSpecificFacts,
-        null,
-        2
+        phaseSpecificFacts
       )}`
     );
 
