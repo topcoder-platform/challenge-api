@@ -216,7 +216,7 @@ class ChallengeHelper {
     const members = await helper.getMembersByHandles(allowedRegistrants);
     const incorrectHandles = _.difference(
       allowedRegistrants,
-      _.map(members, (m) => _.lowerCase(m.handle))
+      _.map(members, (m) => _.toLower(m.handle))
     );
     if (incorrectHandles.length > 0) {
       throw new errors.BadRequestError(
