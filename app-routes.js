@@ -5,8 +5,10 @@
 const _ = require("lodash");
 const config = require("config");
 const HttpStatus = require("http-status-codes");
+const uuid = require("uuid/v4");
 const helper = require("./src/common/helper");
 const errors = require("./src/common/errors");
+const logger = require("./src/common/logger");
 const routes = require("./src/routes");
 const authenticator = require("tc-core-library-js").middleware.jwtAuthenticator;
 
@@ -26,7 +28,9 @@ module.exports = (app) => {
 
       const actions = [];
       actions.push((req, res, next) => {
-        req.signature = `${def.controller}#${def.method}`;
+        req._id = uuid();
+        req.signature = `${req._id}-${def.controller}#${def.method}`;
+        logger.info(`Started request handling, ${req.signature}`);
         next();
       });
 
