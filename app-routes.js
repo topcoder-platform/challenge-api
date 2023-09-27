@@ -108,11 +108,11 @@ module.exports = (app) => {
           }
         });
       }
+      actions.push(method);
       actions.push((req, res, next) => {
         logger.info(`Done request handling, ${req.signature}`);
         next();
       });
-      actions.push(method);
       app[verb](`/${config.API_VERSION}${path}`, helper.autoWrapExpress(actions));
     });
   });
