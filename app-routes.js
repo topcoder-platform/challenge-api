@@ -28,9 +28,11 @@ module.exports = (app) => {
 
       const actions = [];
       actions.push((req, res, next) => {
-        req._id = uuid();
-        req.signature = `${req._id}-${def.controller}#${def.method}`;
-        logger.info(`Started request handling, ${req.signature}`);
+        if (def.method !== "checkHealth") {
+          req._id = uuid();
+          req.signature = `${req._id}-${def.controller}#${def.method}`;
+          logger.info(`Started request handling, ${req.signature}`);
+        }
         next();
       });
 
@@ -109,10 +111,6 @@ module.exports = (app) => {
         });
       }
       actions.push(method);
-      actions.push((req, res, next) => {
-        logger.info(`Done request handling, ${req.signature}`);
-        next();
-      });
       app[verb](`/${config.API_VERSION}${path}`, helper.autoWrapExpress(actions));
     });
   });
