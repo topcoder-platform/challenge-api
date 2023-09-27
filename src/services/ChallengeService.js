@@ -1420,7 +1420,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Remove fields from data that are not allowed to be updated and that match the existing challenge
   data = sanitizeData(sanitizeChallenge(data), challenge);
-  console.debug("Sanitized Data:", data);
+  logger.debug("Sanitized Data:", JSON.stringify(data));
 
   await validateChallengeUpdateRequest(currentUser, challenge, data);
 
