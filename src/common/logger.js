@@ -32,7 +32,7 @@ logger.logFullError = (err, signature) => {
   }
   if (err.isJoi) {
     logger.error(
-      `${e.name} details: ${JSON.stringify(e.details)} input:${JSON.stringify(e._object)}`
+      `${err.name} details: ${JSON.stringify(err.details)} input:${JSON.stringify(err._object)}`
     );
   } else if (err.isAxiosError) {
     logger.error(`${err.message} - ${err.response.data}`);
