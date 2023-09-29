@@ -46,7 +46,26 @@ const {
 const deepEqual = require("deep-equal");
 const { getM2MToken } = require("../common/m2m-helper");
 
-const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const challengeDomain = new ChallengeDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT,
+  {
+    "grpc.service_config": JSON.stringify({
+      methodConfig: [
+        {
+          name: [{}],
+          retryPolicy: {
+            maxAttempts: 5,
+            initialBackoff: "0.5s",
+            maxBackoff: "30s",
+            backoffMultiplier: 2,
+            retryableStatusCodes: ["UNAVAILABLE", "DEADLINE_EXCEEDED", "INTERNAL"],
+          },
+        },
+      ],
+    }),
+  }
+);
 const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
 /**
