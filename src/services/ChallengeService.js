@@ -53,7 +53,7 @@ const challengeDomain = new ChallengeDomain(
     "grpc.service_config": JSON.stringify({
       methodConfig: [
         {
-          name: [{}],
+          name: [{ service: "" }],
           retryPolicy: {
             maxAttempts: 5,
             initialBackoff: "0.5s",
