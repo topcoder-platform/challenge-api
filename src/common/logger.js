@@ -38,6 +38,8 @@ logger.logFullError = (err, signature) => {
     logger.error(`${err.message} - ${err.response.data}`);
   } else if (err.httpStatus) {
     logger.error(err.message);
+  } else if (!_.isUndefined(err.code) && err.details && err.metadata) {
+    logger.error(JSON.stringify(err));
   } else {
     logger.error(util.inspect(err));
   }
