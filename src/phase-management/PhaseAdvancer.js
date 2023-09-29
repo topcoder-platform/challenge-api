@@ -274,15 +274,18 @@ class PhaseAdvancer {
   async #getRegistrantCount(challengeId) {
     console.log(`Getting registrant count for challenge ${challengeId}`);
     // TODO: getChallengeResources loops through all pages, which is not necessary here, we can just get the first page and total count from header[X-Total]
-    const submitters = await helper.getChallengeResources(challengeId, config.SUBMITTER_ROLE_ID);
-    return submitters.length;
+    const submitters = await helper.getChallengeResourcesCount(
+      challengeId,
+      config.SUBMITTER_ROLE_ID
+    );
+    return submitters[config.SUBMITTER_ROLE_ID] || 0;
   }
 
   async #getSubmissionCount(challengeId) {
     console.log(`Getting submission count for challenge ${challengeId}`);
     // TODO: getChallengeSubmissions loops through all pages, which is not necessary here, we can just get the first page and total count from header[X-Total]
-    const submissions = await helper.getChallengeSubmissions(challengeId);
-    return submissions.length;
+    const submissions = await helper.getChallengeSubmissionsCount(challengeId);
+    return submissions["Contest Submission"] || 0;
   }
 
   async #areAllSubmissionsReviewed(challengeId) {

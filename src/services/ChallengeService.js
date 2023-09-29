@@ -46,7 +46,26 @@ const {
 const deepEqual = require("deep-equal");
 const { getM2MToken } = require("../common/m2m-helper");
 
-const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const challengeDomain = new ChallengeDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT,
+  {
+    "grpc.service_config": JSON.stringify({
+      methodConfig: [
+        {
+          name: [{ service: "" }],
+          retryPolicy: {
+            maxAttempts: 5,
+            initialBackoff: "0.5s",
+            maxBackoff: "30s",
+            backoffMultiplier: 2,
+            retryableStatusCodes: ["UNAVAILABLE", "DEADLINE_EXCEEDED", "INTERNAL"],
+          },
+        },
+      ],
+    }),
+  }
+);
 const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
 /**
@@ -1420,7 +1439,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Remove fields from data that are not allowed to be updated and that match the existing challenge
   data = sanitizeData(sanitizeChallenge(data), challenge);
-  console.debug("Sanitized Data:", data);
+  logger.debug(`Sanitized Data: ${JSON.stringify(data)}`);
 
   await validateChallengeUpdateRequest(currentUser, challenge, data);
 

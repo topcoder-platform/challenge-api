@@ -30,10 +30,16 @@ logger.logFullError = (err, signature) => {
   if (signature) {
     logger.error(`Error happened in ${signature}`);
   }
-  logger.error(util.inspect(err));
-  if (!err.logged) {
-    logger.error(err.stack);
-    err.logged = true;
+  if (err.isJoi) {
+    logger.error(
+      `${err.name} details: ${JSON.stringify(err.details)} input:${JSON.stringify(err._object)}`
+    );
+  } else if (err.isAxiosError) {
+    logger.error(`${err.message} - ${err.response.data}`);
+  } else if (err.httpStatus) {
+    logger.error(err.message);
+  } else {
+    logger.error(util.inspect(err));
   }
 };
 
