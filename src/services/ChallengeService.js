@@ -53,7 +53,7 @@ const challengeDomain = new ChallengeDomain(
     "grpc.service_config": JSON.stringify({
       methodConfig: [
         {
-          name: [{ service: "" }],
+          name: [{ service: "topcoder.domain.service.challenge.Challenge" }],
           retryPolicy: {
             maxAttempts: 5,
             initialBackoff: "0.5s",
@@ -2245,6 +2245,7 @@ deleteChallenge.schema = {
 };
 
 async function advancePhase(currentUser, challengeId, data) {
+  logger.info(`Advance Phase Request - ${challengeId} - ${JSON.stringify(data)}`);
   if (currentUser && (currentUser.isMachine || hasAdminRole(currentUser))) {
     const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
 
