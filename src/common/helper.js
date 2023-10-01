@@ -254,6 +254,22 @@ async function getChallengeResources(challengeId, roleId = null) {
 }
 
 /**
+ * Get challenge resources count
+ * @param {String} challengeId the challenge id
+ * @returns {Promise<Object>} the challenge resources count
+ */
+async function getChallengeResourcesCount(challengeId, roleId = null) {
+  const token = await m2mHelper.getM2MToken();
+  const url = `${config.RESOURCES_API_URL}/count?challengeId=${challengeId}${
+    roleId ? `&roleId=${roleId}` : ""
+  }`;
+  const res = await axios.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+/**
  * Create challenge resources
  * @param {String} challengeId the challenge id
  * @param {String} memberHandle the user's member handle
@@ -358,7 +374,7 @@ async function capturePayment(paymentId) {
   const url = `${config.CUSTOMER_PAYMENTS_URL}/${paymentId}/charge`;
   logger.info(`Calling: ${url} to capture payment`);
   const res = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${token}` } });
-  logger.debug(`Payment API Response: ${JSON.stringify(res.data, null, 2)}`);
+  logger.debug(`Payment API Response: ${JSON.stringify(res.data)}`);
   if (res.data.status !== "succeeded") {
     throw new Error(`Failed to charge payment. Current status: ${res.data.status}`);
   }
@@ -1054,6 +1070,19 @@ async function getChallengeSubmissions(challengeId) {
 }
 
 /**
+ * Get challenge submissions count
+ * @param {String} challengeId the challenge id
+ * @returns {Promise<Object>} the submission counts
+ */
+async function getChallengeSubmissionsCount(challengeId) {
+  const token = await m2mHelper.getM2MToken();
+  const res = await axios.get(`${config.SUBMISSIONS_API_URL}/${challengeId}/count`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+/**
  * Get member by ID
  * @param {String} userId the user ID
  * @returns {Object}
@@ -1078,6 +1107,22 @@ async function getMemberByHandle(handle) {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data || {};
+}
+
+/**
+ * Get members by handles
+ * @param {Array<String>} handles the user handle
+ * @returns {Object}
+ */
+async function getMembersByHandles(handles) {
+  const token = await m2mHelper.getM2MToken();
+  const res = await axios.get(
+    `${config.MEMBERS_API_URL}/?fields=handle&handlesLower=["${_.join(handles, '","')}"]`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
 }
 
 /**
@@ -1167,6 +1212,7 @@ module.exports = {
   downloadFromS3,
   deleteFromS3,
   getChallengeResources,
+  getChallengeResourcesCount,
   createResource,
   getUserGroups,
   ensureNoDuplicateOrNullElements,
@@ -1190,6 +1236,7 @@ module.exports = {
   getProjectIdByRoundId,
   getGroupById,
   getChallengeSubmissions,
+  getChallengeSubmissionsCount,
   getMemberById,
   createSelfServiceProject,
   activateProject,
@@ -1199,6 +1246,7 @@ module.exports = {
   cancelPayment,
   sendSelfServiceNotification,
   getMemberByHandle,
+  getMembersByHandles,
   submitZendeskRequest,
   updateSelfServiceProjectInfo,
   getFromInternalCache,

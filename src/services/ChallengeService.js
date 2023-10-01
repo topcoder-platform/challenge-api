@@ -46,7 +46,26 @@ const {
 const deepEqual = require("deep-equal");
 const { getM2MToken } = require("../common/m2m-helper");
 
-const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const challengeDomain = new ChallengeDomain(
+  GRPC_CHALLENGE_SERVER_HOST,
+  GRPC_CHALLENGE_SERVER_PORT,
+  {
+    "grpc.service_config": JSON.stringify({
+      methodConfig: [
+        {
+          name: [{ service: "topcoder.domain.service.challenge.Challenge" }],
+          retryPolicy: {
+            maxAttempts: 5,
+            initialBackoff: "0.5s",
+            maxBackoff: "30s",
+            backoffMultiplier: 2,
+            retryableStatusCodes: ["UNAVAILABLE", "DEADLINE_EXCEEDED", "INTERNAL"],
+          },
+        },
+      ],
+    }),
+  }
+);
 const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
 /**
@@ -1165,6 +1184,11 @@ createChallenge.schema = {
       tags: Joi.array().items(Joi.string()), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
+      constraints: Joi.object()
+        .keys({
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
+        })
+        .optional(),
       startDate: Joi.date().iso(),
       status: Joi.string().valid([
         constants.challengeStatuses.Active,
@@ -1415,7 +1439,7 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   // Remove fields from data that are not allowed to be updated and that match the existing challenge
   data = sanitizeData(sanitizeChallenge(data), challenge);
-  console.debug("Sanitized Data:", data);
+  logger.debug(`Sanitized Data: ${JSON.stringify(data)}`);
 
   await validateChallengeUpdateRequest(currentUser, challenge, data);
 
@@ -1991,6 +2015,11 @@ updateChallenge.schema = {
       tags: Joi.array().items(Joi.string().required()).min(1), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
+      constraints: Joi.object()
+        .keys({
+          allowedRegistrants: Joi.array().items(Joi.string().trim().lowercase()).optional(),
+        })
+        .optional(),
       status: Joi.string().valid(_.values(constants.challengeStatuses)),
       attachments: Joi.array().items(
         Joi.object().keys({
@@ -2078,6 +2107,7 @@ function sanitizeChallenge(challenge) {
     "task",
     "groups",
     "cancelReason",
+    "constraints",
   ]);
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name);
@@ -2215,6 +2245,7 @@ deleteChallenge.schema = {
 };
 
 async function advancePhase(currentUser, challengeId, data) {
+  logger.info(`Advance Phase Request - ${challengeId} - ${JSON.stringify(data)}`);
   if (currentUser && (currentUser.isMachine || hasAdminRole(currentUser))) {
     const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
 
