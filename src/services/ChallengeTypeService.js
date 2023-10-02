@@ -24,7 +24,7 @@ const challengeTypeDomain = new ChallengeTypeDomain(
 /**
  * Search challenge types
  * @param {Object} criteria the search criteria
- * @returns {Object} the search result
+ * @returns {Promise<Object>} the search result
  */
 async function searchChallengeTypes(criteria) {
   const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));

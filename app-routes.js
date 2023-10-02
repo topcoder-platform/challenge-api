@@ -10,6 +10,7 @@ const helper = require("./src/common/helper");
 const errors = require("./src/common/errors");
 const logger = require("./src/common/logger");
 const routes = require("./src/routes");
+const transformations = require("./src/common/transformations");
 const authenticator = require("tc-core-library-js").middleware.jwtAuthenticator;
 
 /**
@@ -17,6 +18,14 @@ const authenticator = require("tc-core-library-js").middleware.jwtAuthenticator;
  * @param app the express app
  */
 module.exports = (app) => {
+  app.use((req, res, next) => {
+    req.appVersion = req.headers["app-version"] || "1.0.0";
+    if (!transformations[req.appVersion]) {
+      req.appVersion = "1.0.0"; // default to 1.0.0 if provided version doesn't match any transformation
+    }
+    next();
+  });
+
   // Load all routes
   _.each(routes, (verbs, path) => {
     _.each(verbs, (def, verb) => {
@@ -35,6 +44,32 @@ module.exports = (app) => {
         }
         next();
       });
+
+      if (def.versioned) {
+        actions.push((req, res, next) => {
+          // TODO: Overriding res.send is a temporary solution to inject version-based transformations.
+          // TODO: A more conventional approach in Express would be to use res.locals to pass data through middleware,
+          // TODO: and then send the response in a centralized middleware after all transformations are applied.
+          // TODO: This would require a refactor of the current controllers' response handling.
+          // TODO: Consider revisiting this implementation in the future for a more maintainable architecture.
+
+          const originalSend = res.send;
+
+          res.send = (data) => {
+            // Fetch the transformation function for the app version or default to "1.0.0"
+            const transformer = transformations[req.appVersion] || transformations["1.0.0"];
+            const transformedData = transformer(data);
+
+            // Reset the send function to its original behavior
+            res.send = originalSend;
+
+            // Call the original send function with the transformed data
+            originalSend.call(res, transformedData);
+          };
+
+          next();
+        });
+      }
 
       actions.push((req, res, next) => {
         if (_.get(req, "query.token")) {

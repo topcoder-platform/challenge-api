@@ -837,6 +837,10 @@ async function searchChallenges(currentUser, criteria) {
     if (element.status !== constants.challengeStatuses.Completed) {
       _.unset(element, "winners");
     }
+    // TODO: in the long run we wanna do a finer grained filtering of the payments
+    if (!_hasAdminRole && !currentUser.isMachine) {
+      _.unset(element, "payments");
+    }
   });
 
   return { total, page, perPage, result };
@@ -1230,12 +1234,7 @@ async function getPhasesAndPopulate(data) {
  * @returns {Object} the challenge with given id
  */
 async function getChallenge(currentUser, id, checkIfExists) {
-  // get challenge from Elasticsearch
   let challenge;
-  // logger.warn(JSON.stringify({
-  //   index: config.get('ES.ES_INDEX'),
-  //   _id: id
-  // }))
   try {
     if (config.get("ES.OPENSEARCH") == "true") {
       challenge = (
@@ -1293,6 +1292,11 @@ async function getChallenge(currentUser, id, checkIfExists) {
 
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, "winners");
+  }
+
+  // TODO: in the long run we wanna do a finer grained filtering of the payments
+  if (!hasAdminRole(currentUser) && !currentUser.isMachine) {
+    _.unset(challenge, "payments");
   }
 
   return challenge;
