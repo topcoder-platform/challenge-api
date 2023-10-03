@@ -54,17 +54,27 @@ module.exports = (app) => {
           // TODO: Consider revisiting this implementation in the future for a more maintainable architecture.
 
           const originalSend = res.send;
+          const originalStatus = res.status;
+          let currentStatusCode = 200; // Default status code for Express
+
+          // Override res.status to capture the status code
+          res.status = function (code) {
+            currentStatusCode = code;
+            return originalStatus.apply(this, arguments);
+          };
 
           res.send = (data) => {
-            // Fetch the transformation function for the app version or default to "1.0.0"
-            const transformer = transformations[req.appVersion] || transformations["1.0.0"];
-            const transformedData = transformer(data);
+            // If the status code indicates a successful response, apply the transformation
+            if (currentStatusCode >= 200 && currentStatusCode < 300) {
+              const transformer = transformations[req.appVersion] || transformations["1.0.0"];
+              data = transformer(data);
+            }
 
             // Reset the send function to its original behavior
             res.send = originalSend;
 
-            // Call the original send function with the transformed data
-            originalSend.call(res, transformedData);
+            // Call the original send function with the transformed (or original) data
+            originalSend.call(res, data);
           };
 
           next();
