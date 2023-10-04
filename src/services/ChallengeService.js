@@ -838,7 +838,7 @@ async function searchChallenges(currentUser, criteria) {
       _.unset(element, "winners");
     }
     // TODO: in the long run we wanna do a finer grained filtering of the payments
-    if (!_hasAdminRole && !currentUser.isMachine) {
+    if (!_hasAdminRole && !_.get(currentUser, "isMachine", false)) {
       _.unset(element, "payments");
     }
   });
@@ -1295,7 +1295,7 @@ async function getChallenge(currentUser, id, checkIfExists) {
   }
 
   // TODO: in the long run we wanna do a finer grained filtering of the payments
-  if (!hasAdminRole(currentUser) && !currentUser.isMachine) {
+  if (!hasAdminRole(currentUser) && !_.get(currentUser, "isMachine", false)) {
     _.unset(challenge, "payments");
   }
 
