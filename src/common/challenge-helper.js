@@ -105,9 +105,9 @@ class ChallengeHelper {
     }
   }
 
-  async validateChallengeUpdateRequest(currentUser, challenge, data) {
+  async validateChallengeUpdateRequest(currentUser, challenge, data, challengeResources) {
     if (process.env.LOCAL != "true") {
-      await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+      await helper.ensureUserCanModifyChallenge(currentUser, challenge, challengeResources);
     }
 
     helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
