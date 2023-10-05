@@ -1423,15 +1423,15 @@ function validateTask(currentUser, challenge, data, challengeResources) {
     return;
   }
 
-  // Status from Draft -> Active, indicating launch a Task
+  // Status changed to Active, indicating launch a Task
   const isLaunchTask =
     data.status === constants.challengeStatuses.Active &&
-    challenge.status === constants.challengeStatuses.Draft;
+    challenge.status !== constants.challengeStatuses.Active;
 
-  // Status from Active -> Completed, indicating complete a Task
+  // Status changed to Completed, indicating complete a Task
   const isCompleteTask =
     data.status === constants.challengeStatuses.Completed &&
-    challenge.status === constants.challengeStatuses.Active;
+    challenge.status !== constants.challengeStatuses.Completed;
 
   // When complete a Task, input data should have winners
   if (isCompleteTask && (!data.winners || !data.winners.length)) {
