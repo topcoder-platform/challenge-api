@@ -898,27 +898,7 @@ async function _filterChallengesByGroupsAccess(currentUser, challenges) {
   const needToCheckForGroupAccess = !currentUser
     ? true
     : !currentUser.isMachine && !hasAdminRole(currentUser);
-  if(!needToCheckForGroupAccess)
-  {
-    for (const challenge of challenges) {
-      if(challenge && challenge.groups && challenge.groups.length>0) {
-        const promises = [];
-        _.each(challenge.groups, (g) => {
-          promises.push(
-            (async () => {
-              const group = await getGroupById(g);
-              if ( !group || !group.status==='active') {
-                throw new errors.BadRequestError("The groups provided are invalid "+g);
-              }
-            })()
-          );
-        });
-        await Promise.all(promises);
-        res.push(challenge);
-      }
-    }
-    return res;
-  }
+  if (!needToCheckForGroupAccess) return challenges;
 
   let userGroups;
 
