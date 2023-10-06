@@ -1421,37 +1421,44 @@ async function validateWinners(winners, challengeResources) {
  * @param {Object} data the new input challenge data
  * @param {Array} challengeResources the challenge resources
  */
-function validateTaskSelfAssign(currentUser, challenge, data, challengeResources) {
-  if (currentUser.isMachine) {
+function validateTask(currentUser, challenge, data, challengeResources) {
+  if (!_.get(challenge, "legacy.pureV5Task")) {
+    // Not a Task
     return;
   }
 
-  const finalStatus = data.status || challenge.status;
+  // Status changed to Active, indicating launch a Task
+  const isLaunchTask =
+    data.status === constants.challengeStatuses.Active &&
+    challenge.status !== constants.challengeStatuses.Active;
 
-  // Only validate when launch/complete a task
-  const isLaunchCompleteTask =
-    _.get(challenge, "legacy.pureV5Task") &&
-    (finalStatus === constants.challengeStatuses.Active ||
-      finalStatus === constants.challengeStatuses.Completed);
-  if (!isLaunchCompleteTask) {
-    return;
+  // Status changed to Completed, indicating complete a Task
+  const isCompleteTask =
+    data.status === constants.challengeStatuses.Completed &&
+    challenge.status !== constants.challengeStatuses.Completed;
+
+  // When complete a Task, input data should have winners
+  if (isCompleteTask && (!data.winners || !data.winners.length)) {
+    throw new errors.BadRequestError("The winners is required to complete a Task");
   }
 
-  // Whether task is assigned to current user
-  const assignedToCurrentUser =
-    _.filter(
-      challengeResources,
-      (r) =>
-        r.roleId === config.SUBMITTER_ROLE_ID &&
-        _.toString(r.memberId) === _.toString(currentUser.userId)
-    ).length > 0;
+  if (!currentUser.isMachine && (isLaunchTask || isCompleteTask)) {
+    // Whether task is assigned to current user
+    const assignedToCurrentUser =
+      _.filter(
+        challengeResources,
+        (r) =>
+          r.roleId === config.SUBMITTER_ROLE_ID &&
+          _.toString(r.memberId) === _.toString(currentUser.userId)
+      ).length > 0;
 
-  if (assignedToCurrentUser) {
-    throw new errors.ForbiddenError(
-      `You are not allowed to ${
-        finalStatus === constants.challengeStatuses.Active ? "lanuch" : "complete"
-      } task assigned to yourself. Please contact manager to operate.`
-    );
+    if (assignedToCurrentUser) {
+      throw new errors.ForbiddenError(
+        `You are not allowed to ${
+          data.status === constants.challengeStatuses.Active ? "lanuch" : "complete"
+        } task assigned to yourself. Please contact manager to operate.`
+      );
+    }
   }
 }
 
@@ -1489,7 +1496,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   const challengeResources = await helper.getChallengeResources(challengeId);
 
   await validateChallengeUpdateRequest(currentUser, challenge, data, challengeResources);
-  validateTaskSelfAssign(currentUser, challenge, data, challengeResources);
+  validateTask(currentUser, challenge, data, challengeResources);
 
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
