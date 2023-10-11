@@ -910,24 +910,6 @@ searchChallenges.schema = {
     })
     .unknown(true),
 };
-/**
- * Validate Challenge groups.
- * @param {Object} groups the group of a challenge
- */
-async function validateGroups(groups) {
-  const promises = [];
-  _.each(groups, (g) => {
-    promises.push(
-      (async () => {
-        const group = await helper.getGroupById(g);
-        if (!group || group.status !== "active") {
-          throw new errors.BadRequestError("The groups provided are invalid " + g);
-        }
-      })()
-    );
-  });
-  await Promise.all(promises);
-}
 
 /**
  * Create challenge.
@@ -938,15 +920,6 @@ async function validateGroups(groups) {
  */
 async function createChallenge(currentUser, challenge, userToken) {
   await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
-
-  //Validate the groups if Valid or Not
-  if (
-    challenge.groups &&
-    challenge.groups.length > 0 &&
-    (currentUser.isMachine || hasAdminRole(currentUser))
-  ) {
-    await validateGroups(challenge.groups);
-  }
 
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
@@ -1469,15 +1442,6 @@ async function updateChallenge(currentUser, challengeId, data) {
   logger.debug(`Sanitized Data: ${JSON.stringify(data)}`);
 
   await validateChallengeUpdateRequest(currentUser, challenge, data);
-
-  //Validate the groups if Valid or Not
-  if (
-    data.groups &&
-    data.groups.length > 0 &&
-    (currentUser.isMachine || hasAdminRole(currentUser))
-  ) {
-    await validateGroups(data.groups);
-  }
 
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
