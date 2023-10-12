@@ -90,7 +90,7 @@ workflows:
           branches:
             only:
             - dev
-            - PLAT-3368
+            - PLAT-2528
 
     - "build-qa":
         context: org-global
