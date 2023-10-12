@@ -119,7 +119,7 @@ class ChallengeHelper {
     // check groups authorization
     if (challenge.groups && challenge.groups.length > 0) {
       if (currentUser.isMachine || hasAdminRole(currentUser)) {
-        await validateGroups(challenge.groups);
+        await this.validateGroups(challenge.groups);
       } else {
         await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
       }
@@ -145,7 +145,7 @@ class ChallengeHelper {
     // check groups access to be updated group values
     if (data.groups && data.groups.length > 0) {
       if (currentUser.isMachine || hasAdminRole(currentUser)) {
-        await validateGroups(data.groups);
+        await this.validateGroups(data.groups);
       } else {
         await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
       }
