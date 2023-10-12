@@ -36,7 +36,6 @@ const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 
 const { hasAdminRole } = require("../common/role-helper");
 const {
-  validateChallengeUpdateRequest,
   enrichChallengeForResponse,
   sanitizeRepeatedFieldsInUpdateRequest,
   convertPrizeSetValuesToCents,
@@ -1441,7 +1440,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   data = sanitizeData(sanitizeChallenge(data), challenge);
   logger.debug(`Sanitized Data: ${JSON.stringify(data)}`);
 
-  await validateChallengeUpdateRequest(currentUser, challenge, data);
+  await challengeHelper.validateChallengeUpdateRequest(currentUser, challenge, data);
 
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
