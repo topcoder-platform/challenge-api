@@ -528,14 +528,17 @@ async function getResourceRoles() {
  * Check if a user has full access on a challenge
  * @param {String} challengeId the challenge UUID
  * @param {String} userId the user ID
+ * @param {Array} challengeResources the challenge resources
  */
-async function userHasFullAccess(challengeId, userId) {
+async function userHasFullAccess(challengeId, userId, challengeResources) {
   const resourceRoles = await getResourceRoles();
   const rolesWithFullAccess = _.map(
     _.filter(resourceRoles, (r) => r.fullWriteAccess),
     "id"
   );
-  const challengeResources = await getChallengeResources(challengeId);
+  if (!challengeResources) {
+    challengeResources = await getChallengeResources(challengeId);
+  }
   return (
     _.filter(
       challengeResources,
@@ -982,13 +985,14 @@ async function ensureUserCanViewChallenge(currentUser, challenge) {
  *
  * @param {Object} currentUser the user who perform operation
  * @param {Object} challenge the challenge to check
+ * @param {Array} challengeResources the challenge resources
  * @returns {Promise}
  */
-async function ensureUserCanModifyChallenge(currentUser, challenge) {
+async function ensureUserCanModifyChallenge(currentUser, challenge, challengeResources) {
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge);
   // check full access
-  const isUserHasFullAccess = await userHasFullAccess(challenge.id, currentUser.userId);
+  const isUserHasFullAccess = await userHasFullAccess(challenge.id, currentUser.userId, challengeResources);
   if (
     !currentUser.isMachine &&
     !hasAdminRole(currentUser) &&

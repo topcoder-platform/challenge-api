@@ -1363,10 +1363,9 @@ function isDifferentPrizeSets(prizeSets = [], otherPrizeSets = []) {
 /**
  * Validate the winners array.
  * @param {Array} winners the Winner Array
- * @param {String} winchallengeIdners the challenge ID
+ * @param {Array} challengeResources the challenge resources
  */
-async function validateWinners(winners, challengeId) {
-  const challengeResources = await helper.getChallengeResources(challengeId);
+async function validateWinners(winners, challengeResources) {
   const registrants = _.filter(challengeResources, (r) => r.roleId === config.SUBMITTER_ROLE_ID);
   for (const prizeType of _.values(constants.prizeSetTypes)) {
     const filteredWinners = _.filter(winners, (w) => w.type === prizeType);
@@ -1410,6 +1409,55 @@ async function validateWinners(winners, challengeId) {
 }
 
 /**
+ * Task shouldn't be launched/completed when it is assigned to the current user self.
+ * E.g: stop copilots from paying themselves, thus copilots will need to contact manager to launch/complete the task.
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} challenge the existing challenge
+ * @param {Object} data the new input challenge data
+ * @param {Array} challengeResources the challenge resources
+ */
+function validateTask(currentUser, challenge, data, challengeResources) {
+  if (!_.get(challenge, "legacy.pureV5Task")) {
+    // Not a Task
+    return;
+  }
+
+  // Status changed to Active, indicating launch a Task
+  const isLaunchTask =
+    data.status === constants.challengeStatuses.Active &&
+    challenge.status !== constants.challengeStatuses.Active;
+
+  // Status changed to Completed, indicating complete a Task
+  const isCompleteTask =
+    data.status === constants.challengeStatuses.Completed &&
+    challenge.status !== constants.challengeStatuses.Completed;
+
+  // When complete a Task, input data should have winners
+  if (isCompleteTask && (!data.winners || !data.winners.length)) {
+    throw new errors.BadRequestError("The winners is required to complete a Task");
+  }
+
+  if (!currentUser.isMachine && (isLaunchTask || isCompleteTask)) {
+    // Whether task is assigned to current user
+    const assignedToCurrentUser =
+      _.filter(
+        challengeResources,
+        (r) =>
+          r.roleId === config.SUBMITTER_ROLE_ID &&
+          _.toString(r.memberId) === _.toString(currentUser.userId)
+      ).length > 0;
+
+    if (assignedToCurrentUser) {
+      throw new errors.ForbiddenError(
+        `You are not allowed to ${
+          data.status === constants.challengeStatuses.Active ? "lanuch" : "complete"
+        } task assigned to yourself. Please contact manager to operate.`
+      );
+    }
+  }
+}
+
+/**
  * Update challenge.
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
@@ -1440,7 +1488,10 @@ async function updateChallenge(currentUser, challengeId, data) {
   data = sanitizeData(sanitizeChallenge(data), challenge);
   logger.debug(`Sanitized Data: ${JSON.stringify(data)}`);
 
-  await challengeHelper.validateChallengeUpdateRequest(currentUser, challenge, data);
+  const challengeResources = await helper.getChallengeResources(challengeId);
+
+  await challengeHelper.validateChallengeUpdateRequest(currentUser, challenge, data, challengeResources);
+  validateTask(currentUser, challenge, data, challengeResources);
 
   let sendActivationEmail = false;
   let sendSubmittedEmail = false;
@@ -1715,7 +1766,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
-    await validateWinners(data.winners, challengeId);
+    await validateWinners(data.winners, challengeResources);
   }
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
@@ -1776,7 +1827,6 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   if (_.get(type, "isTask")) {
     if (!_.isEmpty(_.get(data, "task.memberId"))) {
-      const challengeResources = await helper.getChallengeResources(challengeId);
       const registrants = _.filter(
         challengeResources,
         (r) => r.roleId === config.SUBMITTER_ROLE_ID

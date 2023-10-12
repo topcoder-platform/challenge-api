@@ -119,7 +119,7 @@ class ChallengeHelper {
     // check groups authorization
     if (challenge.groups && challenge.groups.length > 0) {
       if (currentUser.isMachine || hasAdminRole(currentUser)) {
-        await this.validateGroups(challenge.groups);
+        await validateGroups(challenge.groups);
       } else {
         await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
       }
@@ -130,9 +130,9 @@ class ChallengeHelper {
     }
   }
 
-  async validateChallengeUpdateRequest(currentUser, challenge, data) {
+  async validateChallengeUpdateRequest(currentUser, challenge, data, challengeResources) {
     if (process.env.LOCAL != "true") {
-      await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+      await helper.ensureUserCanModifyChallenge(currentUser, challenge, challengeResources);
     }
 
     helper.ensureNoDuplicateOrNullElements(data.tags, "tags");
@@ -145,7 +145,7 @@ class ChallengeHelper {
     // check groups access to be updated group values
     if (data.groups && data.groups.length > 0) {
       if (currentUser.isMachine || hasAdminRole(currentUser)) {
-        await this.validateGroups(data.groups);
+        await validateGroups(data.groups);
       } else {
         await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
       }
