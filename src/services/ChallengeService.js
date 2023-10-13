@@ -1036,6 +1036,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.startDate != null) challenge.startDate = challenge.startDate;
   if (challenge.endDate != null) challenge.endDate = challenge.endDate;
   if (challenge.discussions == null) challenge.discussions = [];
+  if (challenge.skills == null) challenge.skills = [];
 
   challenge.metadata = challenge.metadata.map((m) => ({
     name: m.name,
@@ -1203,6 +1204,15 @@ createChallenge.schema = {
           roleId: Joi.id(),
         })
       ),
+      skills: Joi.array()
+        .items(
+          Joi.object()
+            .keys({
+              id: Joi.id(),
+            })
+            .unknown(true)
+        )
+        .optional(),
     })
     .required(),
   userToken: Joi.string().required(),
@@ -1490,7 +1500,12 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   const challengeResources = await helper.getChallengeResources(challengeId);
 
-  await challengeHelper.validateChallengeUpdateRequest(currentUser, challenge, data, challengeResources);
+  await challengeHelper.validateChallengeUpdateRequest(
+    currentUser,
+    challenge,
+    data,
+    challengeResources
+  );
   validateTask(currentUser, challenge, data, challengeResources);
 
   let sendActivationEmail = false;
@@ -2102,6 +2117,15 @@ updateChallenge.schema = {
           roleId: Joi.id(),
         })
       ),
+      skills: Joi.array()
+        .items(
+          Joi.object()
+            .keys({
+              id: Joi.id(),
+            })
+            .unknown(true)
+        )
+        .optional(),
       overview: Joi.any().forbidden(),
     })
     .unknown(true)
@@ -2157,6 +2181,7 @@ function sanitizeChallenge(challenge) {
     "groups",
     "cancelReason",
     "constraints",
+    "skills",
   ]);
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name);
@@ -2233,6 +2258,11 @@ function sanitizeData(data, challenge) {
     if (key === "phases") continue;
 
     if (challenge.hasOwnProperty(key)) {
+      if (key === "skills" && deepEqual(_.map(data.skills, "id"), _.map(challenge.skills, "id"))) {
+        delete data[key];
+        continue;
+      }
+
       if (
         (typeof data[key] === "object" || Array.isArray(data[key])) &&
         deepEqual(data[key], challenge[key])
