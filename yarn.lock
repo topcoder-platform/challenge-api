@@ -257,7 +257,7 @@
 
 "@topcoder-framework/client-relational@^0.23.1-PLAT-3614.0":
   version "0.23.1-PLAT-3614.0"
-  resolved "https://topcoder-811668436784.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.23.1-PLAT-3614.0.tgz#1f658d534ab0e1ba0ca93f5c73980d27e678cdeb"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.23.1-PLAT-3614.0.tgz#1f658d534ab0e1ba0ca93f5c73980d27e678cdeb"
   integrity sha512-iCKPgDZvefywhUjPai5yadlcZua52Tl6KaVFSrmAaXEODBP8KeqJAlpT73bQqBdt/PqVSkvUUiEo4Xt9QU7Z/w==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
@@ -267,7 +267,7 @@
 
 "@topcoder-framework/domain-challenge@^v0.23.1-PLAT-3614.0":
   version "0.23.1-PLAT-3614.0"
-  resolved "https://topcoder-811668436784.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.23.1-PLAT-3614.0.tgz#3054b5b5610a039bdbd08e137144325f98a53f5c"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.23.1-PLAT-3614.0.tgz#3054b5b5610a039bdbd08e137144325f98a53f5c"
   integrity sha512-HK3WDtnE3IvygBrMX6FlP4dsZlx2xqs48/T4G1beH39w4Wo7tv3yvGgzCHgQt+nyzuEwMk+iQDsl7OkXFXZYhg==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
@@ -278,7 +278,7 @@
 
 "@topcoder-framework/lib-common@^0.23.1-PLAT-3614.0", "@topcoder-framework/lib-common@^v0.23.1-PLAT-3614.0":
   version "0.23.1-PLAT-3614.0"
-  resolved "https://topcoder-811668436784.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.23.1-PLAT-3614.0.tgz#087d9abda8671e1ef3116af7f6fb5911f08d81c3"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.23.1-PLAT-3614.0.tgz#087d9abda8671e1ef3116af7f6fb5911f08d81c3"
   integrity sha512-+ynrGjT7hnZ9fKudqPwyYx1v7e1YHjS1nfUFfeFW4Bvj7a3aAlCLeL6ElMHgquMndea4pmOYlUpGxdqbRnce+A==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
