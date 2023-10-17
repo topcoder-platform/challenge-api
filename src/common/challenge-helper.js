@@ -102,13 +102,26 @@ class ChallengeHelper {
   /**
    * Validate Challenge skills.
    * @param {Object} challenge the challenge
+   * @param {oldChallenge} challenge the old challenge data
    */
-  async validateSkills(challenge) {
-    if (!challenge.skills || !challenge.skills.length) {
+  async validateSkills(challenge, oldChallenge) {
+    if (!challenge.skills) {
       return;
     }
 
     const ids = _.uniq(_.map(challenge.skills, "id"));
+
+    if (oldChallenge && oldChallenge.status === constants.challengeStatuses.Completed) {
+      // Don't allow edit skills for Completed challenges
+      if (!_.isEqual(ids, _.uniq(_.map(oldChallenge.skills, "id")))) {
+        throw new errors.BadRequestError("You can't edit skills for Completed challenges");
+      }
+    }
+
+    if (!ids.length) {
+      return;
+    }
+
     const standSkills = await helper.getStandSkills(ids);
 
     const skills = [];
