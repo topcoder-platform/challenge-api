@@ -114,7 +114,7 @@ class ChallengeHelper {
     if (oldChallenge && oldChallenge.status === constants.challengeStatuses.Completed) {
       // Don't allow edit skills for Completed challenges
       if (!_.isEqual(ids, _.uniq(_.map(oldChallenge.skills, "id")))) {
-        throw new errors.BadRequestError("You can't edit skills for Completed challenges");
+        throw new errors.BadRequestError("Cannot update skills for challenges with Completed status");
       }
     }
 
@@ -204,7 +204,7 @@ class ChallengeHelper {
     }
 
     // check skills
-    await this.validateSkills(data);
+    await this.validateSkills(data, challenge);
 
     // Ensure descriptionFormat is either 'markdown' or 'html'
     if (data.descriptionFormat && !_.includes(["markdown", "html"], data.descriptionFormat)) {
