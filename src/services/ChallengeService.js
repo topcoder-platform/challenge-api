@@ -253,7 +253,7 @@ async function searchChallenges(currentUser, criteria) {
       // match 100% words
       multi_match: {
         query: criteria.search,
-        fields: ["name.text^3.0", "tags^2.5", "skills.name^3", "description^1.0"],
+        fields: ["name.text^3.0", "tags^2.5", "skills.name^2.5", "description^1.0"],
         type: "most_fields",
         minimum_should_match: "100%",
         boost: 2.5,
@@ -263,7 +263,7 @@ async function searchChallenges(currentUser, criteria) {
       // fuzzy match
       multi_match: {
         query: criteria.search,
-        fields: ["name.text^2.5", "tags^1.5", "skills.name^3", "description^1.0"],
+        fields: ["name.text^2.5", "tags^1.5", "skills.name^1.5", "description^1.0"],
         type: "most_fields",
         minimum_should_match: "50%",
         fuzziness: "AUTO",
