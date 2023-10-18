@@ -8,16 +8,16 @@ function transformData(data, fieldsToDelete) {
   }
 
   if (_.isArray(data)) {
-    return data.map((item) => transformData(item, fieldsToDelete));
+    _.each(data, (item, index) => {
+      data[index] = transformData(item, fieldsToDelete);
+    });
   } else if (_.isObject(data)) {
-    const clonedData = { ...data };
     for (const field of fieldsToDelete) {
-      delete clonedData[field];
+      delete data[field];
     }
-    if (clonedData.result) {
-      clonedData.result = transformData(clonedData.result, fieldsToDelete);
+    if (data.result) {
+      data.result = transformData(data.result, fieldsToDelete);
     }
-    return clonedData;
   }
 
   return data;
@@ -33,23 +33,30 @@ function transformServices() {
     _.each(service, (method, methodName) => {
       service[methodName] = async function () {
         const args = Array.prototype.slice.call(arguments);
-        const data = await method.apply(this, args.slice(1));
 
         // No transform need for this method
         if (!serviceConfig.methods.includes(methodName)) {
-          return data;
+          return await method.apply(this, args.slice(1));
         }
 
         // args[0] is request, get version header
-        const apiVersion = args[0].headers["challenge-api-version"] || "1.0.0";
+        const request = args[0];
+        const apiVersion = request.headers["challenge-api-version"] || "1.0.0";
 
         const fieldsToDelete = [];
         _.each(serviceConfig.fieldsVersion, (version, field) => {
-          // If input version less than required version, delete fields from response
+          // If input version less than required version, delete fields
           if (compareVersions(apiVersion, version) < 0) {
             fieldsToDelete.push(field);
           }
         });
+
+        // Transform request body by deleting fields
+        if (_.isArray(request.body) || _.isObject(request.body)) {
+          transformData(request.body, fieldsToDelete);
+        }
+
+        const data = await method.apply(this, args.slice(1));
 
         // Transform response data by deleting fields
         return transformData(data, fieldsToDelete);
