@@ -20,7 +20,6 @@ module.exports = {
         constants.UserRoles.User,
       ],
       scopes: [READ, ALL],
-      versioned: true,
     },
     post: {
       controller: "ChallengeController",
@@ -52,7 +51,6 @@ module.exports = {
       controller: "ChallengeController",
       method: "getChallenge",
       scopes: [READ, ALL],
-      versioned: true,
     },
     // @deprecated
     put: {
