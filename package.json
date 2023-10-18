@@ -49,6 +49,7 @@
     "axios-retry": "^3.4.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.15.1",
+    "compare-versions": "^6.1.0",
     "config": "^3.0.1",
     "cors": "^2.8.5",
     "decimal.js": "^10.4.3",
