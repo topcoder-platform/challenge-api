@@ -2,7 +2,7 @@
  * Controller for challenge endpoints
  */
 const HttpStatus = require("http-status-codes");
-const service = require("../services/ChallengeService");
+const { challengeService: service } = require("../common/transformer");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 
@@ -12,7 +12,7 @@ const logger = require("../common/logger");
  * @param {Object} res the response
  */
 async function searchChallenges(req, res) {
-  let result = await service.searchChallenges(req.authUser, {
+  let result = await service.searchChallenges(req, req.authUser, {
     ...req.query,
     ...req.body,
   });
@@ -23,7 +23,7 @@ async function searchChallenges(req, res) {
       logger.debug(`Staring to get mm challengeId`);
       const legacyId = await helper.getProjectIdByRoundId(req.query.legacyId);
       logger.debug(`Get mm challengeId successfully ${legacyId}`);
-      result = await service.searchChallenges(req.authUser, {
+      result = await service.searchChallenges(req, req.authUser, {
         ...req.query,
         ...req.body,
         legacyId,
@@ -50,7 +50,7 @@ async function createChallenge(req, res) {
   logger.debug(
     `createChallenge User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`
   );
-  const result = await service.createChallenge(req.authUser, req.body, req.userToken);
+  const result = await service.createChallenge(req, req.authUser, req.body, req.userToken);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -60,7 +60,7 @@ async function createChallenge(req, res) {
  * @param {Object} res the response
  */
 async function sendNotifications(req, res) {
-  const result = await service.sendNotifications(req.authUser, req.params.challengeId);
+  const result = await service.sendNotifications(req, req.authUser, req.params.challengeId);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -71,6 +71,7 @@ async function sendNotifications(req, res) {
  */
 async function getChallenge(req, res) {
   const result = await service.getChallenge(
+    req,
     req.authUser,
     req.params.challengeId,
     req.query.checkIfExists
@@ -84,7 +85,7 @@ async function getChallenge(req, res) {
  * @param {Object} res the response
  */
 async function getChallengeStatistics(req, res) {
-  const result = await service.getChallengeStatistics(req.authUser, req.params.challengeId);
+  const result = await service.getChallengeStatistics(req, req.authUser, req.params.challengeId);
   res.send(result);
 }
 
@@ -99,7 +100,7 @@ async function updateChallenge(req, res) {
       req.params.challengeId
     } - Body: ${JSON.stringify(req.body)}`
   );
-  const result = await service.updateChallenge(req.authUser, req.params.challengeId, req.body);
+  const result = await service.updateChallenge(req, req.authUser, req.params.challengeId, req.body);
   res.send(result);
 }
 
@@ -112,7 +113,7 @@ async function deleteChallenge(req, res) {
   logger.debug(
     `deleteChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${req.params.challengeId}`
   );
-  const result = await service.deleteChallenge(req.authUser, req.params.challengeId);
+  const result = await service.deleteChallenge(req, req.authUser, req.params.challengeId);
   res.send(result);
 }
 
@@ -122,7 +123,7 @@ async function deleteChallenge(req, res) {
  * @param {Object} res the response
  */
 async function advancePhase(req, res) {
-  res.send(await service.advancePhase(req.authUser, req.params.challengeId, req.body));
+  res.send(await service.advancePhase(req, req.authUser, req.params.challengeId, req.body));
 }
 
 module.exports = {
