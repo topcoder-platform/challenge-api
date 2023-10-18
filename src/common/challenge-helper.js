@@ -80,6 +80,25 @@ class ChallengeHelper {
     }
   }
 
+  /**
+   * Validate Challenge groups.
+   * @param {Object} groups the group of a challenge
+   */
+  async validateGroups(groups) {
+    const promises = [];
+    _.each(groups, (g) => {
+      promises.push(
+        (async () => {
+          const group = await helper.getGroupById(g);
+          if (!group || group.status !== "active") {
+            throw new errors.BadRequestError("The groups provided are invalid " + g);
+          }
+        })()
+      );
+    });
+    await Promise.all(promises);
+  }
+
   async validateCreateChallengeRequest(currentUser, challenge) {
     // projectId is required for non self-service challenges
     if (challenge.legacy.selfService == null && challenge.projectId == null) {
@@ -98,7 +117,13 @@ class ChallengeHelper {
     // helper.ensureNoDuplicateOrNullElements(challenge.events, 'events')
 
     // check groups authorization
-    await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
+    if (challenge.groups && challenge.groups.length > 0) {
+      if (currentUser.isMachine || hasAdminRole(currentUser)) {
+        await this.validateGroups(challenge.groups);
+      } else {
+        await helper.ensureAccessibleByGroupsAccess(currentUser, challenge);
+      }
+    }
 
     if (challenge.constraints) {
       await ChallengeHelper.validateChallengeConstraints(challenge.constraints);
@@ -118,8 +143,12 @@ class ChallengeHelper {
     }
 
     // check groups access to be updated group values
-    if (data.groups) {
-      await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
+    if (data.groups && data.groups.length > 0) {
+      if (currentUser.isMachine || hasAdminRole(currentUser)) {
+        await this.validateGroups(data.groups);
+      } else {
+        await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
+      }
     }
 
     // Ensure descriptionFormat is either 'markdown' or 'html'
