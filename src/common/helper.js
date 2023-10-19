@@ -992,7 +992,11 @@ async function ensureUserCanModifyChallenge(currentUser, challenge, challengeRes
   // check groups authorization
   await ensureAccessibleByGroupsAccess(currentUser, challenge);
   // check full access
-  const isUserHasFullAccess = await userHasFullAccess(challenge.id, currentUser.userId, challengeResources);
+  const isUserHasFullAccess = await userHasFullAccess(
+    challenge.id,
+    currentUser.userId,
+    challengeResources
+  );
   if (
     !currentUser.isMachine &&
     !hasAdminRole(currentUser) &&
@@ -1130,6 +1134,24 @@ async function getMembersByHandles(handles) {
 }
 
 /**
+ * Get standard skills by ids
+ * @param {Array<String>} ids the skills ids
+ * @returns {Object}
+ */
+async function getStandSkills(ids) {
+  const token = await m2mHelper.getM2MToken();
+  const res = await axios.get(`${config.API_BASE_URL}/v5/standardized-skills/skills`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      page: 1,
+      perPage: ids.length,
+      skillId: ids,
+    },
+  });
+  return res.data;
+}
+
+/**
  * Send self service notification
  * @param {String} type the notification type
  * @param {Array} recipients the array of recipients in { userId || email || handle } format
@@ -1251,6 +1273,7 @@ module.exports = {
   sendSelfServiceNotification,
   getMemberByHandle,
   getMembersByHandles,
+  getStandSkills,
   submitZendeskRequest,
   updateSelfServiceProjectInfo,
   getFromInternalCache,

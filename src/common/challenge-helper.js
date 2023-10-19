@@ -99,6 +99,55 @@ class ChallengeHelper {
     await Promise.all(promises);
   }
 
+  /**
+   * Validate Challenge skills.
+   * @param {Object} challenge the challenge
+   * @param {oldChallenge} challenge the old challenge data
+   */
+  async validateSkills(challenge, oldChallenge) {
+    if (!challenge.skills) {
+      return;
+    }
+
+    const ids = _.uniq(_.map(challenge.skills, "id"));
+
+    if (oldChallenge && oldChallenge.status === constants.challengeStatuses.Completed) {
+      // Don't allow edit skills for Completed challenges
+      if (!_.isEqual(ids, _.uniq(_.map(oldChallenge.skills, "id")))) {
+        throw new errors.BadRequestError("Cannot update skills for challenges with Completed status");
+      }
+    }
+
+    if (!ids.length) {
+      return;
+    }
+
+    const standSkills = await helper.getStandSkills(ids);
+
+    const skills = [];
+    for (const id of ids) {
+      const found = _.find(standSkills, (item) => item.id === id);
+      if (!found) {
+        throw new errors.BadRequestError("The skill id is invalid " + id);
+      }
+
+      const skill = {
+        id,
+        name: found.name,
+      };
+
+      if (found.category) {
+        skill.category = {
+          id: found.category.id,
+          name: found.category.name,
+        };
+      }
+
+      skills.push(skill);
+    }
+    challenge.skills = skills;
+  }
+
   async validateCreateChallengeRequest(currentUser, challenge) {
     // projectId is required for non self-service challenges
     if (challenge.legacy.selfService == null && challenge.projectId == null) {
@@ -125,6 +174,9 @@ class ChallengeHelper {
       }
     }
 
+    // check skills
+    await this.validateSkills(challenge);
+
     if (challenge.constraints) {
       await ChallengeHelper.validateChallengeConstraints(challenge.constraints);
     }
@@ -150,6 +202,9 @@ class ChallengeHelper {
         await ensureAcessibilityToModifiedGroups(currentUser, data, challenge);
       }
     }
+
+    // check skills
+    await this.validateSkills(data, challenge);
 
     // Ensure descriptionFormat is either 'markdown' or 'html'
     if (data.descriptionFormat && !_.includes(["markdown", "html"], data.descriptionFormat)) {
@@ -326,6 +381,13 @@ class ChallengeHelper {
         groups: data.groups,
       };
       delete data.groups;
+    }
+
+    if (data.skills != null) {
+      data.skillUpdate = {
+        skills: data.skills,
+      };
+      delete data.skills;
     }
 
     return data;
