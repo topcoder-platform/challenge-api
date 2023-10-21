@@ -42,8 +42,8 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.8.12",
     "@opensearch-project/opensearch": "^2.2.0",
-    "@topcoder-framework/domain-challenge": "^0.22.1-PLAT-3491.2",
-    "@topcoder-framework/lib-common": "^0.22.1-PLAT-3491.2",
+    "@topcoder-framework/domain-challenge": "^0.22.1-PLAT-3491.5",
+    "@topcoder-framework/lib-common": "^0.22.1-PLAT-3491.5",
     "aws-sdk": "^2.1145.0",
     "axios": "^0.19.0",
     "axios-retry": "^3.4.0",

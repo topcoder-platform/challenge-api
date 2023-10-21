@@ -244,7 +244,7 @@ async function searchChallenges(currentUser, criteria) {
       // exact match
       multi_match: {
         query: criteria.search,
-        fields: ["name.text^7", "tags^3", "description^2"],
+        fields: ["name.text^7", "tags^3", "skills.name^3", "description^2"],
         type: "phrase_prefix",
         boost: 5,
       },
@@ -253,7 +253,7 @@ async function searchChallenges(currentUser, criteria) {
       // match 100% words
       multi_match: {
         query: criteria.search,
-        fields: ["name.text^3.0", "tags^2.5", "description^1.0"],
+        fields: ["name.text^3.0", "tags^2.5", "skills.name^2.5", "description^1.0"],
         type: "most_fields",
         minimum_should_match: "100%",
         boost: 2.5,
@@ -263,7 +263,7 @@ async function searchChallenges(currentUser, criteria) {
       // fuzzy match
       multi_match: {
         query: criteria.search,
-        fields: ["name.text^2.5", "tags^1.5", "description^1.0"],
+        fields: ["name.text^2.5", "tags^1.5", "skills.name^1.5", "description^1.0"],
         type: "most_fields",
         minimum_should_match: "50%",
         fuzziness: "AUTO",
@@ -277,6 +277,7 @@ async function searchChallenges(currentUser, criteria) {
           { wildcard: { name: `${criteria.search}*` } },
           { wildcard: { name: `*${criteria.search}` } },
           { match_phrase: { tags: criteria.search } },
+          { match_phrase: { "skills.name": criteria.search } },
         ],
       },
     });
@@ -1040,6 +1041,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.startDate != null) challenge.startDate = challenge.startDate;
   if (challenge.endDate != null) challenge.endDate = challenge.endDate;
   if (challenge.discussions == null) challenge.discussions = [];
+  if (challenge.skills == null) challenge.skills = [];
 
   challenge.metadata = challenge.metadata.map((m) => ({
     name: m.name,
@@ -1207,6 +1209,15 @@ createChallenge.schema = {
           roleId: Joi.id(),
         })
       ),
+      skills: Joi.array()
+        .items(
+          Joi.object()
+            .keys({
+              id: Joi.id(),
+            })
+            .unknown(true)
+        )
+        .optional(),
     })
     .required(),
   userToken: Joi.string().required(),
@@ -1494,7 +1505,12 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   const challengeResources = await helper.getChallengeResources(challengeId);
 
-  await challengeHelper.validateChallengeUpdateRequest(currentUser, challenge, data, challengeResources);
+  await challengeHelper.validateChallengeUpdateRequest(
+    currentUser,
+    challenge,
+    data,
+    challengeResources
+  );
   validateTask(currentUser, challenge, data, challengeResources);
 
   let sendActivationEmail = false;
@@ -2106,6 +2122,15 @@ updateChallenge.schema = {
           roleId: Joi.id(),
         })
       ),
+      skills: Joi.array()
+        .items(
+          Joi.object()
+            .keys({
+              id: Joi.id(),
+            })
+            .unknown(true)
+        )
+        .optional(),
       overview: Joi.any().forbidden(),
     })
     .unknown(true)
@@ -2161,6 +2186,7 @@ function sanitizeChallenge(challenge) {
     "groups",
     "cancelReason",
     "constraints",
+    "skills",
   ]);
   if (!_.isUndefined(sanitized.name)) {
     sanitized.name = xss(sanitized.name);
@@ -2237,6 +2263,11 @@ function sanitizeData(data, challenge) {
     if (key === "phases") continue;
 
     if (challenge.hasOwnProperty(key)) {
+      if (key === "skills" && deepEqual(_.map(data.skills, "id"), _.map(challenge.skills, "id"))) {
+        delete data[key];
+        continue;
+      }
+
       if (
         (typeof data[key] === "object" || Array.isArray(data[key])) &&
         deepEqual(data[key], challenge[key])
