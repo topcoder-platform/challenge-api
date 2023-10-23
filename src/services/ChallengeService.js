@@ -1030,7 +1030,6 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   if (challenge.phases && challenge.phases.length > 0) {
     challenge.endDate = helper.calculateChallengeEndDate(challenge);
-    console.log("End Date", challenge.endDate);
   }
 
   if (challenge.events == null) challenge.events = [];
@@ -1041,7 +1040,6 @@ async function createChallenge(currentUser, challenge, userToken) {
   if (challenge.tags == null) challenge.tags = [];
   if (challenge.startDate != null) challenge.startDate = challenge.startDate;
   if (challenge.endDate != null) challenge.endDate = challenge.endDate;
-  console.log("END Date", challenge.endDate);
   if (challenge.discussions == null) challenge.discussions = [];
   if (challenge.skills == null) challenge.skills = [];
 
@@ -1906,6 +1904,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
   await indexChallengeAndPostToKafka(updatedChallenge, track, type);
 
   if (updatedChallenge.legacy.selfService) {
