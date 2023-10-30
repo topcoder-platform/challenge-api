@@ -978,7 +978,7 @@ async function createChallenge(currentUser, challenge, userToken) {
     _.set(challenge, "task.isTask", true);
     // this is only applicable for WorkType: Gig, i.e., Tasks created from Salesforce
     if (challenge.billing != null && challenge.billing.clientBillingRate != null) {
-      _.set(challenge, "billing.clientBilingRate", challenge.billing.clientBillingRate);
+      _.set(challenge, "billing.clientBillingRate", challenge.billing.clientBillingRate);
     }
 
     if (_.isUndefined(_.get(challenge, "task.isAssigned"))) {
