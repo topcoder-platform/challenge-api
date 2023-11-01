@@ -91,6 +91,7 @@ workflows:
             only:
             - dev
             - PLAT-3614
+            - feat/group-search
 
     - "build-qa":
         context: org-global
