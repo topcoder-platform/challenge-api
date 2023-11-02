@@ -2084,7 +2084,7 @@ updateChallenge.schema = {
             .unknown(true)
         )
         .min(1),
-      tags: Joi.array().items(Joi.string().required()).min(1), // tag names
+      tags: Joi.array().items(Joi.string()), // tag names
       projectId: Joi.number().integer().positive(),
       legacyId: Joi.number().integer().positive(),
       constraints: Joi.object()
