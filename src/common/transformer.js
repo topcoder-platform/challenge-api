@@ -41,7 +41,7 @@ function transformServices() {
 
         // args[0] is request, get version header
         const request = args[0];
-        const apiVersion = request.headers["challenge-api-version"] || "1.0.0";
+        const apiVersion = request.headers["app-version"] || "1.0.0";
 
         const fieldsToDelete = [];
         _.each(serviceConfig.fieldsVersion, (version, field) => {
