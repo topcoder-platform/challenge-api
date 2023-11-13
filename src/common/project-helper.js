@@ -69,8 +69,7 @@ class ProjectHelper {
         : null;
 
       if (markup && markup > 0) {
-        // Change int returned from api to decimal
-        markup = markup / 100;
+        markup = (markup * 100) / 10000;
       }
       return {
         billingAccountId: _.get(res, "data.tcBillingAccountId", null),
