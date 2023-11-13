@@ -833,6 +833,10 @@ async function searchChallenges(currentUser, criteria) {
     if (element.status !== constants.challengeStatuses.Completed) {
       _.unset(element, "winners");
     }
+    // TODO: in the long run we wanna do a finer grained filtering of the payments
+    if (!_hasAdminRole && !_.get(currentUser, "isMachine", false)) {
+      _.unset(element, "payments");
+    }
   });
 
   return { total, page, perPage, result };
@@ -968,6 +972,11 @@ async function createChallenge(currentUser, challenge, userToken) {
 
   if (_.get(type, "isTask")) {
     _.set(challenge, "task.isTask", true);
+    // this is only applicable for WorkType: Gig, i.e., Tasks created from Salesforce
+    if (challenge.billing != null && challenge.billing.clientBillingRate != null) {
+      _.set(challenge, "billing.clientBillingRate", challenge.billing.clientBillingRate);
+    }
+
     if (_.isUndefined(_.get(challenge, "task.isAssigned"))) {
       _.set(challenge, "task.isAssigned", false);
     }
@@ -1109,6 +1118,7 @@ createChallenge.schema = {
         .keys({
           billingAccountId: Joi.string(),
           markup: Joi.number().min(0).max(100),
+          clientBillingRate: Joi.number().min(0).max(100),
         })
         .unknown(true),
       task: Joi.object().keys({
@@ -1236,12 +1246,7 @@ async function getPhasesAndPopulate(data) {
  * @returns {Object} the challenge with given id
  */
 async function getChallenge(currentUser, id, checkIfExists) {
-  // get challenge from Elasticsearch
   let challenge;
-  // logger.warn(JSON.stringify({
-  //   index: config.get('ES.ES_INDEX'),
-  //   _id: id
-  // }))
   try {
     if (config.get("ES.OPENSEARCH") == "true") {
       challenge = (
@@ -1299,6 +1304,11 @@ async function getChallenge(currentUser, id, checkIfExists) {
 
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, "winners");
+  }
+
+  // TODO: in the long run we wanna do a finer grained filtering of the payments
+  if (!hasAdminRole(currentUser) && !_.get(currentUser, "isMachine", false)) {
+    _.unset(challenge, "payments");
   }
 
   return challenge;
@@ -1896,6 +1906,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
   await indexChallengeAndPostToKafka(updatedChallenge, track, type);
 
   if (updatedChallenge.legacy.selfService) {
