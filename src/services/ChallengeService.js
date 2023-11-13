@@ -920,7 +920,9 @@ searchChallenges.schema = {
  */
 async function createChallenge(currentUser, challenge, userToken) {
   await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
+  let prizeTypeTmp = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
 
+  console.log("TYPE", prizeTypeTmp);
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
     if (!challenge.projectId) {
@@ -1055,9 +1057,17 @@ async function createChallenge(currentUser, challenge, userToken) {
   grpcMetadata.set("userId", currentUser.userId);
   grpcMetadata.set("token", await getM2MToken());
 
-  convertPrizeSetValuesToCents(challenge.prizeSets);
+  const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+
+  if (prizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToCents(challenge.prizeSets);
+  }
+
   const ret = await challengeDomain.create(challenge, grpcMetadata);
-  convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
+
+  if (prizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
+  }
 
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
@@ -1484,7 +1494,11 @@ function validateTask(currentUser, challenge, data, challengeResources) {
  */
 async function updateChallenge(currentUser, challengeId, data) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-  convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
+  const existingPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+
+  if (existingPrizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
+  }
 
   const projectId = _.get(challenge, "projectId");
 
@@ -1881,28 +1895,30 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
   }
 
-  try {
-    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ["cancelReason"]));
-    if (!_.isEmpty(updateInput)) {
-      const grpcMetadata = new GrpcMetadata();
+  const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ["cancelReason"]));
+  if (!_.isEmpty(updateInput)) {
+    const grpcMetadata = new GrpcMetadata();
 
-      grpcMetadata.set("handle", currentUser.handle);
-      grpcMetadata.set("userId", currentUser.userId);
-      grpcMetadata.set("token", await getM2MToken());
+    grpcMetadata.set("handle", currentUser.handle);
+    grpcMetadata.set("userId", currentUser.userId);
+    grpcMetadata.set("token", await getM2MToken());
 
-      if (updateInput.prizeSetUpdate != null) {
-        convertPrizeSetValuesToCents(updateInput.prizeSetUpdate.prizeSets);
-      }
-      await challengeDomain.update(
-        {
-          filterCriteria: getScanCriteria({ id: challengeId }),
-          updateInput,
-        },
-        grpcMetadata
+    const newPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(updateInput.prizeSets);
+    if (newPrizeType != null && existingPrizeType != null && newPrizeType !== existingPrizeType) {
+      throw new errors.BadRequestError(
+        `Cannot change prize type from ${existingPrizeType} to ${newPrizeType}`
       );
     }
-  } catch (e) {
-    throw e;
+    if (updateInput.prizeSetUpdate != null && newPrizeType === constants.prizeTypes.USD) {
+      convertPrizeSetValuesToCents(updateInput.prizeSetUpdate.prizeSets);
+    }
+    await challengeDomain.update(
+      {
+        filterCriteria: getScanCriteria({ id: challengeId }),
+        updateInput,
+      },
+      grpcMetadata
+    );
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
@@ -2416,7 +2432,11 @@ advancePhase.schema = {
 };
 
 async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
-  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
+  const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(updatedChallenge.prizeSets);
+
+  if (prizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
+  }
 
   if (track == null || type == null) {
     const trackAndTypeData = await challengeHelper.validateAndGetChallengeTypeAndTrack({
