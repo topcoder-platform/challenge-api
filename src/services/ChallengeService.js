@@ -1890,9 +1890,6 @@ async function updateChallenge(currentUser, challengeId, data) {
       grpcMetadata.set("userId", currentUser.userId);
       grpcMetadata.set("token", await getM2MToken());
 
-      if (updateInput.prizeSetUpdate != null) {
-        convertPrizeSetValuesToCents(updateInput.prizeSetUpdate.prizeSets);
-      }
       await challengeDomain.update(
         {
           filterCriteria: getScanCriteria({ id: challengeId }),

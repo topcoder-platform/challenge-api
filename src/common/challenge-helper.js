@@ -356,9 +356,12 @@ class ChallengeHelper {
     }
 
     if (data.prizeSets != null) {
+      ChallengeHelper.convertPSValuesToCents(data.prizeSets)
+      console.log('Converted prizeSets to cents', data.prizeSets)
       data.prizeSetUpdate = {
-        prizeSets: data.prizeSets,
+        prizeSets: [...data.prizeSets],
       };
+      console.log('prizeSetUpdate', data.prizeSetUpdate)
       delete data.prizeSets;
     }
 
@@ -465,17 +468,21 @@ class ChallengeHelper {
     }
   }
 
-  convertToISOString(startDate) {
-    return ChallengeHelper.convertDateToISOString(startDate);
-  }
-
-  convertPrizeSetValuesToCents(prizeSets) {
+  static convertPSValuesToCents(prizeSets){
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
         prize.amountInCents = new Decimal(prize.value).mul(100).toNumber();
         delete prize.value;
       });
     });
+  }
+
+  convertToISOString(startDate) {
+    return ChallengeHelper.convertDateToISOString(startDate);
+  }
+
+  convertPrizeSetValuesToCents(prizeSets) {
+    return ChallengeHelper.convertPSValuesToCents(prizeSets);
   }
 
   convertPrizeSetValuesToDollars(prizeSets, overview) {
