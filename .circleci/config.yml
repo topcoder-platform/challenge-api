@@ -90,7 +90,7 @@ workflows:
           branches:
             only:
             - dev
-            - PLAT-3491
+            - hotfix/budget-update
 
     - "build-qa":
         context: org-global

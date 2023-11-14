@@ -356,9 +356,12 @@ class ChallengeHelper {
     }
 
     if (data.prizeSets != null) {
+      this.convertPrizeSetValuesToCents(data.prizeSets)
+      console.log('Converted prizeSets to cents', data.prizeSets)
       data.prizeSetUpdate = {
-        prizeSets: data.prizeSets,
+        prizeSets: [...data.prizeSets],
       };
+      console.log('prizeSetUpdate', data.prizeSetUpdate)
       delete data.prizeSets;
     }
 
