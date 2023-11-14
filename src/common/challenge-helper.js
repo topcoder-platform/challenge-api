@@ -481,7 +481,7 @@ class ChallengeHelper {
     return ChallengeHelper.convertDateToISOString(startDate);
   }
 
-  static convertPrizeSetValuesToCents(prizeSets) {
+  convertPrizeSetValuesToCents(prizeSets) {
     return ChallengeHelper.convertPSValuesToCents(prizeSets);
   }
 
