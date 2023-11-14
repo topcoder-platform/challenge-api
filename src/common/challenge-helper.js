@@ -356,7 +356,7 @@ class ChallengeHelper {
     }
 
     if (data.prizeSets != null) {
-      ChallengeHelper.convertPSValuesToCent(data.prizeSets)
+      ChallengeHelper.convertPSValuesToCents(data.prizeSets)
       console.log('Converted prizeSets to cents', data.prizeSets)
       data.prizeSetUpdate = {
         prizeSets: [...data.prizeSets],
