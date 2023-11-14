@@ -250,35 +250,35 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@topcoder-framework/client-relational@^0.24.0":
-  version "0.24.0"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.24.0.tgz#07ee26b1a35f3a5c4c7d7f2ec7300efbc63cf311"
-  integrity sha512-H+sHV9pKDW6urMZLr//NLmC2XDX6obrEy1dynpmF2W1AgkMFDgWy9euevAjPNWqnZvScW08N3c8yPwQ43/akaw==
+"@topcoder-framework/client-relational@^0.24.1":
+  version "0.24.1"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/client-relational/-/client-relational-0.24.1.tgz#a01c4bb5a6117c38d5b61e1a79ded58abeb5b7c5"
+  integrity sha512-yZJS2N6l1YT/wadWRgMhMzrtFNfPgCBMVLUPO2ORHq182xXSIBkpXLRvX99z2XVPRGpjCVkfumh+jANQKX8AXw==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/lib-common" "^0.24.0"
-    topcoder-proto-registry "0.1.0"
+    "@topcoder-framework/lib-common" "^0.24.1"
+    topcoder-proto-registry "0.2.0"
     tslib "^2.4.1"
 
-"@topcoder-framework/domain-challenge@^0.24.0":
-  version "0.24.0"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.24.0.tgz#023e57b95cc5213650eebffb860939b61d9b8068"
-  integrity sha512-RDD7D8Mk8hFkONuGEAYk2E7SMhBWGWtH3CJHsRoANn+7HzkeiGe48WCZRCdNI+5ygFmm3oKltMOf9lB/PD8RMw==
+"@topcoder-framework/domain-challenge@^0.24.1":
+  version "0.24.1"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/domain-challenge/-/domain-challenge-0.24.1.tgz#912cb9c7903236345ee036574e2fe82fe810b659"
+  integrity sha512-Zp7YEqCMxBel+VHFsmg9C7ZoZwkq5xMB3V0e2OxRdd0QZwyzXHll66NsajPNpkkEAAaMmzMmZTbKxF6KTJ97GQ==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
-    "@topcoder-framework/client-relational" "^0.24.0"
-    "@topcoder-framework/lib-common" "^0.24.0"
-    topcoder-proto-registry "0.1.0"
+    "@topcoder-framework/client-relational" "^0.24.1"
+    "@topcoder-framework/lib-common" "^0.24.1"
+    topcoder-proto-registry "0.2.0"
     tslib "^2.4.1"
 
-"@topcoder-framework/lib-common@^0.24.0":
-  version "0.24.0"
-  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.24.0.tgz#a6baeeb3e1d3ad15cd0c010aaa7a62769a908a90"
-  integrity sha512-lKTqHYyVRdSs8JvXT9MYpxe4bY/ysIksCvj7OJUtntExkRjv7EPBysofjb7H4uNsofa2G5iOGycJtp+Qhaqb8Q==
+"@topcoder-framework/lib-common@^0.24.1":
+  version "0.24.1"
+  resolved "https://topcoder-409275337247.d.codeartifact.us-east-1.amazonaws.com/npm/topcoder-framework/@topcoder-framework/lib-common/-/lib-common-0.24.1.tgz#fc69af0f3deb263d347bfb8ac014065c5a7ceeec"
+  integrity sha512-Av/v5YybzyrJlhxANFxy+uJR938OWzd4vkcBZvAWmY4wX9D8UOiBA1nF2EMZ5+9xhY+PD3O/yuqnfqUs/4qT+g==
   dependencies:
     "@grpc/grpc-js" "^1.8.0"
     rimraf "^3.0.2"
-    topcoder-proto-registry "0.1.0"
+    topcoder-proto-registry "0.2.0"
     tslib "^2.4.1"
 
 "@types/body-parser@*":
@@ -4007,10 +4007,10 @@ topcoder-bus-api-wrapper@topcoder-platform/tc-bus-api-wrapper.git:
     superagent "^3.8.3"
     tc-core-library-js appirio-tech/tc-core-library-js.git#v2.6.4
 
-topcoder-proto-registry@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/topcoder-proto-registry/-/topcoder-proto-registry-0.1.0.tgz#7bdcb7df7c8bbf9d54beba1c69a6210d0f4ca097"
-  integrity sha512-2RYGdDfCaX02pNcJu7ofb26O0SPe4MA6yfvpzXx6DjiuGtZu5QSZHkeaxqAlzRc9/F5zfWmGJwin4TOppo2xrA==
+topcoder-proto-registry@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/topcoder-proto-registry/-/topcoder-proto-registry-0.2.0.tgz#703d636d2581b7b3903fe299f6c3d572c5f728c0"
+  integrity sha512-qmoAY0jb25A4S4bunUagj+wP++d1Db0iZqMc0SaMFjzW33dXjay7TpJDBbNZuVk4He7kUhYXrn2CDikbPM3TFw==
 
 topo@3.x.x:
   version "3.0.3"
