@@ -1909,9 +1909,7 @@ async function updateChallenge(currentUser, challengeId, data) {
         `Cannot change prize type from ${existingPrizeType} to ${newPrizeType}`
       );
     }
-    if (updateInput.prizeSetUpdate != null && newPrizeType === constants.prizeTypes.USD) {
-      convertPrizeSetValuesToCents(updateInput.prizeSetUpdate.prizeSets);
-    }
+
     await challengeDomain.update(
       {
         filterCriteria: getScanCriteria({ id: challengeId }),

@@ -375,8 +375,13 @@ class ChallengeHelper {
     }
 
     if (data.prizeSets != null) {
+      const type = data.prizeSets[0]?.prizes[0]?.type;
+      if (type === constants.prizeTypes.USD) {
+        ChallengeHelper.convertPSValuesToCents(data.prizeSets)
+      }
+      
       data.prizeSetUpdate = {
-        prizeSets: data.prizeSets,
+        prizeSets: [...data.prizeSets],
       };
       delete data.prizeSets;
     }
@@ -484,12 +489,7 @@ class ChallengeHelper {
     }
   }
 
-  convertToISOString(startDate) {
-    return ChallengeHelper.convertDateToISOString(startDate);
-  }
-
-  // TODO: Deprecate this method
-  convertPrizeSetValuesToCents(prizeSets) {
+  static convertPSValuesToCents(prizeSets){
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
         prize.amountInCents = new Decimal(prize.value).mul(100).toNumber();
@@ -498,7 +498,14 @@ class ChallengeHelper {
     });
   }
 
-  // TODO: Deprecate this method
+  convertToISOString(startDate) {
+    return ChallengeHelper.convertDateToISOString(startDate);
+  }
+
+  convertPrizeSetValuesToCents(prizeSets) {
+    return ChallengeHelper.convertPSValuesToCents(prizeSets);
+  }
+
   convertPrizeSetValuesToDollars(prizeSets, overview) {
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
