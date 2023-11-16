@@ -1156,10 +1156,10 @@ async function getStandSkills(ids) {
   }
   queryBatches.push(queryString);
 
-  const promises = [];
+  const skillDataPromises = [];
   const token = await m2mHelper.getM2MToken();
   for (const batch of queryBatches) {
-    promises.push(
+    skillDataPromises.push(
       (async () => {
         const res = await axios.get(
           `${config.API_BASE_URL}/v5/standardized-skills/skills?${batch}`,
@@ -1172,8 +1172,8 @@ async function getStandSkills(ids) {
     );
   }
 
-  const datas = await Promise.all(promises);
-  return _.concat(...datas);
+  const data = await Promise.all(skillDataPromises);
+  return _.concat(...data);
 }
 
 /**
