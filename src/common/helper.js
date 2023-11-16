@@ -1139,16 +1139,41 @@ async function getMembersByHandles(handles) {
  * @returns {Object}
  */
 async function getStandSkills(ids) {
+
+  const queryBatches = [];
+  const skillIdArg = "&skillId=";
+  let queryString = "disablePagination=true";
+
+  for (const id of ids) {
+    const enid = encodeURIComponent(id);
+    // When many skill ids, the query string will exceed 2048 limit
+    if (queryString.length + skillIdArg.length + enid.length < 2048) {
+      queryString += skillIdArg + enid;
+    } else {
+      queryBatches.push(queryString);
+      queryString = "disablePagination=true" + skillIdArg + enid;
+    }
+  }
+  queryBatches.push(queryString);
+
+  const skillDataPromises = [];
   const token = await m2mHelper.getM2MToken();
-  const res = await axios.get(`${config.API_BASE_URL}/v5/standardized-skills/skills`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: {
-      page: 1,
-      perPage: ids.length,
-      skillId: ids,
-    },
-  });
-  return res.data;
+  for (const batch of queryBatches) {
+    skillDataPromises.push(
+      (async () => {
+        const res = await axios.get(
+          `${config.API_BASE_URL}/v5/standardized-skills/skills?${batch}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        return res.data;
+      })()
+    );
+  }
+
+  const data = await Promise.all(skillDataPromises);
+  return _.concat(...data);
 }
 
 /**
