@@ -58,6 +58,7 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: "#/parameters/app-version"
         - $ref: "#/parameters/page"
         - $ref: "#/parameters/perPage"
         - name: id
@@ -472,6 +473,7 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: "#/parameters/app-version"
         - in: body
           name: body
           required: true
@@ -512,6 +514,7 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: "#/parameters/app-version"
         - name: challengeId
           in: path
           required: true
@@ -548,6 +551,7 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: "#/parameters/app-version"
         - name: challengeId
           in: path
           required: true
@@ -593,6 +597,7 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: "#/parameters/app-version"
         - name: challengeId
           in: path
           required: true
@@ -2398,6 +2403,19 @@ parameters:
     minimum: 1
     default: 100
     maximum: 100
+  app-version:
+    name: app-version
+    in: header
+    description: >
+      The app version:
+
+      - 1.1.0: With 1.1.0 or later version, challenge-api supports create/update challenge with "skills" data in request payload,
+      and with "skills" data in response body when get/search/create/update challenges.
+
+      - 2.0.0: With 2.0.0 or later version, challenge-api supports "payments" data in response body when get/search/create/update challenges for admin/m2m user.
+    required: false
+    type: string
+    default: 1.0.0
 definitions:
   Challenge:
     type: object
@@ -2643,6 +2661,39 @@ definitions:
         type: string
         description: Auto-generated
         example: Development
+      payments:
+        type: array
+        description: The payments of the challenge, only applicable when "app-version" header >= 2.0.0 for admin/m2m user
+        items:
+          type: object
+          properties:
+            handle:
+              type: string
+            type:
+              type: string
+            amount:
+              type: number
+            userId:
+              type: number
+      skills:
+        type: array
+        description: The skills of the challenge, only applicable when "app-version" header >= 1.1.0
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: UUID
+            name:
+              type: string
+            category:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: UUID
+                name:
+                  type: string
     required:
       - typeId
       - trackId
@@ -2792,6 +2843,17 @@ definitions:
           required:
             - id
             - roleId
+      skills:
+        type: array
+        description: The ids of the skills to add for the challenge, only applicable when "app-version" header >= 1.1.0
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: UUID
+          required:
+            - id
     required:
       - typeId
       - trackId
@@ -2975,6 +3037,17 @@ definitions:
           required:
             - id
             - roleId
+      skills:
+        type: array
+        description: The ids of the skills to add for the challenge, only applicable when "app-version" header >= 1.1.0
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: UUID
+          required:
+            - id
     required:
       - typeId
       - trackId
@@ -3159,6 +3232,17 @@ definitions:
           required:
             - id
             - roleId
+      skills:
+        type: array
+        description: The ids of the skills to add for the challenge, only applicable when "app-version" header >= 1.1.0
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: UUID
+          required:
+            - id
   SearchChallengeRequestBody:
     type: object
     properties:
