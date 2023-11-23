@@ -36,13 +36,13 @@ function getSRMScheduleQuery(filter) {
     _.map(filter.statuses, (s) => `'${_.toUpper(s)}'`),
     ","
   );
-  const registrationTimeFilter = `reg.start_time >= ${moment(
+  const registrationTimeFilter = `reg.start_time >= '${moment(
     filter.registrationStartTimeAfter
-  ).format("yyyy-MM-DD HH:mm:ss")}${
+  ).format("yyyy-MM-DD HH:mm:ss")}'${
     filter.registrationStartTimeBefore
-      ? ` AND reg.start_time <= ${moment(filter.registrationStartTimeBefore).format(
+      ? ` AND reg.start_time <= '${moment(filter.registrationStartTimeBefore).format(
           "yyyy-MM-DD HH:mm:ss"
-        )}`
+        )}'`
       : ""
   }`;
 
