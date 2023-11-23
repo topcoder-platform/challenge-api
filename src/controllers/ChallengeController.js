@@ -126,6 +126,16 @@ async function advancePhase(req, res) {
   res.send(await service.advancePhase(req, req.authUser, req.params.challengeId, req.body));
 }
 
+/**
+ * Get SRM Schedule
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function getSRMSchedule(req, res) {
+  const result = await service.getSRMSchedule(req, req.query);
+  res.send(result);
+}
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -135,4 +145,5 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
+  getSRMSchedule,
 };

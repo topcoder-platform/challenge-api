@@ -91,6 +91,7 @@ workflows:
             only:
             - dev
             - hotfix/budget-update
+            - CORE-140
 
     - "build-qa":
         context: org-global
