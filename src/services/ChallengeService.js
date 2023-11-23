@@ -2489,6 +2489,7 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
+  getSRMSchedule,
 };
 
 logger.buildService(module.exports);
