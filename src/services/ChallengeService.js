@@ -68,7 +68,7 @@ const challengeDomain = new ChallengeDomain(
   }
 );
 
-const aclQueryDomain = new QueryDomain(GRPC_ACL_SERVER_HOST, GRPC_ACL_SERVER_PORT);
+const aclQueryDomain = new QueryDomain(config.GRPC_ACL_SERVER_HOST, config.GRPC_ACL_SERVER_PORT);
 
 const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
