@@ -163,7 +163,9 @@ function getPracticeProblemsQuery(criteria) {
     );
   }
 
-  const query = `SELECT
+  const queryCount = `SELECT count(*) AS count`;
+
+  const querySelect = `SELECT
   SKIP ${offset}
   FIRST ${criteria.perPage}
     p.problem_id AS problemId
@@ -182,8 +184,9 @@ function getPracticeProblemsQuery(criteria) {
          WHEN pcs.status_id = 150 THEN 'Solved'::nvarchar(50)
          WHEN pcs.status_id >= 120 AND pcs.status_id != 150 THEN 'Viewed'::nvarchar(50)
       END AS status
-  , NVL(pcs.points, 0) AS myPoints
-  FROM informixoltp:problem p
+  , NVL(pcs.points, 0) AS myPoints`;
+
+  const queryFrom = `FROM informixoltp:problem p
   INNER JOIN informixoltp:problem_type_lu ptl ON ptl.problem_type_id = p.problem_type_id
   INNER JOIN informixoltp:component c ON c.problem_id = p.problem_id
   INNER JOIN informixoltp:round_component rc ON rc.component_id = c.component_id
@@ -193,9 +196,11 @@ function getPracticeProblemsQuery(criteria) {
     criteria.userId
   }
   WHERE ${_.join(filters, " AND ")}
-  ORDER BY ${sortBy} ${criteria.sortOrder}
-  `;
-  return query;
+  ORDER BY ${sortBy} ${criteria.sortOrder}`;
+
+  const query = `${querySelect} ${queryFrom}`;
+  const countQuery = `${queryCount} ${queryFrom}`;
+  return { query, countQuery };
 }
 
 function convertSRMScheduleQueryOutput(queryOutput) {

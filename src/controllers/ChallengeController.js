@@ -143,7 +143,8 @@ async function getSRMSchedule(req, res) {
  */
 async function getPracticeProblems(req, res) {
   const result = await service.getPracticeProblems(req, req.authUser, req.query);
-  res.send(result);
+  helper.setResHeaders(req, res, result);
+  res.send(result.result);
 }
 
 module.exports = {

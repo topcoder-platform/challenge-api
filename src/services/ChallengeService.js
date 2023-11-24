@@ -2491,9 +2491,12 @@ getSRMSchedule.schema = {
  */
 async function getPracticeProblems(currentUser, criteria = {}) {
   criteria.userId = currentUser.userId;
-  const sql = getPracticeProblemsQuery(criteria);
-  const result = await aclQueryDomain.rawQuery({ sql });
-  return convertPracticeProblemsQueryOutput(result);
+  const { query, countQuery } = getPracticeProblemsQuery(criteria);
+  const resultOutput = await aclQueryDomain.rawQuery({ sql: query });
+  const countOutput = await aclQueryDomain.rawQuery({ sql: countQuery });
+  const result = convertPracticeProblemsQueryOutput(resultQueryOutput);
+  const total = countOutput.rows[0].fields[0].value;
+  return { total, page: criteria.page, perPage: criteria.perPage, result };
 }
 
 getPracticeProblems.schema = {
