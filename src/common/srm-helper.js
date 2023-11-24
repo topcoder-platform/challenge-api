@@ -192,13 +192,13 @@ function getPracticeProblemsQuery(criteria) {
   INNER JOIN informixoltp:round_component rc ON rc.component_id = c.component_id
   INNER JOIN informixoltp:round r ON r.round_id = rc.round_id AND r.status = 'A' AND r.round_type_id = 3
   INNER JOIN informixoltp:room ro ON ro.round_id = rc.round_id AND ro.room_type_id = 3
-  LEFT  JOIN informixoltp:component_state pcs ON pcs.round_id = rc.round_id AND pcs.component_id = c.component_id AND pcs.coder_id = ${
-    criteria.userId
-  }
-  WHERE ${_.join(filters, " AND ")}
-  ORDER BY ${sortBy} ${criteria.sortOrder}`;
+  LEFT  JOIN informixoltp:component_state pcs ON pcs.round_id = rc.round_id AND pcs.component_id = c.component_id AND pcs.coder_id = ${criteria.userId}`;
 
-  const query = `${querySelect} ${queryFrom}`;
+  const queryWhere = filters.length ? `WHERE ${_.join(filters, " AND ")}` : "";
+
+  const queryOrder = `ORDER BY ${sortBy} ${criteria.sortOrder}`;
+
+  const query = `${querySelect} ${queryFrom} ${queryWhere} ${queryOrder}`;
   const countQuery = `${queryCount} ${queryFrom}`;
   return { query, countQuery };
 }
