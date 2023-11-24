@@ -40,6 +40,12 @@ module.exports = {
       method: "createRequest",
     },
   },
+  "/challenges/srms/schedule": {
+    get: {
+      controller: "ChallengeController",
+      method: "getSRMSchedule",
+    },
+  },
   "/challenges/health": {
     get: {
       controller: "HealthController",

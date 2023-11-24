@@ -33,6 +33,7 @@ const esClient = helper.getESClient();
 
 const PhaseAdvancer = require("../phase-management/PhaseAdvancer");
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
+const { QueryDomain } = require("@topcoder-framework/domain-acl");
 
 const { hasAdminRole } = require("../common/role-helper");
 const {
@@ -44,6 +45,7 @@ const {
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 const { getM2MToken } = require("../common/m2m-helper");
+const { getSRMScheduleQuery, convertSRMScheduleQueryOutput } = require("../common/srm-helper");
 
 const challengeDomain = new ChallengeDomain(
   GRPC_CHALLENGE_SERVER_HOST,
@@ -65,6 +67,9 @@ const challengeDomain = new ChallengeDomain(
     }),
   }
 );
+
+const aclQueryDomain = new QueryDomain(config.GRPC_ACL_SERVER_HOST, config.GRPC_ACL_SERVER_PORT);
+
 const phaseAdvancer = new PhaseAdvancer(challengeDomain);
 
 /**
@@ -2475,6 +2480,27 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
   });
 }
 
+/**
+ * Get SRM Schedule
+ * @param {Object} criteria the criteria
+ */
+async function getSRMSchedule(criteria = {}) {
+  if (!criteria.statuses) {
+    criteria.statuses = ["A", "F", "P"];
+  }
+  const sql = getSRMScheduleQuery(criteria);
+  const result = await aclQueryDomain.rawQuery({ sql });
+  return convertSRMScheduleQueryOutput(result);
+}
+
+getSRMSchedule.schema = {
+  criteria: Joi.object().keys({
+    registrationStartTimeAfter: Joi.date().default(new Date()),
+    registrationStartTimeBefore: Joi.date(),
+    statuses: Joi.array().items(Joi.string().valid(["A", "F", "P"])),
+  }),
+};
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -2484,6 +2510,7 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
+  getSRMSchedule,
 };
 
 logger.buildService(module.exports);
