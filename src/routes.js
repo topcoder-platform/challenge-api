@@ -46,6 +46,13 @@ module.exports = {
       method: "getSRMSchedule",
     },
   },
+  "/challenges/srms/practice/problems": {
+    get: {
+      controller: "ChallengeController",
+      method: "getPracticeProblems",
+      auth: "jwt",
+    },
+  },
   "/challenges/health": {
     get: {
       controller: "HealthController",

@@ -136,6 +136,16 @@ async function getSRMSchedule(req, res) {
   res.send(result);
 }
 
+/**
+ * Get Practice Problems
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function getPracticeProblems(req, res) {
+  const result = await service.getPracticeProblems(req, req.authUser, req.query);
+  res.send(result);
+}
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -146,4 +156,5 @@ module.exports = {
   sendNotifications,
   advancePhase,
   getSRMSchedule,
+  getPracticeProblems,
 };
