@@ -1627,15 +1627,6 @@ async function updateChallenge(currentUser, challengeId, data) {
   let isChallengeBeingCancelled = false;
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (
-        !_.get(challenge, "legacy.pureV5Task") &&
-        !_.get(challenge, "legacy.pureV5") &&
-        _.isUndefined(_.get(challenge, "legacyId"))
-      ) {
-        throw new errors.BadRequestError(
-          "You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support."
-        );
-      }
       // if activating a challenge, the challenge must have a billing account id
       if (
         (!billingAccountId || billingAccountId === null) &&
