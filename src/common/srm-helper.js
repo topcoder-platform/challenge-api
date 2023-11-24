@@ -56,11 +56,11 @@ const PracticeProblemsKeyMappings = _.reduce(
 function getSRMScheduleQuery(filter) {
   const offset = (filter.page - 1) * filter.perPage;
   let sortBy = filter.sortBy;
-  if (criteria.sortBy === "registrationStartTime") {
+  if (filter.sortBy === "registrationStartTime") {
     sortBy = "reg.start_time";
-  } else if (criteria.sortBy === "codingStartTime") {
+  } else if (filter.sortBy === "codingStartTime") {
     sortBy = "coding.start_time";
-  } else if (criteria.sortBy === "challengeStartTime") {
+  } else if (filter.sortBy === "challengeStartTime") {
     sortBy = "challenge.start_time";
   }
   const statuses = _.join(
@@ -143,7 +143,7 @@ function getPracticeProblemsQuery(criteria) {
   } else if (criteria.sortBy === "status") {
     sortBy = "pcs.status_id";
   } else if (criteria.sortBy === "myPoints") {
-    sortBy = "pcs.point";
+    sortBy = "NVL(pcs.points, 0)";
   }
   const filters = [];
   if (criteria.difficulty) {
@@ -212,7 +212,7 @@ function getPracticeProblemsQuery(criteria) {
   const queryOrder = `ORDER BY ${sortBy} ${criteria.sortOrder}`;
 
   const query = `${querySelect} ${queryFrom} ${queryWhere} ${queryOrder}`;
-  const countQuery = `${queryCount} ${queryFrom}`;
+  const countQuery = `${queryCount} ${queryFrom} ${queryWhere}`;
   return { query, countQuery };
 }
 
