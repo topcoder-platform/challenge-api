@@ -45,7 +45,12 @@ const {
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
 const { getM2MToken } = require("../common/m2m-helper");
-const { getSRMScheduleQuery, convertSRMScheduleQueryOutput } = require("../common/srm-helper");
+const {
+  getSRMScheduleQuery,
+  getPracticeProblemsQuery,
+  convertSRMScheduleQueryOutput,
+  convertPracticeProblemsQueryOutput,
+} = require("../common/srm-helper");
 
 const challengeDomain = new ChallengeDomain(
   GRPC_CHALLENGE_SERVER_HOST,
@@ -2476,9 +2481,6 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
  * @param {Object} criteria the criteria
  */
 async function getSRMSchedule(criteria = {}) {
-  if (!criteria.statuses) {
-    criteria.statuses = ["A", "F", "P"];
-  }
   const sql = getSRMScheduleQuery(criteria);
   const result = await aclQueryDomain.rawQuery({ sql });
   return convertSRMScheduleQueryOutput(result);
@@ -2488,7 +2490,47 @@ getSRMSchedule.schema = {
   criteria: Joi.object().keys({
     registrationStartTimeAfter: Joi.date().default(new Date()),
     registrationStartTimeBefore: Joi.date(),
-    statuses: Joi.array().items(Joi.string().valid(["A", "F", "P"])),
+    statuses: Joi.array()
+      .items(Joi.string().valid(["A", "F", "P"]))
+      .default(["A", "F", "P"]),
+    sortBy: Joi.string()
+      .valid(["registrationStartTime", "codingStartTime", "challengeStartTime"])
+      .default("registrationStartTime"),
+    sortOrder: Joi.string().valid(["asc", "desc"]).default("asc"),
+    page: Joi.page(),
+    perPage: Joi.perPage(),
+  }),
+};
+
+/**
+ * Get SRM Schedule
+ * @param {Object} currentUser the user who perform operation
+ * @param {Object} criteria the criteria
+ */
+async function getPracticeProblems(currentUser, criteria = {}) {
+  criteria.userId = currentUser.userId;
+  const { query, countQuery } = getPracticeProblemsQuery(criteria);
+  const resultOutput = await aclQueryDomain.rawQuery({ sql: query });
+  const countOutput = await aclQueryDomain.rawQuery({ sql: countQuery });
+  const result = convertPracticeProblemsQueryOutput(resultOutput);
+  const total = countOutput.rows[0].fields[0].value;
+  return { total, page: criteria.page, perPage: criteria.perPage, result };
+}
+
+getPracticeProblems.schema = {
+  currentUser: Joi.any(),
+  criteria: Joi.object().keys({
+    sortBy: Joi.string()
+      .valid(["problemName", "problemType", "points", "difficulty", "status", "myPoints"])
+      .default("problemId"),
+    sortOrder: Joi.string().valid(["asc", "desc"]).default("desc"),
+    page: Joi.page(),
+    perPage: Joi.perPage(),
+    difficulty: Joi.string().valid(["easy", "medium", "hard"]),
+    status: Joi.string().valid(["new", "viewed", "solved"]),
+    pointsLowerBound: Joi.number().integer(),
+    pointsUpperBound: Joi.number().integer(),
+    problemName: Joi.string(),
   }),
 };
 
@@ -2502,6 +2544,7 @@ module.exports = {
   sendNotifications,
   advancePhase,
   getSRMSchedule,
+  getPracticeProblems,
 };
 
 logger.buildService(module.exports);

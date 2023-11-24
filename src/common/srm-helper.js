@@ -24,14 +24,45 @@ const SRMScheduleKeyMappings = _.reduce(
   {}
 );
 
+const PracticeProblemsKeyMappings = _.reduce(
+  [
+    "problemId",
+    "componentId",
+    "roomId",
+    "roundId",
+    "divisionId",
+    "problemName",
+    "problemType",
+    "difficulty",
+    "status",
+    "points",
+    "myPoints",
+  ],
+  (acc, field) => ({ ...acc, [_.toLower(field)]: field }),
+  {}
+);
+
 /**
  * Get schedule query
  * @param {Object} filter the query filter
  * @param {Array<String>} filter.statuses the statues
  * @param {Date} filter.registrationStartTimeAfter the start of the registration time
- * @param {Date} filter.registrationStartTimeBefore the end of the registration time
+ * @param {Date=} filter.registrationStartTimeBefore the end of the registration time
+ * @param {String} filter.sortBy the sort field
+ * @param {String} filter.sortOrder the sort order
+ * @param {Number} filter.page the sort order
+ * @param {Number} filter.perPage the sort order
  */
 function getSRMScheduleQuery(filter) {
+  const offset = (filter.page - 1) * filter.perPage;
+  let sortBy = filter.sortBy;
+  if (filter.sortBy === "registrationStartTime") {
+    sortBy = "reg.start_time";
+  } else if (filter.sortBy === "codingStartTime") {
+    sortBy = "coding.start_time";
+  } else if (filter.sortBy === "challengeStartTime") {
+    sortBy = "challenge.start_time";
+  }
   const statuses = _.join(
     _.map(filter.statuses, (s) => `'${_.toUpper(s)}'`),
     ","
@@ -46,8 +77,9 @@ function getSRMScheduleQuery(filter) {
       : ""
   }`;
 
-  const query = `SELECT 
-  FIRST 50
+  const query = `SELECT
+  SKIP ${offset}
+  FIRST ${filter.perPage}
   r.round_id AS roundId
   , r.name AS name
   , r.short_name AS shortName
@@ -77,13 +109,119 @@ function getSRMScheduleQuery(filter) {
   r.round_type_id in (1,2,10) AND
   UPPER(r.status) in (${statuses}) AND 
   ${registrationTimeFilter}
-  ORDER BY 
-  reg.start_time DESC`;
+  ORDER BY ${sortBy} ${filter.sortOrder}`;
   return query;
+}
+
+/**
+ * Get schedule query
+ * @param {Object} criteria the query criteria
+ * @param {String} criteria.userId the user id
+ * @param {String} criteria.sortBy the sort field
+ * @param {String} criteria.sortOrder the sort order
+ * @param {Number} criteria.page the sort order
+ * @param {Number} criteria.perPage the sort order
+ * @param {String=} criteria.difficulty the sort order
+ * @param {String=} criteria.status the sort order
+ * @param {Number=} criteria.pointsLowerBound the sort order
+ * @param {Number=} criteria.pointsUpperBound the statues
+ * @param {String=} criteria.problemName the start of the registration time
+ */
+function getPracticeProblemsQuery(criteria) {
+  const offset = (criteria.page - 1) * criteria.perPage;
+  let sortBy = criteria.sortBy;
+  if (criteria.sortBy === "problemId") {
+    sortBy = "p.problem_id";
+  } else if (criteria.sortBy === "problemName") {
+    sortBy = "p.name";
+  } else if (criteria.sortBy === "problemType") {
+    sortBy = "ptl.problem_type_desc";
+  } else if (criteria.sortBy === "points") {
+    sortBy = "rc.points";
+  } else if (criteria.sortBy === "difficulty") {
+    sortBy = "p.proposed_difficulty_id";
+  } else if (criteria.sortBy === "status") {
+    sortBy = "pcs.status_id";
+  } else if (criteria.sortBy === "myPoints") {
+    sortBy = "NVL(pcs.points, 0)";
+  }
+  const filters = [];
+  if (criteria.difficulty) {
+    if (criteria.difficulty === "easy") {
+      filters.push(`p.proposed_difficulty_id=1`);
+    } else if (criteria.difficulty === "medium") {
+      filters.push(`p.proposed_difficulty_id=2`);
+    } else if (criteria.difficulty === "hard") {
+      filters.push(`p.proposed_difficulty_id=3`);
+    }
+  }
+  if (criteria.status) {
+    if (criteria.status === "new") {
+      filters.push("NVL(pcs.status_id, 0) < 120");
+    } else if (criteria.status === "viewed") {
+      filters.push("pcs.status_id >= 120 AND pcs.status_id != 150");
+    } else if (criteria.status === "solved") {
+      filters.push("pcs.status_id = 150");
+    }
+  }
+  if (criteria.pointsLowerBound) {
+    filters.push(`rc.points >= ${criteria.pointsLowerBound}`);
+  }
+  if (criteria.pointsUpperBound) {
+    filters.push(`rc.points <= ${criteria.pointsUpperBound}`);
+  }
+  if (criteria.problemName) {
+    filters.push(
+      `lower(p.name) like '%${_.toLower(_.replace(criteria.problemName, /[^a-z0-9]/gi, ""))}%'`
+    );
+  }
+
+  const queryCount = `SELECT count(*) AS count`;
+
+  const querySelect = `SELECT
+  SKIP ${offset}
+  FIRST ${criteria.perPage}
+    p.problem_id AS problemId
+  , c.component_id AS componentId
+  , ro.room_id AS roomId
+  , rc.round_id AS roundId
+  , rc.division_id AS divisionId
+  , p.name AS problemName
+  , ptl.problem_type_desc AS problemType
+  , CASE WHEN (p.problem_type_id = 1 AND p.proposed_difficulty_id = 1) THEN 'Easy'::nvarchar(50)
+         WHEN (p.problem_type_id = 1 AND p.proposed_difficulty_id = 2) THEN 'Medium'::nvarchar(50)
+         WHEN (p.problem_type_id = 1 AND p.proposed_difficulty_id = 3) THEN 'Hard'::nvarchar(50)
+      END AS difficulty
+  , rc.points AS points
+  , CASE WHEN NVL(pcs.status_id, 0) < 120 THEN 'New'::nvarchar(50)
+         WHEN pcs.status_id = 150 THEN 'Solved'::nvarchar(50)
+         WHEN pcs.status_id >= 120 AND pcs.status_id != 150 THEN 'Viewed'::nvarchar(50)
+      END AS status
+  , NVL(pcs.points, 0) AS myPoints`;
+
+  const queryFrom = `FROM informixoltp:problem p
+  INNER JOIN informixoltp:problem_type_lu ptl ON ptl.problem_type_id = p.problem_type_id
+  INNER JOIN informixoltp:component c ON c.problem_id = p.problem_id
+  INNER JOIN informixoltp:round_component rc ON rc.component_id = c.component_id
+  INNER JOIN informixoltp:round r ON r.round_id = rc.round_id AND r.status = 'A' AND r.round_type_id = 3
+  INNER JOIN informixoltp:room ro ON ro.round_id = rc.round_id AND ro.room_type_id = 3
+  LEFT  JOIN informixoltp:component_state pcs ON pcs.round_id = rc.round_id AND pcs.component_id = c.component_id AND pcs.coder_id = ${criteria.userId}`;
+
+  const queryWhere = filters.length ? `WHERE ${_.join(filters, " AND ")}` : "";
+
+  const queryOrder = `ORDER BY ${sortBy} ${criteria.sortOrder}`;
+
+  const query = `${querySelect} ${queryFrom} ${queryWhere} ${queryOrder}`;
+  const countQuery = `${queryCount} ${queryFrom} ${queryWhere}`;
+  return { query, countQuery };
 }
 
 function convertSRMScheduleQueryOutput(queryOutput) {
   return transformDatabaseResponse(queryOutput, SRMScheduleKeyMappings);
+}
+
+function convertPracticeProblemsQueryOutput(queryOutput) {
+  return transformDatabaseResponse(queryOutput, PracticeProblemsKeyMappings);
 }
 
 function transformDatabaseResponse(databaseResponse, keyMappings) {
@@ -108,4 +246,6 @@ function transformDatabaseResponse(databaseResponse, keyMappings) {
 module.exports = {
   getSRMScheduleQuery,
   convertSRMScheduleQueryOutput,
+  getPracticeProblemsQuery,
+  convertPracticeProblemsQueryOutput,
 };
