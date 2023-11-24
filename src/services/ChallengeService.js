@@ -2481,6 +2481,12 @@ getSRMSchedule.schema = {
     statuses: Joi.array()
       .items(Joi.string().valid(["A", "F", "P"]))
       .default(["A", "F", "P"]),
+    sortBy: Joi.string()
+      .valid(["registrationStartTime", "codingStartTime", "challengeStartTime"])
+      .default("registrationStartTime"),
+    sortOrder: Joi.string().valid(["asc", "desc"]).default("asc"),
+    page: Joi.page(),
+    perPage: Joi.perPage(),
   }),
 };
 
@@ -2494,7 +2500,7 @@ async function getPracticeProblems(currentUser, criteria = {}) {
   const { query, countQuery } = getPracticeProblemsQuery(criteria);
   const resultOutput = await aclQueryDomain.rawQuery({ sql: query });
   const countOutput = await aclQueryDomain.rawQuery({ sql: countQuery });
-  const result = convertPracticeProblemsQueryOutput(resultQueryOutput);
+  const result = convertPracticeProblemsQueryOutput(resultOutput);
   const total = countOutput.rows[0].fields[0].value;
   return { total, page: criteria.page, perPage: criteria.perPage, result };
 }

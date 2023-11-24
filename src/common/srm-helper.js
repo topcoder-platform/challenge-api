@@ -48,8 +48,21 @@ const PracticeProblemsKeyMappings = _.reduce(
  * @param {Array<String>} filter.statuses the statues
  * @param {Date} filter.registrationStartTimeAfter the start of the registration time
  * @param {Date=} filter.registrationStartTimeBefore the end of the registration time
+ * @param {String} filter.sortBy the sort field
+ * @param {String} filter.sortOrder the sort order
+ * @param {Number} filter.page the sort order
+ * @param {Number} filter.perPage the sort order
  */
 function getSRMScheduleQuery(filter) {
+  const offset = (filter.page - 1) * filter.perPage;
+  let sortBy = filter.sortBy;
+  if (criteria.sortBy === "registrationStartTime") {
+    sortBy = "reg.start_time";
+  } else if (criteria.sortBy === "codingStartTime") {
+    sortBy = "coding.start_time";
+  } else if (criteria.sortBy === "challengeStartTime") {
+    sortBy = "challenge.start_time";
+  }
   const statuses = _.join(
     _.map(filter.statuses, (s) => `'${_.toUpper(s)}'`),
     ","
@@ -64,8 +77,9 @@ function getSRMScheduleQuery(filter) {
       : ""
   }`;
 
-  const query = `SELECT 
-  FIRST 50
+  const query = `SELECT
+  SKIP ${offset}
+  FIRST ${filter.perPage}
   r.round_id AS roundId
   , r.name AS name
   , r.short_name AS shortName
@@ -95,8 +109,7 @@ function getSRMScheduleQuery(filter) {
   r.round_type_id in (1,2,10) AND
   UPPER(r.status) in (${statuses}) AND 
   ${registrationTimeFilter}
-  ORDER BY 
-  reg.start_time DESC`;
+  ORDER BY ${sortBy} ${filter.sortOrder}`;
   return query;
 }
 
