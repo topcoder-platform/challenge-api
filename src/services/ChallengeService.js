@@ -132,6 +132,7 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
  */
 async function searchChallenges(currentUser, criteria) {
   // construct ES query
+  console.log("Serach Challenges Query", JSON.stringify(criteria));
 
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 20;
@@ -339,12 +340,6 @@ async function searchChallenges(currentUser, criteria) {
       prizeRangeQuery.lte = criteria.totalPrizesTo;
     }
     boolQuery.push({ range: { "overview.totalPrizes": prizeRangeQuery } });
-  }
-
-  if (criteria.useSchedulingAPI) {
-    boolQuery.push({
-      match_phrase: { "legacy.useSchedulingAPI": criteria.useSchedulingAPI },
-    });
   }
   if (criteria.selfService) {
     boolQuery.push({
