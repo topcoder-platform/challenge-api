@@ -1,5 +1,32 @@
 {
   "openRules": {
+    "Open": [
+      {
+        "name": "Open Registration & Submission",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isPastScheduledStartTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isOpen",
+              "operator": "notEqual",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canOpen"
+        }
+      }
+    ],
     "Registration": [
       {
         "name": "Registration Open",
@@ -184,6 +211,33 @@
     ]
   },
   "closeRules": {
+    "Open": [
+      {
+        "name": "Close Registration & Submission",
+        "conditions": {
+          "all": [
+            {
+              "fact": "isOpen",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isPastScheduledEndTime",
+              "operator": "equal",
+              "value": true
+            },
+            {
+              "fact": "isClosed",
+              "operator": "notEqual",
+              "value": true
+            }
+          ]
+        },
+        "event": {
+          "type": "canClose"
+        }
+      }
+    ],
     "Registration": [
       {
         "name": "Registration Close",
