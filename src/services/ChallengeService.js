@@ -132,7 +132,6 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
  */
 async function searchChallenges(currentUser, criteria) {
   // construct ES query
-  console.log("Serach Challenges Query", JSON.stringify(criteria));
 
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 20;
@@ -374,9 +373,21 @@ async function searchChallenges(currentUser, criteria) {
     });
   }
   if (criteria.currentPhaseName) {
-    boolQuery.push({
-      match_phrase: { currentPhaseNames: criteria.currentPhaseName },
-    });
+    if (criteria.currentPhaseName === "Registration") {
+      boolQuery.push({
+        bool: {
+          should: [
+            { match_phrase: { currentPhaseNames: "Registration" } },
+            { match_phrase: { currentPhaseNames: "Open" } },
+          ],
+          minimum_should_match: 1,
+        },
+      });
+    } else {
+      boolQuery.push({
+        match_phrase: { currentPhaseNames: criteria.currentPhaseName },
+      });
+    }
   }
   if (criteria.createdDateStart) {
     boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } });
