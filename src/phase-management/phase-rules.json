@@ -102,11 +102,6 @@
               "value": true
             },
             {
-              "fact": "submissionCount",
-              "operator": "greaterThanInclusive",
-              "value": 1
-            },
-            {
               "fact": "isPredecessorPhaseClosed",
               "operator": "equal",
               "value": true
