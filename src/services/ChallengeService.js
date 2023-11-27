@@ -1113,7 +1113,14 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
+
+  try {
+    await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
+  } catch (err) {
+    console.error(
+      `Failed to post bus event ${constants.Topics.ChallengeCreated}: ${JSON.stringify(err)}`
+    );
+  }
 
   return ret;
 }
