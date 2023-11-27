@@ -1113,14 +1113,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   // post bus event
-
-  try {
-    await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
-  } catch (err) {
-    console.error(
-      `Failed to post bus event ${constants.Topics.ChallengeCreated}: ${JSON.stringify(err)}`
-    );
-  }
+  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
 
   return ret;
 }
@@ -1817,6 +1810,11 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
     await validateWinners(data.winners, challengeResources);
+    if (_.get(challenge, "legacy.pureV5Task", false)) {
+      _.each(data.winners, (w) => {
+        w.type = constants.prizeSetTypes.ChallengePrizes;
+      });
+    }
   }
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
@@ -2140,9 +2138,7 @@ updateChallenge.schema = {
               userId: Joi.number().integer().positive().required(),
               handle: Joi.string().required(),
               placement: Joi.number().integer().positive().required(),
-              type: Joi.string()
-                .valid(_.values(constants.prizeSetTypes))
-                .default(constants.prizeSetTypes.ChallengePrizes),
+              type: Joi.string().valid(_.values(constants.prizeSetTypes)),
             })
             .unknown(true)
         )
