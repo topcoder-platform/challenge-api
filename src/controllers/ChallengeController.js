@@ -126,6 +126,27 @@ async function advancePhase(req, res) {
   res.send(await service.advancePhase(req, req.authUser, req.params.challengeId, req.body));
 }
 
+/**
+ * Get SRM Schedule
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function getSRMSchedule(req, res) {
+  const result = await service.getSRMSchedule(req, req.query);
+  res.send(result);
+}
+
+/**
+ * Get Practice Problems
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+async function getPracticeProblems(req, res) {
+  const result = await service.getPracticeProblems(req, req.authUser, req.query);
+  helper.setResHeaders(req, res, result);
+  res.send(result.result);
+}
+
 module.exports = {
   searchChallenges,
   createChallenge,
@@ -135,4 +156,6 @@ module.exports = {
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
+  getSRMSchedule,
+  getPracticeProblems,
 };
