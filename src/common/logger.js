@@ -35,7 +35,7 @@ logger.logFullError = (err, signature) => {
       `${err.name} details: ${JSON.stringify(err.details)} input:${JSON.stringify(err._object)}`
     );
   } else if (err.isAxiosError) {
-    logger.error(`${err.message} - ${err.response.data}`);
+    logger.error(`${err.message} - ${JSON.stringify(err.response.data)}`);
   } else if (err.httpStatus) {
     logger.error(err.message);
   } else if (!_.isUndefined(err.code) && err.details && err.metadata) {

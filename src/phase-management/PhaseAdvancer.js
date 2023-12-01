@@ -290,7 +290,7 @@ class PhaseAdvancer {
 
   async #areAllSubmissionsReviewed(challengeId) {
     console.log(`Getting review count for challenge ${challengeId}`);
-    return Promise.resolve(false);
+    return Promise.resolve(true);
   }
 
   async #areAllAppealsResolved(challengeId) {

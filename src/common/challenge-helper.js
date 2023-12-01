@@ -99,6 +99,23 @@ class ChallengeHelper {
     await Promise.all(promises);
   }
 
+  validatePrizeSetsAndGetPrizeType(prizeSets) {
+    if (_.isEmpty(prizeSets)) return null;
+
+    const firstType = _.get(prizeSets, "[0].prizes[0].type", null);
+    if (!firstType) return null;
+
+    const isConsistent = _.every(prizeSets, (prizeSet) =>
+      _.every(prizeSet.prizes, (prize) => prize.type === firstType)
+    );
+
+    if (!isConsistent) {
+      throw new errors.BadRequestError("All prizes must be of the same type");
+    }
+
+    return firstType;
+  }
+
   /**
    * Validate Challenge skills.
    * @param {Object} challenge the challenge
@@ -114,7 +131,9 @@ class ChallengeHelper {
     if (oldChallenge && oldChallenge.status === constants.challengeStatuses.Completed) {
       // Don't allow edit skills for Completed challenges
       if (!_.isEqual(ids, _.uniq(_.map(oldChallenge.skills, "id")))) {
-        throw new errors.BadRequestError("Cannot update skills for challenges with Completed status");
+        throw new errors.BadRequestError(
+          "Cannot update skills for challenges with Completed status"
+        );
       }
     }
 
@@ -356,12 +375,14 @@ class ChallengeHelper {
     }
 
     if (data.prizeSets != null) {
-      ChallengeHelper.convertPSValuesToCents(data.prizeSets)
-      console.log('Converted prizeSets to cents', data.prizeSets)
+      const type = data.prizeSets[0]?.prizes[0]?.type;
+      if (type === constants.prizeTypes.USD) {
+        ChallengeHelper.convertPSValuesToCents(data.prizeSets)
+      }
+      
       data.prizeSetUpdate = {
         prizeSets: [...data.prizeSets],
       };
-      console.log('prizeSetUpdate', data.prizeSetUpdate)
       delete data.prizeSets;
     }
 

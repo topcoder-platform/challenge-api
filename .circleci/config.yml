@@ -90,8 +90,7 @@ workflows:
           branches:
             only:
             - dev
-            - hotfix/budget-update
-            - CORE-140
+            - CORE-40
 
     - "build-qa":
         context: org-global
