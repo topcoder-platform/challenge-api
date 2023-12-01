@@ -340,12 +340,6 @@ async function searchChallenges(currentUser, criteria) {
     }
     boolQuery.push({ range: { "overview.totalPrizes": prizeRangeQuery } });
   }
-
-  if (criteria.useSchedulingAPI) {
-    boolQuery.push({
-      match_phrase: { "legacy.useSchedulingAPI": criteria.useSchedulingAPI },
-    });
-  }
   if (criteria.selfService) {
     boolQuery.push({
       match_phrase: { "legacy.selfService": criteria.selfService },
@@ -379,9 +373,21 @@ async function searchChallenges(currentUser, criteria) {
     });
   }
   if (criteria.currentPhaseName) {
-    boolQuery.push({
-      match_phrase: { currentPhaseNames: criteria.currentPhaseName },
-    });
+    if (criteria.currentPhaseName === "Registration") {
+      boolQuery.push({
+        bool: {
+          should: [
+            { match_phrase: { currentPhaseNames: "Registration" } },
+            { match_phrase: { currentPhaseNames: "Open" } },
+          ],
+          minimum_should_match: 1,
+        },
+      });
+    } else {
+      boolQuery.push({
+        match_phrase: { currentPhaseNames: criteria.currentPhaseName },
+      });
+    }
   }
   if (criteria.createdDateStart) {
     boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } });
@@ -930,7 +936,9 @@ searchChallenges.schema = {
  */
 async function createChallenge(currentUser, challenge, userToken) {
   await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
+  let prizeTypeTmp = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
 
+  console.log("TYPE", prizeTypeTmp);
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
     if (!challenge.projectId) {
@@ -1065,9 +1073,17 @@ async function createChallenge(currentUser, challenge, userToken) {
   grpcMetadata.set("userId", currentUser.userId);
   grpcMetadata.set("token", await getM2MToken());
 
-  convertPrizeSetValuesToCents(challenge.prizeSets);
+  const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+
+  if (prizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToCents(challenge.prizeSets);
+  }
+
   const ret = await challengeDomain.create(challenge, grpcMetadata);
-  convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
+
+  if (prizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
+  }
 
   ret.numOfSubmissions = 0;
   ret.numOfRegistrants = 0;
@@ -1494,7 +1510,11 @@ function validateTask(currentUser, challenge, data, challengeResources) {
  */
 async function updateChallenge(currentUser, challengeId, data) {
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-  convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
+  const existingPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+
+  if (existingPrizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
+  }
 
   const projectId = _.get(challenge, "projectId");
 
@@ -1618,15 +1638,6 @@ async function updateChallenge(currentUser, challengeId, data) {
   let isChallengeBeingCancelled = false;
   if (data.status) {
     if (data.status === constants.challengeStatuses.Active) {
-      if (
-        !_.get(challenge, "legacy.pureV5Task") &&
-        !_.get(challenge, "legacy.pureV5") &&
-        _.isUndefined(_.get(challenge, "legacyId"))
-      ) {
-        throw new errors.BadRequestError(
-          "You cannot activate the challenge as it has not been created on legacy yet. Please try again later or contact support."
-        );
-      }
       // if activating a challenge, the challenge must have a billing account id
       if (
         (!billingAccountId || billingAccountId === null) &&
@@ -1799,6 +1810,11 @@ async function updateChallenge(currentUser, challengeId, data) {
 
   if (data.winners && data.winners.length && data.winners.length > 0) {
     await validateWinners(data.winners, challengeResources);
+    if (_.get(challenge, "legacy.pureV5Task", false)) {
+      _.each(data.winners, (w) => {
+        w.type = constants.prizeSetTypes.ChallengePrizes;
+      });
+    }
   }
 
   // Only m2m tokens are allowed to modify the `task.*` information on a challenge
@@ -1891,25 +1907,28 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
   }
 
-  try {
-    const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ["cancelReason"]));
-    if (!_.isEmpty(updateInput)) {
-      const grpcMetadata = new GrpcMetadata();
+  const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ["cancelReason"]));
+  if (!_.isEmpty(updateInput)) {
+    const grpcMetadata = new GrpcMetadata();
 
-      grpcMetadata.set("handle", currentUser.handle);
-      grpcMetadata.set("userId", currentUser.userId);
-      grpcMetadata.set("token", await getM2MToken());
+    grpcMetadata.set("handle", currentUser.handle);
+    grpcMetadata.set("userId", currentUser.userId);
+    grpcMetadata.set("token", await getM2MToken());
 
-      await challengeDomain.update(
-        {
-          filterCriteria: getScanCriteria({ id: challengeId }),
-          updateInput,
-        },
-        grpcMetadata
+    const newPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(updateInput.prizeSets);
+    if (newPrizeType != null && existingPrizeType != null && newPrizeType !== existingPrizeType) {
+      throw new errors.BadRequestError(
+        `Cannot change prize type from ${existingPrizeType} to ${newPrizeType}`
       );
     }
-  } catch (e) {
-    throw e;
+
+    await challengeDomain.update(
+      {
+        filterCriteria: getScanCriteria({ id: challengeId }),
+        updateInput,
+      },
+      grpcMetadata
+    );
   }
 
   const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
@@ -2119,9 +2138,7 @@ updateChallenge.schema = {
               userId: Joi.number().integer().positive().required(),
               handle: Joi.string().required(),
               placement: Joi.number().integer().positive().required(),
-              type: Joi.string()
-                .valid(_.values(constants.prizeSetTypes))
-                .default(constants.prizeSetTypes.ChallengePrizes),
+              type: Joi.string().valid(_.values(constants.prizeSetTypes)),
             })
             .unknown(true)
         )
@@ -2423,7 +2440,11 @@ advancePhase.schema = {
 };
 
 async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
-  convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
+  const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(updatedChallenge.prizeSets);
+
+  if (prizeType === constants.prizeTypes.USD) {
+    convertPrizeSetValuesToDollars(updatedChallenge.prizeSets, updatedChallenge.overview);
+  }
 
   if (track == null || type == null) {
     const trackAndTypeData = await challengeHelper.validateAndGetChallengeTypeAndTrack({

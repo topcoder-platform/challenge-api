@@ -18,6 +18,11 @@ const prizeSetTypes = {
   CheckpointPrizes: "checkpoint",
 };
 
+const prizeTypes = {
+  USD: "USD",
+  POINT: "POINT",
+};
+
 const challengeStatuses = {
   New: "New",
   Draft: "Draft",
@@ -137,6 +142,7 @@ const SelfServiceNotificationSettings = {
 module.exports = {
   UserRoles,
   prizeSetTypes,
+  prizeTypes,
   challengeStatuses,
   validChallengeParams,
   EVENT_ORIGINATOR,
