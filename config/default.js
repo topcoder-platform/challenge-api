@@ -49,6 +49,8 @@ module.exports = {
     TEMP_REINDEXING: process.env.TEMP_REINDEXING || true, // if true, it won't delete the existing index when reindexing data
   },
 
+  CENTRAL_SEARCH_URL: process.env.CENTRAL_SEARCH_URL || "https://vpc-centra-search-glnpbuur5r2ffx7fzcnkwzzcfi.us-east-1.es.amazonaws.com",
+
   // in bytes
   FILE_UPLOAD_SIZE_LIMIT: process.env.FILE_UPLOAD_SIZE_LIMIT
     ? Number(process.env.FILE_UPLOAD_SIZE_LIMIT)
@@ -73,6 +75,8 @@ module.exports = {
     ? process.env.COPILOT_RESOURCE_ROLE_IDS.split(",")
     : ["10ba038e-48da-487b-96e8-8d3b99b6d18b"],
   SUBMITTER_ROLE_ID: process.env.SUBMITTER_ROLE_ID || "732339e7-8e30-49d7-9198-cccf9451e221",
+  REVIEWER_RESOURCE_ROLE_ID: process.env.REVIEWER_RESOURCE_ROLE_ID || '318b9c07-079a-42d9-a81f-b96be1dc1099',
+  ITERATIVE_REVIEWER_RESOURCE_ROLE_ID: process.env.ITERATIVE_REVIEWER_RESOURCE_ROLE_ID || 'f6df7212-b9d6-4193-bfb1-b383586fce63',
 
   MANAGER_ROLE_ID: process.env.MANAGER_ROLE_ID || "0e9c6879-39e4-4eb6-b8df-92407890faf1",
   OBSERVER_ROLE_ID: process.env.OBSERVER_ROLE_ID || "2a4dc376-a31c-4d00-b173-13934d89e286",

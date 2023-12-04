@@ -91,6 +91,7 @@ workflows:
             only:
             - dev
             - CORE-40
+            - CORE-154
 
     - "build-qa":
         context: org-global

@@ -1,0 +1,411 @@
+/**
+ * This service provides operations for Topgear.
+ */
+const _ = require("lodash");
+const Joi = require("joi");
+const moment = require("moment");
+const config = require("config");
+const { Client: SearchClient } = require("@opensearch-project/opensearch");
+
+const logger = require("../common/logger");
+const constants = require("../../app-constants");
+
+const searchClient = new SearchClient({
+  node: config.CENTRAL_SEARCH_URL,
+});
+
+const indexName = "topgear_challenge";
+
+/**
+ * Get Topgear trending technologies.
+ * @param {Object} currentUser The user who perform operation
+ * @param {Object} criteria The search criteria
+ */
+async function getTechTrending(currentUser, criteria) {
+  // Default to get trending technologies in 1 year, client can pass afterCompleteDate to override
+  const result = await searchClient.search({
+    index: indexName,
+    body: {
+      size: 0,
+      query: {
+        bool: {
+          filter: [
+            { term: { "status.keyword": constants.challengeStatuses.Completed } },
+            {
+              range: {
+                endDate: {
+                  gte: criteria.afterCompleteDate
+                    ? criteria.afterCompleteDate
+                    : moment().subtract(1, "years").toISOString(),
+                },
+              },
+            },
+          ],
+        },
+      },
+      aggs: {
+        teches: {
+          terms: {
+            field: "tags.keyword",
+            size: 100000,
+          },
+        },
+      },
+    },
+  });
+
+  const aggs = result.body.aggregations;
+  const teches = [];
+
+  _.forEach(_.get(aggs, "teches.buckets"), (bucket) => {
+    teches.push({
+      tech: bucket.key,
+      count: bucket.doc_count,
+    });
+  });
+
+  return teches.sort((a, b) => b.count - a.count);
+}
+
+getTechTrending.schema = {
+  currentUser: Joi.any(),
+  criteria: Joi.object({
+    afterCompleteDate: Joi.date(),
+  }).unknown(true),
+};
+
+/**
+ * Get Topgear member badges.
+ * @param {Object} currentUser The user who perform operation
+ * @param {Object} criteria The search criteria
+ */
+async function getMemberBadges(currentUser, criteria) {
+  // Default to get member badges in 1 year, client can pass afterCompleteDate to override
+  const result = await searchClient.search({
+    index: indexName,
+    body: {
+      size: 0,
+      query: {
+        bool: {
+          filter: [
+            { term: { "status.keyword": constants.challengeStatuses.Completed } },
+            {
+              range: {
+                endDate: {
+                  gte: criteria.afterCompleteDate
+                    ? criteria.afterCompleteDate
+                    : moment().subtract(1, "years").toISOString(),
+                },
+              },
+            },
+          ],
+        },
+      },
+      aggs: {
+        wins: {
+          terms: {
+            field: "winners.userId",
+            size: 1000000,
+          },
+        },
+        submissions: {
+          terms: {
+            field: "submissions.memberId",
+            size: 1000000,
+          },
+        },
+        resources: {
+          nested: {
+            path: "resources",
+          },
+          aggs: {
+            registrants: {
+              filter: {
+                term: {
+                  "resources.roleId": config.SUBMITTER_ROLE_ID,
+                },
+              },
+              aggs: {
+                count: {
+                  multi_terms: {
+                    terms: [
+                      {
+                        field: "resources.memberId",
+                      },
+                      {
+                        field: "resources.memberHandle.keyword",
+                      },
+                    ],
+                    size: 1000000,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const aggs = result.body.aggregations;
+  const members = new Map();
+
+  _.forEach(_.get(aggs, "resources.registrants.count.buckets"), (bucket) => {
+    const memberId = `${bucket.key[0]}`;
+    const memberHandle = bucket.key[1];
+
+    members.set(memberId, { memberId, memberHandle, challenges: bucket.doc_count });
+  });
+
+  _.forEach(_.get(aggs, "submissions.buckets"), (bucket) => {
+    const memberId = `${bucket.key}`;
+    const member = members.get(memberId);
+    if (member) {
+      member.submissions = bucket.doc_count;
+    }
+  });
+
+  _.forEach(_.get(aggs, "wins.buckets"), (bucket) => {
+    const memberId = `${bucket.key}`;
+    const member = members.get(memberId);
+    if (member) {
+      member.wins = bucket.doc_count;
+    }
+  });
+
+  return Array.from(members.values()).sort((a, b) => b.challenges - a.challenges);
+}
+
+getMemberBadges.schema = {
+  currentUser: Joi.any(),
+  criteria: Joi.object({
+    afterCompleteDate: Joi.date(),
+  }).unknown(true),
+};
+
+/**
+ * Search Topgear challenges
+ * @param {Object} currentUser The user who perform operation
+ * @param {Object} criteria The search criteria
+ */
+async function searchChallenges(currentUser, criteria) {
+  const should = [];
+
+  // Default to find Active/Completed challenges
+  if (!criteria.status || !criteria.status.length) {
+    criteria.status = [constants.challengeStatuses.Active, constants.challengeStatuses.Completed];
+  }
+
+  if (criteria.status.includes(constants.challengeStatuses.Active)) {
+    const activeFilter = {
+      bool: {
+        filter: [],
+      },
+    };
+    should.push(activeFilter);
+
+    // Default to find Active challenges in 90 days, client can pass afterActiveDate to override
+    activeFilter.bool.filter.push({
+      term: { "status.keyword": constants.challengeStatuses.Active },
+    });
+    activeFilter.bool.filter.push({
+      range: {
+        startDate: {
+          gte: criteria.afterActiveDate || moment().subtract(90, "days").toISOString(),
+        },
+      },
+    });
+
+    delete criteria.afterActiveDate;
+    criteria.status = _.filter(criteria.status, (s) => s !== constants.challengeStatuses.Active);
+  }
+
+  if (criteria.status.includes(constants.challengeStatuses.Completed)) {
+    const completeFilter = {
+      bool: {
+        filter: [],
+      },
+    };
+    should.push(completeFilter);
+
+    // Default to find Completed challenges in 90 days, client can pass afterCompleteDate to override
+    completeFilter.bool.filter.push({
+      term: { "status.keyword": constants.challengeStatuses.Completed },
+    });
+    completeFilter.bool.filter.push({
+      range: {
+        endDate: {
+          gte: criteria.afterCompleteDate || moment().subtract(90, "days").toISOString(),
+        },
+      },
+    });
+
+    delete criteria.afterCompleteDate;
+    criteria.status = _.filter(criteria.status, (s) => s !== constants.challengeStatuses.Completed);
+  }
+
+  if (criteria.status.length) {
+    should.push({ terms: { "status.keyword": criteria.status } });
+  }
+
+  const filters = [];
+  if (criteria.afterActiveDate) {
+    filters.push({ range: { startDate: { gte: criteria.afterActiveDate } } });
+  }
+  if (criteria.afterCompleteDate) {
+    filters.push({ range: { endDate: { gte: criteria.afterCompleteDate } } });
+  }
+
+  const matches = [];
+  if (criteria.name) {
+    matches.push({
+      match: { name: criteria.name },
+    });
+  }
+
+  const query = {
+    bool: {
+      minimum_should_match: 1,
+    },
+  };
+
+  if (should.length) {
+    query.bool.should = should;
+  }
+  if (filters.length) {
+    query.bool.filter = filters;
+  }
+  if (matches.length) {
+    query.bool.must = matches;
+  }
+
+  console.info("Topgear query:", JSON.stringify(query, null, 2));
+
+  const startTime = new Date().getTime();
+  const challenges = await scroll(indexName, {
+    query,
+    _source: {
+      includes: [
+        "id",
+        "directProjectId",
+        "name",
+        "status",
+        "startDate",
+        "endDate",
+        "scheduledEndDate",
+        "tags",
+        "groups",
+        "winners",
+        "payments",
+        "resources",
+        "submissions.memberId",
+        "submissions.submittedDate",
+        "submissions.review.scoreCardId",
+        "submissions.review.score",
+      ],
+    },
+  });
+  console.info(
+    `Search Topgear challenges finishes, count: ${challenges.length}, time spent: ${
+      (new Date().getTime() - startTime) / 1000
+    }s`
+  );
+
+  for (const challenge of challenges) {
+    challenge.registrants = [];
+    challenge.reviewers = [];
+
+    const resources = challenge.resources || [];
+    for (const resource of resources) {
+      if (resource.roleId === config.SUBMITTER_ROLE_ID) {
+        challenge.registrants.push({
+          memberId: resource.memberId,
+          memberHandle: resource.memberHandle,
+          submitInd: false,
+        });
+      } else if (
+        resource.roleId === config.REVIEWER_RESOURCE_ROLE_ID ||
+        resource.roleId === config.ITERATIVE_REVIEWER_RESOURCE_ROLE_ID
+      ) {
+        challenge.reviewers.push({
+          memberId: resource.memberId,
+          memberHandle: resource.memberHandle,
+        });
+      }
+    }
+
+    const submissions = challenge.submissions || [];
+
+    submissions.sort(
+      (a, b) => moment(b.submittedDate).valueOf() - moment(a.submittedDate).valueOf()
+    );
+
+    for (const registrant of challenge.registrants) {
+      const submission = submissions.find((sub) => `${sub.memberId}` === `${registrant.memberId}`);
+      if (submission) {
+        registrant.submitInd = true;
+        registrant.submittedDate = submission.submittedDate;
+        registrant.review = submission.review;
+      }
+    }
+
+    delete challenge.resources;
+    delete challenge.submissions;
+  }
+
+  return challenges;
+}
+
+searchChallenges.schema = {
+  currentUser: Joi.any(),
+  criteria: Joi.object({
+    name: Joi.string(),
+    status: Joi.array().items(Joi.string().valid(_.values(constants.challengeStatuses))),
+    afterActiveDate: Joi.date(),
+    afterCompleteDate: Joi.date(),
+  }).unknown(true),
+};
+
+async function scroll(index, body) {
+  let sortValues;
+  const allHits = [];
+
+  while (true) {
+    const result = (
+      await searchClient.search({
+        index,
+        size: 10000,
+        timeout: "30s",
+        body: {
+          ...body,
+          sort: [
+            {
+              created: "desc",
+            },
+            {
+              id: "desc",
+            },
+          ],
+          ...(sortValues ? { search_after: sortValues } : {}),
+        },
+      })
+    ).body;
+
+    if (!result.hits || !result.hits.hits || !result.hits.hits.length) {
+      return allHits;
+    } else {
+      for (const hit of result.hits.hits) {
+        allHits.push(hit._source);
+      }
+      sortValues = result.hits.hits[result.hits.hits.length - 1].sort;
+    }
+  }
+}
+
+module.exports = {
+  getTechTrending,
+  getMemberBadges,
+  searchChallenges,
+};
+
+logger.buildService(module.exports);

@@ -34,6 +34,39 @@ module.exports = {
       scopes: [CREATE, ALL],
     },
   },
+  "/challenges/topgear": {
+    get: {
+      controller: "TopgearController",
+      method: "searchChallenges",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+      ],
+      scopes: [READ, ALL],
+    },
+  },
+  "/challenges/topgear/tech-trending": {
+    get: {
+      controller: "TopgearController",
+      method: "getTechTrending",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+      ],
+      scopes: [READ, ALL],
+    },
+  },
+  "/challenges/topgear/badges": {
+    get: {
+      controller: "TopgearController",
+      method: "getMemberBadges",
+      auth: "jwt",
+      access: [
+        constants.UserRoles.Admin,
+      ],
+      scopes: [READ, ALL],
+    },
+  },
   "/challenges/support-requests": {
     post: {
       controller: "SupportController",
