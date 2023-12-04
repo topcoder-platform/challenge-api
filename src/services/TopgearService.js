@@ -8,6 +8,7 @@ const config = require("config");
 const { Client: SearchClient } = require("@opensearch-project/opensearch");
 
 const logger = require("../common/logger");
+const errors = require("../common/errors");
 const constants = require("../../app-constants");
 
 const searchClient = new SearchClient({
@@ -189,6 +190,19 @@ getMemberBadges.schema = {
  * @param {Object} criteria The search criteria
  */
 async function searchChallenges(currentUser, criteria) {
+  if (criteria.includeAll) {
+    // When include all data, max size window, and no need cursor
+    criteria.size = 10000;
+    delete criteria.cursor;
+  } else if (criteria.cursor) {
+    // Decode base64 cursor
+    try {
+      criteria.cursor = JSON.parse(Buffer.from(criteria.cursor, "base64").toString("utf8"));
+    } catch (err) {
+      throw new errors.BadRequestError("Bad cursor");
+    }
+  }
+
   const should = [];
 
   // Default to find Active/Completed challenges
@@ -245,7 +259,9 @@ async function searchChallenges(currentUser, criteria) {
   }
 
   if (criteria.status.length) {
-    should.push({ terms: { "status.keyword": criteria.status } });
+    for (const status of criteria.status) {
+      should.push({ match_phrase: { status: status } });
+    }
   }
 
   const filters = [];
@@ -256,59 +272,48 @@ async function searchChallenges(currentUser, criteria) {
     filters.push({ range: { endDate: { gte: criteria.afterCompleteDate } } });
   }
 
-  const matches = [];
+  const must = [];
   if (criteria.name) {
-    matches.push({
-      match: { name: criteria.name },
+    must.push({
+      match: {
+        name: {
+          query: criteria.name,
+          operator: "and",
+        },
+      },
+    });
+  }
+  if (criteria.createdBy) {
+    must.push({
+      match: {
+        createdBy: {
+          query: criteria.createdBy,
+          operator: "and",
+        },
+      },
     });
   }
 
   const query = {
-    bool: {
-      minimum_should_match: 1,
-    },
+    bool: {},
   };
 
   if (should.length) {
+    query.bool.minimum_should_match = 1;
     query.bool.should = should;
   }
   if (filters.length) {
     query.bool.filter = filters;
   }
-  if (matches.length) {
-    query.bool.must = matches;
+  if (must.length) {
+    query.bool.must = must;
   }
 
-  console.info("Topgear query:", JSON.stringify(query, null, 2));
-
-  const startTime = new Date().getTime();
-  const challenges = await scroll(indexName, {
+  const { challenges, cursor } = await scroll(
     query,
-    _source: {
-      includes: [
-        "id",
-        "directProjectId",
-        "name",
-        "status",
-        "startDate",
-        "endDate",
-        "scheduledEndDate",
-        "tags",
-        "groups",
-        "winners",
-        "payments",
-        "resources",
-        "submissions.memberId",
-        "submissions.submittedDate",
-        "submissions.review.scoreCardId",
-        "submissions.review.score",
-      ],
-    },
-  });
-  console.info(
-    `Search Topgear challenges finishes, count: ${challenges.length}, time spent: ${
-      (new Date().getTime() - startTime) / 1000
-    }s`
+    criteria.size,
+    criteria.includeAll,
+    criteria.cursor
   );
 
   for (const challenge of challenges) {
@@ -353,53 +358,109 @@ async function searchChallenges(currentUser, criteria) {
     delete challenge.submissions;
   }
 
-  return challenges;
+  return { challenges, cursor };
 }
 
 searchChallenges.schema = {
   currentUser: Joi.any(),
   criteria: Joi.object({
     name: Joi.string(),
+    createdBy: Joi.string(),
     status: Joi.array().items(Joi.string().valid(_.values(constants.challengeStatuses))),
     afterActiveDate: Joi.date(),
     afterCompleteDate: Joi.date(),
+    includeAll: Joi.boolean().default(false),
+    cursor: Joi.string().base64({ paddingRequired: false }),
+    size: Joi.number().integer().min(1).max(10000).default(1000),
   }).unknown(true),
 };
 
-async function scroll(index, body) {
-  let sortValues;
+const includeFields = [
+  "id",
+  "directProjectId",
+  "name",
+  "status",
+  "created",
+  "createdBy",
+  "startDate",
+  "endDate",
+  "scheduledEndDate",
+  "tags",
+  "groups",
+  "winners",
+  "payments",
+  "resources",
+  "submissions.memberId",
+  "submissions.submittedDate",
+  "submissions.review.scoreCardId",
+  "submissions.review.score",
+];
+
+async function scroll(query, size, includeAll, cursor) {
+  console.info("Topgear query:", JSON.stringify(query, null, 2));
+  console.info(
+    `size: ${size}, includeAll: ${includeAll}` +
+      (cursor ? `, cursor: ${JSON.stringify(cursor)}` : "")
+  );
+
+  const startTime = new Date().getTime();
+
   const allHits = [];
 
   while (true) {
-    const result = (
-      await searchClient.search({
-        index,
-        size: 10000,
-        timeout: "30s",
-        body: {
-          ...body,
-          sort: [
-            {
-              created: "desc",
-            },
-            {
-              id: "desc",
-            },
-          ],
-          ...(sortValues ? { search_after: sortValues } : {}),
+    const result = await searchClient.search({
+      index: indexName,
+      size,
+      timeout: "10s",
+      body: {
+        query,
+        _source: {
+          includes: includeFields,
         },
-      })
-    ).body;
+        sort: [
+          {
+            created: "desc",
+          },
+          {
+            id: "desc",
+          },
+        ],
+        ...(cursor ? { search_after: cursor } : {}),
+      },
+    });
 
-    if (!result.hits || !result.hits.hits || !result.hits.hits.length) {
-      return allHits;
+    const hits = _.get(result, "body.hits.hits");
+
+    if (!hits || !hits.length) {
+      cursor = null;
+      break;
     } else {
-      for (const hit of result.hits.hits) {
+      for (const hit of hits) {
         allHits.push(hit._source);
       }
-      sortValues = result.hits.hits[result.hits.hits.length - 1].sort;
+      if (hits.length < size) {
+        cursor = null;
+        break;
+      } else {
+        cursor = hits[hits.length - 1].sort;
+      }
+    }
+
+    if (!includeAll) {
+      break;
     }
   }
+
+  console.info(
+    `Search Topgear challenges finishes, count: ${allHits.length}, time spent: ${
+      (new Date().getTime() - startTime) / 1000
+    }s`
+  );
+
+  return {
+    challenges: allHits,
+    cursor: cursor ? Buffer.from(JSON.stringify(cursor), "utf8").toString("base64") : null,
+  };
 }
 
 module.exports = {

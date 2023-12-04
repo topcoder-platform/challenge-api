@@ -39,7 +39,10 @@ async function searchChallenges(req, res) {
     ...req.query,
     ...req.body,
   });
-  res.send(result);
+  if (result.cursor) {
+    res.header("X-Cursor", result.cursor);
+  }
+  res.send(result.challenges);
 }
 
 module.exports = {
