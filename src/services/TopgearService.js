@@ -397,8 +397,9 @@ const includeFields = [
 ];
 
 async function scroll(query, size, includeAll, cursor) {
-  console.info("Topgear query:", JSON.stringify(query, null, 2));
   console.info(
+    "Topgear query:",
+    JSON.stringify(query),
     `size: ${size}, includeAll: ${includeAll}` +
       (cursor ? `, cursor: ${JSON.stringify(cursor)}` : "")
   );

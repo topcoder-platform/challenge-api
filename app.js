@@ -7,6 +7,8 @@ require("./app-bootstrap");
 const _ = require("lodash");
 const config = require("config");
 const express = require("express");
+const compressible = require("compressible");
+const compression = require("compression");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const HttpStatus = require("http-status-codes");
@@ -20,6 +22,20 @@ const { ForbiddenError } = require("./src/common/errors");
 
 // setup express app
 const app = express();
+app.use(
+  compression({
+    filter: (req, res) => {
+      var type = res.getHeader("Content-Type");
+
+      if (!compressible(type)) {
+        return false;
+      }
+
+      // enable compression for /challenges/topgear api
+      return req.path && req.path.startsWith(`/${config.API_VERSION}/challenges/topgear`);
+    },
+  })
+);
 
 // Disable POST, PUT, PATCH, DELETE operations if READONLY is set to true
 app.use((req, res, next) => {
