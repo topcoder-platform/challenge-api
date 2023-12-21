@@ -91,6 +91,7 @@ workflows:
             only:
             - dev
             - CORE-40
+            - TSJR-327
 
     - "build-qa":
         context: org-global
