@@ -590,6 +590,20 @@ async function searchChallenges(currentUser, criteria) {
     });
   }
 
+  const includedSkillIds = _.isArray(criteria.skillIds) ? criteria.skillIds : [];
+
+  if (includedSkillIds.length > 0) {
+    for (const skillId of includedSkillIds) {
+      const matchPhrase = {};
+      matchPhrase[`skills.id`] = `${skillId}`;
+      mustQuery.push({
+        bool: {
+          should: matchPhrase,
+        },
+      });
+    }
+  }
+
   // FIXME: Tech Debt
   let excludeTasks = true;
   // if you're an admin or m2m, security rules wont be applied
@@ -881,6 +895,7 @@ searchChallenges.schema = {
       description: Joi.string(),
       timelineTemplateId: Joi.string(), // Joi.optionalId(),
       reviewType: Joi.string(),
+      skillIds: Joi.array().items(Joi.string()),
       tag: Joi.string(),
       tags: Joi.array().items(Joi.string()),
       includeAllTags: Joi.boolean().default(true),
