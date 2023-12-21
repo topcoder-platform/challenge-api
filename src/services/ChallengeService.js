@@ -593,6 +593,7 @@ async function searchChallenges(currentUser, criteria) {
   const includedSkillIds = _.isArray(criteria.skillIds) ? criteria.skillIds : [];
 
   if (includedSkillIds.length > 0) {
+    logger.debug(`Skill IDs for search: ${JSON.stringify(includedSkillIds)}`)
     for (const skillId of includedSkillIds) {
       const matchPhrase = {};
       matchPhrase[`skills.id`] = `${skillId}`;
@@ -602,6 +603,9 @@ async function searchChallenges(currentUser, criteria) {
         },
       });
     }
+    logger.debug(`Skill ID Query: ${JSON.stringify(mustQuery)}`)
+  } else {
+    logger.debug("No skill IDs sent for searching")
   }
 
   // FIXME: Tech Debt
