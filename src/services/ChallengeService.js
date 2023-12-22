@@ -599,14 +599,13 @@ async function searchChallenges(currentUser, criteria) {
       const matchPhrase = {};
       matchPhrase[`skills.id`] = `${skillId}`;
       skillQuery.push({"match_phrase":matchPhrase})
-      
-      boolQuery.push({
-        bool:{
-          should:skillQuery,
-          minimum_should_match: 1
-        }
-      })
     }
+    boolQuery.push({
+      bool:{
+        should:skillQuery,
+        minimum_should_match: 1
+      }
+    })
     logger.debug(`Skill ID Query: ${JSON.stringify(boolQuery)}`)
   } else {
     logger.debug("No skill IDs sent for searching")
