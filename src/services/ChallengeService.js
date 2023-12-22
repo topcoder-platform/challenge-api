@@ -594,8 +594,9 @@ async function searchChallenges(currentUser, criteria) {
 
   if (includedSkillIds.length > 0) {
     logger.debug(`Skill IDs for search: ${JSON.stringify(includedSkillIds)}`)
+    const skillQuery=[]
+
     for (const skillId of includedSkillIds) {
-      const skillQuery=[]
       const matchPhrase = {};
       matchPhrase[`skills.id`] = `${skillId}`;
       skillQuery.push({"match_phrase":matchPhrase})
