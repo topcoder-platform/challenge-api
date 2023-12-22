@@ -593,7 +593,6 @@ async function searchChallenges(currentUser, criteria) {
   const includedSkillIds = _.isArray(criteria.skillIds) ? criteria.skillIds : [];
 
   if (includedSkillIds.length > 0) {
-    logger.debug(`Skill IDs for search: ${JSON.stringify(includedSkillIds)}`)
     const skillQuery=[]
 
     for (const skillId of includedSkillIds) {
@@ -607,10 +606,7 @@ async function searchChallenges(currentUser, criteria) {
         minimum_should_match: 1
       }
     })
-    logger.debug(`Skill ID Query: ${JSON.stringify(boolQuery)}`)
-  } else {
-    logger.debug("No skill IDs sent for searching")
-  }
+  } 
 
   // FIXME: Tech Debt
   let excludeTasks = true;
@@ -790,7 +786,6 @@ async function searchChallenges(currentUser, criteria) {
     };
   }
 
-  logger.debug(`Final query: ${JSON.stringify(finalQuery)}`)
   const esQuery = {
     index: config.get("ES.ES_INDEX"),
     size: perPage,
