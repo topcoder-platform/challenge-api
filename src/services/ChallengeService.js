@@ -598,7 +598,7 @@ async function searchChallenges(currentUser, criteria) {
       const skillQuery=[]
       const matchPhrase = {};
       matchPhrase[`skills.id`] = `${skillId}`;
-      skillQuery.push(matchPhrase)
+      skillQuery.push({"match_phrase":matchPhrase})
       
       boolQuery.push({
         bool:{
