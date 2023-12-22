@@ -790,7 +790,7 @@ async function searchChallenges(currentUser, criteria) {
     };
   }
 
-  logger.debug(`Final query: ${finalQuery}`)
+  logger.debug(`Final query: ${JSON.stringify(finalQuery)}`)
   const esQuery = {
     index: config.get("ES.ES_INDEX"),
     size: perPage,
