@@ -1157,16 +1157,10 @@ async function getStandSkills(ids) {
   queryBatches.push(queryString);
 
   const skillDataPromises = [];
-  const token = await m2mHelper.getM2MToken();
   for (const batch of queryBatches) {
     skillDataPromises.push(
       (async () => {
-        const res = await axios.get(
-          `${config.API_BASE_URL}/v5/standardized-skills/skills?${batch}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.get(`${config.API_BASE_URL}/v5/standardized-skills/skills?${batch}`);
         return res.data;
       })()
     );
