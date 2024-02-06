@@ -1139,7 +1139,6 @@ async function getMembersByHandles(handles) {
  * @returns {Object}
  */
 async function getStandSkills(ids) {
-
   const queryBatches = [];
   const skillIdArg = "&skillId=";
   let queryString = "disablePagination=true";
@@ -1160,7 +1159,9 @@ async function getStandSkills(ids) {
   for (const batch of queryBatches) {
     skillDataPromises.push(
       (async () => {
-        const res = await axios.get(`${config.API_BASE_URL}/v5/standardized-skills/skills?${batch}`);
+        const res = await axios.get(
+          `${config.API_BASE_URL}/v5/standardized-skills/skills?${batch}`
+        );
         return res.data;
       })()
     );

@@ -42,10 +42,7 @@ async function getPhase(req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdatePhase(req, res) {
-  const result = await service.fullyUpdatePhase(
-    req.params.challengePhaseId,
-    req.body
-  );
+  const result = await service.fullyUpdatePhase(req.params.challengePhaseId, req.body);
   res.send(result);
 }
 
@@ -55,10 +52,7 @@ async function fullyUpdatePhase(req, res) {
  * @param {Object} res the response
  */
 async function partiallyUpdatePhase(req, res) {
-  const result = await service.partiallyUpdatePhase(
-    req.params.challengePhaseId,
-    req.body
-  );
+  const result = await service.partiallyUpdatePhase(req.params.challengePhaseId, req.body);
   res.send(result);
 }
 

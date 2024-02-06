@@ -15,9 +15,7 @@ const viewData = async (modelName) => {
 };
 
 if (process.argv.length === 2) {
-  logger.info(
-    `Please provide one of the following table name: [${_.keys(models)}]`
-  );
+  logger.info(`Please provide one of the following table name: [${_.keys(models)}]`);
   process.exit(1);
 } else {
   const modelName = process.argv[2];
@@ -32,9 +30,7 @@ if (process.argv.length === 2) {
         process.exit(1);
       });
   } else {
-    logger.info(
-      `Please provide one of the following table name: [${_.keys(models)}]`
-    );
+    logger.info(`Please provide one of the following table name: [${_.keys(models)}]`);
     process.exit(1);
   }
 }

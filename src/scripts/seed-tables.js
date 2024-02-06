@@ -18,9 +18,7 @@ Object.keys(models).forEach((modelName) => {
   }
   try {
     const data = require(`./seed/${modelName}.json`);
-    logger.info(
-      `Inserting ${get(data, "length")} records in table ${modelName}`
-    );
+    logger.info(`Inserting ${get(data, "length")} records in table ${modelName}`);
     promises.push(models[modelName].batchPut(data));
   } catch (e) {
     logger.warn(`No records will be inserted in table ${modelName}`);
@@ -29,9 +27,7 @@ Object.keys(models).forEach((modelName) => {
 
 Promise.all(promises)
   .then(() => {
-    logger.info(
-      "All tables have been inserted with the data. The processes is run asynchronously"
-    );
+    logger.info("All tables have been inserted with the data. The processes is run asynchronously");
     process.exit();
   })
   .catch((err) => {

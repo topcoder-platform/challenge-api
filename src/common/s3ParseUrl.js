@@ -17,9 +17,7 @@ module.exports = function s3ParseUrl(url) {
   }
 
   // http://s3-aws-region.amazonaws.com/bucket/key1/key2
-  match = decodedUrl.match(
-    /^https?:\/\/s3-([^.]+).amazonaws.com\/([^/]+)\/?(.*?)$/
-  );
+  match = decodedUrl.match(/^https?:\/\/s3-([^.]+).amazonaws.com\/([^/]+)\/?(.*?)$/);
   if (match) {
     return {
       bucket: match[2],
@@ -40,9 +38,7 @@ module.exports = function s3ParseUrl(url) {
 
   // http://bucket.s3-aws-region.amazonaws.com/key1/key2 or,
   // http://bucket.s3.aws-region.amazonaws.com/key1/key2
-  match = decodedUrl.match(
-    /^https?:\/\/([^.]+).(?:s3-|s3\.)([^.]+).amazonaws.com\/?(.*?)$/
-  );
+  match = decodedUrl.match(/^https?:\/\/([^.]+).(?:s3-|s3\.)([^.]+).amazonaws.com\/?(.*?)$/);
   if (match) {
     return {
       bucket: match[1],

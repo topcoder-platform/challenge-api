@@ -377,9 +377,9 @@ class ChallengeHelper {
     if (data.prizeSets != null) {
       const type = data.prizeSets[0]?.prizes[0]?.type;
       if (type === constants.prizeTypes.USD) {
-        ChallengeHelper.convertPSValuesToCents(data.prizeSets)
+        ChallengeHelper.convertPSValuesToCents(data.prizeSets);
       }
-      
+
       data.prizeSetUpdate = {
         prizeSets: [...data.prizeSets],
       };
@@ -489,7 +489,7 @@ class ChallengeHelper {
     }
   }
 
-  static convertPSValuesToCents(prizeSets){
+  static convertPSValuesToCents(prizeSets) {
     prizeSets.forEach((prizeSet) => {
       prizeSet.prizes.forEach((prize) => {
         prize.amountInCents = new Decimal(prize.value).mul(100).toNumber();
