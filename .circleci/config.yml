@@ -90,7 +90,7 @@ workflows:
           branches:
             only:
             - dev
-            - CORE-40
+            - feature/tsjr-365-remove-auth-get-skills
 
     - "build-qa":
         context: org-global
