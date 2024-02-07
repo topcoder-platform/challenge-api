@@ -12,9 +12,7 @@ const logger = require("../common/logger");
  */
 async function createRequest(req, res) {
   logger.debug(
-    `createRequest User: ${JSON.stringify(
-      req.authUser
-    )} - Body: ${JSON.stringify(req.body)}`
+    `createRequest User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`
   );
   const result = await service.createRequest(req.authUser, req.body);
   res.status(HttpStatus.CREATED).send(result);

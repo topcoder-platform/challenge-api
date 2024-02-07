@@ -1,19 +1,15 @@
 version: 2
 defaults: &defaults
   docker:
-  - image: cimg/python:3.11.0-browsers
+  - image: cimg/python:3.12.1-browsers
 install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
-    sudo apt update
-    sudo apt install jq
-    sudo apt install python3-pip
-    sudo pip3 install awscli --upgrade
-    sudo pip3 install docker-compose
+    pip3 install awscli --upgrade
 install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
   command: |
-    git clone --branch v1.4.15 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
+    git clone --branch v1.4.17 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
     cp ./../buildscript/master_deploy.sh .
     cp ./../buildscript/buildenv.sh .
     cp ./../buildscript/awsconfiguration.sh .
@@ -90,7 +86,6 @@ workflows:
           branches:
             only:
             - dev
-            - CORE-40
 
     - "build-qa":
         context: org-global

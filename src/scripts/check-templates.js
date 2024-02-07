@@ -11,13 +11,11 @@ async function main() {
   const phases = res.data;
   _.each(template.phases, (phase) => {
     const phaseInstance = _.find(phases, (p) => p.id === phase.phaseId);
-    const pred = phase.predecessor
-      ? _.find(phases, (p) => p.id === phase.predecessor)
-      : null;
+    const pred = phase.predecessor ? _.find(phases, (p) => p.id === phase.predecessor) : null;
     console.log(
-      `Phase Length: ${phase.defaultDuration / 60 / 60} hrs \t ${
-        phaseInstance.name
-      } - Depends on ${pred ? pred.name : "nothing"}`
+      `Phase Length: ${phase.defaultDuration / 60 / 60} hrs \t ${phaseInstance.name} - Depends on ${
+        pred ? pred.name : "nothing"
+      }`
     );
   });
 }

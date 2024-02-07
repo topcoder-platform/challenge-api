@@ -32,9 +32,7 @@ async function createTimelineTemplate(req, res) {
  * @param {Object} res the response
  */
 async function getTimelineTemplate(req, res) {
-  const result = await service.getTimelineTemplate(
-    req.params.timelineTemplateId
-  );
+  const result = await service.getTimelineTemplate(req.params.timelineTemplateId);
   res.send(result);
 }
 
@@ -44,10 +42,7 @@ async function getTimelineTemplate(req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateTimelineTemplate(req, res) {
-  const result = await service.fullyUpdateTimelineTemplate(
-    req.params.timelineTemplateId,
-    req.body
-  );
+  const result = await service.fullyUpdateTimelineTemplate(req.params.timelineTemplateId, req.body);
   res.send(result);
 }
 
@@ -70,9 +65,7 @@ async function partiallyUpdateTimelineTemplate(req, res) {
  * @param {Object} res the response
  */
 async function deleteTimelineTemplate(req, res) {
-  const result = await service.deleteTimelineTemplate(
-    req.params.timelineTemplateId
-  );
+  const result = await service.deleteTimelineTemplate(req.params.timelineTemplateId);
   res.send(result);
 }
 
