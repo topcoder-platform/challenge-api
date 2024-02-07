@@ -5,7 +5,7 @@ defaults: &defaults
 install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
-    sudo pip3 install awscli --upgrade
+    pip3 install awscli --upgrade
 install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
   command: |
