@@ -32,9 +32,7 @@ async function createChallengeTimelineTemplate(req, res) {
  * @param {Object} res the response
  */
 async function getChallengeTimelineTemplate(req, res) {
-  const result = await service.getChallengeTimelineTemplate(
-    req.params.challengeTimelineTemplateId
-  );
+  const result = await service.getChallengeTimelineTemplate(req.params.challengeTimelineTemplateId);
   res.send(result);
 }
 

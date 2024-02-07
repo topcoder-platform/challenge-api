@@ -12,11 +12,7 @@ const service = require("../services/AttachmentService");
  */
 async function createAttachment(req, res) {
   const body = _.isArray(req.body) ? req.body : [req.body];
-  const result = await service.createAttachment(
-    req.authUser,
-    req.params.challengeId,
-    body
-  );
+  const result = await service.createAttachment(req.authUser, req.params.challengeId, body);
   res.status(HttpStatus.CREATED).send(result);
 }
 
