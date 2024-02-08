@@ -941,7 +941,10 @@ async function createChallenge(currentUser, challenge, userToken) {
   console.log("TYPE", prizeTypeTmp);
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
-    if (!challenge.projectId) {
+    if (
+      !challenge.projectId &&
+      !_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, challenge.timelineTemplateId)
+    ) {
       const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`;
       challenge.projectId = await helper.createSelfServiceProject(
         selfServiceProjectName,
@@ -963,14 +966,18 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   /** Ensure project exists, and set direct project id, billing account id & markup */
-  const { projectId } = challenge;
+  if (!_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, challenge.timelineTemplateId)) {
+    const { projectId } = challenge;
 
-  const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
-  const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId);
+    const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
+    const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
+      projectId
+    );
 
-  _.set(challenge, "legacy.directProjectId", directProjectId);
-  _.set(challenge, "billing.billingAccountId", billingAccountId);
-  _.set(challenge, "billing.markup", markup || 0);
+    _.set(challenge, "legacy.directProjectId", directProjectId);
+    _.set(challenge, "billing.billingAccountId", billingAccountId);
+    _.set(challenge, "billing.markup", markup || 0);
+  }
 
   if (!_.isUndefined(_.get(challenge, "legacy.reviewType"))) {
     _.set(challenge, "legacy.reviewType", _.toUpper(_.get(challenge, "legacy.reviewType")));
