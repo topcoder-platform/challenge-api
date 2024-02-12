@@ -172,7 +172,7 @@ class ChallengeHelper {
     if (
       challenge.legacy.selfService == null &&
       challenge.projectId == null &&
-      !_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, challenge.timelineTemplateId)
+      this.isProjectIdRequired(challenge.timelineTemplateId)
     ) {
       throw new errors.BadRequestError("projectId is required for non self-service challenges.");
     }
@@ -527,6 +527,11 @@ class ChallengeHelper {
 
       delete overview.totalPrizesInCents;
     }
+  }
+
+  isProjectIdRequired(timelineTemplateId) {
+    if (!_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, timelineTemplateId)) return true;
+    return false;
   }
 }
 

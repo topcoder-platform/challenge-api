@@ -941,10 +941,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   console.log("TYPE", prizeTypeTmp);
   if (challenge.legacy.selfService) {
     // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
-    if (
-      !challenge.projectId &&
-      !_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, challenge.timelineTemplateId)
-    ) {
+    if (!challenge.projectId && challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
       const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`;
       challenge.projectId = await helper.createSelfServiceProject(
         selfServiceProjectName,
@@ -966,7 +963,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   /** Ensure project exists, and set direct project id, billing account id & markup */
-  if (!_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, challenge.timelineTemplateId)) {
+  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
     const { projectId } = challenge;
 
     const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
@@ -1523,13 +1520,18 @@ async function updateChallenge(currentUser, challengeId, data) {
     convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
   }
 
-  const projectId = _.get(challenge, "projectId");
+  let projectId;
+  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId ?? "")) {
+    projectId = _.get(challenge, "projectId");
 
-  const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId);
+    const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
+      projectId
+    );
 
-  if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
-    _.set(data, "billing.billingAccountId", billingAccountId);
-    _.set(data, "billing.markup", markup || 0);
+    if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
+      _.set(data, "billing.billingAccountId", billingAccountId);
+      _.set(data, "billing.markup", markup || 0);
+    }
   }
 
   // Make sure the user cannot change the direct project ID
@@ -1578,7 +1580,8 @@ async function updateChallenge(currentUser, challengeId, data) {
     if (
       (data.status === constants.challengeStatuses.Approved ||
         data.status === constants.challengeStatuses.Active) &&
-      challenge.status !== constants.challengeStatuses.Active
+      challenge.status !== constants.challengeStatuses.Active &&
+      challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)
     ) {
       try {
         const selfServiceProjectName = `Self service - ${challenge.createdBy} - ${challenge.name}`;
@@ -1614,7 +1617,10 @@ async function updateChallenge(currentUser, challengeId, data) {
       }
     }
 
-    if (data.status === constants.challengeStatuses.Draft) {
+    if (
+      data.status === constants.challengeStatuses.Draft &&
+      challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)
+    ) {
       try {
         await helper.updateSelfServiceProjectInfo(
           projectId,
@@ -1648,7 +1654,8 @@ async function updateChallenge(currentUser, challengeId, data) {
       // if activating a challenge, the challenge must have a billing account id
       if (
         (!billingAccountId || billingAccountId === null) &&
-        challenge.status === constants.challengeStatuses.Draft
+        challenge.status === constants.challengeStatuses.Draft &&
+        challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)
       ) {
         throw new errors.BadRequestError(
           "Cannot Activate this project, it has no active billing account."
