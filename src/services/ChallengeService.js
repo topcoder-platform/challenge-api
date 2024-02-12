@@ -1633,8 +1633,9 @@ async function updateChallenge(currentUser, challengeId, data) {
     }
 
     if (
-      data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
-      data.status === constants.challengeStatuses.CancelledPaymentFailed
+      (data.status === constants.challengeStatuses.CancelledRequirementsInfeasible ||
+        data.status === constants.challengeStatuses.CancelledPaymentFailed) &&
+      challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)
     ) {
       try {
         await helper.cancelProject(challenge.projectId, data.cancelReason, currentUser);
