@@ -1530,12 +1530,12 @@ async function updateChallenge(currentUser, challengeId, data) {
       _.set(data, "billing.billingAccountId", billingAccountId);
       _.set(data, "billing.markup", markup || 0);
     }
-  }
 
-  // Make sure the user cannot change the direct project ID
-  if (data.legacy) {
-    data.legacy = _.assign({}, challenge.legacy, data.legacy);
-    _.set(data, "legacy.directProjectId", challenge.legacy.directProjectId);
+    // Make sure the user cannot change the direct project ID
+    if (data.legacy) {
+      data.legacy = _.assign({}, challenge.legacy, data.legacy);
+      _.set(data, "legacy.directProjectId", challenge.legacy.directProjectId);
+    }
   }
 
   // Remove fields from data that are not allowed to be updated and that match the existing challenge
