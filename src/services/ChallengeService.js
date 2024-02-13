@@ -1524,9 +1524,7 @@ async function updateChallenge(currentUser, challengeId, data) {
   if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
     projectId = _.get(challenge, "projectId");
 
-    ({ billingAccountId, markup }) = await projectHelper.getProjectBillingInformation(
-      projectId
-    );
+    ({ billingAccountId, markup } = await projectHelper.getProjectBillingInformation(projectId));
 
     if (billingAccountId && _.isUndefined(_.get(challenge, "billing.billingAccountId"))) {
       _.set(data, "billing.billingAccountId", billingAccountId);
