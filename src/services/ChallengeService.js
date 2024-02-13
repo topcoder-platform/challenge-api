@@ -1520,11 +1520,11 @@ async function updateChallenge(currentUser, challengeId, data) {
     convertPrizeSetValuesToDollars(challenge.prizeSets, challenge.overview);
   }
 
-  let projectId;
-  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId ?? "")) {
+  let projectId, billingAccountId, markup;
+  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
     projectId = _.get(challenge, "projectId");
 
-    const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
+    ({ billingAccountId, markup }) = await projectHelper.getProjectBillingInformation(
       projectId
     );
 
