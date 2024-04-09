@@ -530,13 +530,9 @@ class ChallengeHelper {
   }
 
   isProjectIdRequired(timelineTemplateId) {
-    if (
-      _.isNull(timelineTemplateId) ||
-      _.isUndefined(timelineTemplateId) ||
-      !_.includes(config.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID, timelineTemplateId)
-    )
-      return true;
-    return false;
+    const template = _.get(config, "SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID", '517e76b0-8824-4e72-9b48-a1ebde1793a8');
+
+    return template !== timelineTemplateId;
   }
 }
 
