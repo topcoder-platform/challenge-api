@@ -8,6 +8,8 @@
     "dev": "nodemon app.js",
     "lint": "prettier src/**/*.js",
     "lint:fix": "prettier --write src/**/*.js",
+    "standard-lint": "standard",
+    "standard-lint:fix": "standard --fix",
     "init-es": "node src/init-es.js",
     "init-db": "node src/init-db.js",
     "sync-es": "node src/scripts/sync-es.js",
@@ -37,13 +39,14 @@
     "mocha-prepare": "^0.1.0",
     "nodemon": "^2.0.20",
     "nyc": "^14.0.0",
-    "prettier": "^2.8.1"
+    "prettier": "^2.8.1",
+    "standard": "^17.1.0"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.8.12",
     "@opensearch-project/opensearch": "^2.2.0",
-    "@topcoder-framework/domain-challenge": "^0.24.1",
     "@topcoder-framework/domain-acl": "^0.24.0",
+    "@topcoder-framework/domain-challenge": "^0.24.1",
     "@topcoder-framework/lib-common": "^0.24.1",
     "aws-sdk": "^2.1145.0",
     "axios": "^0.19.0",
