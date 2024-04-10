@@ -4,7 +4,7 @@
 
 const constants = require("../app-constants");
 const {
-  SCOPES: { PAYMENT, READ, CREATE, UPDATE, DELETE, ALL },
+  SCOPES: { READ, CREATE, UPDATE, DELETE, ALL },
 } = require("config");
 
 module.exports = {
@@ -110,14 +110,6 @@ module.exports = {
       auth: "jwt",
       access: [constants.UserRoles.Admin],
       scopes: [UPDATE, ALL],
-    },
-  },
-  "/challenges/:challengeId/legacy-payment": {
-    patch: {
-      controller: "ChallengeController",
-      method: "updateLegacyPayout",
-      auth: "jwt",
-      scopes: [PAYMENT],
     },
   },
   "/challenges/:challengeId/statistics": {
