@@ -74,8 +74,8 @@ module.exports = (app) => {
                 )
               ) {
                 next(new errors.ForbiddenError(`You are not allowed to perform this action, because the roles are incorrect. \
-                                                Required scopes: ${JSON.stringify(def.access)} \
-                                                Provided scopes: ${JSON.stringify(req.authUser.roles)}`));
+                                                Required roles: ${JSON.stringify(def.access)} \
+                                                Provided roles: ${JSON.stringify(req.authUser.roles)}`));
               } else {
                 // user token is used in create/update challenge to ensure user can create/update challenge under specific project
                 req.userToken = req.headers.authorization.split(" ")[1];
