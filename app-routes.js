@@ -53,7 +53,9 @@ module.exports = (app) => {
           if (req.authUser.isMachine) {
             // M2M
             if (!req.authUser.scopes || !helper.checkIfExists(def.scopes, req.authUser.scopes)) {
-              next(new errors.ForbiddenError("You are not allowed to perform this action!"));
+              next(new errors.ForbiddenError(`You are not allowed to perform this action, because the scopes are incorrect. \
+                                              Required scopes: ${JSON.stringify(def.scopes)} \
+                                              Provided scopes: ${JSON.stringify(req.authUser.scopes)}`));
             } else {
               req.authUser.handle = config.M2M_AUDIT_HANDLE;
               req.authUser.userId = config.M2M_AUDIT_USERID;
@@ -71,14 +73,17 @@ module.exports = (app) => {
                   _.map(req.authUser.roles, (r) => r.toLowerCase())
                 )
               ) {
-                next(new errors.ForbiddenError("You are not allowed to perform this action!"));
+                next(new errors.ForbiddenError(`You are not allowed to perform this action, because the roles are incorrect. \
+                                                Required roles: ${JSON.stringify(def.access)} \
+                                                Provided roles: ${JSON.stringify(req.authUser.roles)}`));
               } else {
                 // user token is used in create/update challenge to ensure user can create/update challenge under specific project
                 req.userToken = req.headers.authorization.split(" ")[1];
                 next();
               }
             } else {
-              next(new errors.ForbiddenError("You are not authorized to perform this action"));
+              next(new errors.ForbiddenError("You are not authorized to perform this action, \
+                                             because no roles were provided"));
             }
           }
         });
