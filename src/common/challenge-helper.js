@@ -169,7 +169,11 @@ class ChallengeHelper {
 
   async validateCreateChallengeRequest(currentUser, challenge) {
     // projectId is required for non self-service challenges
-    if (challenge.legacy.selfService == null && challenge.projectId == null) {
+    if (
+      challenge.legacy.selfService == null &&
+      challenge.projectId == null &&
+      this.isProjectIdRequired(challenge.timelineTemplateId)
+    ) {
       throw new errors.BadRequestError("projectId is required for non self-service challenges.");
     }
 
@@ -523,6 +527,12 @@ class ChallengeHelper {
 
       delete overview.totalPrizesInCents;
     }
+  }
+
+  isProjectIdRequired(timelineTemplateId) {
+    const template = _.get(config, "SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID", '517e76b0-8824-4e72-9b48-a1ebde1793a8');
+
+    return template !== timelineTemplateId;
   }
 }
 
