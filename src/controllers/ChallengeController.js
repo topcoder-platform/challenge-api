@@ -105,6 +105,26 @@ async function updateChallenge(req, res) {
 }
 
 /**
+ * Update Legacy Payout (Updates informixoltp:payment_detail)
+ * This has no effect other than to keep DW in sync for looker with
+ * Updates that happen in Wallet
+ */
+async function updateLegacyPayout(req, res) {
+  logger.debug(
+    `updateLegacyPayout User: ${JSON.stringify(req.authUser)} - ChallengeID: ${
+      req.params.challengeId
+    } - Body: ${JSON.stringify(req.body)}`
+  );
+  const result = await service.updateLegacyPayout(
+    req,
+    req.authUser,
+    req.params.challengeId,
+    req.body
+  );
+  res.send(result);
+}
+
+/**
  * Delete challenge
  * @param {Object} req the request
  * @param {Object} res the response
@@ -152,6 +172,7 @@ module.exports = {
   createChallenge,
   getChallenge,
   updateChallenge,
+  updateLegacyPayout,
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,
