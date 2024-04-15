@@ -2498,14 +2498,14 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
   });
 }
 
-async function updateLegacyPayout(currentUser, challengeId, v5Payout) {
-  console.log(`Update legacy payment data for challenge: ${challengeId} with data: `, v5Payout);
+async function updateLegacyPayout(currentUser, challengeId, data) {
+  console.log(`Update legacy payment data for challenge: ${challengeId} with data: `, data);
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
 
   // SQL qurey to fetch the payment and payment_detail record
   let sql = `SELECT * FROM informixoltp:payment p
     INNER JOIN informixoltp:payment_detail pd ON p.most_recent_detail_id = pd.payment_detail_id
-    WHERE p.user_id = ${v5Payout.userId} AND`;
+    WHERE p.user_id = ${data.userId} AND`;
 
   if (challenge.legacyId != null) {
     sql += ` pd.component_project_id = ${challenge.legacyId}`;
@@ -2529,28 +2529,28 @@ async function updateLegacyPayout(currentUser, challengeId, v5Payout) {
     EnteredIntoPaymentSystem: 70,
   };
 
-  if (v5Payout.status != null) {
-    updateClauses.push(`payment_status_id = ${statusMap[v5Payout.status]}`);
-    if (v5Payout.status === "Paid") {
-      updateClauses.push(`date_paid = '${v5Payout.datePaid}'`);
+  if (data.status != null) {
+    updateClauses.push(`payment_status_id = ${statusMap[data.status]}`);
+    if (data.status === "Paid") {
+      updateClauses.push(`date_paid = '${data.datePaid}'`);
     } else {
       updateClauses.push("date_paid = null");
     }
   }
 
-  if (v5Payout.releaseDate != null) {
-    updateClauses.push(`date_due = '${v5Payout.releaseDate}'`);
+  if (data.releaseDate != null) {
+    updateClauses.push(`date_due = '${data.releaseDate}'`);
   }
 
   const paymentDetailIds = result.rows.map(
     (row) => row.fields.find((field) => field.key === "payment_detail_id").value
   );
 
-  if (v5Payout.amount != null) {
-    updateClauses.push(`total_amount = ${v5Payout.amount}`);
+  if (data.amount != null) {
+    updateClauses.push(`total_amount = ${data.amount}`);
     if (paymentDetailIds.length === 1) {
-      updateClauses.push(`net_amount = ${v5Payout.amount}`);
-      updateClauses.push(`gross_amount = ${v5Payout.amount}`);
+      updateClauses.push(`net_amount = ${data.amount}`);
+      updateClauses.push(`gross_amount = ${data.amount}`);
     }
   }
 
@@ -2572,9 +2572,9 @@ async function updateLegacyPayout(currentUser, challengeId, v5Payout) {
 
   await aclQueryDomain.rawQuery({ sql: updateQuery });
 
-  if (v5Payout.amount != null) {
+  if (data.amount != null) {
     if (paymentDetailIds.length > 1) {
-      const amountInCents = v5Payout.amount * 100;
+      const amountInCents = data.amount * 100;
 
       const split1Cents = Math.round(amountInCents * 0.75);
       const split2Cents = amountInCents - split1Cents;
