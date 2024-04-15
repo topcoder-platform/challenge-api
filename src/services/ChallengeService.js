@@ -2171,14 +2171,7 @@ updateChallenge.schema = {
             .unknown(true)
         )
         .optional(),
-      overview: Joi.any().forbidden(),
-      v5Payout: Joi.object().keys({
-        userId: Joi.number().integer().positive().required(),
-        amount: Joi.number().allow(null),
-        status: Joi.string().allow(null),
-        datePaid: Joi.string().allow(null),
-        releaseDate: Joi.string().allow(null),
-      }),
+      overview: Joi.any().forbidden()      
     })
     .unknown(true)
     .required(),
@@ -2505,9 +2498,9 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
   });
 }
 
-async function updateLegacyPayout(currentUser, challengeId, data) {
+async function updateLegacyPayout(currentUser, challengeId, v5Payout) {
+  console.log(`Update legacy payment data for challenge: ${challengeId} with data: `, v5Payout);
   const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-  const { v5Payout } = data;
 
   // SQL qurey to fetch the payment and payment_detail record
   let sql = `SELECT * FROM informixoltp:payment p
@@ -2619,16 +2612,12 @@ updateLegacyPayout.schema = {
   challengeId: Joi.id(),
   data: Joi.object()
     .keys({
-      v5Payout: Joi.object().keys({
-        userId: Joi.number().integer().positive().required(),
-        amount: Joi.number().allow(null),
-        status: Joi.string().allow(null),
-        datePaid: Joi.string().allow(null),
-        releaseDate: Joi.string().allow(null),
-      }),
+      userId: Joi.number().integer().positive().required(),
+      amount: Joi.number().allow(null),
+      status: Joi.string().allow(null),
+      datePaid: Joi.string().allow(null),
+      releaseDate: Joi.string().allow(null),
     })
-    .unknown(true)
-    .required(),
 };
 
 /**
