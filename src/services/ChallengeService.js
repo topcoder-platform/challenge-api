@@ -2171,7 +2171,7 @@ updateChallenge.schema = {
             .unknown(true)
         )
         .optional(),
-      overview: Joi.any().forbidden(),
+      overview: Joi.any().forbidden()      
     })
     .unknown(true)
     .required(),
@@ -2498,6 +2498,128 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
   });
 }
 
+async function updateLegacyPayout(currentUser, challengeId, data) {
+  console.log(`Update legacy payment data for challenge: ${challengeId} with data: `, data);
+  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+
+  // SQL qurey to fetch the payment and payment_detail record
+  let sql = `SELECT * FROM informixoltp:payment p
+    INNER JOIN informixoltp:payment_detail pd ON p.most_recent_detail_id = pd.payment_detail_id
+    WHERE p.user_id = ${data.userId} AND`;
+
+  if (challenge.legacyId != null) {
+    sql += ` pd.component_project_id = ${challenge.legacyId}`;
+  } else {
+    sql += ` pd.jira_issue_id = \'${challengeId}\'`;
+  }
+
+  sql += " ORDER BY pd.payment_detail_id ASC";
+
+  console.log("Fetch legacy payment detail: ", sql);
+
+  const result = await aclQueryDomain.rawQuery({ sql });
+  let updateClauses = [`date_modified = current`];
+
+  const statusMap = {
+    Paid: 53,
+    OnHold: 55,
+    OnHoldAdmin: 55,
+    Owed: 56,
+    Cancelled: 65,
+    EnteredIntoPaymentSystem: 70,
+  };
+
+  if (data.status != null) {
+    updateClauses.push(`payment_status_id = ${statusMap[data.status]}`);
+    if (data.status === "Paid") {
+      updateClauses.push(`date_paid = '${data.datePaid}'`);
+    } else {
+      updateClauses.push("date_paid = null");
+    }
+  }
+
+  if (data.releaseDate != null) {
+    updateClauses.push(`date_due = '${data.releaseDate}'`);
+  }
+
+  const paymentDetailIds = result.rows.map(
+    (row) => row.fields.find((field) => field.key === "payment_detail_id").value
+  );
+
+  if (data.amount != null) {
+    updateClauses.push(`total_amount = ${data.amount}`);
+    if (paymentDetailIds.length === 1) {
+      updateClauses.push(`net_amount = ${data.amount}`);
+      updateClauses.push(`gross_amount = ${data.amount}`);
+    }
+  }
+
+  if (paymentDetailIds.length === 0) {
+    return {
+      success: false,
+      message: "No payment detail record found",
+    };
+  }
+
+  const whereClause = [`payment_detail_id IN (${paymentDetailIds.join(",")})`];
+
+  const updateQuery = `UPDATE informixoltp:payment_detail SET ${updateClauses.join(
+    ", "
+  )} WHERE ${whereClause.join(" AND ")}`;
+
+  console.log("Update Clauses", updateClauses);
+  console.log("Update Query", updateQuery);
+
+  await aclQueryDomain.rawQuery({ sql: updateQuery });
+
+  if (data.amount != null) {
+    if (paymentDetailIds.length > 1) {
+      const amountInCents = data.amount * 100;
+
+      const split1Cents = Math.round(amountInCents * 0.75);
+      const split2Cents = amountInCents - split1Cents;
+
+      const split1Dollars = Number((split1Cents / 100).toFixed(2));
+      const split2Dollars = Number((split2Cents / 100).toFixed(2));
+
+      const paymentUpdateQueries = paymentDetailIds.map((paymentDetailId, index) => {
+        let amt = 0;
+        if (index === 0) {
+          amt = split1Dollars;
+        }
+        if (index === 1) {
+          amt = split2Dollars;
+        }
+
+        return `UPDATE informixoltp:payment_detail SET date_modified = CURRENT, net_amount = ${amt}, gross_amount = ${amt} WHERE payment_detail_id = ${paymentDetailId}`;
+      });
+
+      console.log("Payment Update Queries", paymentUpdateQueries);
+
+      await Promise.all(
+        paymentUpdateQueries.map((query) => aclQueryDomain.rawQuery({ sql: query }))
+      );
+    }
+  }
+
+  return {
+    success: true,
+    message: "Successfully updated legacy payout",
+  };
+}
+updateLegacyPayout.schema = {
+  currentUser: Joi.any(),
+  challengeId: Joi.id(),
+  data: Joi.object()
+    .keys({
+      userId: Joi.number().integer().positive().required(),
+      amount: Joi.number().allow(null),
+      status: Joi.string().allow(null),
+      datePaid: Joi.string().allow(null),
+      releaseDate: Joi.string().allow(null),
+    })
+};
+
 /**
  * Get SRM Schedule
  * @param {Object} criteria the criteria
@@ -2562,6 +2684,7 @@ module.exports = {
   getChallenge,
   updateChallenge,
   deleteChallenge,
+  updateLegacyPayout,
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
