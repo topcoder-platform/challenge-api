@@ -92,6 +92,7 @@ module.exports = {
     UPDATE: process.env.SCOPE_CHALLENGES_UPDATE || "update:challenges",
     DELETE: process.env.SCOPE_CHALLENGES_DELETE || "delete:challenges",
     ALL: process.env.SCOPE_CHALLENGES_ALL || "all:challenges",
+    PAYMENT: process.env.SCOPE_PAYMENT || "create:payments",
   },
 
   DEFAULT_CONFIDENTIALITY_TYPE: process.env.DEFAULT_CONFIDENTIALITY_TYPE || "public",
@@ -129,5 +130,8 @@ module.exports = {
   GRPC_CHALLENGE_SERVER_HOST: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_HOST || "localhost",
   GRPC_CHALLENGE_SERVER_PORT: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_PORT || 8888,
   GRPC_ACL_SERVER_HOST: process.env.GRPC_ACL_SERVER_HOST || "localhost",
-  GRPC_ACL_SERVER_PORT: process.env.GRPC_ACL_SERVER_PORT || 8889,
+  GRPC_ACL_SERVER_PORT: process.env.GRPC_ACL_SERVER_PORT || 40020,
+
+  SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID:
+    process.env.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID || "517e76b0-8824-4e72-9b48-a1ebde1793a8",
 };
