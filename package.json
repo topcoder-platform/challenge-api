@@ -61,7 +61,7 @@
     "dompurify": "^3.0.2",
     "dotenv": "^8.2.0",
     "elasticsearch": "^16.7.3",
-    "express": "^4.15.4",
+    "express": "^4.19.2",
     "express-fileupload": "^1.1.6",
     "express-interceptor": "^1.2.0",
     "get-parameter-names": "^0.3.0",
