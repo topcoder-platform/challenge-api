@@ -715,6 +715,7 @@ async function searchChallenges(currentUser, criteria) {
         ? await esClient.search(esQuery)
         : (await esClient.search(esQuery)).body;
   } catch (e) {
+    logger.error(JSON.stringify(e));
     // Catch error when the ES is fresh and has no data
     docs = {
       hits: {
