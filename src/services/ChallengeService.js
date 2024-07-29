@@ -153,12 +153,6 @@ async function searchChallenges(currentUser, criteria) {
 
   const _hasAdminRole = hasAdminRole(currentUser);
 
-  const includeSelfService =
-    currentUser &&
-    (currentUser.isMachine ||
-      _hasAdminRole ||
-      _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()));
-
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : [];
   const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : [];
 
@@ -642,83 +636,6 @@ async function searchChallenges(currentUser, criteria) {
           ...(currentUser && !_hasAdminRole && !_.get(currentUser, "isMachine", false)
             ? [{ match_phrase: { "task.memberId": currentUser.userId } }]
             : []),
-        ],
-      },
-    });
-  }
-
-  if (!includeSelfService) {
-    mustQuery.push({
-      bool: {
-        should: [
-          { bool: { must_not: { exists: { field: "legacy.selfService" } } } },
-          ...(currentUser
-            ? [
-                {
-                  bool: {
-                    must: [
-                      {
-                        bool: {
-                          must_not: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.New,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        bool: {
-                          must_not: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Draft,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        bool: {
-                          must_not: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Approved,
-                            },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                },
-                {
-                  bool: {
-                    must: { match_phrase: { createdBy: currentUser.handle } },
-                  },
-                },
-              ]
-            : [
-                {
-                  bool: {
-                    should: [
-                      {
-                        bool: {
-                          must: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Active,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        bool: {
-                          must: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Completed,
-                            },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                },
-              ]),
         ],
       },
     });
