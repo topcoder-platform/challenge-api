@@ -153,12 +153,6 @@ async function searchChallenges(currentUser, criteria) {
 
   const _hasAdminRole = hasAdminRole(currentUser);
 
-  const includeSelfService =
-    currentUser &&
-    (currentUser.isMachine ||
-      _hasAdminRole ||
-      _.includes(config.SELF_SERVICE_WHITELIST_HANDLES, currentUser.handle.toLowerCase()));
-
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : [];
   const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : [];
 
@@ -463,6 +457,18 @@ async function searchChallenges(currentUser, criteria) {
   }
 
   let sortByProp = criteria.sortBy ? criteria.sortBy : "created";
+
+  // Add '.keyword' to the end of the sort by prop for certain fields 
+  // (TOP-2364)
+  if(sortByProp == "updatedBy" || 
+     sortByProp == "createdBy" ||
+     sortByProp == "name" || 
+     sortByProp == "type" || 
+     sortByProp == "status") {
+
+      sortByProp = sortByProp + ".keyword";
+  }
+
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : "desc";
 
   const mustQuery = [];
@@ -647,83 +653,6 @@ async function searchChallenges(currentUser, criteria) {
     });
   }
 
-  if (!includeSelfService) {
-    mustQuery.push({
-      bool: {
-        should: [
-          { bool: { must_not: { exists: { field: "legacy.selfService" } } } },
-          ...(currentUser
-            ? [
-                {
-                  bool: {
-                    must: [
-                      {
-                        bool: {
-                          must_not: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.New,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        bool: {
-                          must_not: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Draft,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        bool: {
-                          must_not: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Approved,
-                            },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                },
-                {
-                  bool: {
-                    must: { match_phrase: { createdBy: currentUser.handle } },
-                  },
-                },
-              ]
-            : [
-                {
-                  bool: {
-                    should: [
-                      {
-                        bool: {
-                          must: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Active,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        bool: {
-                          must: {
-                            match_phrase: {
-                              status: constants.challengeStatuses.Completed,
-                            },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                },
-              ]),
-        ],
-      },
-    });
-  }
-
   if (groupsQuery.length > 0) {
     mustQuery.push({
       bool: {
@@ -787,6 +716,7 @@ async function searchChallenges(currentUser, criteria) {
       ],
     },
   };
+
   // Search with constructed query
   let docs;
   try {
@@ -795,6 +725,7 @@ async function searchChallenges(currentUser, criteria) {
         ? await esClient.search(esQuery)
         : (await esClient.search(esQuery)).body;
   } catch (e) {
+    logger.error(JSON.stringify(e));
     // Catch error when the ES is fresh and has no data
     docs = {
       hits: {
