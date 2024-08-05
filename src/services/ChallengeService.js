@@ -717,6 +717,7 @@ async function searchChallenges(currentUser, criteria) {
     },
   };
 
+  logger.info(`ES Query: ${JSON.stringify(esQuery)}`)
   // Search with constructed query
   let docs;
   try {
