@@ -710,7 +710,7 @@ async function searchChallenges(currentUser, criteria) {
               [sortByProp]: {
                 order: sortOrderProp,
                 missing: "_last",
-                unmapped_type: "text",
+                unmapped_type: "keyword",
               },
             },
       ],
