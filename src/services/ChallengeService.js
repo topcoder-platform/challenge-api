@@ -458,17 +458,6 @@ async function searchChallenges(currentUser, criteria) {
 
   let sortByProp = criteria.sortBy ? criteria.sortBy : "created";
 
-  // Add '.keyword' to the end of the sort by prop for certain fields 
-  // (TOP-2364)
-  if(sortByProp == "updatedBy" || 
-     sortByProp == "createdBy" ||
-     sortByProp == "name" || 
-     sortByProp == "type" || 
-     sortByProp == "status") {
-
-      sortByProp = sortByProp + ".keyword";
-  }
-
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : "desc";
 
   const mustQuery = [];
@@ -717,6 +706,7 @@ async function searchChallenges(currentUser, criteria) {
     },
   };
 
+  logger.info(`ES Query: ${JSON.stringify(esQuery)}`)
   // Search with constructed query
   let docs;
   try {
