@@ -458,15 +458,17 @@ async function searchChallenges(currentUser, criteria) {
 
   let sortByProp = criteria.sortBy ? criteria.sortBy : "created";
 
-  // Add '.keyword' to the end of the sort by prop for certain fields 
+  // Reverting change to test TOP-2433 fix
+  // Add '.keyword' to the end of the sort by prop for certain fields
   // (TOP-2364)
-  if(sortByProp == "updatedBy" || 
-     sortByProp == "createdBy" ||
-     sortByProp == "name" || 
-     sortByProp == "type" || 
-     sortByProp == "status") {
-
-      sortByProp = sortByProp + ".keyword";
+  if (
+    sortByProp == "updatedBy" ||
+    sortByProp == "createdBy" ||
+    sortByProp == "name" ||
+    sortByProp == "type" ||
+    sortByProp == "status"
+  ) {
+    sortByProp = sortByProp + ".keyword";
   }
 
   const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : "desc";
@@ -717,7 +719,7 @@ async function searchChallenges(currentUser, criteria) {
     },
   };
 
-  logger.info(`ES Query: ${JSON.stringify(esQuery)}`)
+  logger.info(`ES Query: ${JSON.stringify(esQuery)}`);
   // Search with constructed query
   let docs;
   try {
@@ -2097,7 +2099,7 @@ updateChallenge.schema = {
             .unknown(true)
         )
         .optional(),
-      overview: Joi.any().forbidden()      
+      overview: Joi.any().forbidden(),
     })
     .unknown(true)
     .required(),
@@ -2536,14 +2538,13 @@ async function updateLegacyPayout(currentUser, challengeId, data) {
 updateLegacyPayout.schema = {
   currentUser: Joi.any(),
   challengeId: Joi.id(),
-  data: Joi.object()
-    .keys({
-      userId: Joi.number().integer().positive().required(),
-      amount: Joi.number().allow(null),
-      status: Joi.string().allow(null),
-      datePaid: Joi.string().allow(null),
-      releaseDate: Joi.string().allow(null),
-    })
+  data: Joi.object().keys({
+    userId: Joi.number().integer().positive().required(),
+    amount: Joi.number().allow(null),
+    status: Joi.string().allow(null),
+    datePaid: Joi.string().allow(null),
+    releaseDate: Joi.string().allow(null),
+  }),
 };
 
 /**
