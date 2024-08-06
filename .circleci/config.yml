@@ -1,7 +1,7 @@
 version: 2
 defaults: &defaults
   docker:
-  - image: cimg/python:3.12.1-browsers
+    - image: cimg/python:3.12.1-browsers
 install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
@@ -20,32 +20,32 @@ restore_cache_settings_for_build: &restore_cache_settings_for_build
 save_cache_settings: &save_cache_settings
   key: docker-node-modules-{{ checksum "yarn.lock" }}
   paths:
-  - node_modules
+    - node_modules
 
 builddeploy_steps: &builddeploy_steps
-- checkout
-- setup_remote_docker
-- run: *install_dependency
-- run: *install_deploysuite
-- restore_cache: *restore_cache_settings_for_build
-- run:
-    name: "Authenticate with CodeArtifact and build Docker image"
-    command: |
-      ./awsconfiguration.sh ${CODEARTIFACT_ENV}
-      source awsenvconf
-      aws codeartifact login --tool npm --repository topcoder-framework --domain topcoder --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --namespace @topcoder-framework
-      cp ~/.npmrc .
-      rm -f awsenvconf
-      ./build.sh ${APPNAME}
-- save_cache: *save_cache_settings
-- deploy:
-    name: Running MasterScript.
-    command: |
-      ./awsconfiguration.sh $DEPLOY_ENV
-      source awsenvconf
-      ./buildenv.sh -e $DEPLOY_ENV -b ${LOGICAL_ENV}-${APPNAME}-deployvar
-      source buildenvvar
-      ./master_deploy.sh -d ECS -e $DEPLOY_ENV -t latest -s ${LOGICAL_ENV}-global-appvar,${LOGICAL_ENV}-${APPNAME}-appvar -i ${APPNAME}
+  - checkout
+  - setup_remote_docker
+  - run: *install_dependency
+  - run: *install_deploysuite
+  - restore_cache: *restore_cache_settings_for_build
+  - run:
+      name: "Authenticate with CodeArtifact and build Docker image"
+      command: |
+        ./awsconfiguration.sh ${CODEARTIFACT_ENV}
+        source awsenvconf
+        aws codeartifact login --tool npm --repository topcoder-framework --domain topcoder --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --namespace @topcoder-framework
+        cp ~/.npmrc .
+        rm -f awsenvconf
+        ./build.sh ${APPNAME}
+  - save_cache: *save_cache_settings
+  - deploy:
+      name: Running MasterScript.
+      command: |
+        ./awsconfiguration.sh $DEPLOY_ENV
+        source awsenvconf
+        ./buildenv.sh -e $DEPLOY_ENV -b ${LOGICAL_ENV}-${APPNAME}-deployvar
+        source buildenvvar
+        ./master_deploy.sh -d ECS -e $DEPLOY_ENV -t latest -s ${LOGICAL_ENV}-global-appvar,${LOGICAL_ENV}-${APPNAME}-appvar -i ${APPNAME}
 jobs:
   # Build & Deploy against development backend
   "build-dev":
@@ -79,27 +79,26 @@ workflows:
   version: 2
   build:
     jobs:
-    # Development builds are executed on "develop" branch only.
-    - "build-dev":
-        context: org-global
-        filters:
-          branches:
-            only:
-            - dev
-            - feature/top-262-projectid-non-mandatory
-            - TOP-2364
+      # Development builds are executed on "develop" branch only.
+      - "build-dev":
+          context: org-global
+          filters:
+            branches:
+              only:
+                - dev
+                - TOP-2433-challenge-not-found
 
-    - "build-qa":
-        context: org-global
-        filters:
-          branches:
-            only:
-            - qa
+      - "build-qa":
+          context: org-global
+          filters:
+            branches:
+              only:
+                - qa
 
-    # Production builds are exectuted only on tagged commits to the
-    # master branch.
-    - "build-prod":
-        context: org-global
-        filters:
-          branches:
-            only: master
+      # Production builds are exectuted only on tagged commits to the
+      # master branch.
+      - "build-prod":
+          context: org-global
+          filters:
+            branches:
+              only: master
