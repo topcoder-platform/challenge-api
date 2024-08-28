@@ -17,7 +17,7 @@ const HttpStatus = require("http-status-codes");
 const xss = require("xss");
 const logger = require("./logger");
 
-const { Client: ESClient } = require("@opensearch-project/opensearch");
+const { Client: OSClient } = require("@opensearch-project/opensearch");
 const elasticsearch = require("elasticsearch");
 
 const projectHelper = require("./project-helper");
@@ -734,7 +734,7 @@ function getESClient() {
       });
     }
   } else {
-    esClient = new ESClient({
+    esClient = new OSClient({
       node: esHost,
       ssl: {
         rejectUnauthorized: false,
