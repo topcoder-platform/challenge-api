@@ -87,6 +87,7 @@ workflows:
             only:
             - dev
             - feature/top-262-projectid-non-mandatory
+            - TOP-2364
 
     - "build-qa":
         context: org-global
