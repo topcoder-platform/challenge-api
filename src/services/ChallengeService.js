@@ -884,7 +884,7 @@ async function createChallenge(currentUser, challenge, userToken) {
   }
 
   /** Ensure project exists, and set direct project id, billing account id & markup */
-  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
+  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId) || challenge.projectId) {
     const { projectId } = challenge;
 
     const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
