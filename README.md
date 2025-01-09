@@ -62,6 +62,7 @@ The following parameters can be set in config files or in env variables:
 - ES.ES_INDEX: Elasticsearch index name
 - ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
+- OPENSEARCH: Flag to use Opensearch NPM instead of Elasticsearch
 - RESOURCES_API_URL: TC resources API base URL
 - GROUPS_API_URL: TC groups API base URL
 - PROJECTS_API_URL: TC projects API base URL
