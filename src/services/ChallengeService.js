@@ -724,8 +724,10 @@ async function searchChallenges(currentUser, criteria) {
       },
     };
   }
+
   // Extract data from hits
-  const total = docs.hits.total;
+  const total = docs.hits.total.value;
+
   let result = _.map(docs.hits.hits, (item) => item._source);
 
   // Hide privateDescription for non-register challenges
