@@ -1,0 +1,3331 @@
+[
+  {
+      "id": "54f5ed28-6acf-4f25-a8b0-e529150adf79",
+      "name": "Marathon Match Leaderboard Test challenge",
+      "typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DATA_SCIENCE",
+          "subTrack": "MARATHON_MATCH",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30001610
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+      "phases": [
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-04-04T04:29:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-21T04:29:51.000Z",
+              "description": "Registration Phase",
+              "id": "20eeece9-4ee0-4531-8ff4-a97ed6ca9762",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-21T04:29:51.000Z"
+          },
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-04-04T04:38:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-21T04:38:22.000Z",
+              "description": "Submission Phase",
+              "id": "fe6e484b-ec8c-412d-a88c-73c26756d0be",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-21T04:38:22.000Z"
+          },
+          {
+              "duration": 604800,
+              "scheduledEndDate": "2025-04-11T04:38:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "cdb8b363-34ac-4f29-a3bb-0b23142beb2b",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001610
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-04-04T04:38:00.000Z"
+          }
+      ],
+      "events": [{
+        "id": 2025,
+        "name": "TCO25",
+        "key": "TCO25"
+      }],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-21T04:29:51.000Z",
+      "endDate": "2025-04-11T04:38:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Marathon Match Leaderboard Test challenge Discussion",
+              "id": "fac1678e-952e-4afc-8ee7-e7fcfaa2fa2d",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-21T04:27:23.771Z",
+      "updated": "2025-03-21T04:38:23.116Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 30,
+      "numOfRegistrants": 28,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-21T04:29:51.228Z",
+      "registrationEndDate": "2025-04-04T04:29:00.000Z",
+      "submissionStartDate": "2025-03-21T04:38:22.000Z",
+      "submissionEndDate": "2025-04-04T04:38:00.000Z",
+      "track": "Development",
+      "type": "Marathon Match",
+      "legacyId": 30096757,
+      "currentPhase": {
+          "duration": 1209600,
+          "scheduledEndDate": "2025-04-04T04:38:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-21T04:38:22.000Z",
+          "description": "Submission Phase",
+          "id": "fe6e484b-ec8c-412d-a88c-73c26756d0be",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-21T04:38:22.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "3f5a35ea-ff30-45e8-b9f2-6c7546497bb5",
+      "name": "Artifcat MM",
+      "typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+      "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+      "legacy": {
+          "track": "DATA_SCIENCE",
+          "subTrack": "MARATHON_MATCH",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30001610
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+      "phases": [
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-04-01T07:03:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-18T07:03:23.000Z",
+              "description": "Registration Phase",
+              "id": "d73119be-bb12-457d-86cb-af35fb99751e",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T07:03:23.000Z"
+          },
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-04-01T07:07:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-18T07:07:50.000Z",
+              "description": "Submission Phase",
+              "id": "eaec2745-cd8f-4d72-af51-52f3a3a41cc1",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-18T07:07:50.000Z"
+          },
+          {
+              "duration": 604800,
+              "scheduledEndDate": "2025-04-08T07:07:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "5f961e34-5339-4c76-bd85-435c7d3405a8",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-04-01T07:07:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-18T07:03:23.000Z",
+      "endDate": "2025-04-08T07:07:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Artifcat MM Discussion",
+              "id": "002e4c2a-70d2-49e4-af3f-111f032ff81f",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "jcori",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-18T07:02:57.590Z",
+      "updated": "2025-03-18T07:07:50.774Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 3,
+      "numOfRegistrants": 2,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-18T07:03:23.498Z",
+      "registrationEndDate": "2025-04-01T07:03:00.000Z",
+      "submissionStartDate": "2025-03-18T07:07:50.000Z",
+      "submissionEndDate": "2025-04-01T07:07:00.000Z",
+      "track": "Data Science",
+      "type": "Marathon Match",
+      "legacyId": 30096756,
+      "currentPhase": {
+          "duration": 1209600,
+          "scheduledEndDate": "2025-04-01T07:07:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-18T07:07:50.000Z",
+          "description": "Submission Phase",
+          "id": "eaec2745-cd8f-4d72-af51-52f3a3a41cc1",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-18T07:07:50.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "856139b6-29d7-42c8-995f-2bca5b7b31bb",
+      "name": "Artifact 1 dev chl",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-23T07:02:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-18T07:02:33.000Z",
+              "description": "Registration Phase",
+              "id": "01e3965a-0291-4829-bc03-d969026d3dfa",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T07:02:33.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-23T07:07:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-18T07:07:43.000Z",
+              "description": "Submission Phase",
+              "id": "9950bada-de11-455e-8aec-cc9726a1ef08",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-18T07:07:43.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-25T07:07:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "66306acc-bf1d-4650-bff5-1fe5c37ba5f1",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-23T07:07:00.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-26T07:07:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "90466a31-e669-40f4-b5c0-d747b57f0eee",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-25T07:07:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-26T19:07:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "a1b5ba04-32a2-4700-9709-6c77c021c656",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-26T07:07:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-18T07:02:33.000Z",
+      "endDate": "2025-03-26T19:07:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Artifact 1 dev chl Discussion",
+              "id": "bbf78e92-6214-4fae-bf45-5f27eda26b33",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/856139b6-29d7-42c8-995f-2bca5b7b31bb"
+          }
+      ],
+      "createdBy": "jcori",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-18T07:02:02.997Z",
+      "updated": "2025-03-18T07:07:43.917Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 2,
+      "numOfRegistrants": 2,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-18T07:02:33.513Z",
+      "registrationEndDate": "2025-03-23T07:02:00.000Z",
+      "submissionStartDate": "2025-03-18T07:07:43.000Z",
+      "submissionEndDate": "2025-03-23T07:07:00.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096755,
+      "currentPhase": {
+          "duration": 432000,
+          "scheduledEndDate": "2025-03-23T07:07:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-18T07:07:43.000Z",
+          "description": "Submission Phase",
+          "id": "9950bada-de11-455e-8aec-cc9726a1ef08",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-18T07:07:43.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "1278d9c9-b617-4292-a2f0-51d9bc172caa",
+      "name": "March 18 artifact test",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-23T03:46:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-18T03:46:13.000Z",
+              "description": "Registration Phase",
+              "id": "cce3ac00-983d-4942-a9e5-e9cf48468d7c",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T03:46:13.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-23T03:51:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-18T03:51:45.000Z",
+              "description": "Submission Phase",
+              "id": "89149e4f-84f0-43bd-8a08-c7dfeffeeeae",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-18T03:51:45.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-25T03:51:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "06717419-bd54-4c45-851b-539e5e5e2aa4",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-23T03:51:00.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-26T03:51:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "91f058eb-917f-4cc5-8147-1c71c21eb1cc",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-25T03:51:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-26T15:51:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "64b8b922-2370-4404-a993-c4ca8cb16cb8",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-26T03:51:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-18T03:46:13.000Z",
+      "endDate": "2025-03-26T15:51:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "March 18 artifact test Discussion",
+              "id": "2d10f18d-82d0-4322-a17e-a84f5071c7eb",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/1278d9c9-b617-4292-a2f0-51d9bc172caa"
+          }
+      ],
+      "createdBy": "jcori",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-18T03:45:39.452Z",
+      "updated": "2025-03-18T03:51:45.272Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 3,
+      "numOfRegistrants": 1,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-18T03:46:13.166Z",
+      "registrationEndDate": "2025-03-23T03:46:00.000Z",
+      "submissionStartDate": "2025-03-18T03:51:45.000Z",
+      "submissionEndDate": "2025-03-23T03:51:00.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096754,
+      "currentPhase": {
+          "duration": 432000,
+          "scheduledEndDate": "2025-03-23T03:51:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-18T03:51:45.000Z",
+          "description": "Submission Phase",
+          "id": "89149e4f-84f0-43bd-8a08-c7dfeffeeeae",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-18T03:51:45.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "b5c2d356-b91e-49e0-a0f1-9476aea63a14",
+      "name": "Design CH Mar 18",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+      "legacy": {
+          "track": "DESIGN",
+          "subTrack": "WEB_DESIGNS",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "INTERNAL",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "screeningScorecardId": 30001610,
+          "reviewScorecardId": 30001610
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "918f6a3e-1a63-4680-8b5e-deb95b1411e7",
+      "phases": [
+          {
+              "duration": 518400,
+              "scheduledEndDate": "2025-03-24T03:06:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-18T03:06:55.000Z",
+              "description": "Registration Phase",
+              "id": "8f257b77-79eb-4e08-b296-55800a45902b",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T03:06:55.000Z"
+          },
+          {
+              "duration": 518400,
+              "scheduledEndDate": "2025-03-24T03:12:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-18T03:12:51.000Z",
+              "description": "Submission Phase",
+              "id": "b84e4278-a380-49cc-aa96-6ea1596f9ccc",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-18T03:12:51.000Z"
+          },
+          {
+              "duration": 14400,
+              "scheduledEndDate": "2025-03-24T07:12:00.000Z",
+              "isOpen": false,
+              "name": "Screening",
+              "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "description": "Screening Phase",
+              "id": "43b7c08e-adef-42ed-b0da-98019f02276d",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30000344
+                  }
+              ],
+              "scheduledStartDate": "2025-03-24T03:12:00.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-29T07:12:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "a4f4ad37-94f7-41d9-8c2b-13cf86a2a1fc",
+              "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30000160
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-24T07:12:00.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-31T07:12:00.000Z",
+              "isOpen": false,
+              "name": "Approval",
+              "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+              "description": "Approval Phase",
+              "id": "453b9b67-a19c-4dab-99a7-601b7bba108f",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30000720
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-29T07:12:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 100
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [
+          "Web Design"
+      ],
+      "projectId": 100315,
+      "startDate": "2025-03-18T03:06:55.000Z",
+      "endDate": "2025-03-31T07:12:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Design CH Mar 18 Discussion",
+              "id": "8617b8b1-646b-4596-a582-7bf110c2b0f8",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/b5c2d356-b91e-49e0-a0f1-9476aea63a14"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-18T03:05:03.386Z",
+      "updated": "2025-03-18T03:12:52.235Z",
+      "overview": {
+          "totalPrizes": 100,
+          "type": "USD"
+      },
+      "numOfSubmissions": 2,
+      "numOfRegistrants": 2,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-18T03:05:00.000Z",
+      "registrationEndDate": "2025-03-24T03:06:00.000Z",
+      "submissionStartDate": "2025-03-18T03:12:51.000Z",
+      "submissionEndDate": "2025-03-24T03:12:00.000Z",
+      "track": "Design",
+      "type": "Challenge",
+      "legacyId": 30096753,
+      "currentPhase": {
+          "duration": 518400,
+          "scheduledEndDate": "2025-03-24T03:12:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-18T03:12:51.000Z",
+          "description": "Submission Phase",
+          "id": "b84e4278-a380-49cc-aa96-6ea1596f9ccc",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-18T03:12:51.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "a537c08d-1e07-467e-8c1d-86fa7e6b0492",
+      "legacyId": 30096752,
+      "name": "Test Development - Task",
+      "typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "FIRST_2_FINISH",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "reviewScorecardId": 30001551,
+          "pureV5Task": true
+      },
+      "description": "description",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "task": {
+          "isTask": true,
+          "isAssigned": false,
+          "memberId": 0
+      },
+      "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+      "phases": [
+          {
+              "duration": 864000,
+              "scheduledStartDate": "2020-08-15T05:10:35.000Z",
+              "scheduledEndDate": "2020-08-25T05:10:35.000Z",
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "id": "42153912-1cba-4d89-b02a-27f19ec5c403",
+              "isOpen": false,
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "description": "Registration Phase"
+          },
+          {
+              "duration": 86400,
+              "scheduledStartDate": "2020-08-15T05:15:35.000Z",
+              "scheduledEndDate": "2020-08-16T05:15:35.000Z",
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "efb2d97e-3891-4ffe-8f60-d89576700a87",
+              "isOpen": false,
+              "constraints": [],
+              "description": "Submission Phase"
+          },
+          {
+              "duration": 86400,
+              "scheduledStartDate": "2020-08-15T05:15:35.000Z",
+              "scheduledEndDate": "2020-08-16T05:15:35.000Z",
+              "name": "Iterative Review",
+              "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+              "id": "f7e3daae-a98a-43bd-9d38-eca05996a679",
+              "isOpen": false,
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001551
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 1
+                  }
+              ],
+              "description": "Iterative Review Phase",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49"
+          }
+      ],
+      "events": [],
+      "terms": [],
+      "prizeSets": [
+          {
+              "type": "placement",
+              "description": "Challenge Prizes",
+              "prizes": [
+                  {
+                      "value": 1,
+                      "type": "USD"
+                  }
+              ]
+          }
+      ],
+      "tags": [
+          "Heroku"
+      ],
+      "projectId": 100315,
+      "startDate": "2020-08-15T05:10:35.000Z",
+      "endDate": "2020-08-16T05:15:35.000Z",
+      "status": "Draft",
+      "attachments": [],
+      "groups": [],
+      "discussions": [],
+      "createdBy": "mess",
+      "updatedBy": "mess",
+      "created": "2025-03-17T06:20:38.023Z",
+      "updated": "2025-03-17T06:20:38.023Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [],
+      "registrationStartDate": "2020-08-15T05:10:35.000Z",
+      "registrationEndDate": "2020-08-25T05:10:35.000Z",
+      "submissionStartDate": "2020-08-15T05:15:35.000Z",
+      "submissionEndDate": "2020-08-16T05:15:35.000Z",
+      "track": "Development",
+      "type": "Task"
+  },
+  {
+      "id": "5bfe6e95-8cec-4415-84aa-c9dc3a6565bb",
+      "name": "test",
+      "typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "FIRST_2_FINISH",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30001551
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+      "phases": [
+          {
+              "duration": 2592000,
+              "scheduledEndDate": "2025-04-17T06:19:29.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "description": "Registration Phase",
+              "id": "f102636b-c072-4e0a-a47b-856f1c47cd5b",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T06:19:29.000Z"
+          },
+          {
+              "duration": 2592000,
+              "scheduledEndDate": "2025-04-17T06:24:29.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "description": "Submission Phase",
+              "id": "744fdf2f-88bc-47e9-98db-01b0f3e8017b",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-18T06:24:29.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-19T06:24:29.000Z",
+              "isOpen": false,
+              "name": "Iterative Review",
+              "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+              "description": "Iterative Review Phase",
+              "id": "f48da09c-3056-4f4c-9328-64c4031d6293",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001551
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T06:24:29.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-18T06:19:29.000Z",
+      "endDate": "2025-03-19T06:24:29.000Z",
+      "status": "Draft",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "test Discussion",
+              "id": "adbe7b8e-e3bc-4dee-8c11-c1b8204b7234",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/5bfe6e95-8cec-4415-84aa-c9dc3a6565bb"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "mess",
+      "created": "2025-03-17T06:19:30.757Z",
+      "updated": "2025-03-17T06:19:30.757Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [],
+      "registrationStartDate": "2025-03-18T06:19:29.000Z",
+      "registrationEndDate": "2025-04-17T06:19:29.000Z",
+      "submissionStartDate": "2025-03-18T06:24:29.000Z",
+      "submissionEndDate": "2025-04-17T06:24:29.000Z",
+      "track": "Development",
+      "type": "First2Finish",
+      "legacyId": 30096751
+  },
+  {
+      "id": "08cb4122-72c9-4757-8222-4a330f1d43ba",
+      "name": "Artifact test 17 Mar",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-22T04:18:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-17T04:18:50.000Z",
+              "description": "Registration Phase",
+              "id": "b20f3520-b774-4185-b9b7-5a950ff0ad6d",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-17T04:18:50.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-22T04:28:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-17T04:28:02.000Z",
+              "description": "Submission Phase",
+              "id": "f6a8b620-b878-49d9-901f-1ce0cc14c005",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-17T04:28:02.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-24T04:28:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "00a45e99-5c98-4b35-aaa0-77c688a2284c",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-22T04:28:00.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-25T04:28:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "5df2614e-7073-4a34-a90c-71617f4bb91c",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-24T04:28:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-25T16:28:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "9e7d164a-9db3-46ef-928d-48e43e69130e",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-25T04:28:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-17T04:18:50.000Z",
+      "endDate": "2025-03-25T16:28:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Artifact test 17 Mar Discussion",
+              "id": "c74cb08a-54bc-42da-bd4d-daf0035c4a6a",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/08cb4122-72c9-4757-8222-4a330f1d43ba"
+          }
+      ],
+      "createdBy": "jcori",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-17T04:18:17.418Z",
+      "updated": "2025-03-17T04:28:02.849Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 3,
+      "numOfRegistrants": 2,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-17T04:18:50.783Z",
+      "registrationEndDate": "2025-03-22T04:18:00.000Z",
+      "submissionStartDate": "2025-03-17T04:28:02.000Z",
+      "submissionEndDate": "2025-03-22T04:28:00.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096750,
+      "currentPhase": {
+          "duration": 432000,
+          "scheduledEndDate": "2025-03-22T04:28:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-17T04:28:02.000Z",
+          "description": "Submission Phase",
+          "id": "f6a8b620-b878-49d9-901f-1ce0cc14c005",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-17T04:28:02.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "ab8eb2f2-225f-48ae-b311-dcfa52525024",
+      "name": "DEV Ch Test reviewers 3",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-19T06:18:51.000Z",
+              "actualEndDate": "2025-03-19T06:18:51.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-14T06:14:21.000Z",
+              "description": "Registration Phase",
+              "id": "716c84fe-0fd2-4bdf-a2a7-23652165bf21",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T06:14:21.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-19T06:31:35.000Z",
+              "actualEndDate": "2025-03-19T06:31:35.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-14T06:24:55.000Z",
+              "description": "Submission Phase",
+              "id": "24a26c9b-c619-4208-a824-7dc7709da85a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-14T06:24:55.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-21T06:31:00.000Z",
+              "isOpen": true,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "actualStartDate": "2025-03-19T06:31:36.000Z",
+              "description": "Review Phase",
+              "id": "bd1eb5ff-99d2-47a9-be1f-f0d645c008f8",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-19T06:31:36.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-22T06:31:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "a21baa4f-0c51-4005-a1ca-3b24a68ce381",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-21T06:31:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-22T18:31:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "4d4f551f-c77e-4a10-8b0a-2c0f3040e414",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-22T06:31:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 30
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 22248,
+      "startDate": "2025-03-14T06:14:21.000Z",
+      "endDate": "2025-03-22T18:31:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "DEV Ch Test reviewers 3 Discussion",
+              "id": "e6ab3d45-83f8-431a-bd7e-d8aec59d9279",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-14T06:13:43.991Z",
+      "updated": "2025-03-19T06:31:36.388Z",
+      "overview": {
+          "totalPrizes": 30,
+          "type": "USD"
+      },
+      "numOfSubmissions": 1,
+      "numOfRegistrants": 1,
+      "currentPhaseNames": [
+          "Review"
+      ],
+      "registrationStartDate": "2025-03-14T06:14:21.106Z",
+      "registrationEndDate": "2025-03-19T06:18:51.000Z",
+      "submissionStartDate": "2025-03-14T06:24:55.000Z",
+      "submissionEndDate": "2025-03-19T06:31:35.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096749,
+      "currentPhase": {
+          "duration": 172800,
+          "scheduledEndDate": "2025-03-21T06:31:00.000Z",
+          "isOpen": true,
+          "name": "Review",
+          "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+          "actualStartDate": "2025-03-19T06:31:36.000Z",
+          "description": "Review Phase",
+          "id": "bd1eb5ff-99d2-47a9-be1f-f0d645c008f8",
+          "constraints": [
+              {
+                  "name": "Scorecard",
+                  "value": 30001031
+              },
+              {
+                  "name": "Number of Reviewers",
+                  "value": 2
+              }
+          ],
+          "scheduledStartDate": "2025-03-19T06:31:36.000Z",
+          "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "0b5b218c-09c1-4872-aad5-22f8779d009d",
+      "name": "DEV Ch test reviewers 2",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-19T06:18:51.000Z",
+              "actualEndDate": "2025-03-19T06:18:51.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-14T06:13:23.000Z",
+              "description": "Registration Phase",
+              "id": "cf8a5ad5-c5b0-4da6-9f57-d1024226aecf",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T06:13:23.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-19T06:31:35.000Z",
+              "actualEndDate": "2025-03-19T06:31:35.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-14T06:24:34.000Z",
+              "description": "Submission Phase",
+              "id": "794cc14e-4cbf-4ace-ab7b-13fd9dc61c3f",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-14T06:24:34.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-21T06:31:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "60c50757-af90-4d7b-9681-64e47e598d0d",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-19T06:31:35.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-22T06:31:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "5eda3bc3-ab66-468b-b61b-213ae5315942",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-21T06:31:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-22T18:31:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "39d4b0e3-b5b1-4867-82bc-a5c6242ddd3d",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-22T06:31:00.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-20T06:31:00.000Z",
+              "isOpen": true,
+              "name": "Post-Mortem",
+              "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+              "actualStartDate": "2025-03-19T06:31:36.000Z",
+              "description": "Post-Mortem Phase",
+              "id": "798e811d-f006-4acb-85db-cafd3c0dab81",
+              "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-19T06:31:36.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 20
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 22248,
+      "startDate": "2025-03-14T06:13:23.000Z",
+      "endDate": "2025-03-22T18:31:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "DEV Ch test reviewers 2 Discussion",
+              "id": "e039fea1-d690-4032-98ba-5fe7e7ab7235",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-14T06:12:44.861Z",
+      "updated": "2025-03-19T06:31:36.526Z",
+      "overview": {
+          "totalPrizes": 20,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [
+          "Post-Mortem"
+      ],
+      "registrationStartDate": "2025-03-14T06:13:23.000Z",
+      "registrationEndDate": "2025-03-19T06:18:51.000Z",
+      "submissionStartDate": "2025-03-14T06:24:34.000Z",
+      "submissionEndDate": "2025-03-19T06:31:35.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096748,
+      "currentPhase": {
+          "duration": 86400,
+          "scheduledEndDate": "2025-03-20T06:31:00.000Z",
+          "isOpen": true,
+          "name": "Post-Mortem",
+          "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+          "actualStartDate": "2025-03-19T06:31:36.000Z",
+          "description": "Post-Mortem Phase",
+          "id": "798e811d-f006-4acb-85db-cafd3c0dab81",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-19T06:31:36.000Z",
+          "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a"
+      }
+  },
+  {
+      "id": "e032ace9-6784-49ee-a0c0-7675b18743ba",
+      "name": "QA Ch test reviewers",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "BUG_HUNT",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30001610
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963",
+      "phases": [
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-17T05:27:00.000Z",
+              "isOpen": true,
+              "name": "Post-Mortem",
+              "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+              "actualStartDate": "2025-03-16T05:27:16.000Z",
+              "description": "Post-Mortem Phase",
+              "id": "f1480f8b-6489-4f34-887c-3fe0c291bbbc",
+              "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-16T05:27:16.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-16T05:14:41.000Z",
+              "actualEndDate": "2025-03-16T05:14:41.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-14T05:08:02.000Z",
+              "description": "Registration Phase",
+              "id": "1a3b45d3-8109-4c7b-8efc-e5e7cdec8e4b",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T05:08:02.000Z"
+          },
+          {
+              "duration": 345600,
+              "scheduledEndDate": "2025-03-18T05:34:30.000Z",
+              "actualEndDate": "2025-03-18T05:34:30.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-14T05:22:53.000Z",
+              "description": "Submission Phase",
+              "id": "f0a3f04d-f39f-4cda-b557-2c58163e0afa",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-14T05:22:53.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-20T05:34:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "2c88494b-c4a5-4610-977e-3db932e6dea5",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001610
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T05:34:30.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 200
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [
+          "QA"
+      ],
+      "projectId": 22248,
+      "startDate": "2025-03-14T05:08:02.000Z",
+      "endDate": "2025-03-20T05:34:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "QA Ch test reviewers Discussion",
+              "id": "cf9828cf-ec4f-4d69-960c-30a79bab25ee",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-14T05:06:36.160Z",
+      "updated": "2025-03-18T05:34:30.675Z",
+      "overview": {
+          "totalPrizes": 200,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [
+          "Post-Mortem"
+      ],
+      "registrationStartDate": "2025-03-14T05:08:02.492Z",
+      "registrationEndDate": "2025-03-16T05:14:41.000Z",
+      "submissionStartDate": "2025-03-14T05:22:53.000Z",
+      "submissionEndDate": "2025-03-18T05:34:30.000Z",
+      "track": "Quality Assurance",
+      "type": "Challenge",
+      "legacyId": 30096747,
+      "currentPhase": {
+          "duration": 86400,
+          "scheduledEndDate": "2025-03-17T05:27:00.000Z",
+          "isOpen": true,
+          "name": "Post-Mortem",
+          "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+          "actualStartDate": "2025-03-16T05:27:16.000Z",
+          "description": "Post-Mortem Phase",
+          "id": "f1480f8b-6489-4f34-887c-3fe0c291bbbc",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-16T05:27:16.000Z",
+          "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a"
+      }
+  },
+  {
+      "id": "e4ae360b-c855-4408-adc7-012d27822750",
+      "name": "DS CH test reviewers",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+      "phases": [
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-03-28T04:36:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-14T04:36:56.000Z",
+              "description": "Registration Phase",
+              "id": "ed8ff82f-0748-4838-bbe3-1ec4d0a95195",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T04:36:56.000Z"
+          },
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-03-28T05:10:00.000Z",
+              "isOpen": true,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-14T05:10:20.000Z",
+              "description": "Submission Phase",
+              "id": "124e0004-8e8a-4ac0-8c45-43e2e11917ea",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-14T05:10:20.000Z"
+          },
+          {
+              "duration": 604800,
+              "scheduledEndDate": "2025-04-04T05:10:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "aa67693f-b06e-465c-8360-d192f4103a92",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-28T05:10:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 12
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 22248,
+      "startDate": "2025-03-14T04:36:56.000Z",
+      "endDate": "2025-04-04T05:10:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "DS CH test reviewers Discussion",
+              "id": "a348b264-1129-4f3c-b994-efb7f58284b9",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-14T04:36:15.155Z",
+      "updated": "2025-03-14T05:10:20.826Z",
+      "overview": {
+          "totalPrizes": 12,
+          "type": "USD"
+      },
+      "numOfSubmissions": 1,
+      "numOfRegistrants": 1,
+      "currentPhaseNames": [
+          "Registration",
+          "Submission"
+      ],
+      "registrationStartDate": "2025-03-14T04:36:56.028Z",
+      "registrationEndDate": "2025-03-28T04:36:00.000Z",
+      "submissionStartDate": "2025-03-14T05:10:20.000Z",
+      "submissionEndDate": "2025-03-28T05:10:00.000Z",
+      "track": "Data Science",
+      "type": "Challenge",
+      "legacyId": 30096746,
+      "currentPhase": {
+          "duration": 1209600,
+          "scheduledEndDate": "2025-03-28T05:10:00.000Z",
+          "isOpen": true,
+          "name": "Submission",
+          "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+          "actualStartDate": "2025-03-14T05:10:20.000Z",
+          "description": "Submission Phase",
+          "id": "124e0004-8e8a-4ac0-8c45-43e2e11917ea",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-14T05:10:20.000Z"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "430fa8d2-3cfe-4c8c-91a1-ae60748f2862",
+      "name": "F2f Test reviewers",
+      "typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "FIRST_2_FINISH",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30001551
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+      "phases": [
+          {
+              "duration": 2592000,
+              "scheduledEndDate": "2025-04-13T04:33:00.000Z",
+              "isOpen": true,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-14T04:33:54.000Z",
+              "description": "Registration Phase",
+              "id": "91e4552a-1d0b-408a-b27c-350d8d69101c",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T04:33:54.000Z"
+          },
+          {
+              "duration": 2592000,
+              "scheduledEndDate": "2025-04-13T04:38:00.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "description": "Submission Phase",
+              "id": "62b6329f-6624-4ca1-b3e5-33764747d648",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-14T04:38:00.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-15T04:38:00.000Z",
+              "isOpen": false,
+              "name": "Iterative Review",
+              "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+              "description": "Iterative Review Phase",
+              "id": "514d7c75-3209-4fb4-9462-9731ac4f5793",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001551
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T04:38:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 50
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 22248,
+      "startDate": "2025-03-14T04:33:54.000Z",
+      "endDate": "2025-04-13T04:38:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "F2f Test reviewers Discussion",
+              "id": "18508889-b123-46ec-9ef9-4e7d71f6d0ed",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-14T04:33:15.475Z",
+      "updated": "2025-03-14T05:08:37.938Z",
+      "overview": {
+          "totalPrizes": 50,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [
+          "Registration"
+      ],
+      "registrationStartDate": "2025-03-14T04:33:54.686Z",
+      "registrationEndDate": "2025-04-13T04:33:00.000Z",
+      "submissionStartDate": "2025-03-14T04:38:00.000Z",
+      "submissionEndDate": "2025-04-13T04:38:00.000Z",
+      "track": "Development",
+      "type": "First2Finish",
+      "legacyId": 30096744,
+      "currentPhase": {
+          "duration": 2592000,
+          "scheduledEndDate": "2025-04-13T04:33:00.000Z",
+          "isOpen": true,
+          "name": "Registration",
+          "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+          "actualStartDate": "2025-03-14T04:33:54.000Z",
+          "description": "Registration Phase",
+          "id": "91e4552a-1d0b-408a-b27c-350d8d69101c",
+          "constraints": [
+              {
+                  "name": "Number of Registrants",
+                  "value": 1
+              }
+          ],
+          "scheduledStartDate": "2025-03-14T04:33:54.000Z"
+      }
+  },
+  {
+      "id": "0e819949-4fb3-4c5f-808f-cef3162495b8",
+      "name": "TEst SMTP",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 60,
+              "scheduledEndDate": "2025-03-12T06:56:49.000Z",
+              "actualEndDate": "2025-03-12T06:56:49.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-12T06:40:52.000Z",
+              "description": "Registration Phase",
+              "id": "52e5836e-7e44-40a1-bb1d-8816b3941459",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-12T06:40:52.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-17T06:58:49.000Z",
+              "actualEndDate": "2025-03-17T06:58:49.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-12T06:50:57.000Z",
+              "description": "Submission Phase",
+              "id": "77e84fd9-8a6f-4203-b7de-43458f0f13c9",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-12T06:50:57.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-19T06:58:00.000Z",
+              "isOpen": true,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "actualStartDate": "2025-03-17T06:58:50.000Z",
+              "description": "Review Phase",
+              "id": "47138b42-cedb-482e-a2ab-2637bf8c7325",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-17T06:58:50.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-20T06:58:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "10670635-42cd-480c-b2b2-2908e932a5f0",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-19T06:58:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-20T18:58:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "380e4428-62c2-449b-9e1d-209aac8abbe1",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-20T06:58:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          }
+      ],
+      "tags": [],
+      "projectId": 22248,
+      "startDate": "2025-03-12T06:40:52.000Z",
+      "endDate": "2025-03-20T18:58:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "TEst SMTP Discussion",
+              "id": "d3b6327d-5cc3-4eaf-a015-22d65924094d",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "TCConnCopilot",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-12T06:40:17.364Z",
+      "updated": "2025-03-17T06:58:50.663Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 1,
+      "numOfRegistrants": 1,
+      "currentPhaseNames": [
+          "Review"
+      ],
+      "registrationStartDate": "2025-03-12T06:40:52.159Z",
+      "registrationEndDate": "2025-03-12T06:56:49.000Z",
+      "submissionStartDate": "2025-03-12T06:50:57.000Z",
+      "submissionEndDate": "2025-03-17T06:58:49.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096743,
+      "currentPhase": {
+          "duration": 172800,
+          "scheduledEndDate": "2025-03-19T06:58:00.000Z",
+          "isOpen": true,
+          "name": "Review",
+          "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+          "actualStartDate": "2025-03-17T06:58:50.000Z",
+          "description": "Review Phase",
+          "id": "47138b42-cedb-482e-a2ab-2637bf8c7325",
+          "constraints": [
+              {
+                  "name": "Scorecard",
+                  "value": 30001031
+              },
+              {
+                  "name": "Number of Reviewers",
+                  "value": 2
+              }
+          ],
+          "scheduledStartDate": "2025-03-17T06:58:50.000Z",
+          "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "d71503da-b9e1-4331-89be-c1665e8d5fd6",
+      "name": "Test reviewers",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 31036,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-16T09:00:28.000Z",
+              "actualEndDate": "2025-03-16T09:00:28.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-11T08:55:20.000Z",
+              "description": "Registration Phase",
+              "id": "05b4bd83-141f-4584-bc4e-025fe2f7a45e",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-11T08:55:20.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-17T09:05:34.000Z",
+              "actualEndDate": "2025-03-17T09:05:34.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-12T08:59:53.000Z",
+              "description": "Submission Phase",
+              "id": "6d986f13-76c0-413f-9bee-54818c5921d8",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-12T08:59:53.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-19T09:05:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "3c2098af-4aeb-4862-a041-51cdcde3596c",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-17T09:05:34.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-20T09:05:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "5ec62e89-bcbd-4f50-b6bb-e6049f10f97d",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-19T09:05:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-20T21:05:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "0aa7f813-824e-4ea2-8aff-84beb8220634",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-20T09:05:00.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-17T09:13:00.000Z",
+              "isOpen": true,
+              "name": "Post-Mortem",
+              "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+              "actualStartDate": "2025-03-16T09:13:01.000Z",
+              "description": "Post-Mortem Phase",
+              "id": "2a3aedf4-003d-42f1-b48a-bbe0ee2b5499",
+              "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-16T09:13:01.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 10
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 22248,
+      "startDate": "2025-03-11T08:55:20.000Z",
+      "endDate": "2025-03-20T21:05:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Test reviewers Discussion",
+              "id": "be7e25a7-d164-482c-81d6-58e0ceceb27a",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-11T08:54:31.440Z",
+      "updated": "2025-03-17T09:05:35.059Z",
+      "overview": {
+          "totalPrizes": 10,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [
+          "Post-Mortem"
+      ],
+      "registrationStartDate": "2025-03-11T08:55:20.164Z",
+      "registrationEndDate": "2025-03-16T09:00:28.000Z",
+      "submissionStartDate": "2025-03-12T08:59:53.000Z",
+      "submissionEndDate": "2025-03-17T09:05:34.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096742,
+      "currentPhase": {
+          "duration": 86400,
+          "scheduledEndDate": "2025-03-17T09:13:00.000Z",
+          "isOpen": true,
+          "name": "Post-Mortem",
+          "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+          "actualStartDate": "2025-03-16T09:13:01.000Z",
+          "description": "Post-Mortem Phase",
+          "id": "2a3aedf4-003d-42f1-b48a-bbe0ee2b5499",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-16T09:13:01.000Z",
+          "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a"
+      }
+  },
+  {
+      "id": "bfae29b6-f2a1-48aa-afc9-ea32a4313984",
+      "name": "DS MM",
+      "typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+      "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+      "legacy": {
+          "track": "DATA_SCIENCE",
+          "subTrack": "MARATHON_MATCH",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30001610
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+      "phases": [
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-03-21T04:00:45.000Z",
+              "actualEndDate": "2025-03-21T04:00:45.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-07T03:52:02.000Z",
+              "description": "Registration Phase",
+              "id": "64dcc6c9-856a-4773-bd56-2205eec3501a",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-07T03:52:02.000Z"
+          },
+          {
+              "duration": 1209600,
+              "scheduledEndDate": "2025-03-21T04:13:18.000Z",
+              "actualEndDate": "2025-03-21T04:13:18.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-07T04:01:17.000Z",
+              "description": "Submission Phase",
+              "id": "ed1342cf-9a0e-4644-ab3a-6ff77e8041a3",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-07T04:01:17.000Z"
+          },
+          {
+              "duration": 604800,
+              "scheduledEndDate": "2025-03-28T04:13:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "1f4cb45a-8ae9-4602-871a-5db3b762d85b",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001610
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-21T04:13:18.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-22T04:25:00.000Z",
+              "isOpen": true,
+              "name": "Post-Mortem",
+              "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+              "actualStartDate": "2025-03-21T04:25:51.000Z",
+              "description": "Post-Mortem Phase",
+              "id": "ea766761-365a-4d6b-8da7-685394f56bc9",
+              "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-21T04:25:51.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 2
+                  }
+              ],
+              "type": "placement"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-07T03:52:02.000Z",
+      "endDate": "2025-03-28T04:13:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "DS MM Discussion",
+              "id": "cb7578ad-5a80-47d6-98a9-84c433c53da2",
+              "type": "challenge"
+          }
+      ],
+      "createdBy": "jcori",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-07T03:51:20.315Z",
+      "updated": "2025-03-21T04:25:52.163Z",
+      "overview": {
+          "totalPrizes": 2,
+          "type": "USD"
+      },
+      "numOfSubmissions": 1,
+      "numOfRegistrants": 2,
+      "currentPhaseNames": [
+          "Post-Mortem"
+      ],
+      "registrationStartDate": "2025-03-07T03:52:02.277Z",
+      "registrationEndDate": "2025-03-21T04:00:45.000Z",
+      "submissionStartDate": "2025-03-07T04:01:17.000Z",
+      "submissionEndDate": "2025-03-21T04:13:18.000Z",
+      "track": "Data Science",
+      "type": "Marathon Match",
+      "legacyId": 30096741,
+      "currentPhase": {
+          "duration": 86400,
+          "scheduledEndDate": "2025-03-22T04:25:00.000Z",
+          "isOpen": true,
+          "name": "Post-Mortem",
+          "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+          "actualStartDate": "2025-03-21T04:25:51.000Z",
+          "description": "Post-Mortem Phase",
+          "id": "ea766761-365a-4d6b-8da7-685394f56bc9",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-21T04:25:51.000Z",
+          "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "37a54199-9fab-4f2f-8132-bbab6b11d382",
+      "name": "Test dev 3/7",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-12T03:59:02.000Z",
+              "actualEndDate": "2025-03-12T03:59:02.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-07T03:50:30.000Z",
+              "description": "Registration Phase",
+              "id": "7710ecad-aff6-47b0-8dee-37de98fe2819",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-07T03:50:30.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-12T03:59:03.000Z",
+              "actualEndDate": "2025-03-12T03:59:03.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-07T03:54:26.000Z",
+              "description": "Submission Phase",
+              "id": "a48abfc1-7a17-403a-8bb9-c38e02f87c4a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-07T03:54:26.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-14T03:59:00.000Z",
+              "isOpen": true,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "actualStartDate": "2025-03-12T03:59:03.000Z",
+              "description": "Review Phase",
+              "id": "86a9d0ba-6ea7-4045-b001-eb5185abaee3",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001031
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-12T03:59:03.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-15T03:59:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "d6933b8d-882e-4ceb-ad2d-f865f6a1d0f7",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T03:59:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-15T15:59:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "5ceb1e84-ea46-4ebd-b1c2-5eeea5c39dee",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-15T03:59:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 2
+                  }
+              ],
+              "type": "placement"
+          },
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "copilot"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-07T03:50:30.000Z",
+      "endDate": "2025-03-15T15:59:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Test dev 3/7 Discussion",
+              "id": "4fbba88e-64b5-4e46-b741-b128b2eafe36",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/37a54199-9fab-4f2f-8132-bbab6b11d382"
+          }
+      ],
+      "createdBy": "jcori",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-07T03:49:50.075Z",
+      "updated": "2025-03-12T03:59:03.822Z",
+      "overview": {
+          "totalPrizes": 2,
+          "type": "USD"
+      },
+      "numOfSubmissions": 1,
+      "numOfRegistrants": 1,
+      "currentPhaseNames": [
+          "Review"
+      ],
+      "registrationStartDate": "2025-03-07T03:50:30.149Z",
+      "registrationEndDate": "2025-03-12T03:59:02.000Z",
+      "submissionStartDate": "2025-03-07T03:54:26.000Z",
+      "submissionEndDate": "2025-03-12T03:59:03.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096740,
+      "currentPhase": {
+          "duration": 172800,
+          "scheduledEndDate": "2025-03-14T03:59:00.000Z",
+          "isOpen": true,
+          "name": "Review",
+          "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+          "actualStartDate": "2025-03-12T03:59:03.000Z",
+          "description": "Review Phase",
+          "id": "86a9d0ba-6ea7-4045-b001-eb5185abaee3",
+          "constraints": [
+              {
+                  "name": "Scorecard",
+                  "value": 30001031
+              },
+              {
+                  "name": "Number of Reviewers",
+                  "value": 2
+              }
+          ],
+          "scheduledStartDate": "2025-03-12T03:59:03.000Z",
+          "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49"
+      },
+      "numOfCheckpointSubmissions": 0
+  },
+  {
+      "id": "360550a3-3712-4784-a2af-911c1968896a",
+      "name": "Test Demo",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+      "legacy": {
+          "track": "DEVELOP",
+          "subTrack": "CODE",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "COMMUNITY",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "reviewScorecardId": 30002133
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [
+          {
+              "name": "show_data_dashboard",
+              "value": "false"
+          }
+      ],
+      "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "phases": [
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-13T14:26:00.000Z",
+              "isOpen": true,
+              "name": "Post-Mortem",
+              "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+              "actualStartDate": "2025-03-12T14:26:59.000Z",
+              "description": "Post-Mortem Phase",
+              "id": "bb71190c-a916-4279-8866-2aec4358a5cb",
+              "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-12T14:26:59.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-12T14:14:20.000Z",
+              "actualEndDate": "2025-03-12T14:14:20.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-07T14:04:30.000Z",
+              "description": "Registration Phase",
+              "id": "b0330763-ff10-4d6c-a8bc-2480c52a1b58",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-07T14:04:30.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-12T14:14:21.000Z",
+              "actualEndDate": "2025-03-12T14:14:21.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-07T14:04:31.000Z",
+              "description": "Submission Phase",
+              "id": "242883bc-2167-4963-9b8d-6debcfaf82eb",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-07T14:04:31.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-14T14:14:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "b1ad22ec-359d-4ea2-8b0e-740de10e8c94",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30002133
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-12T14:14:21.000Z"
+          },
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-15T14:14:00.000Z",
+              "isOpen": false,
+              "name": "Appeals",
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "description": "Appeals Phase",
+              "id": "e77aafb1-84cb-4161-8ad8-945a175c5914",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "View Response During Appeals",
+                      "value": 0
+                  }
+              ],
+              "scheduledStartDate": "2025-03-14T14:14:00.000Z"
+          },
+          {
+              "duration": 43200,
+              "scheduledEndDate": "2025-03-16T02:14:00.000Z",
+              "isOpen": false,
+              "name": "Appeals Response",
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "description": "Appeals Response Phase",
+              "id": "111e7c07-60d2-4977-9232-7981776c6564",
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-15T14:14:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [],
+      "projectId": 100315,
+      "startDate": "2025-03-07T14:04:30.000Z",
+      "endDate": "2025-03-16T02:14:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Test Demo Discussion",
+              "id": "be801ff1-8676-4cba-a2ef-13630598bf52",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/360550a3-3712-4784-a2af-911c1968896a"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-06T13:56:26.781Z",
+      "updated": "2025-03-12T14:26:59.527Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [
+          "Post-Mortem"
+      ],
+      "registrationStartDate": "2025-03-07T13:56:25.000Z",
+      "registrationEndDate": "2025-03-12T14:14:20.000Z",
+      "submissionStartDate": "2025-03-07T14:04:31.000Z",
+      "submissionEndDate": "2025-03-12T14:14:21.000Z",
+      "track": "Development",
+      "type": "Challenge",
+      "legacyId": 30096739,
+      "currentPhase": {
+          "duration": 86400,
+          "scheduledEndDate": "2025-03-13T14:26:00.000Z",
+          "isOpen": true,
+          "name": "Post-Mortem",
+          "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+          "actualStartDate": "2025-03-12T14:26:59.000Z",
+          "description": "Post-Mortem Phase",
+          "id": "bb71190c-a916-4279-8866-2aec4358a5cb",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-12T14:26:59.000Z",
+          "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a"
+      }
+  },
+  {
+      "id": "2776bcc8-aa2d-4d1b-9af0-f569c627a94b",
+      "name": "design new",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+      "legacy": {
+          "track": "DESIGN",
+          "subTrack": "WEB_DESIGNS",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "INTERNAL",
+          "confidentialityType": "public",
+          "pureV5Task": false
+      },
+      "description": "",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "918f6a3e-1a63-4680-8b5e-deb95b1411e7",
+      "phases": [
+          {
+              "duration": 518400,
+              "scheduledEndDate": "2025-03-13T09:03:45.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "description": "Registration Phase",
+              "id": "0f5deef7-f663-4d2d-96ef-922341c135bc",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-07T09:03:45.000Z"
+          },
+          {
+              "duration": 518400,
+              "scheduledEndDate": "2025-03-13T09:08:45.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "description": "Submission Phase",
+              "id": "9e52655c-f3e4-4ad0-8bc9-868f5936a517",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-07T09:08:45.000Z"
+          },
+          {
+              "duration": 14400,
+              "scheduledEndDate": "2025-03-13T13:08:45.000Z",
+              "isOpen": false,
+              "name": "Screening",
+              "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "description": "Screening Phase",
+              "id": "3de72340-57b5-49d3-a652-f484bb9c0536",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-13T09:08:45.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-18T13:08:45.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "540fcd2e-4d49-487c-bcc4-2381dc4ee3a3",
+              "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-13T13:08:45.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-20T13:08:45.000Z",
+              "isOpen": false,
+              "name": "Approval",
+              "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+              "description": "Approval Phase",
+              "id": "2433b99d-4d81-4071-ba77-394c34bfb449",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-18T13:08:45.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [],
+      "tags": [
+          "Web Design"
+      ],
+      "projectId": 100315,
+      "startDate": "2025-03-07T09:03:45.000Z",
+      "endDate": "2025-03-20T13:08:45.000Z",
+      "status": "New",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "design new Discussion",
+              "id": "5044919a-6ebd-4946-88b7-d32ce113a834",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/2776bcc8-aa2d-4d1b-9af0-f569c627a94b"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "mess",
+      "created": "2025-03-06T09:03:47.019Z",
+      "updated": "2025-03-06T09:03:47.019Z",
+      "overview": {
+          "totalPrizes": 0
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [],
+      "registrationStartDate": "2025-03-07T09:03:45.000Z",
+      "registrationEndDate": "2025-03-13T09:03:45.000Z",
+      "submissionStartDate": "2025-03-07T09:08:45.000Z",
+      "submissionEndDate": "2025-03-13T09:08:45.000Z",
+      "track": "Design",
+      "type": "Challenge"
+  },
+  {
+      "id": "1d5d2b79-50d0-4aa4-8650-3a111b079d79",
+      "name": "Design ch mar 6",
+      "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+      "legacy": {
+          "track": "DESIGN",
+          "subTrack": "WEB_DESIGNS",
+          "forumId": 0,
+          "directProjectId": 33413,
+          "reviewType": "INTERNAL",
+          "confidentialityType": "public",
+          "pureV5Task": false,
+          "screeningScorecardId": 30001610,
+          "reviewScorecardId": 30001610
+      },
+      "description": "Test",
+      "descriptionFormat": "markdown",
+      "metadata": [],
+      "timelineTemplateId": "918f6a3e-1a63-4680-8b5e-deb95b1411e7",
+      "phases": [
+          {
+              "duration": 86400,
+              "scheduledEndDate": "2025-03-14T09:22:00.000Z",
+              "isOpen": true,
+              "name": "Post-Mortem",
+              "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+              "actualStartDate": "2025-03-13T09:22:13.000Z",
+              "description": "Post-Mortem Phase",
+              "id": "9ff7f741-2cb8-48f7-b76d-204d34143a8e",
+              "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-13T09:22:13.000Z"
+          },
+          {
+              "duration": 518400,
+              "scheduledEndDate": "2025-03-13T09:09:37.000Z",
+              "actualEndDate": "2025-03-13T09:09:37.000Z",
+              "isOpen": false,
+              "name": "Registration",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "actualStartDate": "2025-03-07T09:03:44.000Z",
+              "description": "Registration Phase",
+              "id": "0dde8d2f-7775-4964-bdac-d7ef4bc4beba",
+              "constraints": [
+                  {
+                      "name": "Number of Registrants",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-07T09:03:44.000Z"
+          },
+          {
+              "duration": 518400,
+              "scheduledEndDate": "2025-03-13T09:22:13.000Z",
+              "actualEndDate": "2025-03-13T09:22:13.000Z",
+              "isOpen": false,
+              "name": "Submission",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "actualStartDate": "2025-03-07T09:16:17.000Z",
+              "description": "Submission Phase",
+              "id": "8e9adec9-9e19-4af3-866b-c5d8af772807",
+              "constraints": [],
+              "scheduledStartDate": "2025-03-07T09:16:17.000Z"
+          },
+          {
+              "duration": 14400,
+              "scheduledEndDate": "2025-03-13T13:22:00.000Z",
+              "isOpen": false,
+              "name": "Screening",
+              "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "description": "Screening Phase",
+              "id": "e9a77e2d-8648-4008-a29b-9b20a3c2ba5c",
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001610
+                  }
+              ],
+              "scheduledStartDate": "2025-03-13T09:22:13.000Z"
+          },
+          {
+              "duration": 432000,
+              "scheduledEndDate": "2025-03-18T13:22:00.000Z",
+              "isOpen": false,
+              "name": "Review",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "description": "Review Phase",
+              "id": "76410959-737a-4e8b-bcc9-9d95029f39bd",
+              "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001610
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 2
+                  }
+              ],
+              "scheduledStartDate": "2025-03-13T13:22:00.000Z"
+          },
+          {
+              "duration": 172800,
+              "scheduledEndDate": "2025-03-20T13:22:00.000Z",
+              "isOpen": false,
+              "name": "Approval",
+              "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+              "description": "Approval Phase",
+              "id": "f097f909-18b4-417e-8c48-ccad775ebe8c",
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "constraints": [
+                  {
+                      "name": "Scorecard",
+                      "value": 30001610
+                  },
+                  {
+                      "name": "Number of Reviewers",
+                      "value": 1
+                  }
+              ],
+              "scheduledStartDate": "2025-03-18T13:22:00.000Z"
+          }
+      ],
+      "events": [],
+      "terms": [
+          {
+              "roleId": "732339e7-8e30-49d7-9198-cccf9451e221",
+              "id": "317cd8f9-d66c-4f2a-8774-63c612d99cd4"
+          }
+      ],
+      "prizeSets": [
+          {
+              "prizes": [
+                  {
+                      "type": "USD",
+                      "value": 1
+                  }
+              ],
+              "type": "placement"
+          }
+      ],
+      "tags": [
+          "Web Design"
+      ],
+      "projectId": 100315,
+      "startDate": "2025-03-07T09:03:44.000Z",
+      "endDate": "2025-03-20T13:22:00.000Z",
+      "status": "Active",
+      "attachments": [],
+      "groups": [],
+      "discussions": [
+          {
+              "provider": "vanilla",
+              "name": "Design ch mar 6 Discussion",
+              "id": "53984bc7-d4bd-41aa-a608-a3bad73e47d7",
+              "type": "challenge",
+              "url": "https://vanilla.topcoder-dev.com/categories/1d5d2b79-50d0-4aa4-8650-3a111b079d79"
+          }
+      ],
+      "createdBy": "mess",
+      "updatedBy": "tcwebservice",
+      "created": "2025-03-06T09:02:06.100Z",
+      "updated": "2025-03-13T09:22:14.048Z",
+      "overview": {
+          "totalPrizes": 1,
+          "type": "USD"
+      },
+      "numOfSubmissions": 0,
+      "numOfRegistrants": 0,
+      "currentPhaseNames": [
+          "Post-Mortem"
+      ],
+      "registrationStartDate": "2025-03-07T09:02:04.000Z",
+      "registrationEndDate": "2025-03-13T09:09:37.000Z",
+      "submissionStartDate": "2025-03-07T09:16:17.000Z",
+      "submissionEndDate": "2025-03-13T09:22:13.000Z",
+      "track": "Design",
+      "type": "Challenge",
+      "legacyId": 30096738,
+      "currentPhase": {
+          "duration": 86400,
+          "scheduledEndDate": "2025-03-14T09:22:00.000Z",
+          "isOpen": true,
+          "name": "Post-Mortem",
+          "phaseId": "f308bdb4-d3da-43d8-942b-134dfbaf5c45",
+          "actualStartDate": "2025-03-13T09:22:13.000Z",
+          "description": "Post-Mortem Phase",
+          "id": "9ff7f741-2cb8-48f7-b76d-204d34143a8e",
+          "constraints": [],
+          "scheduledStartDate": "2025-03-13T09:22:13.000Z",
+          "predecessor": "a93544bc-c165-4af4-b55e-18f3593b457a"
+      }
+  }
+]

@@ -1,14 +1,6 @@
 /**
  * This service provides operations of phases.
  */
-const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
-
-const { PhaseDomain } = require("@topcoder-framework/domain-challenge");
-
-const {
-  DomainHelper: { getScanCriteria, getLookupCriteria },
-} = require("@topcoder-framework/lib-common");
-
 const _ = require("lodash");
 const Joi = require("joi");
 const helper = require("../common/helper");
@@ -16,7 +8,7 @@ const logger = require("../common/logger");
 const constants = require("../../app-constants");
 const errors = require("../common/errors");
 
-const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const prisma = require('../common/prisma').getClient()
 
 /**
  * Search phases
@@ -24,19 +16,33 @@ const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_S
  * @returns {Object} the search result
  */
 async function searchPhases(criteria = {}) {
-  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
+  const searchFilter = getSearchFilter(_.omit(criteria, ['page', 'perPage']))
 
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 50;
 
-  const { items: list } = await phaseDomain.scan({
-    criteria: scanCriteria,
-  });
-
-  const total = list.length;
-  const result = list.slice((page - 1) * perPage, page * perPage);
+  let records = await prisma.phase.findMany({
+    where: searchFilter
+  })
+  records = _.map(records, r => _.omit(r, constants.auditFields))
+  const total = records.length;
+  const result = records.slice((page - 1) * perPage, page * perPage);
 
   return { total, page, perPage, result };
+}
+
+/**
+ * Get prisma filter
+ *
+ * @param {Object} criteria search criteria
+ * @returns filter used in prisma
+ */
+function getSearchFilter (criteria) {
+  const ret = {}
+  if (!_.isEmpty(criteria.name)) {
+    ret.name = { equals: criteria.name }
+  }
+  return ret
 }
 
 searchPhases.schema = {
@@ -48,23 +54,36 @@ searchPhases.schema = {
 };
 
 /**
+ * Check phase with given name exists or not
+ * @param {String} name phase name
+ * @throws error if phase name exists in db
+ */
+async function checkName (name) {
+  const existingByName = await prisma.phase.findMany({
+    where: { name }
+  })
+  if (existingByName.length > 0) { throw new errors.ConflictError(`Phase with name: ${name} already exist`) }
+}
+
+/**
  * Create phase.
+ * @param {Object} authUser auth user
  * @param {Object} phase the phase to created
  * @returns {Object} the created phase
  */
-async function createPhase(phase) {
-  const { items: existingByName } = await phaseDomain.scan({
-    criteria: getScanCriteria({ name: phase.name }),
-  });
-  if (existingByName.length > 0)
-    throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
-  const ret = await phaseDomain.create(phase);
+async function createPhase (authUser, phase) {
+  await checkName(phase.name)
+  phase.createdBy = authUser.userId
+  phase.updatedBy = authUser.userId
+  let ret = await prisma.phase.create({ data: phase })
+  ret = _.omit(ret, constants.auditFields)
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengePhaseCreated, ret);
   return ret;
 }
 
 createPhase.schema = {
+  authUser: Joi.any(),
   phase: Joi.object()
     .keys({
       name: Joi.string().required(),
@@ -81,7 +100,12 @@ createPhase.schema = {
  * @returns {Object} the phase with given id
  */
 async function getPhase(phaseId) {
-  return phaseDomain.lookup(getLookupCriteria("id", phaseId));
+  let ret = await prisma.phase.findUnique({ where: { id: phaseId } })
+  if (!ret || _.isUndefined(ret.id)) {
+    throw new errors.NotFoundError(`Phase with id: ${phaseId} doesn't exist`)
+  }
+  ret = _.omit(ret, constants.auditFields)
+  return ret
 }
 
 getPhase.schema = {
@@ -90,49 +114,51 @@ getPhase.schema = {
 
 /**
  * Update phase.
+ * @param {Object} authUser auth user
  * @param {String} phaseId the phase id
  * @param {Object} data the phase data to be updated
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated phase
  */
-async function update(phaseId, data, isFull) {
+async function update (authUser, phaseId, data, isFull) {
   const phase = await getPhase(phaseId);
-
   if (data.name && data.name.toLowerCase() !== phase.name.toLowerCase()) {
-    const { items } = await phaseDomain.scan({
-      criteria: getScanCriteria({ name: data.name }),
-    });
-    if (items.length > 0)
-      throw new errors.ConflictError(`Phase with name ${phase.name} already exists`);
+    await checkName(data.name);
   }
 
   if (isFull) {
     // description is optional field, can be undefined
-    phase.description = data.description;
+    if (_.isUndefined(data.description)) {
+      data.description = null
+    }
   }
-  const { items } = await phaseDomain.update({
-    filterCriteria: getScanCriteria({ id: phaseId }),
-    updateInput: data,
+  data.updatedBy = authUser.userId;
+  let ret = await prisma.phase.update({
+    where: { id: phaseId },
+    data
   });
+  ret = _.omit(ret, constants.auditFields);
   // post bus event
   await helper.postBusEvent(
     constants.Topics.ChallengePhaseUpdated,
-    isFull ? items[0] : _.assignIn({ id: phaseId }, data)
+    isFull ? ret : _.assignIn({ id: phaseId }, data)
   );
-  return items[0];
+  return ret;
 }
 
 /**
  * Fully update phase.
+ * @param {Object} authUser auth user
  * @param {String} phaseId the phase id
  * @param {Object} data the phase data to be updated
  * @returns {Object} the updated phase
  */
-async function fullyUpdatePhase(phaseId, data) {
-  return update(phaseId, data, true);
+async function fullyUpdatePhase (authUser, phaseId, data) {
+  return update(authUser, phaseId, data, true);
 }
 
 fullyUpdatePhase.schema = {
+  authUser: Joi.any(),
   phaseId: Joi.id(),
   data: Joi.object()
     .keys({
@@ -146,15 +172,17 @@ fullyUpdatePhase.schema = {
 
 /**
  * Partially update phase.
+ * @param {Object} authUser auth user
  * @param {String} phaseId the phase id
  * @param {Object} data the phase data to be updated
  * @returns {Object} the updated phase
  */
-async function partiallyUpdatePhase(phaseId, data) {
-  return update(phaseId, data);
+async function partiallyUpdatePhase (authUser, phaseId, data) {
+  return update(authUser, phaseId, data);
 }
 
 partiallyUpdatePhase.schema = {
+  authUser: Joi.any(),
   phaseId: Joi.id(),
   data: Joi.object()
     .keys({
@@ -172,10 +200,11 @@ partiallyUpdatePhase.schema = {
  * @returns {Object} the deleted phase
  */
 async function deletePhase(phaseId) {
-  const { items } = await phaseDomain.delete(getLookupCriteria("id", phaseId));
+  let ret = await getPhase(phaseId)
+  await prisma.phase.delete({ where: { id: phaseId } })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, items[0]);
-  return items[0];
+  await helper.postBusEvent(constants.Topics.ChallengePhaseDeleted, ret);
+  return ret;
 }
 
 deletePhase.schema = {

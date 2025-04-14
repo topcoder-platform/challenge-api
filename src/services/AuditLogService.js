@@ -2,37 +2,51 @@
  * This service provides operations of audit logs.
  */
 
-const _ = require("lodash");
 const Joi = require("joi");
-const helper = require("../common/helper");
-// const logger = require('../common/logger')
+const logger = require('../common/logger')
+const prisma = require('../common/prisma').getClient()
 
 /**
  * Search audit logs
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchAuditLogs(criteria) {
-  const page = criteria.page || 1;
-  const perPage = criteria.perPage || 50;
-  let records = await helper.scanAll("AuditLog");
-  // TODO this needs to be in ES
-  if (criteria.fieldName)
-    records = _.filter(records, (e) => helper.partialMatch(criteria.fieldName, e.fieldName));
-  if (criteria.createdDateStart)
-    records = _.filter(records, (e) => criteria.createdDateStart.getTime() <= e.created.getTime());
-  if (criteria.createdDateEnd)
-    records = _.filter(records, (e) => criteria.createdDateEnd.getTime() <= e.created.getTime());
-  if (criteria.challengeId)
-    records = _.filter(records, (e) => criteria.challengeId === e.challengeId);
-  if (criteria.createdBy)
-    records = _.filter(
-      records,
-      (e) => criteria.createdBy.toLowerCase() === e.createdBy.toLowerCase()
-    );
+async function searchAuditLogs (criteria) {
+  const page = criteria.page || 1
+  const perPage = criteria.perPage || 50
 
-  const total = records.length;
-  const result = records.slice((page - 1) * perPage, page * perPage);
+  const prismaFilter = { where: { AND: [] } }
+  if (criteria.fieldName) {
+    prismaFilter.where.AND.push({
+      fieldName: criteria.fieldName
+    })
+  }
+  if (criteria.createdDateStart) {
+    prismaFilter.where.AND.push({
+      createdAt: { gte: criteria.createdDateStart }
+    })
+  }
+  if (criteria.createdDateEnd) {
+    prismaFilter.where.AND.push({
+      createdAt: { lte: criteria.createdDateEnd }
+    })
+  }
+  if (criteria.challengeId) {
+    prismaFilter.where.AND.push({
+      challengeId: criteria.challengeId
+    })
+  }
+  if (criteria.createdBy) {
+    prismaFilter.where.AND.push({
+      createdBy: criteria.createdBy
+    })
+  }
+  const total = await prisma.auditLog.count(prismaFilter)
+  const result = await prisma.auditLog.findMany({
+    ...prismaFilter,
+    take: perPage,
+    skip: (page - 1) * perPage
+  })
 
   return { total, page, perPage, result };
 }
@@ -53,4 +67,4 @@ module.exports = {
   searchAuditLogs,
 };
 
-// logger.buildService(module.exports);
+logger.buildService(module.exports);

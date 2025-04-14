@@ -16,5 +16,9 @@ module.exports = {
   AUTH0_CLIENT_ID: '8QovDh27SrDu1XSs68m21A1NBP8isvOt',
   AUTH0_CLIENT_SECRET: '3QVxxu20QnagdH-McWhVz0WfsQzA1F8taDdGDI4XphgpEYZPcMTF4lX3aeOIeCzh',
   AUTH0_URL: 'https://topcoder-dev.auth0.com/oauth/token',
-  AUTH0_AUDIENCE: 'https://m2m.topcoder-dev.com/'
+  AUTH0_AUDIENCE: 'https://m2m.topcoder-dev.com/',
+  // mock API to get M2M token
+  AUTH0_PROXY_SERVER_URL: 'http://localhost:4000/v5/auth0',
+  // mock API to post bus event
+  BUSAPI_URL: "http://localhost:4000/v5"
 }

@@ -32,21 +32,8 @@ module.exports = {
     // AWS_ACCESS_KEY_ID: process.env.AWS_FAKE_ID || 'FAKE_ACCESS_KEY',
     // AWS_SECRET_ACCESS_KEY: process.env.AWS_FAKE_KEY || 'FAKE_SECRET_ACCESS_KEY',
     AWS_REGION: process.env.AWS_REGION || "ap-northeast-1",
-    IS_LOCAL_DB: process.env.IS_LOCAL_DB || true,
-    DYNAMODB_URL: process.env.DYNAMODB_URL || "http://localhost:7777",
     S3_API_VERSION: process.env.S3_API_VERSION || "2006-03-01",
     BUCKET_WHITELIST: process.env.BUCKET_WHITELIST || "topcoder_01, topcoder_02",
-  },
-
-  ES: {
-    // above AWS_REGION is used if we use AWS ES
-    HOST: process.env.ES_HOST || "localhost:9200",
-    API_VERSION: process.env.ES_API_VERSION || "6.8",
-    OPENSEARCH: process.env.OPENSEARCH || "false",
-    ES_INDEX: process.env.ES_INDEX || "challenge",
-    ES_TYPE: process.env.ES_TYPE || "_doc",
-    ES_REFRESH: process.env.ES_REFRESH || "true",
-    TEMP_REINDEXING: process.env.TEMP_REINDEXING || true, // if true, it won't delete the existing index when reindexing data
   },
 
   // in bytes
@@ -127,10 +114,6 @@ module.exports = {
   ZENDESK_CUSTOM_FIELD_TAG_ID: process.env.ZENDESK_CUSTOM_FIELD_TAG_ID,
   ZENDESK_DEFAULT_PRIORITY: process.env.ZENDESK_DEFAULT_PRIORITY || "high",
   INTERNAL_CACHE_TTL: process.env.INTERNAL_CACHE_TTL || 1800,
-  GRPC_CHALLENGE_SERVER_HOST: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_HOST || "localhost",
-  GRPC_CHALLENGE_SERVER_PORT: process.env.GRPC_DOMAIN_CHALLENGE_SERVER_PORT || 8888,
-  GRPC_ACL_SERVER_HOST: process.env.GRPC_ACL_SERVER_HOST || "localhost",
-  GRPC_ACL_SERVER_PORT: process.env.GRPC_ACL_SERVER_PORT || 40020,
 
   SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID:
     process.env.SKIP_PROJECT_ID_BY_TIMLINE_TEMPLATE_ID || "517e76b0-8824-4e72-9b48-a1ebde1793a8",

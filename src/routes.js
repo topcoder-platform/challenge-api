@@ -4,7 +4,7 @@
 
 const constants = require("../app-constants");
 const {
-  SCOPES: { PAYMENT, READ, CREATE, UPDATE, DELETE, ALL },
+  SCOPES: { READ, CREATE, UPDATE, DELETE, ALL },
 } = require("config");
 
 module.exports = {
@@ -38,19 +38,6 @@ module.exports = {
     post: {
       controller: "SupportController",
       method: "createRequest",
-    },
-  },
-  "/challenges/srms/schedule": {
-    get: {
-      controller: "ChallengeController",
-      method: "getSRMSchedule",
-    },
-  },
-  "/challenges/srms/practice/problems": {
-    get: {
-      controller: "ChallengeController",
-      method: "getPracticeProblems",
-      auth: "jwt",
     },
   },
   "/challenges/health": {
@@ -110,14 +97,6 @@ module.exports = {
       auth: "jwt",
       access: [constants.UserRoles.Admin],
       scopes: [UPDATE, ALL],
-    },
-  },
-  "/challenges/:challengeId/legacy-payment": {
-    patch: {
-      controller: "ChallengeController",
-      method: "updateLegacyPayout",
-      auth: "jwt",
-      scopes: [PAYMENT],
     },
   },
   "/challenges/:challengeId/statistics": {

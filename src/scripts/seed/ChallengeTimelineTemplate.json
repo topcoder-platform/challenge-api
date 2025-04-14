@@ -1,114 +1,511 @@
-[
-    {
-        "id": "6a29fccb-81ab-49f8-905d-0db0e840881a",
-        "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
-        "isDefault": false
-    },
-    {
-        "id": "edd528d7-b2d6-48e4-80ab-cfccc3cfb6cb",
-        "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "d4201ca4-8437-4d63-9957-3f7708184b07",
-        "isDefault": true
-    },
-    {
-        "id": "4a59472b-0743-4dae-9739-1f5b327e1255",
-        "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "2d0807fa-ece1-4328-a260-76f5f6b559e0",
-        "isDefault": false
-    },
-    {
-        "id": "fccd933a-34c3-497f-850e-00d6f499e703",
-        "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
-        "typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
-        "timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
-        "isDefault": true
-    },
-    {
-        "id": "26de5868-f405-46d6-bf82-f3966b2a382d",
-        "trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
-        "typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
-        "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
-        "isDefault": true
-    },
-    {
-        "id": "4df06ca4-367f-4768-93b4-94ba18625983",
-        "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
-        "isDefault": true
-    },
-    {
-        "id": "140b24d5-5259-4449-bc1f-3780f3b01555",
-        "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
-        "typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
-        "timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
-        "isDefault": true
-    },
-    {
-        "id": "3cd4e42f-141f-4118-950c-fb815569fb34",
-        "trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
-        "typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
-        "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
-        "isDefault": true
-    },
-    {
-        "id": "87ab69d5-09ec-45ef-b3d1-f6f6f1fdf2f3",
-        "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
-        "isDefault": true
-    },
-    {
-        "id": "9e4da450-d29a-44e6-aa80-26d9d5798637",
-        "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
-        "isDefault": false
-    },
-    {
-        "id": "92207659-e2e3-4578-85d5-02a36f384907",
-        "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
-        "typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
-        "timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
-        "isDefault": true
-    },
-    {
-        "id": "ab235f79-6606-41b2-afaf-4956824fcbcc",
-        "trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
-        "typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
-        "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
-        "isDefault": true
-    },
-    {
-        "id": "1be20f5f-9356-49cf-b3df-a7be8099b5d9",
-        "trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
-        "isDefault": true
-    },
-    {
-        "id": "71b5e844-9847-43b0-aa66-9bcc620704b3",
-        "trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
-        "typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-        "timelineTemplateId": "f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963",
-        "isDefault": false
-    },
-    {
-        "id": "00660d04-1e84-467b-a450-281cb4ec4137",
-        "trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
-        "typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
-        "timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
-        "isDefault": true
-    },
-    {
-        "id": "68ae6341-f571-4be1-9d86-44773c294538",
-        "trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
-        "typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
-        "timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
-        "isDefault": true
-    }
-]
+[{
+	"id": "87ab69d5-09ec-45ef-b3d1-f6f6f1fdf2f3",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "d8c129bc-3b4a-4bbb-acd1-837bf637b5c0",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "101a2035-646f-44c6-bcc9-95d97e651cef",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "26de5868-f405-46d6-bf82-f3966b2a382d",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "654f61c5-e7fa-4f22-8da0-13a6c8e4c265",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "cc5079e9-0b2e-4047-b068-a462cd007f70",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "fccd933a-34c3-497f-850e-00d6f499e703",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "5c4601cd-3e85-4f76-be29-13b240c80fbb",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "d1fd1aef-0a7b-4fa1-8441-1c2c728eefb7",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "d824e949-6a3a-421e-8a72-83d632ae45d7",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "afc7156f-6569-45e5-8627-fc6953bd0a51",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "3cd4e42f-141f-4118-950c-fb815569fb34",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "b61fc7cf-cbd8-4867-a2ec-8fb4d7cad368",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "b2595b50-d99b-415a-916d-4f6033e846f0",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "00660d04-1e84-467b-a450-281cb4ec4137",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "9e4da450-d29a-44e6-aa80-26d9d5798637",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "a5bbaf91-c239-4d17-b660-aa7287edae14",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "dbc5572e-484e-4c72-b83b-d8e2f1a90336",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "b78d8d0f-36c3-4345-9fea-338326e50b61",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "df3885ed-5e63-489d-a57d-0f24d56d0242",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "92207659-e2e3-4578-85d5-02a36f384907",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "4d8290be-d0d0-496a-b3fd-68a951d5b862",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "4a59472b-0743-4dae-9739-1f5b327e1255",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "2d0807fa-ece1-4328-a260-76f5f6b559e0",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "71b5e844-9847-43b0-aa66-9bcc620704b3",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "68ae6341-f571-4be1-9d86-44773c294538",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "2334a675-6ca0-4285-863a-0d7c35466c90",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "7be8f0ca-e07e-455d-a13e-e10d286c5089",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "32c23f20-33fe-43d9-be6e-d9be83863566",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "c4a4da55-ff93-4065-8b3a-256344c41c90",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "087b7949-2283-4500-8480-1b4cccd49278",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "918f6a3e-1a63-4680-8b5e-deb95b1411e7",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "140b24d5-5259-4449-bc1f-3780f3b01555",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "e89394b0-3bc4-420a-a405-640e202802c3",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "0465e63a-3c01-4477-ab3b-dddde176987d",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "052d4cdd-677e-4cc3-a739-bc40a469014a",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "edd528d7-b2d6-48e4-80ab-cfccc3cfb6cb",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "d4201ca4-8437-4d63-9957-3f7708184b07",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "42a33445-4c06-47bd-9200-daabb9690ff0",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "62e1fe80-f016-4e0d-a518-ed2fb0a279e3",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "532b69b4-aa0d-4078-9011-d595005b6cd9",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "1be20f5f-9356-49cf-b3df-a7be8099b5d9",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "ab235f79-6606-41b2-afaf-4956824fcbcc",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "190bbc0e-6ddd-4149-bf79-460d21620da6",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "1a459034-d36c-458f-b770-5adae6ac07c2",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "26a65014-bf06-42ec-a9b5-4e3e835df507",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "762694a4-48ee-41ae-8267-7bff4275873d",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+	"timelineTemplateId": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "4689c430-76f2-4f90-a9f8-0131393fc01a",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "7564ac1d-31a2-4db5-abb7-64e027cb2d20",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "517e76b0-8824-4e72-9b48-a1ebde1793a8",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "4df06ca4-367f-4768-93b4-94ba18625983",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "530ceee9-1cbe-49db-90b0-3ddb261c19ce",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "bb7d2bbd-fdf3-4cdf-ab0a-132b33ee00e4",
+	"trackId": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "d6ee0b38-2045-46ed-99fc-6010037e8f9c",
+	"trackId": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "d926946e-cd55-4d6b-83bf-55571cf16622",
+	"trackId": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+	"typeId": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+	"timelineTemplateId": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+	"isDefault": false,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}, {
+	"id": "83c33ca9-c253-4d97-bd4c-42c13b76a077",
+	"trackId": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+	"typeId": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+	"timelineTemplateId": "06b5743d-c059-4784-98fa-32c7dde3646c",
+	"isDefault": true,
+	"createdAt": "2025-03-10T13:08:02.378Z",
+	"createdBy": "topcoder user",
+	"updatedAt": "2025-03-10T13:08:02.378Z",
+	"updatedBy": "topcoder user"
+}]

@@ -7,7 +7,7 @@ const _ = require('lodash')
 const uuid = require('uuid/v4')
 const chai = require('chai')
 const service = require('../../src/services/AuditLogService')
-const ChallengeService = require('../../src/services/ChallengeService')
+const prisma = require('../../src/common/prisma').getClient()
 const testHelper = require('../testHelper')
 
 const should = chai.should()
@@ -18,8 +18,25 @@ describe('audit log service unit tests', () => {
   const notFoundId = uuid()
 
   before(async () => {
+    await testHelper.clearData()
     await testHelper.createData()
     data = testHelper.getData()
+    await prisma.auditLog.createMany({
+      data: [{
+        challengeId: data.challenge.id,
+        fieldName: 'privateDescription',
+        createdBy: 'sub',
+        newValue: '"private Desc."',
+        createdAt: new Date()
+      }, {
+        challengeId: data.challenge.id,
+        fieldName: 'description',
+        createdBy: 'sub',
+        newValue: '"desc-abc"',
+        oldValue: '"desc"',
+        createdAt: new Date()
+      }]
+    })
   })
 
   after(async () => {
@@ -28,18 +45,12 @@ describe('audit log service unit tests', () => {
 
   describe('search audit logs tests', () => {
     it('search audit logs successfully 1', async () => {
-      // update challenge so that there are some audit logs
-      await ChallengeService.partiallyUpdateChallenge({ isMachine: true, sub: 'sub' }, data.challenge.id, {
-        description: 'desc-abc',
-        privateDescription: 'private Desc.'
-      })
-
       const res = await service.searchAuditLogs({
         page: 1,
         perPage: 10,
         challengeId: data.challenge.id,
         createdDateStart: new Date(new Date().getTime() - 1000 * 60 * 60 * 30),
-        createdDateEnd: '2022-01-02',
+        createdDateEnd: '2026-01-02',
         createdBy: 'sub'
       })
       should.equal(res.total, 2)
@@ -51,7 +62,7 @@ describe('audit log service unit tests', () => {
       should.equal(log.newValue, '"private Desc."')
       should.equal(log.challengeId, data.challenge.id)
       should.equal(log.createdBy, 'sub')
-      should.exist(log.created)
+      should.exist(log.createdAt)
       should.exist(log.id)
       log = _.find(res.result, (item) => item.fieldName === 'description')
       should.exist(log)
@@ -59,7 +70,7 @@ describe('audit log service unit tests', () => {
       should.equal(log.newValue, '"desc-abc"')
       should.equal(log.challengeId, data.challenge.id)
       should.equal(log.createdBy, 'sub')
-      should.exist(log.created)
+      should.exist(log.createdAt)
       should.exist(log.id)
     })
 

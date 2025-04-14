@@ -1,14 +1,6 @@
 /**
  * This service provides operations of attachments.
  */
-const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
-
-const {
-  DomainHelper: { getLookupCriteria, getScanCriteria },
-} = require("@topcoder-framework/lib-common");
-
-const { AttachmentDomain, ChallengeDomain } = require("@topcoder-framework/domain-challenge");
-
 const _ = require("lodash");
 const Joi = require("joi");
 const config = require("config");
@@ -17,17 +9,12 @@ const helper = require("../common/helper");
 const s3ParseUrl = require("../common/s3ParseUrl");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
-const challengeService = require("./ChallengeService");
 
 const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(",").map((bucketName) =>
   bucketName.trim()
 );
 
-const attachmentDomain = new AttachmentDomain(
-  GRPC_CHALLENGE_SERVER_HOST,
-  GRPC_CHALLENGE_SERVER_PORT
-);
-const challengeDomain = new ChallengeDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const prisma = require("../common/prisma").getClient();
 
 /**
  * Check if a url is acceptable.
@@ -53,10 +40,10 @@ function validateUrl(url) {
  * @returns {Object} the challenge and the attachment
  */
 async function _getChallengeAttachment(challengeId, attachmentId) {
-  const challenge = await helperchallengeDomain.lookup(getLookupCriteria("id", challengeId));
-  const attachment = await attachmentDomain.lookup(getLookupCriteria("id", attachmentId));
-  if (!attachment || attachment.challengeId !== challengeId) {
-    throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`);
+  const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } })
+  const attachment = await prisma.attachment.findUnique({ where: { id: attachmentId } })
+  if (!challenge || !challenge.id || !attachment || attachment.challengeId !== challengeId) {
+    throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
   }
   return { challenge, attachment };
 }
@@ -68,21 +55,22 @@ async function _getChallengeAttachment(challengeId, attachmentId) {
  * @returns {Object} the created attachment
  */
 async function createAttachment(currentUser, challengeId, attachments) {
-  const challenge = await helperchallengeDomain.lookup(getLookupCriteria("id", challengeId));
+  const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
   await helper.ensureUserCanModifyChallenge(currentUser, challenge);
+  const userId = currentUser.userId;
   const newAttachments = [];
   for (const attachment of attachments) {
     validateUrl(attachment.url);
-    const attachmentObject = { challengeId, ...attachment };
-    const newAttachment = await attachmentDomain.create(attachmentObject);
+    _.assignIn(attachment, {
+      challengeId,
+      createdBy: userId,
+      updatedBy: userId
+    });
+    let newAttachment = await prisma.attachment.create({ data: attachment });
+    newAttachment = _.omit(newAttachment, constants.auditFields, 'challengeId');
     await helper.postBusEvent(constants.Topics.ChallengeAttachmentCreated, newAttachment);
     newAttachments.push(newAttachment);
   }
-  // update challenge object
-  await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
-    attachments: [..._.get(challenge, "attachments", []), ...newAttachments],
-  });
-  // post bus event
   return newAttachments;
 }
 
@@ -108,10 +96,10 @@ createAttachment.schema = {
  * @param {String} attachmentId the attachment id
  * @returns {Object} the attachment with given id
  */
-async function getAttachment(currentUser, challengeId, attachmentId) {
+async function getAttachment (currentUser, challengeId, attachmentId) {
   const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId);
   await helper.ensureUserCanViewChallenge(currentUser, challenge);
-  return attachment;
+  return _.omit(attachment, constants.auditFields, 'challengeId');
 }
 
 getAttachment.schema = {
@@ -128,37 +116,29 @@ getAttachment.schema = {
  * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated attachment
  */
-async function update(currentUser, challengeId, attachmentId, data, isFull) {
+async function update (currentUser, challengeId, attachmentId, data, isFull) {
   const { challenge, attachment } = await _getChallengeAttachment(challengeId, attachmentId);
   await helper.ensureUserCanModifyChallenge(currentUser, challenge);
   validateUrl(data.url);
 
-  if (isFull) {
+  if (!isFull) {
     // optional fields can be undefined
-    attachment.fileSize = data.fileSize;
-    attachment.description = data.description;
+    data.fileSize = data.fileSize || attachment.fileSize;
+    data.description = data.description || attachment.description;
   }
+  data.updatedBy = currentUser.userId;
 
-  const { items } = await attachmentDomain.update({
-    filterCriteria: getScanCriteria({ id: attachmentId }),
-    updateInput: data,
+  let ret = await prisma.attachment.update({
+    data,
+    where: { id: attachmentId }
   });
-  // update challenge object
-  const newAttachments = _.get(challenge, "attachments", []);
-  try {
-    newAttachments[_.findIndex(newAttachments, (a) => a.id === attachmentId)] = items[0];
-    await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
-      attachments: newAttachments,
-    });
-  } catch (e) {
-    logger.warn(`The attachment ${attachmentId} does not exist on the challenge object`);
-  }
+  ret = _.omit(ret, constants.auditFields, 'challengeId');
   // post bus event
   await helper.postBusEvent(
     constants.Topics.ChallengeAttachmentUpdated,
-    isFull ? items[0] : _.assignIn({ id: attachmentId }, data)
+    isFull ? ret : _.assignIn({ id: attachmentId }, data)
   );
-  return items[0];
+  return ret;
 }
 
 /**
@@ -224,24 +204,11 @@ async function deleteAttachment(currentUser, challengeId, attachmentId) {
     await helper.deleteFromS3(s3UrlObject.bucket, s3UrlObject.key);
   }
 
-  await attachmentDomain.delete(getLookupCriteria("id", attachmentId));
-
-  // update challenge object
-  const newAttachments = _.get(challenge, "attachments", []);
-  try {
-    newAttachments.splice(
-      _.findIndex(newAttachments, (a) => a.id === attachmentId),
-      1
-    );
-    await challengeService.partiallyUpdateChallenge(currentUser, challengeId, {
-      attachments: newAttachments,
-    });
-  } catch (e) {
-    logger.warn(`The attachment ${attachmentId} does not exist on the challenge object`);
-  }
+  let ret = await prisma.attachment.delete({ where: { id: attachmentId } });
+  ret = _.omit(ret, constants.auditFields, 'challengeId');
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeAttachmentDeleted, attachment);
-  return attachment;
+  await helper.postBusEvent(constants.Topics.ChallengeAttachmentDeleted, ret);
+  return ret;
 }
 
 deleteAttachment.schema = {

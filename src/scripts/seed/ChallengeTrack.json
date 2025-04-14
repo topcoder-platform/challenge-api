@@ -1,30 +1,50 @@
 [
   {
-    "id": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
-    "name": "Design",
-    "description": "",
-    "isActive": true,
-    "abbreviation": "Des"
-  },
-  {
     "id": "9b6fc876-f4d9-4ccb-9dfd-419247628825",
     "name": "Development",
-    "description": "",
     "isActive": true,
-    "abbreviation": "Dev"
+    "abbreviation": "Dev",
+    "legacyId": 1,
+    "track": "DEVELOP",
+    "createdAt": "2025-03-10T13:08:02.378Z",
+    "createdBy": "topcoder user",
+    "updatedAt": "2025-03-10T13:08:02.378Z",
+    "updatedBy": "topcoder user"
   },
   {
-    "id": "c0f5d461-8219-4c14-878a-c3a3f356466d",
-    "name": "Data Science",
-    "description": "",
-    "isActive": true,
-    "abbreviation": "DS"
+      "id": "c0f5d461-8219-4c14-878a-c3a3f356466d",
+      "name": "Data Science",
+      "isActive": true,
+      "abbreviation": "DS",
+      "legacyId": 2,
+      "track": "DATA_SCIENCE",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "36e6a8d0-7e1e-4608-a673-64279d99c115",
-    "name": "Quality Assurance",
-    "description": "",
-    "isActive": true,
-    "abbreviation": "QA"
+      "id": "5fa04185-041f-49a6-bfd1-fe82533cd6c8",
+      "name": "Design",
+      "isActive": true,
+      "abbreviation": "Des",
+      "legacyId": 3,
+      "track": "DESIGN",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "36e6a8d0-7e1e-4608-a673-64279d99c115",
+      "name": "Quality Assurance",
+      "isActive": true,
+      "abbreviation": "QA",
+      "legacyId": 4,
+      "track": "QA",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   }
 ]

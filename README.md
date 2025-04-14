@@ -21,14 +21,11 @@ Dev: [![CircleCI](https://circleci.com/gh/topcoder-platform/challenge-api/tree/d
 ## Related repos
 
 - [Resources API](https://github.com/topcoder-platform/resources-api)
-- [ES Processor](https://github.com/topcoder-platform/challenge-processor-es) - Updates data in ElasticSearch
-- [Domain Challenge](https://github.com/topcoder-platform/domain-challenge) - Domain Challenge
 
 ## Prerequisites
 
 - [NodeJS](https://nodejs.org/en/) (v18+)
 - [AWS S3](https://aws.amazon.com/s3/)
-- [Elasticsearch v6](https://www.elastic.co/)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
@@ -50,19 +47,11 @@ The following parameters can be set in config files or in env variables:
 - AUTH0_CLIENT_SECRET: AUTH0 client secret, used to get M2M token
 - BUSAPI_URL: Bus API URL
 - KAFKA_ERROR_TOPIC: Kafka error topic used by bus API wrapper
-- AMAZON.AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting. Use local dynamodb you can set fake value
-- AMAZON.AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting. Use local dynamodb you can set fake value
-- AMAZON.AWS_REGION: The Amazon certificate region to use when connecting. Use local dynamodb you can set fake value
-- AMAZON.IS_LOCAL_DB: Use Amazon DynamoDB Local or server.
-- AMAZON.DYNAMODB_URL: The local url if using Amazon DynamoDB Local
+- AMAZON.AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting.
+- AMAZON.AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting.
+- AMAZON.AWS_REGION: The Amazon certificate region to use when connecting.
 - AMAZON.ATTACHMENT_S3_BUCKET: the AWS S3 bucket to store attachments
-- ES: config object for Elasticsearch
-- ES.HOST: Elasticsearch host
-- ES.API_VERSION: Elasticsearch API version
-- ES.ES_INDEX: Elasticsearch index name
-- ES.ES_REFRESH: Elasticsearch refresh method. Default to string `true`(i.e. refresh immediately)
 - FILE_UPLOAD_SIZE_LIMIT: the file upload size limit in bytes
-- OPENSEARCH: Flag to use Opensearch NPM instead of Elasticsearch
 - RESOURCES_API_URL: TC resources API base URL
 - GROUPS_API_URL: TC groups API base URL
 - PROJECTS_API_URL: TC projects API base URL
@@ -78,18 +67,15 @@ You can find sample `.env` files inside the `/docs` directory.
 
 ## Available commands
 
-1. Drop/delete tables: `npm run drop-tables`
-2. Creating tables: `npm run create-tables`
-3. Seed/Insert data to tables: `npm run seed-tables`
-4. Initialize/Clear database in default environment: `npm run init-db`
-5. View table data in default environment: `npm run view-data <ModelName>`, ModelName can be `Challenge`, `ChallengeType`, `AuditLog`, `Phase`, `TimelineTemplate`or `Attachment`
-6. Create Elasticsearch index: `npm run init-es`, or to re-create index: `npm run init-es force`
-7. Synchronize ES data and DynamoDB data: `npm run sync-es`
-8. Start all the depending services for local deployment: `npm run services:up`
-9. Stop all the depending services for local deployment: `npm run services:down`
-10. Check the logs of all the depending services for local deployment: `npm run services:logs`
-11. Initialize the local environments: `npm run local:init`
-12. Reset the local environments: `npm run local:reset`
+Make sure you have set environment variable `DATABASE_URL` before any database operations.
+
+1. Creating tables: `npm run create-tables`
+2. Seed/Insert data to tables: `npm run seed-tables`
+3. Start all the depending services for local deployment: `npm run services:up`
+4. Stop all the depending services for local deployment: `npm run services:down`
+5. Check the logs of all the depending services for local deployment: `npm run services:logs`
+6. Initialize the local environments: `npm run local:init`
+7. Reset the local environments: `npm run local:reset`
 
 ### Notes
 
@@ -103,17 +89,7 @@ You can find sample `.env` files inside the `/docs` directory.
    nvm use
    ```
 
-1. 📦 Install npm dependencies
-
-   ```bash
-   # export the production AWS credentials to access the topcoder-framework private repos in AWS codeartifact
-   aws codeartifact login --tool npm --repository topcoder-framework --domain topcoder --domain-owner 409275337247 --region us-east-1 --namespace @topcoder-framework
-
-   # install dependencies
-   yarn install
-   ```
-
-2. ⚙ Local config  
+1. ⚙ Local config
    In the `challenge-api` root directory create `.env` file with the next environment variables. Values for **Auth0 config** should be shared with you on the forum.<br>
 
    ```bash
@@ -123,47 +99,113 @@ You can find sample `.env` files inside the `/docs` directory.
    AUTH0_AUDIENCE=
    AUTH0_CLIENT_ID=
    AUTH0_CLIENT_SECRET=
-
-   # Locally deployed services (via docker-compose)
-   IS_LOCAL_DB=true
-   DYNAMODB_URL=http://localhost:8000
    ```
 
    - Values from this file would be automatically used by many `npm` commands.
    - ⚠️ Never commit this file or its copy to the repository!
 
-3. 🚢 Start docker-compose with services which are required to start Topcoder Challenges API locally
+   Please make sure database url is configured before everything.
+   ```bash
+   DATABASE_URL=
+   ```
+
+   After that you can run `npm install` to install dependencies. And then prisma will setup clients automatically.
+
+2. 🚢 Start docker-compose with services which are required to start Topcoder Challenges API locally
 
    ```bash
    npm run services:up
    ```
+   This command will start postgres with docker-compose.
 
-4. ♻ Update following two parts:
-
-- https://github.com/topcoder-platform/challenge-api/blob/develop/src/models/Challenge.js#L116
-  `throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
-- https://github.com/topcoder-platform/challenge-api/blob/develop/config/default.js#L27-L28
-
-5. ♻ Create tables.
-
+   If you are running services with docker, you can run:
    ```bash
-   npm run create-tables
-   # Use `npm run drop-tables` to drop tables.
+   docker run -d --name challengedb -p 5432:5432 \
+      -e POSTGRES_USER=johndoe -e POSTGRES_DB=challengedb \
+      -e POSTGRES_PASSWORD=mypassword \
+      postgres:16.8
    ```
 
-6. ♻ Init DB, ES
+   The command to set `DATABASE_URL` environment variable will be like
+   ```bash
+   export DATABASE_URL="postgresql://johndoe:mypassword@localhost:5432/challengedb?schema=public"
+   ```
+   Be sure to run it before running `npm install`
 
+
+3. ♻ Running mock-api:
+
+   TopCoder Challenge API calls many other APIs like Terms API, Groups API, Projects API, Resources API.
+
+   Starting them all is a little complicated. Mock APIs are created in `mock-api`.
+
+   You can run it with
+   ```bash
+   cd mock-api
+   npm start
+   ```
+   It will start a mock service at port `4000` at default, and it works well with Challenge API.
+
+   You might also need to update the API URLs in `config/default.js` Line 44~57 with environment variables. The commands are like:
+   ```bash
+   export RESOURCES_API_URL="http://localhost:4000/v5/resources"
+   export PROJECTS_API_URL="http://localhost:4000/v5/projects"
+   export TERMS_API_URL="http://localhost:4000/v5/terms"
+   export RESOURCE_ROLES_API_URL="http://localhost:4000/v5/resource-roles"
+   ```
+
+4. ♻ Create tables and setup testdata
+
+   To create database tables, you can run:
+   ```bash
+   npm run create-tables
+   ```
+
+   To create test data, you can run:
+   ```bash
+   npm run seed-tables
+   ```
+
+   To reset db structure and create testdata, you can run:
    ```bash
    npm run local:init
    ```
 
-   This command will do 3 things:
+5. Comment Code for M2M Token and postBusEvent
 
-- create Elasticsearch indexes (drop if exists)
-- Initialize the database by cleaning all the records.
-- Import the data to the local database and index it to ElasticSearch
+   In local environment, you don't need to use M2M Token or bus API.
 
-7. 🚀 Start Topcoder Challenge API
+   You can just comment them to make it working.
+
+   For M2M token, you need to comment `src/common/m2m-helper.js#L18`, just return an empty string.
+
+   The content will be like:
+   ```js
+   getM2MToken() {
+      // return M2MHelper.m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET);
+      return '';
+   }
+   ```
+
+   For postBusEvent, you need to comment codes in `src/common/helper.js#L684`. The content will be like:
+   ```js
+   async function postBusEvent(topic, payload, options = {}) {
+      // const client = getBusApiClient();
+      const message = {
+         topic,
+         originator: constants.EVENT_ORIGINATOR,
+         timestamp: new Date().toISOString(),
+         "mime-type": constants.EVENT_MIME_TYPE,
+         payload,
+      };
+      if (options.key) {
+         message.key = options.key;
+      }
+      // await client.postEvent(message);
+   }
+   ```
+
+6. 🚀 Start Topcoder Challenge API
 
    ```bash
    npm start
@@ -195,8 +237,7 @@ The following test parameters can be set in config file or in env variables:
 ### Prepare
 
 - Start Local services in docker.
-- Create DynamoDB tables.
-- Initialize ES index.
+- Create tables.
 - Various config parameters should be properly set.
 
 Seeding db data is not needed.

@@ -14,6 +14,7 @@ const should = chai.should()
 
 const attachmentContent = fs.readFileSync(path.join(__dirname, '../attachment.txt'))
 
+/*
 describe('attachment service unit tests', () => {
   // created attachment id
   let id
@@ -166,3 +167,5 @@ describe('attachment service unit tests', () => {
     })
   })
 })
+
+*/

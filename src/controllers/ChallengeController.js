@@ -2,7 +2,7 @@
  * Controller for challenge endpoints
  */
 const HttpStatus = require("http-status-codes");
-const { challengeService: service } = require("../common/transformer");
+const service = require("../services/ChallengeService");
 const helper = require("../common/helper");
 const logger = require("../common/logger");
 
@@ -12,7 +12,7 @@ const logger = require("../common/logger");
  * @param {Object} res the response
  */
 async function searchChallenges(req, res) {
-  let result = await service.searchChallenges(req, req.authUser, {
+  let result = await service.searchChallenges(req.authUser, {
     ...req.query,
     ...req.body,
   });
@@ -50,7 +50,7 @@ async function createChallenge(req, res) {
   logger.debug(
     `createChallenge User: ${JSON.stringify(req.authUser)} - Body: ${JSON.stringify(req.body)}`
   );
-  const result = await service.createChallenge(req, req.authUser, req.body, req.userToken);
+  const result = await service.createChallenge(req.authUser, req.body, req.userToken);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -60,7 +60,7 @@ async function createChallenge(req, res) {
  * @param {Object} res the response
  */
 async function sendNotifications(req, res) {
-  const result = await service.sendNotifications(req, req.authUser, req.params.challengeId);
+  const result = await service.sendNotifications(req.authUser, req.params.challengeId);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -71,7 +71,6 @@ async function sendNotifications(req, res) {
  */
 async function getChallenge(req, res) {
   const result = await service.getChallenge(
-    req,
     req.authUser,
     req.params.challengeId,
     req.query.checkIfExists
@@ -85,7 +84,7 @@ async function getChallenge(req, res) {
  * @param {Object} res the response
  */
 async function getChallengeStatistics(req, res) {
-  const result = await service.getChallengeStatistics(req, req.authUser, req.params.challengeId);
+  const result = await service.getChallengeStatistics(req.authUser, req.params.challengeId);
   res.send(result);
 }
 
@@ -100,27 +99,7 @@ async function updateChallenge(req, res) {
       req.params.challengeId
     } - Body: ${JSON.stringify(req.body)}`
   );
-  const result = await service.updateChallenge(req, req.authUser, req.params.challengeId, req.body);
-  res.send(result);
-}
-
-/**
- * Update Legacy Payout (Updates informixoltp:payment_detail)
- * This has no effect other than to keep DW in sync for looker with
- * Updates that happen in Wallet
- */
-async function updateLegacyPayout(req, res) {
-  logger.debug(
-    `updateLegacyPayout User: ${JSON.stringify(req.authUser)} - ChallengeID: ${
-      req.params.challengeId
-    } - Body: ${JSON.stringify(req.body)}`
-  );
-  const result = await service.updateLegacyPayout(
-    req,
-    req.authUser,
-    req.params.challengeId,
-    req.body
-  );
+  const result = await service.updateChallenge(req.authUser, req.params.challengeId, req.body);
   res.send(result);
 }
 
@@ -133,7 +112,7 @@ async function deleteChallenge(req, res) {
   logger.debug(
     `deleteChallenge User: ${JSON.stringify(req.authUser)} - ChallengeID: ${req.params.challengeId}`
   );
-  const result = await service.deleteChallenge(req, req.authUser, req.params.challengeId);
+  const result = await service.deleteChallenge(req.authUser, req.params.challengeId);
   res.send(result);
 }
 
@@ -146,37 +125,13 @@ async function advancePhase(req, res) {
   res.send(await service.advancePhase(req, req.authUser, req.params.challengeId, req.body));
 }
 
-/**
- * Get SRM Schedule
- * @param {Object} req the request
- * @param {Object} res the response
- */
-async function getSRMSchedule(req, res) {
-  const result = await service.getSRMSchedule(req, req.query);
-  res.send(result);
-}
-
-/**
- * Get Practice Problems
- * @param {Object} req the request
- * @param {Object} res the response
- */
-async function getPracticeProblems(req, res) {
-  const result = await service.getPracticeProblems(req, req.authUser, req.query);
-  helper.setResHeaders(req, res, result);
-  res.send(result.result);
-}
-
 module.exports = {
   searchChallenges,
   createChallenge,
   getChallenge,
   updateChallenge,
-  updateLegacyPayout,
   deleteChallenge,
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
-  getSRMSchedule,
-  getPracticeProblems,
 };

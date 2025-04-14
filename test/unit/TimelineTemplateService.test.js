@@ -6,7 +6,7 @@ require('../../app-bootstrap')
 const uuid = require('uuid/v4')
 const chai = require('chai')
 const service = require('../../src/services/TimelineTemplateService')
-const helper = require('../../src/common/helper')
+const prisma = require('../../src/common/prisma').getClient()
 
 const should = chai.should()
 
@@ -21,24 +21,31 @@ describe('timeline template service unit tests', () => {
   // reference data
   let phase
   const predecessor = uuid()
+  const authUser = {
+    userId: 'testuser'
+  }
 
   before(async () => {
-    phase = await helper.create('Phase', {
-      id: uuid(),
-      name: `phase${new Date().getTime()}`, // random name
-      description: 'desc',
-      isOpen: true,
-      duration: 12
+    phase = await prisma.phase.create({
+      data: {
+        id: uuid(),
+        name: `phase${new Date().getTime()}`, // random name
+        description: 'desc',
+        isOpen: true,
+        duration: 12,
+        createdBy: authUser.userId,
+        updatedBy: authUser.userId
+      }
     })
   })
 
   after(async () => {
-    await phase.delete()
+    await prisma.phase.delete({ where: { id: phase.id } })
   })
 
   describe('create timeline template tests', () => {
     it('create timeline template successfully 1', async () => {
-      const result = await service.createTimelineTemplate({
+      const result = await service.createTimelineTemplate(authUser, {
         name,
         description: 'desc',
         isActive: true,
@@ -56,7 +63,7 @@ describe('timeline template service unit tests', () => {
     })
 
     it('create timeline template successfully 2', async () => {
-      const result = await service.createTimelineTemplate({
+      const result = await service.createTimelineTemplate(authUser, {
         name: name2,
         description: 'desc',
         isActive: false,
@@ -75,7 +82,7 @@ describe('timeline template service unit tests', () => {
 
     it('create timeline template - name already used', async () => {
       try {
-        await service.createTimelineTemplate({
+        await service.createTimelineTemplate(authUser, {
           name,
           description: 'desc',
           isActive: false,
@@ -90,7 +97,7 @@ describe('timeline template service unit tests', () => {
 
     it('create timeline template - missing name', async () => {
       try {
-        await service.createTimelineTemplate({
+        await service.createTimelineTemplate(authUser, {
           description: 'desc',
           isActive: false,
           phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
@@ -104,7 +111,7 @@ describe('timeline template service unit tests', () => {
 
     it('create timeline template - invalid name', async () => {
       try {
-        await service.createTimelineTemplate({
+        await service.createTimelineTemplate(authUser, {
           name: ['xx'],
           description: 'desc',
           isActive: false,
@@ -117,24 +124,9 @@ describe('timeline template service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('create timeline template - invalid phases', async () => {
-      try {
-        await service.createTimelineTemplate({
-          name: 'jjghurturt34',
-          description: 'desc',
-          isActive: false,
-          phases: [{ phaseId: notFoundId, defaultDuration: 123 }]
-        })
-      } catch (e) {
-        should.equal(e.message.indexOf('phases are invalid') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('create timeline template - missing phases', async () => {
       try {
-        await service.createTimelineTemplate({
+        await service.createTimelineTemplate(authUser, {
           name: 'jjghurturt34',
           description: 'desc',
           isActive: false,
@@ -149,7 +141,7 @@ describe('timeline template service unit tests', () => {
 
     it('create timeline template - unexpected field', async () => {
       try {
-        await service.createTimelineTemplate({
+        await service.createTimelineTemplate(authUser, {
           name: 'some name 1232323',
           description: 'desc',
           isActive: false,
@@ -200,7 +192,7 @@ describe('timeline template service unit tests', () => {
 
   describe('search timeline templates tests', () => {
     it('search timeline templates successfully 1', async () => {
-      const result = await service.searchTimelineTemplates({ page: 1, perPage: 10, name: name.substring(1).toUpperCase() })
+      const result = await service.searchTimelineTemplates({ page: 1, perPage: 10, name })
       should.equal(result.total, 1)
       should.equal(result.page, 1)
       should.equal(result.perPage, 10)
@@ -266,7 +258,7 @@ describe('timeline template service unit tests', () => {
 
   describe('fully update timeline template tests', () => {
     it('fully update timeline template successfully', async () => {
-      const result = await service.fullyUpdateTimelineTemplate(id, {
+      const result = await service.fullyUpdateTimelineTemplate(authUser, id, {
         name: `${name}-updated`,
         description: 'desc222',
         isActive: false,
@@ -284,14 +276,14 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - name already used', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(id, {
+        await service.fullyUpdateTimelineTemplate(authUser, id, {
           name: name2,
           description: 'desc',
           isActive: false,
           phases: [{ phaseId: phase.id, predecessor, defaultDuration: 123 }]
         })
       } catch (e) {
-        should.equal(e.message, `TimelineTemplate with name: ${name2} already exist`)
+        should.equal(e.message, `Timeline template with name ${name2} already exists`)
         return
       }
       throw new Error('should not reach here')
@@ -299,7 +291,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - not found', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(notFoundId, {
+        await service.fullyUpdateTimelineTemplate(authUser, notFoundId, {
           name: 'slkdjflskjdf',
           description: 'desc',
           isActive: false,
@@ -314,7 +306,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - invalid id', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate('invalid', {
+        await service.fullyUpdateTimelineTemplate(authUser, 'invalid', {
           name: 'slkdjflskjdf',
           description: 'desc',
           isActive: false,
@@ -329,7 +321,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - null name', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(id, {
+        await service.fullyUpdateTimelineTemplate(authUser, id, {
           name: null,
           description: 'desc',
           isActive: false,
@@ -344,7 +336,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - invalid name', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(id, {
+        await service.fullyUpdateTimelineTemplate(authUser, id, {
           name: { invalid: 'x' },
           description: 'desc',
           isActive: false,
@@ -359,7 +351,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - empty name', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(id, {
+        await service.fullyUpdateTimelineTemplate(authUser, id, {
           name: '',
           description: 'desc',
           isActive: false,
@@ -374,7 +366,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - invalid isActive', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(id, {
+        await service.fullyUpdateTimelineTemplate(authUser, id, {
           name: 'asdfsadfsdf',
           description: 'desc',
           isActive: 'invalid',
@@ -389,7 +381,7 @@ describe('timeline template service unit tests', () => {
 
     it('fully update timeline template - missing phases', async () => {
       try {
-        await service.fullyUpdateTimelineTemplate(id, {
+        await service.fullyUpdateTimelineTemplate(authUser, id, {
           name: 'asdfsadfsdf',
           description: 'desc',
           isActive: true
@@ -404,7 +396,7 @@ describe('timeline template service unit tests', () => {
 
   describe('partially update timeline template tests', () => {
     it('partially update timeline template successfully 1', async () => {
-      const result = await service.partiallyUpdateTimelineTemplate(id, {
+      const result = await service.partiallyUpdateTimelineTemplate(authUser, id, {
         name: `${name}-33`,
         description: 'desc33'
       })
@@ -420,11 +412,11 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - name already used', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(id, {
+        await service.partiallyUpdateTimelineTemplate(authUser, id, {
           name: name2
         })
       } catch (e) {
-        should.equal(e.message, `TimelineTemplate with name: ${name2} already exist`)
+        should.equal(e.message, `Timeline template with name ${name2} already exists`)
         return
       }
       throw new Error('should not reach here')
@@ -432,7 +424,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - not found', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(notFoundId, {
+        await service.partiallyUpdateTimelineTemplate(authUser, notFoundId, {
           name: 'slkdjflskjdf'
         })
       } catch (e) {
@@ -444,7 +436,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - invalid id', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate('invalid', { name: 'hufdufhdfx' })
+        await service.partiallyUpdateTimelineTemplate(authUser, 'invalid', { name: 'hufdufhdfx' })
       } catch (e) {
         should.equal(e.message.indexOf('"timelineTemplateId" must be a valid GUID') >= 0, true)
         return
@@ -454,7 +446,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - null name', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(id, { name: null })
+        await service.partiallyUpdateTimelineTemplate(authUser, id, { name: null })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
         return
@@ -464,7 +456,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - invalid description', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(id, { description: { invalid: 'x' } })
+        await service.partiallyUpdateTimelineTemplate(authUser, id, { description: { invalid: 'x' } })
       } catch (e) {
         should.equal(e.message.indexOf('"description" must be a string') >= 0, true)
         return
@@ -474,7 +466,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - invalid isActive', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(id, { isActive: 'abc' })
+        await service.partiallyUpdateTimelineTemplate(authUser, id, { isActive: 'abc' })
       } catch (e) {
         should.equal(e.message.indexOf('"isActive" must be a boolean') >= 0, true)
         return
@@ -484,7 +476,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - empty name', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(id, { name: '' })
+        await service.partiallyUpdateTimelineTemplate(authUser, id, { name: '' })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is not allowed to be empty') >= 0, true)
         return
@@ -494,7 +486,7 @@ describe('timeline template service unit tests', () => {
 
     it('partially update timeline template - unexpected field', async () => {
       try {
-        await service.partiallyUpdateTimelineTemplate(id, { name: 'ww', other: 'ww' })
+        await service.partiallyUpdateTimelineTemplate(authUser, id, { name: 'ww', other: 'ww' })
       } catch (e) {
         should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
         return

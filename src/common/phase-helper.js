@@ -1,11 +1,3 @@
-const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
-
-const {
-  DomainHelper: { getScanCriteria },
-} = require("@topcoder-framework/lib-common");
-
-const { PhaseDomain } = require("@topcoder-framework/domain-challenge");
-
 const _ = require("lodash");
 
 const uuid = require("uuid/v4");
@@ -14,8 +6,7 @@ const moment = require("moment");
 const errors = require("./errors");
 
 const timelineTemplateService = require("../services/TimelineTemplateService");
-
-const phaseDomain = new PhaseDomain(GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT);
+const prisma = require('../common/prisma').getClient()
 
 class ChallengePhaseHelper {
   phaseDefinitionMap = {};
@@ -46,7 +37,7 @@ class ChallengePhaseHelper {
         actualStartDate: undefined,
         actualEndDate: undefined,
       };
-      if (_.isUndefined(phase.predecessor)) {
+      if (_.isNil(phase.predecessor)) {
         let scheduledStartDate = _.defaultTo(
           _.get(phaseFromInput, "scheduledStartDate"),
           startDate
@@ -75,15 +66,17 @@ class ChallengePhaseHelper {
       const precedecessorPhase = _.find(finalPhases, {
         phaseId: phase.predecessor,
       });
-      if (phase.name === "Iterative Review") {
-        phase.scheduledStartDate = precedecessorPhase.scheduledStartDate;
-      } else {
-        phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
+      if (!_.isNil(precedecessorPhase)) {
+        if (phase.name === "Iterative Review") {
+          phase.scheduledStartDate = precedecessorPhase.scheduledStartDate;
+        } else {
+          phase.scheduledStartDate = precedecessorPhase.scheduledEndDate;
+        }
+        phase.scheduledEndDate = moment(phase.scheduledStartDate)
+          .add(phase.duration, "seconds")
+          .toDate()
+          .toISOString();
       }
-      phase.scheduledEndDate = moment(phase.scheduledStartDate)
-        .add(phase.duration, "seconds")
-        .toDate()
-        .toISOString();
     }
     return finalPhases;
   }
@@ -109,16 +102,16 @@ class ChallengePhaseHelper {
       if (updatedPhase.name === "Post-Mortem") {
         updatedPhase.predecessor = "a93544bc-c165-4af4-b55e-18f3593b457a";
       }
-      if (_.isUndefined(updatedPhase.actualEndDate)) {
+      if (_.isNil(updatedPhase.actualEndDate)) {
         updatedPhase.duration = _.defaultTo(_.get(newPhase, "duration"), updatedPhase.duration);
       }
-      if (_.isUndefined(updatedPhase.predecessor)) {
+      if (_.isNil(updatedPhase.predecessor)) {
         let scheduledStartDate = _.defaultTo(
           _.get(newPhase, "scheduledStartDate"),
           updatedPhase.scheduledStartDate
         );
         if (
-          !_.isUndefined(fixedStartDate) &&
+          !_.isNil(fixedStartDate) &&
           moment(scheduledStartDate).isSameOrBefore(moment(fixedStartDate))
         ) {
           scheduledStartDate = moment(fixedStartDate).add(5, "minutes").toDate().toISOString();
@@ -127,7 +120,7 @@ class ChallengePhaseHelper {
           updatedPhase.isOpen = true;
           updatedPhase.scheduledStartDate = moment().toDate().toISOString();
           updatedPhase.actualStartDate = updatedPhase.scheduledStartDate;
-        } else if (_.isUndefined(phase.actualStartDate)) {
+        } else if (_.isNil(phase.actualStartDate)) {
           updatedPhase.scheduledStartDate = moment(scheduledStartDate).toDate().toISOString();
         }
         updatedPhase.scheduledEndDate = moment(updatedPhase.scheduledStartDate)
@@ -136,20 +129,20 @@ class ChallengePhaseHelper {
           .toISOString();
       }
       if (
-        _.isUndefined(phase.actualEndDate) &&
-        !_.isUndefined(newPhase) &&
-        !_.isUndefined(newPhase.constraints)
+        _.isNil(phase.actualEndDate) &&
+        !_.isNil(newPhase) &&
+        !_.isNil(newPhase.constraints)
       ) {
         updatedPhase.constraints = newPhase.constraints;
       }
-      if (_.isUndefined(fixedStartDate)) {
+      if (_.isNil(fixedStartDate)) {
         fixedStartDate = updatedPhase.scheduledStartDate;
       }
       return updatedPhase;
     });
     let iterativeReviewSet = false;
     for (let phase of updatedPhases) {
-      if (_.isUndefined(phase.predecessor)) {
+      if (_.isNil(phase.predecessor)) {
         continue;
       }
       const predecessorPhase = _.find(updatedPhases, {
@@ -157,15 +150,15 @@ class ChallengePhaseHelper {
       });
       if (phase.name === "Iterative Review") {
         if (!iterativeReviewSet) {
-          if (_.isUndefined(phase.actualStartDate)) {
+          if (_.isNil(phase.actualStartDate)) {
             phase.scheduledStartDate = predecessorPhase.scheduledStartDate;
           }
           iterativeReviewSet = true;
         }
-      } else if (_.isUndefined(phase.actualStartDate)) {
+      } else if (_.isNil(phase.actualStartDate)) {
         phase.scheduledStartDate = predecessorPhase.scheduledEndDate;
       }
-      if (_.isUndefined(phase.actualEndDate)) {
+      if (_.isNil(phase.actualEndDate)) {
         phase.scheduledEndDate = moment(phase.scheduledStartDate)
           .add(phase.duration, "seconds")
           .toDate()
@@ -209,7 +202,7 @@ class ChallengePhaseHelper {
 
   async getPhaseDefinitionsAndMap() {
     if (_.isEmpty(this.phaseDefinitionMap)) {
-      const { items: records } = await phaseDomain.scan({ criteria: getScanCriteria({}) });
+      const records = await prisma.phase.findMany({})
 
       const map = new Map();
       _.each(records, (r) => {

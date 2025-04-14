@@ -5,12 +5,14 @@ services:
   #   ports:
   #     - "8000:8000"
   #   command: "-inMemory -port 8000"
-  esearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.0"
+  postgres:
+    image: "postgres:16.8-alpine3.20"
     ports:
-      - "9200:9200"
+      - "5432:5432"
     environment:
-      - "discovery.type=single-node"
+      - "POSTGRES_USER=johndoe"
+      - "POSTGRES_DB=challengedb"
+      - "POSTGRES_PASSWORD=mypassword"
   # minio1:
   #   image: minio/minio
   #   ports:
@@ -26,8 +28,5 @@ services:
   #     dockerfile: mock-api/Dockerfile
   #   volumes:
   #     - ../mock-api:/challenge-api/mock-api
-  #   environment:
-  #     DYNAMODB_URL: http://dynamodb:7777
-  #     IS_LOCAL_DB: "true"
   #   ports:
   #     - "4000:4000"

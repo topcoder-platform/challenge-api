@@ -1,195 +1,411 @@
 [
   {
-    "id": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
-    "name": "Default Challenge",
-    "description": "Default Challenge Timeline",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 432000
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 432000
-      },
-      {
-        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 172800
-      },
-      {
-        "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
-        "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 86400
-      },
-      {
-        "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
-        "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
-        "defaultDuration": 43200
-      }
-    ]
-  },
-
-  {
-    "id": "f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963",
-    "name": "QA",
-    "description": "Standard QA Challenge",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 172800
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 345600
-      },
-      {
-        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 172800
-      }
-    ]
+      "id": "6969125a-a12f-4b89-8de6-e66b0056f36b",
+      "name": "Marathon Match",
+      "description": "Standard Marathon Match",
+      "isActive": true,
+      "phases": [
+          {
+              "id": "3e33c46d-015a-4dd7-8ddd-2711026b5f7d",
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 1209600
+          },
+          {
+              "id": "4bdc8ed2-0093-4453-bf7d-ea686ad67448",
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 1209600
+          },
+          {
+              "id": "ac53938a-4498-41f4-8cc2-3f7dbdad5241",
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 604800,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "6969125a-a12f-4b89-8de6-e66b0056f36b",
-    "name": "Marathon Match",
-    "description": "Standard Marathon Match",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 1209600
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 1209600
-      },
-      {
-        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 604800
-      }
-    ]
-  },
-
-  {
-    "id": "d4201ca4-8437-4d63-9957-3f7708184b07",
-    "name": "Design with Checkpoints",
-    "description": "Standard Design Challenge Timeline",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 518400
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 518400
-      },
-      {
-        "phaseId": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
-        "defaultDuration": 259200
-      },
-      {
-        "phaseId": "ce1afb4c-74f9-496b-9e4b-087ae73ab032",
-        "predecessor": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
-        "defaultDuration": 14400
-      },
-      {
-        "phaseId": "84b43897-2aab-44d6-a95a-42c433657eed",
-        "predecessor": "ce1afb4c-74f9-496b-9e4b-087ae73ab032",
-        "defaultDuration": 172800
-      },
-      {
-        "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 14400
-      },
-      {
-        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "defaultDuration": 432000
-      },
-      {
-        "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
-        "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 172800
-      }
-    ]
+      "id": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
+      "name": "Default Task",
+      "description": "Task Timeline",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 864000,
+              "id": "76cf267d-aaf3-488d-b5d0-bba20c274f59"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 864000,
+              "id": "7c52bab2-86c6-40c1-b600-5a9634cdffd7"
+          },
+          {
+              "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+              "defaultDuration": 86400,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "464f1ca9-23f5-4fcd-a5f2-cb0d042837cb"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "2d0807fa-ece1-4328-a260-76f5f6b559e0",
-    "name": "RUX",
-    "description": "Design - Rapid User Experience",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 172800
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 172800
-      },
-      {
-        "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 7200
-      },
-      {
-        "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
-        "defaultDuration": 172800
-      },
-      {
-        "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
-        "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
-        "defaultDuration": 172800
-      }
-    ]
+      "id": "2d0807fa-ece1-4328-a260-76f5f6b559e0",
+      "name": "RUX",
+      "description": "Design - Rapid User Experience",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 172800,
+              "id": "9b268793-79e0-4add-a4b2-b48bedf1286c"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 172800,
+              "id": "5a3f7d12-0b15-4960-bb93-c2e6b5a41ceb"
+          },
+          {
+              "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "defaultDuration": 7200,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "fbbc752b-7e30-4b9f-bc56-a80d6cfebe12"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 172800,
+              "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "id": "aeafe9e8-91f3-4d12-a3b1-9b91ab044516"
+          },
+          {
+              "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+              "defaultDuration": 172800,
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "id": "e446e093-f76e-4187-a3dc-bf32c15b236c"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
-    "name": "Default First2Finish",
-    "description": "First2Finish",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 2592000
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 2592000
-      },
-      {
-        "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 86400
-      }
-    ]
+      "id": "517e76b0-8824-4e72-9b48-a1ebde1793a8",
+      "name": "TopCrowd Challenge",
+      "description": "TopCrowd Challenge",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "cce96447-ec6a-4ac0-a60d-632e76799099",
+              "defaultDuration": 864000,
+              "id": "33a5ea20-ed5a-423d-ade9-5d225df8c79a"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 846000,
+              "predecessor": "cce96447-ec6a-4ac0-a60d-632e76799099",
+              "id": "d900b707-1be6-4ae1-a163-0ccfe1f5cdfc"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "53a307ce-b4b3-4d6f-b9a1-3741a58f77e6",
-    "name": "Default Task",
-    "description": "Task Timeline",
-    "isActive": true,
-    "phases": [
-      {
-        "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
-        "defaultDuration": 864000
-      },
-      {
-        "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 864000
-      },
-      {
-        "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
-        "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
-        "defaultDuration": 86400
-      }
-    ]
+      "id": "f1bcb2c7-3ee4-4fb5-8d0b-efe52c015963",
+      "name": "QA",
+      "description": "Standard QA Challenge",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 172800,
+              "id": "02599a67-1646-477e-8128-c47acb8b82eb"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 345600,
+              "id": "69ffd4c7-70e1-4657-84d5-1c341c737601"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 172800,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "6804386f-f3ca-44f9-b74c-119185de4c30"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "7ebf1c69-f62f-4d3a-bdfb-fe9ddb56861c",
+      "name": "Default Challenge",
+      "description": "Default Challenge Timeline",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 432000,
+              "id": "8e4511c7-f9e5-442f-a7ef-3a6a558f2bc5"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 432000,
+              "id": "b4e7deb1-d31b-42c4-82a3-19929b6d3f60"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 172800,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "f5567a90-35c2-4d50-9945-21d0abe496af"
+          },
+          {
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "defaultDuration": 86400,
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "id": "cd141248-cd5f-4827-abaf-8bd2621c1417"
+          },
+          {
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "defaultDuration": 43200,
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "id": "0d3b800b-efe8-4a27-a31b-c4eda1940c79"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "5c4601cd-3e85-4f76-be29-13b240c80fbb",
+      "name": "Design First2Finish",
+      "description": "Design First2Finish",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 864000,
+              "id": "26582ca4-9d70-4d49-9597-9996f40e0972"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 846000,
+              "id": "d0fd62a8-89d9-4ce5-9b6f-f25af086a51d"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 864000,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "97184b7a-28c2-4ee2-85a0-e918a0db0175"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "918f6a3e-1a63-4680-8b5e-deb95b1411e7",
+      "name": "Design Single Round",
+      "description": "Single-Round Design Challenge Timeline",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 518400,
+              "id": "aa0da4fb-bb08-4319-951c-096b7aa2bb4f"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 518400,
+              "id": "915db241-1d92-4f0d-8fc8-d4246258f1be"
+          },
+          {
+              "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "defaultDuration": 14400,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "c39ef688-1968-4d3e-979f-fe34d7585a36"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 432000,
+              "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "id": "dbcee90f-2de9-4acb-aecf-188c10afa09c"
+          },
+          {
+              "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+              "defaultDuration": 172800,
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "id": "bb3a2738-893c-42fa-94e9-1af3392a2c73"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "07d33e3a-0e80-4f36-8b6f-62ad0207c851",
+      "name": "[DAL] Testing TimelineTemplate Creations",
+      "description": "Testing TimelineTemplate Creations",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 964000,
+              "id": "2bb8b7a0-36af-481f-a00e-ce25bae4f50d"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 864000,
+              "id": "4f3897b3-275e-49a5-901b-f0ad11960f49"
+          },
+          {
+              "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+              "defaultDuration": 86400,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "ff468002-0817-4244-bc1e-2b8c59d0a48c"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "06b5743d-c059-4784-98fa-32c7dde3646c",
+      "name": "Practice Challenge",
+      "description": "Practice Challenge - 1 year length",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 31536000,
+              "id": "a63d48f9-4c82-4265-a0ab-c0da03092fb2"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 31536000,
+              "id": "f073635d-5d3b-4e2a-9a75-d25b9e2afc70"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 172800,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "e83a3324-b8b2-44ff-a862-d33f5b33b567"
+          },
+          {
+              "phaseId": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "defaultDuration": 86400,
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "id": "d2c36b39-f3b7-4081-a9d8-48502cd1c953"
+          },
+          {
+              "phaseId": "797a6af7-cd3f-4436-9fca-9679f773bee9",
+              "defaultDuration": 43200,
+              "predecessor": "1c24cfb3-5b0a-4dbd-b6bd-4b0dff5349c6",
+              "id": "70a7fec1-73a8-4770-8140-2caa5a3cc480"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "d4201ca4-8437-4d63-9957-3f7708184b07",
+      "name": "Design with Checkpoints",
+      "description": "Standard Design Challenge Timeline",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 518400,
+              "id": "ffb24f05-000b-447b-bc49-5488ebad6f78"
+          },
+          {
+              "phaseId": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
+              "defaultDuration": 259200,
+              "id": "1af14a7d-d6c5-4c2a-8ac9-b7f09af06883"
+          },
+          {
+              "phaseId": "ce1afb4c-74f9-496b-9e4b-087ae73ab032",
+              "defaultDuration": 14400,
+              "predecessor": "d8a2cdbe-84d1-4687-ab75-78a6a7efdcc8",
+              "id": "d625b31c-d820-459c-a86d-0ce8a33831f4"
+          },
+          {
+              "phaseId": "84b43897-2aab-44d6-a95a-42c433657eed",
+              "defaultDuration": 172800,
+              "predecessor": "ce1afb4c-74f9-496b-9e4b-087ae73ab032",
+              "id": "3292488a-888d-42d0-833c-20d5fd84ba9f"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 518400,
+              "predecessor": "84b43897-2aab-44d6-a95a-42c433657eed",
+              "id": "d7d84022-ad02-4ad5-8f4b-7bd91e221800"
+          },
+          {
+              "phaseId": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "defaultDuration": 14400,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "44ef5b51-1808-4d9b-88b8-f1b1b4f3698f"
+          },
+          {
+              "phaseId": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "defaultDuration": 432000,
+              "predecessor": "2d7d3d85-0b29-4989-b3b4-be7f2b1d0aa6",
+              "id": "e09c48fd-25c1-4a1b-93c7-708a23d5a315"
+          },
+          {
+              "phaseId": "ad985cff-ad3e-44de-b54e-3992505ba0ae",
+              "defaultDuration": 172800,
+              "predecessor": "aa5a3f78-79e0-4bf7-93ff-b11e8f5b398b",
+              "id": "211bc305-23cd-45ae-8546-869bbf9c2027"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "0a0fed34-cb5a-47f5-b0cb-6e2ee7de8dcb",
+      "name": "Default First2Finish",
+      "description": "First2Finish",
+      "isActive": true,
+      "phases": [
+          {
+              "phaseId": "a93544bc-c165-4af4-b55e-18f3593b457a",
+              "defaultDuration": 2592000,
+              "id": "51188dcb-38af-47fe-ab4c-478450342fb1"
+          },
+          {
+              "phaseId": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "defaultDuration": 2592000,
+              "id": "402c74b6-7f82-4861-a179-d3cf8e4b5aeb"
+          },
+          {
+              "phaseId": "003a4b14-de5d-43fc-9e35-835dbeb6af1f",
+              "defaultDuration": 86400,
+              "predecessor": "6950164f-3c5e-4bdc-abc8-22aaf5a1bd49",
+              "id": "e17c9f20-9bc6-4ec2-8d17-94e8a63aaf6f"
+          }
+      ],
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   }
 ]

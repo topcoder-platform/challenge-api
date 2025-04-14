@@ -14,11 +14,7 @@ const axiosRetry = require("axios-retry");
 const busApi = require("topcoder-bus-api-wrapper");
 const NodeCache = require("node-cache");
 const HttpStatus = require("http-status-codes");
-const xss = require("xss");
 const logger = require("./logger");
-
-const { Client: OSClient } = require("@opensearch-project/opensearch");
-const elasticsearch = require("elasticsearch");
 
 const projectHelper = require("./project-helper");
 const m2mHelper = require("./m2m-helper");
@@ -26,12 +22,6 @@ const { hasAdminRole } = require("./role-helper");
 
 // Bus API Client
 let busApiClient;
-
-// Elasticsearch client
-let esClient;
-
-// validate ES refresh method
-validateESRefreshMethod(config.ES.ES_REFRESH);
 
 AWS.config.update({
   s3: config.AMAZON.S3_API_VERSION,
@@ -707,45 +697,6 @@ async function postBusEvent(topic, payload, options = {}) {
 }
 
 /**
- * Get ES Client
- * @return {Object} Elasticsearch Client Instance
- */
-function getESClient() {
-  if (esClient) {
-    return esClient;
-  }
-  const esHost = config.get("ES.HOST");
-
-  if (config.get("ES.OPENSEARCH") == "false") {
-    if (/.*amazonaws.*/.test(esHost)) {
-      esClient = elasticsearch.Client({
-        apiVersion: config.get("ES.API_VERSION"),
-        hosts: esHost,
-        connectionClass: require("http-aws-es"), // eslint-disable-line global-require
-        amazonES: {
-          region: config.get("AMAZON.AWS_REGION"),
-          credentials: new AWS.EnvironmentCredentials("AWS"),
-        },
-      });
-    } else {
-      esClient = new elasticsearch.Client({
-        apiVersion: config.get("ES.API_VERSION"),
-        hosts: esHost,
-      });
-    }
-  } else {
-    esClient = new OSClient({
-      node: esHost,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    });
-  }
-
-  return esClient;
-}
-
-/**
  * Calculates challenge end date based on its phases
  * @param {any} challenge
  */
@@ -825,17 +776,6 @@ async function listResourcesByMemberAndChallenge(memberId, challengeId) {
 }
 
 /**
- * Check if ES refresh method is valid.
- *
- * @param {String} method method to be tested
- * @returns {String} method valid method
- */
-async function validateESRefreshMethod(method) {
-  Joi.attempt(method, Joi.string().label("ES_REFRESH").valid(["true", "false", "wait_for"]));
-  return method;
-}
-
-/**
  * This functions gets the default terms of use for a given project id
  *
  * @param {Number} projectId The id of the project for which to get the default terms of use
@@ -866,6 +806,9 @@ async function getProjectDefaultTerms(projectId) {
  * @param {Array<Object>} terms The array of terms {id, roleId} to retrieve from terms API
  */
 async function validateChallengeTerms(terms = []) {
+  if (terms.length === 0) {
+    return []
+  }
   const listOfTerms = [];
   const token = await m2mHelper.getM2MToken();
   for (let term of terms) {
@@ -1242,12 +1185,6 @@ function flushInternalCache() {
   internalCache.flushAll();
 }
 
-function grpcErrorToHTTPCode(grpcErrorCode) {
-  if (grpcErrorCode == 2) return HttpStatus.NOT_FOUND;
-
-  return HttpStatus.INTERNAL_SERVER_ERROR;
-}
-
 module.exports = {
   wrapExpress,
   autoWrapExpress,
@@ -1263,11 +1200,9 @@ module.exports = {
   getUserGroups,
   ensureNoDuplicateOrNullElements,
   postBusEvent,
-  getESClient,
   calculateChallengeEndDate,
   listChallengesByMember,
   listResourcesByMemberAndChallenge,
-  validateESRefreshMethod,
   getProjectDefaultTerms,
   validateChallengeTerms,
   expandWithSubGroups,
@@ -1298,7 +1233,6 @@ module.exports = {
   updateSelfServiceProjectInfo,
   getFromInternalCache,
   setToInternalCache,
-  grpcErrorToHTTPCode,
   flushInternalCache,
 };
 

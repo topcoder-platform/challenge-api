@@ -22,7 +22,7 @@ async function searchTimelineTemplates(req, res) {
  * @param {Object} res the response
  */
 async function createTimelineTemplate(req, res) {
-  const result = await service.createTimelineTemplate(req.body);
+  const result = await service.createTimelineTemplate(req.authUser, req.body);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -42,7 +42,7 @@ async function getTimelineTemplate(req, res) {
  * @param {Object} res the response
  */
 async function fullyUpdateTimelineTemplate(req, res) {
-  const result = await service.fullyUpdateTimelineTemplate(req.params.timelineTemplateId, req.body);
+  const result = await service.fullyUpdateTimelineTemplate(req.authUser, req.params.timelineTemplateId, req.body);
   res.send(result);
 }
 
@@ -53,6 +53,7 @@ async function fullyUpdateTimelineTemplate(req, res) {
  */
 async function partiallyUpdateTimelineTemplate(req, res) {
   const result = await service.partiallyUpdateTimelineTemplate(
+    req.authUser,
     req.params.timelineTemplateId,
     req.body
   );

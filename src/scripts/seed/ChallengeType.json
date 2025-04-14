@@ -1,26 +1,50 @@
 [
   {
-    "id": "927abff4-7af9-4145-8ba1-577c16e64e2e",
-    "name": "Challenge",
-    "description": "A Multi-person Competition with Reviews and Winners",
-    "isActive": true,
-    "isTask": false,
-    "abbreviation": "CH"
+      "id": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
+      "name": "Task",
+      "description": "An assignment earned by a sole competitor to demonstrate a specific skill set.",
+      "isActive": true,
+      "isTask": true,
+      "abbreviation": "TSK",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
-    "name": "First2Finish",
-    "description": "A challenge where the first submission that satisfies the spec wins",
-    "isActive": true,
-    "isTask": false,
-    "abbreviation": "F2F"
+      "id": "929bc408-9cf2-4b3e-ba71-adfbf693046c",
+      "name": "Marathon Match",
+      "description": "A match predicated on solving one problem using only what is deemed the best method",
+      "isActive": true,
+      "isTask": false,
+      "abbreviation": "MM",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   },
   {
-    "id": "ecd58c69-238f-43a4-a4bb-d172719b9f31",
-    "name": "Task",
-    "description": "A piece of work assigned to one person",
-    "isActive": true,
-    "isTask": true,
-    "abbreviation": "TSK"
+      "id": "927abff4-7af9-4145-8ba1-577c16e64e2e",
+      "name": "Challenge",
+      "description": "A competition-driven entity with a host of score-based challenges and rankings.",
+      "isActive": true,
+      "isTask": false,
+      "abbreviation": "CH",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
+  },
+  {
+      "id": "dc876fa4-ef2d-4eee-b701-b555fcc6544c",
+      "name": "First2Finish",
+      "description": "A contest in which the winner is set by being the first to submit a completed task.",
+      "isActive": true,
+      "isTask": false,
+      "abbreviation": "F2F",
+      "createdAt": "2025-03-10T13:08:02.378Z",
+      "createdBy": "topcoder user",
+      "updatedAt": "2025-03-10T13:08:02.378Z",
+      "updatedBy": "topcoder user"
   }
 ]

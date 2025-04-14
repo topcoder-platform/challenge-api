@@ -122,7 +122,7 @@ class ChallengeHelper {
    * @param {oldChallenge} challenge the old challenge data
    */
   async validateSkills(challenge, oldChallenge) {
-    if (!challenge.skills) {
+    if (!challenge.skills || _.isEmpty(challenge.skills)) {
       return;
     }
 
@@ -335,101 +335,26 @@ class ChallengeHelper {
     }
   }
 
-  sanitizeRepeatedFieldsInUpdateRequest(data) {
-    if (data.winners != null) {
-      data.winnerUpdate = {
-        winners: data.winners,
-      };
-      delete data.winners;
-    }
-
-    if (data.discussions != null) {
-      data.discussionUpdate = {
-        discussions: data.discussions,
-      };
-      delete data.discussions;
-    }
-
-    if (data.metadata != null) {
-      data.metadataUpdate = {
-        metadata: data.metadata,
-      };
-      delete data.metadata;
-    }
-
-    if (data.phases != null) {
-      data.phaseUpdate = {
-        phases: data.phases,
-      };
-      delete data.phases;
-    }
-
-    if (data.events != null) {
-      data.eventUpdate = {
-        events: data.events,
-      };
-      delete data.events;
-    }
-
-    if (data.terms != null) {
-      data.termUpdate = {
-        terms: data.terms,
-      };
-      delete data.terms;
-    }
-
-    if (data.prizeSets != null) {
-      const type = data.prizeSets[0]?.prizes[0]?.type;
-      if (type === constants.prizeTypes.USD) {
-        ChallengeHelper.convertPSValuesToCents(data.prizeSets);
-      }
-
-      data.prizeSetUpdate = {
-        prizeSets: [...data.prizeSets],
-      };
-      delete data.prizeSets;
-    }
-
-    if (data.tags != null) {
-      data.tagUpdate = {
-        tags: data.tags,
-      };
-      delete data.tags;
-    }
-
-    if (data.attachments != null) {
-      data.attachmentUpdate = {
-        attachments: data.attachments,
-      };
-      delete data.attachments;
-    }
-
-    if (data.groups != null) {
-      data.groupUpdate = {
-        groups: data.groups,
-      };
-      delete data.groups;
-    }
-
-    if (data.skills != null) {
-      data.skillUpdate = {
-        skills: data.skills,
-      };
-      delete data.skills;
-    }
-
-    return data;
-  }
-
   enrichChallengeForResponse(challenge, track, type) {
     if (challenge.phases && challenge.phases.length > 0) {
       const registrationPhase = _.find(challenge.phases, (p) => p.name === "Registration");
       const submissionPhase = _.find(challenge.phases, (p) => p.name === "Submission");
 
-      challenge.currentPhase = challenge.phases
-        .slice()
-        .reverse()
-        .find((phase) => phase.isOpen);
+      // select last started open phase as current phase
+      _.forEach(challenge.phases, p => {
+        if (p.isOpen) {
+          if (!challenge.currentPhase) {
+            challenge.currentPhase = p;
+          } else {
+            const phaseStartDate = p.actualStartDate || p.scheduledStartDate;
+            const existStartDate = challenge.currentPhase.actualStartDate ||
+              challenge.currentPhase.scheduledStartDate;
+            if (phaseStartDate > existStartDate) {
+              challenge.currentPhase = p;
+            }
+          }
+        }
+      });
 
       challenge.currentPhaseNames = _.map(
         _.filter(challenge.phases, (p) => p.isOpen === true),

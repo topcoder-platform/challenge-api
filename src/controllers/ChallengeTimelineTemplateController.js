@@ -22,7 +22,7 @@ async function searchChallengeTimelineTemplates(req, res) {
  * @param {Object} res the response
  */
 async function createChallengeTimelineTemplate(req, res) {
-  const result = await service.createChallengeTimelineTemplate(req.body);
+  const result = await service.createChallengeTimelineTemplate(req.authUser, req.body);
   res.status(HttpStatus.CREATED).send(result);
 }
 
@@ -43,6 +43,7 @@ async function getChallengeTimelineTemplate(req, res) {
  */
 async function fullyUpdateChallengeTimelineTemplate(req, res) {
   const result = await service.fullyUpdateChallengeTimelineTemplate(
+    req.authUser,
     req.params.challengeTimelineTemplateId,
     req.body
   );

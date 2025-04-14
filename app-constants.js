@@ -139,6 +139,27 @@ const SelfServiceNotificationSettings = {
   },
 };
 
+const PhaseFact = {
+  PHASE_FACT_UNSPECIFIED: 0,
+  PHASE_FACT_REGISTRATION: 1,
+  PHASE_FACT_SUBMISSION: 2,
+  PHASE_FACT_REVIEW: 3,
+  PHASE_FACT_ITERATIVE_REVIEW: 4,
+  PHASE_FACT_CHECKPOINT_SUBMISSION: 5,
+  PHASE_FACT_CHECKPOINT_SCREENING: 6,
+  PHASE_FACT_CHECKPOINT_REVIEW: 7,
+  PHASE_FACT_CHECKPOINT_ITERATIVE_REVIEW: 8,
+  PHASE_FACT_FINAL_FIX: 9,
+  PHASE_FACT_FINAL_REVIEW: 10,
+  PHASE_FACT_APPEALS: 11,
+  PHASE_FACT_APPEALS_RESPONSE: 12,
+  UNRECOGNIZED: -1
+}
+
+const auditFields = [
+  'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+]
+
 module.exports = {
   UserRoles,
   prizeSetTypes,
@@ -154,4 +175,6 @@ module.exports = {
   reviewTypes,
   SelfServiceNotificationTypes,
   SelfServiceNotificationSettings,
+  PhaseFact,
+  auditFields,
 };

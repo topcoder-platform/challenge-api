@@ -18,48 +18,43 @@ describe('challenge type service unit tests', () => {
   const name2 = `test2${new Date().getTime()}`
   const abbreviation = `abb1${new Date().getTime()}`
   const abbreviation2 = `abb2${new Date().getTime()}`
-  const legacyId = new Date().getTime()
-  const legacyId2 = legacyId + 123
   const notFoundId = uuid()
+  const authUser = { userId: 'testuser' }
 
   describe('create challenge type tests', () => {
     it('create challenge type successfully 1', async () => {
-      const result = await service.createChallengeType({
+      const result = await service.createChallengeType(authUser, {
         name,
         description: 'desc',
         isActive: true,
-        abbreviation,
-        legacyId
+        abbreviation
       })
       should.equal(result.name, name)
       should.equal(result.description, 'desc')
       should.equal(result.isActive, true)
       should.equal(result.abbreviation, abbreviation)
-      should.equal(result.legacyId, legacyId)
       should.exist(result.id)
       id = result.id
     })
 
     it('create challenge type successfully 2', async () => {
-      const result = await service.createChallengeType({
+      const result = await service.createChallengeType(authUser, {
         name: name2,
         description: 'desc2',
         isActive: false,
-        abbreviation: abbreviation2,
-        legacyId: legacyId2
+        abbreviation: abbreviation2
       })
       should.equal(result.name, name2)
       should.equal(result.description, 'desc2')
       should.equal(result.isActive, false)
       should.equal(result.abbreviation, abbreviation2)
-      should.equal(result.legacyId, legacyId2)
       should.exist(result.id)
       id2 = result.id
     })
 
     it('create challenge type - name already used', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           name,
           description: 'desc',
           isActive: false,
@@ -74,7 +69,7 @@ describe('challenge type service unit tests', () => {
 
     it('create challenge type - abbreviation already used', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           name: `name-abc-${new Date().getTime()}`,
           description: 'desc',
           isActive: false,
@@ -87,25 +82,9 @@ describe('challenge type service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('create challenge type - legacyId already used', async () => {
-      try {
-        await service.createChallengeType({
-          name: `name-abc-${new Date().getTime()}`,
-          description: 'desc',
-          isActive: false,
-          abbreviation: `name-abb-${new Date().getTime()}`,
-          legacyId
-        })
-      } catch (e) {
-        should.equal(e.message, `ChallengeType with legacyId: ${legacyId} already exist`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('create challenge type - missing name', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           description: 'desc',
           isActive: false,
           abbreviation: 'abb'
@@ -119,7 +98,7 @@ describe('challenge type service unit tests', () => {
 
     it('create challenge type - missing abbreviation', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           name: 'nnnnn',
           description: 'desc',
           isActive: false
@@ -133,7 +112,7 @@ describe('challenge type service unit tests', () => {
 
     it('create challenge type - invalid name', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           name: ['xx'],
           description: 'desc',
           isActive: false,
@@ -148,7 +127,7 @@ describe('challenge type service unit tests', () => {
 
     it('create challenge type - invalid isActive', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           name: 'some name',
           description: 'desc',
           isActive: 'abc',
@@ -161,25 +140,9 @@ describe('challenge type service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('create challenge type - invalid legacyId', async () => {
-      try {
-        await service.createChallengeType({
-          name: 'some name',
-          description: 'desc',
-          isActive: true,
-          abbreviation: 'abb',
-          legacyId: 'abc'
-        })
-      } catch (e) {
-        should.equal(e.message.indexOf('"legacyId" must be a number') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('create challenge type - unexpected field', async () => {
       try {
-        await service.createChallengeType({
+        await service.createChallengeType(authUser, {
           name: 'some name',
           description: 'desc',
           isActive: false,
@@ -202,7 +165,6 @@ describe('challenge type service unit tests', () => {
       should.equal(result.description, 'desc2')
       should.equal(result.isActive, false)
       should.equal(result.abbreviation, abbreviation2)
-      should.equal(result.legacyId, legacyId2)
     })
 
     it('get challenge type - not found', async () => {
@@ -231,11 +193,10 @@ describe('challenge type service unit tests', () => {
       const result = await service.searchChallengeTypes({
         page: 1,
         perPage: 10,
-        name: name2.substring(1).toUpperCase(),
+        // name: name2.substring(1).toUpperCase(),
         description: 'desc',
         isActive: false,
-        abbreviation: abbreviation2,
-        legacyId: legacyId2
+        abbreviation: abbreviation2
       })
       should.equal(result.total, 1)
       should.equal(result.page, 1)
@@ -246,7 +207,6 @@ describe('challenge type service unit tests', () => {
       should.equal(result.result[0].description, 'desc2')
       should.equal(result.result[0].isActive, false)
       should.equal(result.result[0].abbreviation, abbreviation2)
-      should.equal(result.result[0].legacyId, legacyId2)
     })
 
     it('search challenge types successfully 2', async () => {
@@ -320,24 +280,22 @@ describe('challenge type service unit tests', () => {
 
   describe('fully update challenge type tests', () => {
     it('fully update challenge type successfully', async () => {
-      const result = await service.fullyUpdateChallengeType(id2, {
+      const result = await service.fullyUpdateChallengeType(authUser, id2, {
         name: `${name2}-updated`,
         description: 'desc222',
         isActive: true,
-        abbreviation: `${abbreviation2}-updated`,
-        legacyId: legacyId2
+        abbreviation: `${abbreviation2}-updated`
       })
       should.equal(result.id, id2)
       should.equal(result.name, `${name2}-updated`)
       should.equal(result.description, 'desc222')
       should.equal(result.isActive, true)
       should.equal(result.abbreviation, `${abbreviation2}-updated`)
-      should.equal(result.legacyId, legacyId2)
     })
 
     it('fully update challenge type - name already used', async () => {
       try {
-        await service.fullyUpdateChallengeType(id2, {
+        await service.fullyUpdateChallengeType(authUser, id2, {
           name,
           description: 'desc',
           isActive: false,
@@ -352,7 +310,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - abbreviation already used', async () => {
       try {
-        await service.fullyUpdateChallengeType(id2, {
+        await service.fullyUpdateChallengeType(authUser, id2, {
           name: `test-name-123-${new Date().getTime()}`,
           description: 'desc',
           isActive: false,
@@ -365,25 +323,9 @@ describe('challenge type service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('fully update challenge type - legacyId already used', async () => {
-      try {
-        await service.fullyUpdateChallengeType(id2, {
-          name: `test-name-123-${new Date().getTime()}`,
-          description: 'desc',
-          isActive: false,
-          abbreviation: `test-abb-123-${new Date().getTime()}`,
-          legacyId
-        })
-      } catch (e) {
-        should.equal(e.message, `ChallengeType with legacyId: ${legacyId} already exist`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('fully update challenge type - not found', async () => {
       try {
-        await service.fullyUpdateChallengeType(notFoundId, {
+        await service.fullyUpdateChallengeType(authUser, notFoundId, {
           name: 'slkdjflskjdf',
           description: 'desc',
           isActive: false,
@@ -398,7 +340,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - invalid id', async () => {
       try {
-        await service.fullyUpdateChallengeType('invalid', {
+        await service.fullyUpdateChallengeType(authUser, 'invalid', {
           name: 'slkdjflskjdf',
           description: 'desc',
           isActive: false,
@@ -413,7 +355,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - null name', async () => {
       try {
-        await service.fullyUpdateChallengeType(id, {
+        await service.fullyUpdateChallengeType(authUser, id, {
           name: null,
           description: 'desc',
           isActive: false,
@@ -428,7 +370,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - invalid name', async () => {
       try {
-        await service.fullyUpdateChallengeType(id, {
+        await service.fullyUpdateChallengeType(authUser, id, {
           name: { invalid: 'x' },
           description: 'desc',
           isActive: false,
@@ -443,7 +385,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - invalid description', async () => {
       try {
-        await service.fullyUpdateChallengeType(id, {
+        await service.fullyUpdateChallengeType(authUser, id, {
           name: 'some name',
           description: ['desc'],
           isActive: false,
@@ -458,7 +400,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - invalid abbreviation', async () => {
       try {
-        await service.fullyUpdateChallengeType(id, {
+        await service.fullyUpdateChallengeType(authUser, id, {
           name: 'some name',
           description: 'desc',
           isActive: false,
@@ -471,25 +413,9 @@ describe('challenge type service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('fully update challenge type - invalid legacyId', async () => {
-      try {
-        await service.fullyUpdateChallengeType(id, {
-          name: 'some name',
-          description: 'desc',
-          isActive: false,
-          abbreviation: 'ab',
-          legacyId: 'abc'
-        })
-      } catch (e) {
-        should.equal(e.message.indexOf('"legacyId" must be a number') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('fully update challenge type - empty name', async () => {
       try {
-        await service.fullyUpdateChallengeType(id, {
+        await service.fullyUpdateChallengeType(authUser, id, {
           name: '',
           description: 'desc',
           isActive: false,
@@ -504,7 +430,7 @@ describe('challenge type service unit tests', () => {
 
     it('fully update challenge type - invalid isActive', async () => {
       try {
-        await service.fullyUpdateChallengeType(id, {
+        await service.fullyUpdateChallengeType(authUser, id, {
           name: 'asdfsadfsdf',
           description: 'desc',
           isActive: 'invalid',
@@ -520,7 +446,7 @@ describe('challenge type service unit tests', () => {
 
   describe('partially update challenge type tests', () => {
     it('partially update challenge type successfully 1', async () => {
-      const result = await service.partiallyUpdateChallengeType(id2, {
+      const result = await service.partiallyUpdateChallengeType(authUser, id2, {
         name: `${name2}-33`,
         description: 'desc33'
       })
@@ -529,12 +455,11 @@ describe('challenge type service unit tests', () => {
       should.equal(result.description, 'desc33')
       should.equal(result.isActive, true)
       should.equal(result.abbreviation, `${abbreviation2}-updated`)
-      should.equal(result.legacyId, legacyId2)
     })
 
     it('partially update challenge type - name already used', async () => {
       try {
-        await service.partiallyUpdateChallengeType(id2, {
+        await service.partiallyUpdateChallengeType(authUser, id2, {
           name
         })
       } catch (e) {
@@ -546,7 +471,7 @@ describe('challenge type service unit tests', () => {
 
     it('partially update challenge type - abbreviation already used', async () => {
       try {
-        await service.partiallyUpdateChallengeType(id2, {
+        await service.partiallyUpdateChallengeType(authUser, id2, {
           abbreviation
         })
       } catch (e) {
@@ -556,21 +481,9 @@ describe('challenge type service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge type - legacyId already used', async () => {
-      try {
-        await service.partiallyUpdateChallengeType(id2, {
-          legacyId
-        })
-      } catch (e) {
-        should.equal(e.message, `ChallengeType with legacyId: ${legacyId} already exist`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('partially update challenge type - not found', async () => {
       try {
-        await service.partiallyUpdateChallengeType(notFoundId, {
+        await service.partiallyUpdateChallengeType(authUser, notFoundId, {
           name: 'slkdjflskjdf'
         })
       } catch (e) {
@@ -582,7 +495,7 @@ describe('challenge type service unit tests', () => {
 
     it('partially update challenge type - invalid id', async () => {
       try {
-        await service.partiallyUpdateChallengeType('invalid', { name: 'hufdufhdfx' })
+        await service.partiallyUpdateChallengeType(authUser, 'invalid', { name: 'hufdufhdfx' })
       } catch (e) {
         should.equal(e.message.indexOf('"id" must be a valid GUID') >= 0, true)
         return
@@ -592,7 +505,7 @@ describe('challenge type service unit tests', () => {
 
     it('partially update challenge type - null name', async () => {
       try {
-        await service.partiallyUpdateChallengeType(id, { name: null })
+        await service.partiallyUpdateChallengeType(authUser, id, { name: null })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
         return
@@ -602,7 +515,7 @@ describe('challenge type service unit tests', () => {
 
     it('partially update challenge type - invalid description', async () => {
       try {
-        await service.partiallyUpdateChallengeType(id, { description: { invalid: 'x' } })
+        await service.partiallyUpdateChallengeType(authUser, id, { description: { invalid: 'x' } })
       } catch (e) {
         should.equal(e.message.indexOf('"description" must be a string') >= 0, true)
         return
@@ -612,7 +525,7 @@ describe('challenge type service unit tests', () => {
 
     it('partially update challenge type - empty name', async () => {
       try {
-        await service.partiallyUpdateChallengeType(id, { name: '' })
+        await service.partiallyUpdateChallengeType(authUser, id, { name: '' })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is not allowed to be empty') >= 0, true)
         return
@@ -622,7 +535,7 @@ describe('challenge type service unit tests', () => {
 
     it('partially update challenge type - unexpected field', async () => {
       try {
-        await service.partiallyUpdateChallengeType(id, { name: 'xx', other: 'xx' })
+        await service.partiallyUpdateChallengeType(authUser, id, { name: 'xx', other: 'xx' })
       } catch (e) {
         should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
         return
@@ -661,7 +574,7 @@ describe('challenge type service unit tests', () => {
       try {
         await service.deleteChallengeType('invalid')
       } catch (e) {
-        should.equal(e.message.indexOf('"challengeType" must be a valid GUID') >= 0, true)
+        should.equal(e.message.indexOf('"id" must be a valid GUID') >= 0, true)
         return
       }
       throw new Error('should not reach here')

@@ -1,0 +1,588 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+// Enum for allowed challenge track values (matches app-constants)
+enum ChallengeTrackEnum {
+  DEVELOP
+  DESIGN
+  DATA_SCIENCE
+  QA
+}
+
+enum ReviewTypeEnum {
+  COMMUNITY
+  INTERNAL
+}
+
+enum DiscussionTypeEnum {
+  CHALLENGE
+}
+
+enum ChallengeStatusEnum {
+  NEW
+  DRAFT
+  APPROVED
+  ACTIVE
+  COMPLETED
+  DELETED
+  CANCELLED
+  CANCELLED_FAILED_REVIEW
+  CANCELLED_FAILED_SCREENING
+  CANCELLED_ZERO_SUBMISSIONS
+  CANCELLED_WINNER_UNRESPONSIVE
+  CANCELLED_CLIENT_REQUEST
+  CANCELLED_REQUIREMENTS_INFEASIBLE
+  CANCELLED_ZERO_REGISTRATIONS
+  CANCELLED_PAYMENT_FAILED
+}
+
+enum PrizeSetTypeEnum {
+  PLACEMENT
+  COPILOT
+  REVIEWER
+  CHECKPOINT
+}
+
+//////////////////////////////////////////
+// Main Challenge model
+//////////////////////////////////////////
+
+model Challenge {
+  id                    String               @id @default(uuid())
+  name                  String
+  description           String?
+  privateDescription    String?
+  descriptionFormat     String?
+  projectId             Int?                 // frequently queried field
+  typeId                String
+  trackId               String               // FK for relation in ChallengeTrack
+  timelineTemplateId    String?                    // now used as foreign key to ChallengeTimelineTemplate
+  overviewTotalPrizes   Float?                 // stored from overview.totalPrizes
+  currentPhaseNames     String[]             // current phase names
+
+  // simple arrays for tags and groups (PostgreSQL native array type)
+  tags                  String[]
+  groups                String[]
+
+  // Task information (flattened from challenge.task)
+  taskIsTask            Boolean              @default(false)
+  taskIsAssigned        Boolean              @default(false)
+  taskMemberId          String?
+
+  // Dates for challenge lifecycle
+  submissionStartDate   DateTime?
+  submissionEndDate     DateTime?
+  registrationStartDate DateTime?
+  registrationEndDate   DateTime?
+  startDate             DateTime?
+  endDate               DateTime?
+
+  // Normalized billing and legacy information (one-to-one)
+  billingRecord         ChallengeBilling?
+  legacyId             Int?                 // Legacy system ID for searching
+  legacyRecord         ChallengeLegacy?     @relation("ChallengeLegacyRelation")
+
+  // Additional fields from createChallenge schema
+  status                ChallengeStatusEnum  @default(NEW)  // new challenges default to status "New"
+  // Normalized top‑level constraints (e.g. allowedRegistrants) for a challenge
+  constraintRecord      ChallengeConstraint?
+
+  // Additional normalized relations from createChallenge
+  events                ChallengeEvent[]
+  discussions           ChallengeDiscussion[]
+
+  // Existing relations (one-to-many) for challenge metadata, phases, prize sets, winners, attachments,
+  // terms and skills
+  metadata              ChallengeMetadata[]
+  phases                ChallengePhase[]
+  prizeSets             ChallengePrizeSet[]
+  winners               ChallengeWinner[]
+  attachments           Attachment[]
+  terms                 ChallengeTerm[]
+  skills                ChallengeSkill[]
+  auditLogs             AuditLog[]
+
+  // Relation to ChallengeType (FK: typeId)
+  type                  ChallengeType        @relation(fields: [typeId], references: [id])
+  // Relation to ChallengeTrack (FK: trackId)
+  track                 ChallengeTrack       @relation(fields: [trackId], references: [id])
+
+  timelineTemplate      TimelineTemplate? @relation(fields: [timelineTemplateId], references: [id])
+
+  // Auditing fields (present in every table)
+  createdAt             DateTime             @default(now())
+  createdBy             String
+  updatedAt             DateTime             @updatedAt
+  updatedBy             String
+
+  @@index([projectId])
+  @@index([status]) // index added for optimized search by status
+}
+
+//////////////////////////////////////////
+// ChallengeType model
+//////////////////////////////////////////
+
+model ChallengeType {
+  id             String      @id @default(uuid())
+  name           String
+  description    String?
+  isActive       Boolean     @default(true)
+  isTask         Boolean     @default(false)
+  abbreviation   String
+
+  challenges     Challenge[]
+  timelineTemplates ChallengeTimelineTemplate[]
+
+  createdAt      DateTime    @default(now())
+  createdBy      String
+  updatedAt      DateTime    @updatedAt
+  updatedBy      String
+
+  @@index([abbreviation])
+}
+
+//////////////////////////////////////////
+// ChallengeTrack model
+//////////////////////////////////////////
+
+model ChallengeTrack {
+  id             String               @id @default(uuid())
+  name           String
+  description    String?
+  isActive       Boolean
+  abbreviation   String
+  legacyId       Int?                 // numeric legacy system id (if provided)
+  track          ChallengeTrackEnum?  // enum value from ChallengeTrackEnum
+  challenges     Challenge[]
+  // Opposite relation for ChallengeTimelineTemplate
+  timelineTemplates ChallengeTimelineTemplate[]
+
+  createdAt      DateTime             @default(now())
+  createdBy      String
+  updatedAt      DateTime             @updatedAt
+  updatedBy      String
+
+  @@index([legacyId])
+}
+
+//////////////////////////////////////////
+// ChallengeTimelineTemplate model
+//////////////////////////////////////////
+
+model ChallengeTimelineTemplate {
+  id                 String           @id @default(uuid())
+  typeId             String
+  trackId            String
+  timelineTemplateId String           // now required per Swagger spec
+
+  // Link to the TimelineTemplate model via timelineTemplateId.
+  timelineTemplate   TimelineTemplate @relation(fields: [timelineTemplateId], references: [id])
+  // Link to the ChallengeTrack model via trackId.
+  track              ChallengeTrack   @relation(fields: [trackId], references: [id])
+  // Link to the ChallengeType model via typeId.
+  type               ChallengeType    @relation(fields: [typeId], references: [id])
+
+  isDefault          Boolean          @default(false)
+
+  createdAt          DateTime         @default(now())
+  createdBy          String
+  updatedAt          DateTime         @updatedAt
+  updatedBy          String
+
+  // Composite index to support searches/updates by typeId, trackId and timelineTemplateId.
+  @@index([typeId, trackId, timelineTemplateId])
+}
+
+//////////////////////////////////////////
+// AuditLog model – tracks field changes
+//////////////////////////////////////////
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  challengeId String?   // optional association with a challenge
+  fieldName   String
+  oldValue    String?
+  newValue    String?
+  createdAt   DateTime  @default(now())
+  createdBy   String
+  memberId    String?
+
+  // Relation field to connect AuditLog to Challenge.
+  challenge   Challenge? @relation(fields: [challengeId], references: [id])
+
+  @@index([challengeId])
+}
+
+//////////////////////////////////////////
+// Attachment model – for challenge attachments
+//////////////////////////////////////////
+
+model Attachment {
+  id          String     @id @default(uuid())
+  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  name        String
+  fileSize    Int
+  url         String
+  description String?
+
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String
+}
+
+//////////////////////////////////////////
+// ChallengeMetadata model – key/value metadata
+//////////////////////////////////////////
+
+model ChallengeMetadata {
+  id          String     @id @default(uuid())
+  challenge   Challenge   @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  name        String      // name of the metadata
+  value       String      // value stored as string for flexibility
+
+  createdAt   DateTime    @default(now())
+  createdBy   String
+  updatedAt   DateTime    @updatedAt
+  updatedBy   String
+
+  @@index([challengeId])
+}
+
+//////////////////////////////////////////
+// Prize model – individual prize in a prize set
+//////////////////////////////////////////
+
+model Prize {
+  id          String                @id @default(uuid())
+  description String?
+  prizeSet    ChallengePrizeSet     @relation(fields: [prizeSetId], references: [id], onDelete: Cascade)
+  prizeSetId  String
+  type        String                // e.g. "USD", "POINT" (could also be converted to enum later)
+  value       Float
+
+  createdAt   DateTime              @default(now())
+  createdBy   String
+  updatedAt   DateTime              @updatedAt
+  updatedBy   String
+}
+
+//////////////////////////////////////////
+// ChallengeWinner model – record winners for a challenge
+//////////////////////////////////////////
+
+model ChallengeWinner {
+  id          String     @id @default(uuid())
+  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  userId      Int
+  handle      String
+  placement   Int
+  type        PrizeSetTypeEnum
+
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String
+
+  @@index([challengeId])
+}
+
+//////////////////////////////////////////
+// ChallengeTerm model – association of challenge and terms
+//////////////////////////////////////////
+
+model ChallengeTerm {
+  id          String     @id @default(uuid())
+  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  termId      String     // Terms API id
+  roleId      String     // UUID for the associated role
+
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String
+}
+
+//////////////////////////////////////////
+// ChallengeSkill model – linking challenges with skills
+//////////////////////////////////////////
+
+model ChallengeSkill {
+  id          String     @id @default(uuid())
+  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  skillId     String     // Request provided skillId
+
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String
+}
+
+//////////////////////////////////////////
+// ChallengeBilling model – normalized billing info
+//////////////////////////////////////////
+
+model ChallengeBilling {
+  id                String   @id @default(uuid())
+  billingAccountId  String?
+  markup            Float? // in range [0, 100]
+  clientBillingRate Float? // in range [0, 100]. Supporting range on postgres is an open issue with prisma https://github.com/prisma/prisma/issues/3287.
+  challengeId       String   @unique
+  challenge         Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  createdBy         String
+  updatedAt         DateTime @updatedAt
+  updatedBy         String
+}
+
+//////////////////////////////////////////
+// ChallengeLegacy model – normalized legacy info
+//////////////////////////////////////////
+
+model ChallengeLegacy {
+  id                   String   @id @default(uuid())
+  reviewType           ReviewTypeEnum   @default(INTERNAL)
+  confidentialityType  String   @default("public")
+  forumId              Int?
+  directProjectId      Int?
+  screeningScorecardId Int?
+  reviewScorecardId    Int?
+  isTask               Boolean  @default(false)
+  useSchedulingAPI     Boolean  @default(false)
+  pureV5Task           Boolean  @default(false)
+  pureV5               Boolean  @default(false)
+  selfService          Boolean  @default(false)
+  selfServiceCopilot   String?
+  track                String?   // as provided in the legacy object
+  subTrack             String?   // as provided in the legacy object
+  legacySystemId       Int?      // represents the external "legacyId"
+  challengeId          String   @unique
+  challenge            Challenge @relation("ChallengeLegacyRelation", fields: [challengeId], references: [id], onDelete: Cascade)
+  createdAt            DateTime @default(now())
+  createdBy            String
+  updatedAt            DateTime @updatedAt
+  updatedBy            String
+}
+
+//////////////////////////////////////////
+// ChallengeEvent model – normalized challenge events
+//////////////////////////////////////////
+
+model ChallengeEvent {
+  id          String     @id @default(uuid())
+  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  eventId     Int
+  name        String?
+  key         String?
+
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String
+
+  @@index([challengeId])
+}
+
+//////////////////////////////////////////
+// ChallengeDiscussion and associated options – normalized discussion channels
+//////////////////////////////////////////
+
+model ChallengeDiscussion {
+  id          String     @id @default(uuid())
+  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+  discussionId String?
+  name        String
+  type        DiscussionTypeEnum     // updated to use enum
+  provider    String
+  url         String?
+  options     ChallengeDiscussionOption[]
+
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String
+
+  @@index([challengeId])
+}
+
+model ChallengeDiscussionOption {
+  id           String              @id @default(uuid())
+  discussion   ChallengeDiscussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  discussionId String
+  optionKey    String
+  optionValue  String
+
+  createdAt    DateTime            @default(now())
+  createdBy    String
+  updatedAt    DateTime            @updatedAt
+  updatedBy    String
+}
+
+//////////////////////////////////////////
+// ChallengeConstraint model – top-level challenge constraints (e.g. allowed registrants)
+//////////////////////////////////////////
+
+model ChallengeConstraint {
+  id                 String     @id @default(uuid())
+  challenge          Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId        String    @unique
+  allowedRegistrants String[]  @default([])
+
+  createdAt          DateTime  @default(now())
+  createdBy          String
+  updatedAt          DateTime  @updatedAt
+  updatedBy          String
+}
+
+//////////////////////////////////////////
+// New Model: ChallengePhase – to capture per-phase info from create/update challenge operations
+// Each phase is linked with a challenge and holds a duration and any custom constraints.
+//////////////////////////////////////////
+
+model Phase {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  isOpen      Boolean
+  duration    Int
+
+  createdAt   DateTime  @default(now())
+  createdBy   String
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String
+
+  // Inverse relation for associated challenge phases
+  challengePhases ChallengePhase[]
+
+  @@unique([name])
+}
+
+model ChallengePhase {
+  id                String         @id @default(uuid())
+  challengeId       String
+  phaseId           String         // foreign key to Phase
+
+  name              String         // phase name
+  description       String?        // description
+  isOpen            Boolean? @default(false)  // if this phase is open
+  predecessor       String?        // predecessor of this phase
+  duration          Int?           // duration in seconds
+  scheduledStartDate DateTime?     // when the phase is scheduled to start
+  scheduledEndDate DateTime?
+  actualStartDate DateTime?
+  actualEndDate     DateTime?      // when the phase actually ended
+  constraints       ChallengePhaseConstraint[]
+
+  // Relation fields
+  challenge         Challenge      @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  phase             Phase          @relation(fields: [phaseId], references: [id])
+
+  createdAt         DateTime       @default(now())
+  createdBy         String
+  updatedAt         DateTime       @updatedAt
+  updatedBy         String
+
+  @@index([challengeId])
+}
+
+//////////////////////////////////////////
+// New Model: ChallengePhaseConstraint – to capture custom constraints for each phase
+//////////////////////////////////////////
+
+model ChallengePhaseConstraint {
+  id                String          @id @default(uuid())
+  challengePhaseId  String
+  name              String          // the name/key of the constraint
+  value             Int             // numeric value of the constraint (can be changed to Float if needed)
+
+  // Relation to the phase
+  challengePhase    ChallengePhase   @relation(fields: [challengePhaseId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime         @default(now())
+  createdBy         String
+  updatedAt         DateTime         @updatedAt
+  updatedBy         String
+
+  @@index([challengePhaseId])
+}
+
+//////////////////////////////////////////
+// New Model: ChallengePrizeSet – to group prizes for a challenge
+//////////////////////////////////////////
+
+model ChallengePrizeSet {
+  id          String       @id @default(uuid())
+  challengeId String
+  type        PrizeSetTypeEnum  // using enum instead of string
+  description String?
+  prizes      Prize[]
+
+  // Relation to the challenge
+  challenge   Challenge    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime     @default(now())
+  createdBy   String
+  updatedAt   DateTime     @updatedAt
+  updatedBy   String
+
+  @@index([challengeId])
+}
+
+//////////////////////////////////////////
+// TimelineTemplate model – defines timeline templates
+//////////////////////////////////////////
+model TimelineTemplate {
+  id          String                  @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean                 @default(true)
+  phases      TimelineTemplatePhase[]
+
+  createdAt   DateTime                @default(now())
+  createdBy   String
+  updatedAt   DateTime                @updatedAt
+  updatedBy   String
+
+  // Opposite relation field, linking back to ChallengeTimelineTemplate.
+  challengeTimelineTemplates ChallengeTimelineTemplate[]
+
+  // Opposite relation field for Challenge.
+  challenges         Challenge[]
+
+  @@unique([name])
+}
+
+//////////////////////////////////////////
+// TimelineTemplatePhase model – phases associated with a timeline template
+//////////////////////////////////////////
+model TimelineTemplatePhase {
+  id                 String            @id @default(uuid())
+  timelineTemplateId String
+  phaseId            String            // identifier for the phase
+  predecessor        String?           // optional predecessor phase id
+  defaultDuration    Int               // duration (in minutes, hours, etc.) as per business rules
+
+  createdAt          DateTime          @default(now())
+  createdBy          String
+  updatedAt          DateTime          @updatedAt
+  updatedBy          String
+
+  timelineTemplate   TimelineTemplate  @relation(fields: [timelineTemplateId], references: [id], onDelete: Cascade)
+
+  @@index([timelineTemplateId])
+}

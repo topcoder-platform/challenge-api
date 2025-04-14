@@ -1,13 +1,6 @@
 /**
  * This service provides operations of challenge.
  */
-
-const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
-
-const {
-  DomainHelper: { getLookupCriteria, getScanCriteria },
-} = require("@topcoder-framework/lib-common");
-
 const _ = require("lodash");
 const Joi = require("joi");
 const uuid = require("uuid/v4");
@@ -17,9 +10,6 @@ const helper = require("../common/helper");
 const logger = require("../common/logger");
 const errors = require("../common/errors");
 const constants = require("../../app-constants");
-const HttpStatus = require("http-status-codes");
-const ChallengeTypeService = require("./ChallengeTypeService");
-const ChallengeTrackService = require("./ChallengeTrackService");
 const ChallengeTimelineTemplateService = require("./ChallengeTimelineTemplateService");
 const { BadRequestError } = require("../common/errors");
 
@@ -27,55 +17,50 @@ const phaseHelper = require("../common/phase-helper");
 const projectHelper = require("../common/project-helper");
 const challengeHelper = require("../common/challenge-helper");
 
-const { Metadata: GrpcMetadata } = require("@grpc/grpc-js");
-
-const esClient = helper.getESClient();
-
 const PhaseAdvancer = require("../phase-management/PhaseAdvancer");
-const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
-const { QueryDomain } = require("@topcoder-framework/domain-acl");
 
 const { hasAdminRole } = require("../common/role-helper");
 const {
   enrichChallengeForResponse,
-  sanitizeRepeatedFieldsInUpdateRequest,
   convertPrizeSetValuesToCents,
   convertPrizeSetValuesToDollars,
   convertToISOString,
 } = require("../common/challenge-helper");
 const deepEqual = require("deep-equal");
-const { getM2MToken } = require("../common/m2m-helper");
-const {
-  getSRMScheduleQuery,
-  getPracticeProblemsQuery,
-  convertSRMScheduleQueryOutput,
-  convertPracticeProblemsQueryOutput,
-} = require("../common/srm-helper");
+const prismaHelper = require('../common/prisma-helper');
 
-const challengeDomain = new ChallengeDomain(
-  GRPC_CHALLENGE_SERVER_HOST,
-  GRPC_CHALLENGE_SERVER_PORT,
-  {
-    "grpc.service_config": JSON.stringify({
-      methodConfig: [
-        {
-          name: [{ service: "topcoder.domain.service.challenge.Challenge" }],
-          retryPolicy: {
-            maxAttempts: 5,
-            initialBackoff: "0.5s",
-            maxBackoff: "30s",
-            backoffMultiplier: 2,
-            retryableStatusCodes: ["UNAVAILABLE", "DEADLINE_EXCEEDED", "INTERNAL"],
-          },
-        },
-      ],
-    }),
-  }
-);
+const prisma = require('../common/prisma').getClient()
 
-const aclQueryDomain = new QueryDomain(config.GRPC_ACL_SERVER_HOST, config.GRPC_ACL_SERVER_PORT);
+const phaseAdvancer = new PhaseAdvancer({});
 
-const phaseAdvancer = new PhaseAdvancer(challengeDomain);
+// define return field for challenge model. Used in prisma.
+const includeReturnFields = {
+  legacyRecord: true,
+  billingRecord: true,
+  metadata: true,
+  phases: {
+    // sort by start/end date
+    orderBy: [{
+      scheduledEndDate: 'asc'
+    }, {
+      scheduledStartDate: 'asc'
+    }],
+    include: { constraints: true }
+  },
+  discussions: {
+    include: { options: true }
+  },
+  events: true,
+  prizeSets: {
+    include: { prizes: true }
+  },
+  terms: true,
+  skills: true,
+  winners: true,
+  attachments: true,
+  track: true,
+  type: true,
+}
 
 /**
  * Search challenges by legacyId
@@ -85,43 +70,20 @@ const phaseAdvancer = new PhaseAdvancer(challengeDomain);
  * @param {Number} perPage the perPage
  * @returns {Array} the search result
  */
-async function searchByLegacyId(currentUser, legacyId, page, perPage) {
-  const esQuery = {
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    size: perPage,
-    from: (page - 1) * perPage,
-    body: {
-      query: {
-        term: {
-          legacyId,
-        },
-      },
-    },
-  };
-  let docs;
-  try {
-    docs =
-      config.get("ES.OPENSEARCH") == "false"
-        ? await esClient.search(esQuery)
-        : (await esClient.search(esQuery)).body;
-  } catch (e) {
-    logger.error(`Query Error from ES ${JSON.stringify(e)}`);
-    docs = {
-      hits: {
-        hits: [],
-      },
-    };
-  }
-  const ids = _.map(docs.hits.hits, (item) => item._source.id);
-  const result = [];
-  for (const id of ids) {
-    try {
-      const challenge = await getChallenge(currentUser, id);
-      result.push(challenge);
-    } catch (e) {}
-  }
-  return result;
+async function searchByLegacyId (currentUser, legacyId, page, perPage) {
+  // Do not take nested objects, query will be faster
+  const challenges = await prisma.challenge.findMany({
+    take: perPage,
+    skip: (page - 1) * perPage,
+    where: { legacyId },
+    include: includeReturnFields
+  })
+
+  _.forEach(challenges, c => {
+    prismaHelper.convertModelToResponse(c);
+    enrichChallengeForResponse(c, c.track, c.type);
+  });
+  return challenges
 }
 
 /**
@@ -130,64 +92,66 @@ async function searchByLegacyId(currentUser, legacyId, page, perPage) {
  * @param {Object} criteria the search criteria
  * @returns {Object} the search result
  */
-async function searchChallenges(currentUser, criteria) {
-  // construct ES query
-
+async function searchChallenges (currentUser, criteria) {
   const page = criteria.page || 1;
   const perPage = criteria.perPage || 20;
   if (!_.isUndefined(criteria.legacyId)) {
     const result = await searchByLegacyId(currentUser, criteria.legacyId, page, perPage);
     return { total: result.length, page, perPage, result };
   }
-  const boolQuery = [];
-  let sortByScore = false;
+
+  const prismaFilter = {
+    where: {
+      AND: []
+    }
+  }
+
   const matchPhraseKeys = [
     "id",
     "timelineTemplateId",
     "projectId",
     "legacyId",
-    "status",
     "createdBy",
     "updatedBy",
   ];
 
   const _hasAdminRole = hasAdminRole(currentUser);
 
-  const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : [];
-  const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : [];
+  let includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : [];
+  let includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : [];
 
   if (criteria.type) {
-    const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({
-      abbreviation: criteria.type,
+    const typeSearchRes = await prisma.challengeType.findFirst({
+      where: {abbreviation: criteria.type}
     });
-    if (typeSearchRes.total > 0) {
-      criteria.typeId = _.get(typeSearchRes, "result[0].id");
+    if (typeSearchRes && _.get(typeSearchRes, "id")) {
+      criteria.typeId = _.get(typeSearchRes, "id");
     }
   }
   if (criteria.track) {
-    const trackSearchRes = await ChallengeTrackService.searchChallengeTracks({
-      abbreviation: criteria.track,
-    });
-    if (trackSearchRes.total > 0) {
-      criteria.trackId = _.get(trackSearchRes, "result[0].id");
+    const trackSearchRes = await prisma.challengeTrack.findFirst({
+      where: { abbreviation: criteria.track }
+    })
+    if (trackSearchRes && _.get(trackSearchRes, "id")) {
+      criteria.trackId = _.get(trackSearchRes, "id");
     }
   }
   if (criteria.types) {
-    for (const t of criteria.types) {
-      const typeSearchRes = await ChallengeTypeService.searchChallengeTypes({ abbreviation: t });
-      if (typeSearchRes.total > 0 || criteria.types.length === 1) {
-        includedTypeIds.push(_.get(typeSearchRes, "result[0].id"));
-      }
+    const typeIds = await prisma.challengeType.findMany({
+      where: { abbreviation: { in: criteria.types } },
+      select: { id: true }
+    });
+    if (typeIds.length > 0) {
+      includedTypeIds = _.concat(includedTypeIds, typeIds.map(t => t.id));
     }
   }
   if (criteria.tracks) {
-    for (const t of criteria.tracks) {
-      const trackSearchRes = await ChallengeTrackService.searchChallengeTracks({
-        abbreviation: t,
-      });
-      if (trackSearchRes.total > 0) {
-        includedTrackIds.push(_.get(trackSearchRes, "result[0].id"));
-      }
+    const trackIds = await prisma.challengeTrack.findMany({
+      select: { id: true },
+      where: { abbreviation: { in: criteria.tracks } }
+    });
+    if (trackIds.length > 0) {
+      includedTrackIds = _.concat(includedTrackIds, trackIds.map(t => t.id));
     }
   }
   if (criteria.typeId) {
@@ -199,286 +163,269 @@ async function searchChallenges(currentUser, criteria) {
 
   _.forIn(_.pick(criteria, matchPhraseKeys), (value, key) => {
     if (!_.isUndefined(value)) {
-      const filter = { match_phrase: {} };
-      filter.match_phrase[key] = value;
-      boolQuery.push(filter);
+      const f = {};
+      f[key] = value;
+      prismaFilter.where.AND.push(f);
     }
-  });
+  })
+
+  // handle status
+  if (!_.isNil(criteria.status)) {
+    prismaFilter.where.AND.push({
+      status: criteria.status.toUpperCase()
+    })
+  }
 
   _.forEach(_.keys(criteria), (key) => {
-    if (_.toString(key).indexOf("meta.") > -1) {
+    if (_.toString(key).indexOf('meta.') > -1) {
       // Parse and use metadata key
       if (!_.isUndefined(criteria[key])) {
-        const metaKey = key.split("meta.")[1];
-        boolQuery.push({
-          bool: {
-            must: [
-              { match_phrase: { "metadata.name": metaKey } },
-              { match_phrase: { "metadata.value": _.toString(criteria[key]) } },
-            ],
-          },
-        });
+        const metaKey = key.split('meta.')[1];
+        prismaFilter.where.AND.push({
+          metadata: {
+            some: {
+              name: { contains: metaKey },
+              value: { contains: _.toString(criteria[key]) }
+            }
+          }
+        })
       }
     }
-  });
+  })
 
   if (includedTypeIds.length > 0) {
-    boolQuery.push({
-      bool: {
-        should: _.map(includedTypeIds, (t) => ({
-          match_phrase: { typeId: t },
-        })),
-      },
-    });
+    prismaFilter.where.AND.push({
+      typeId: { in: includedTypeIds }
+    })
   }
 
   if (includedTrackIds.length > 0) {
-    boolQuery.push({
-      bool: {
-        should: _.map(includedTrackIds, (t) => ({
-          match_phrase: { trackId: t },
-        })),
-      },
-    });
+    prismaFilter.where.AND.push({
+      trackId: { in: includedTrackIds }
+    })
   }
 
-  const multiMatchQuery = [];
   if (criteria.search) {
-    multiMatchQuery.push({
-      // exact match
-      multi_match: {
-        query: criteria.search,
-        fields: ["name.text^7", "tags^3", "skills.name^3", "description^2"],
-        type: "phrase_prefix",
-        boost: 5,
-      },
-    });
-    multiMatchQuery.push({
-      // match 100% words
-      multi_match: {
-        query: criteria.search,
-        fields: ["name.text^3.0", "tags^2.5", "skills.name^2.5", "description^1.0"],
-        type: "most_fields",
-        minimum_should_match: "100%",
-        boost: 2.5,
-      },
-    });
-    multiMatchQuery.push({
-      // fuzzy match
-      multi_match: {
-        query: criteria.search,
-        fields: ["name.text^2.5", "tags^1.5", "skills.name^1.5", "description^1.0"],
-        type: "most_fields",
-        minimum_should_match: "50%",
-        fuzziness: "AUTO",
-        boost: 1,
-      },
-    });
-    boolQuery.push({
-      bool: {
-        should: [
-          { wildcard: { name: `*${criteria.search}*` } },
-          { wildcard: { name: `${criteria.search}*` } },
-          { wildcard: { name: `*${criteria.search}` } },
-          { match_phrase: { tags: criteria.search } },
-          { match_phrase: { "skills.name": criteria.search } },
-        ],
-      },
-    });
+    prismaFilter.where.AND.push({
+      OR: [{
+        name: { contains: criteria.search }
+      }, {
+        description: { contains: criteria.search }
+      // TODO: Skills doesn't have name field in db.
+      /*
+      }, {
+        skills: { some: { name: { contains: criteria.search } } }
+      */
+      }, {
+        tags: { has: criteria.search }
+      }]
+    })
   } else {
     if (criteria.name) {
-      boolQuery.push({
-        bool: {
-          should: [
-            { wildcard: { name: `*${criteria.name}*` } },
-            { wildcard: { name: `${criteria.name}*` } },
-            { wildcard: { name: `*${criteria.name}` } },
-          ],
-        },
-      });
+      prismaFilter.where.AND.push({
+        name: { contains: criteria.name }
+      })
     }
 
     if (criteria.description) {
-      boolQuery.push({
-        match_phrase_prefix: { description: criteria.description },
-      });
+      prismaFilter.where.AND.push({
+        description: { contains: criteria.description }
+      })
     }
-  }
-
-  // 'search', 'name', 'description' fields should be sorted by function score unless sortBy param provided.
-  if (!criteria.sortBy && (criteria.search || criteria.name || criteria.description)) {
-    sortByScore = true;
   }
 
   if (criteria.tag) {
-    boolQuery.push({ match_phrase: { tags: criteria.tag } });
+    prismaFilter.where.AND.push({
+      tags: {
+        has: criteria.tag
+      }
+    })
   }
 
   if (criteria.tags) {
-    boolQuery.push({
-      bool: {
-        [criteria.includeAllTags ? "must" : "should"]: _.map(criteria.tags, (t) => ({
-          match_phrase: { tags: t },
-        })),
-      },
-    });
+    if (criteria.includeAllTags) {
+      prismaFilter.where.AND.push({
+        tags: { hasEvery: criteria.tags }
+      })
+    } else {
+      prismaFilter.where.AND.push({
+        tags: { hasSome: criteria.tags }
+      })
+    }
   }
 
   if (criteria.totalPrizesFrom || criteria.totalPrizesTo) {
-    const prizeRangeQuery = {};
     if (criteria.totalPrizesFrom) {
-      prizeRangeQuery.gte = criteria.totalPrizesFrom;
+      prismaFilter.where.AND.push({
+        overviewTotalPrizes: { gte: criteria.totalPrizesFrom }
+      })
     }
     if (criteria.totalPrizesTo) {
-      prizeRangeQuery.lte = criteria.totalPrizesTo;
+      prismaFilter.where.AND.push({
+        overviewTotalPrizes: { lte: criteria.totalPrizesTo }
+      })
     }
-    boolQuery.push({ range: { "overview.totalPrizes": prizeRangeQuery } });
   }
   if (criteria.selfService) {
-    boolQuery.push({
-      match_phrase: { "legacy.selfService": criteria.selfService },
-    });
+    prismaFilter.where.AND.push({
+      legacyRecord: {
+        is: { selfService: criteria.selfService }
+      }
+    })
   }
   if (criteria.selfServiceCopilot) {
-    boolQuery.push({
-      match_phrase: {
-        "legacy.selfServiceCopilot": criteria.selfServiceCopilot,
-      },
-    });
+    prismaFilter.where.AND.push({
+      legacyRecord: {
+        is: { selfServiceCopilot: criteria.selfServiceCopilot }
+      }
+    })
   }
   if (criteria.forumId) {
-    boolQuery.push({ match_phrase: { "legacy.forumId": criteria.forumId } });
+    prismaFilter.where.AND.push({
+      legacyRecord: {
+        is: { forumId: criteria.forumId }
+      }
+    })
   }
   if (criteria.reviewType) {
-    boolQuery.push({
-      match_phrase: { "legacy.reviewType": criteria.reviewType },
-    });
+    prismaFilter.where.AND.push({
+      legacyRecord: {
+        is: { reviewType: criteria.reviewType.toUpperCase() }
+      }
+    })
   }
   if (criteria.confidentialityType) {
-    boolQuery.push({
-      match_phrase: {
-        "legacy.confidentialityType": criteria.confidentialityType,
-      },
-    });
+    prismaFilter.where.AND.push({
+      legacyRecord: {
+        is: { confidentialityType: criteria.confidentialityType }
+      }
+    })
   }
   if (criteria.directProjectId) {
-    boolQuery.push({
-      match_phrase: { "legacy.directProjectId": criteria.directProjectId },
-    });
+    prismaFilter.where.AND.push({
+      legacyRecord: {
+        is: { directProjectId: criteria.directProjectId }
+      }
+    })
   }
   if (criteria.currentPhaseName) {
-    if (criteria.currentPhaseName === "Registration") {
-      boolQuery.push({
-        bool: {
-          should: [
-            { match_phrase: { currentPhaseNames: "Registration" } },
-            { match_phrase: { currentPhaseNames: "Open" } },
-          ],
-          minimum_should_match: 1,
-        },
-      });
+    if (criteria.currentPhaseName === 'Registration') {
+      prismaFilter.where.AND.push({
+        currentPhaseNames: { hasSome: ['Registration', 'Open'] }
+      })
     } else {
-      boolQuery.push({
-        match_phrase: { currentPhaseNames: criteria.currentPhaseName },
-      });
+      prismaFilter.where.AND.push({
+        currentPhaseNames: { has: criteria.currentPhaseName }
+      })
     }
   }
   if (criteria.createdDateStart) {
-    boolQuery.push({ range: { created: { gte: criteria.createdDateStart } } });
+    prismaFilter.where.AND.push({
+      createdAt: { gte: criteria.createdDateStart }
+    })
   }
   if (criteria.createdDateEnd) {
-    boolQuery.push({ range: { created: { lte: criteria.createdDateEnd } } });
+    prismaFilter.where.AND.push({
+      createdAt: { lte: criteria.createdDateEnd }
+    })
   }
   if (criteria.registrationStartDateStart) {
-    boolQuery.push({
-      range: {
-        registrationStartDate: { gte: criteria.registrationStartDateStart },
-      },
-    });
+    prismaFilter.where.AND.push({
+      registrationStartDate: { gte: criteria.registrationStartDateStart }
+    })
   }
   if (criteria.registrationStartDateEnd) {
-    boolQuery.push({
-      range: {
-        registrationStartDate: { lte: criteria.registrationStartDateEnd },
-      },
-    });
+    prismaFilter.where.AND.push({
+      registrationStartDate: { lte: criteria.registrationStartDateEnd }
+    })
   }
   if (criteria.registrationEndDateStart) {
-    boolQuery.push({
-      range: {
-        registrationEndDate: { gte: criteria.registrationEndDateStart },
-      },
-    });
+    prismaFilter.where.AND.push({
+      registrationEndDate: { gte: criteria.registrationEndDateStart }
+    })
   }
   if (criteria.registrationEndDateEnd) {
-    boolQuery.push({
-      range: { registrationEndDate: { lte: criteria.registrationEndDateEnd } },
-    });
+    prismaFilter.where.AND.push({
+      registrationEndDate: { lte: criteria.registrationEndDateEnd }
+    })
   }
   if (criteria.submissionStartDateStart) {
-    boolQuery.push({
-      range: {
-        submissionStartDate: { gte: criteria.submissionStartDateStart },
-      },
-    });
+    prismaFilter.where.AND.push({
+      submissionStartDate: { gte: criteria.submissionStartDateStart }
+    })
   }
   if (criteria.submissionStartDateEnd) {
-    boolQuery.push({
-      range: { submissionStartDate: { lte: criteria.submissionStartDateEnd } },
-    });
+    prismaFilter.where.AND.push({
+      submissionStartDate: { lte: criteria.submissionStartDateEnd }
+    })
   }
   if (criteria.submissionEndDateStart) {
-    boolQuery.push({
-      range: { submissionEndDate: { gte: criteria.submissionEndDateStart } },
-    });
+    prismaFilter.where.AND.push({
+      submissionEndDate: { gte: criteria.submissionEndDateStart }
+    })
   }
   if (criteria.submissionEndDateEnd) {
-    boolQuery.push({
-      range: { submissionEndDate: { lte: criteria.submissionEndDateEnd } },
-    });
+    prismaFilter.where.AND.push({
+      submissionEndDate: { lte: criteria.submissionEndDateEnd }
+    })
   }
   if (criteria.updatedDateStart) {
-    boolQuery.push({ range: { updated: { gte: criteria.updatedDateStart } } });
+    prismaFilter.where.AND.push({
+      updatedAt: { gte: criteria.updatedDateStart }
+    })
   }
   if (criteria.updatedDateEnd) {
-    boolQuery.push({ range: { updated: { lte: criteria.updatedDateEnd } } });
+    prismaFilter.where.AND.push({
+      updatedAt: { lte: criteria.updatedDateEnd }
+    })
   }
   if (criteria.startDateStart) {
-    boolQuery.push({ range: { startDate: { gte: criteria.startDateStart } } });
+    prismaFilter.where.AND.push({
+      startDate: { gte: criteria.startDateStart }
+    })
   }
   if (criteria.startDateEnd) {
-    boolQuery.push({ range: { startDate: { lte: criteria.startDateEnd } } });
+    prismaFilter.where.AND.push({
+      startDate: { lte: criteria.startDateEnd }
+    })
   }
   if (criteria.endDateStart) {
-    boolQuery.push({ range: { endDate: { gte: criteria.endDateStart } } });
+    prismaFilter.where.AND.push({
+      endDate: { gte: criteria.endDateStart }
+    })
   }
   if (criteria.endDateEnd) {
-    boolQuery.push({ range: { endDate: { lte: criteria.endDateEnd } } });
+    prismaFilter.where.AND.push({
+      endDate: { lte: criteria.endDateEnd }
+    })
   }
 
-  let sortByProp = criteria.sortBy ? criteria.sortBy : "created";
+  const sortByProp = criteria.sortBy ? criteria.sortBy : 'createdAt'
 
-  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : "desc";
-
-  const mustQuery = [];
-
-  const groupsQuery = [];
+  const sortOrderProp = criteria.sortOrder ? criteria.sortOrder : 'desc'
 
   if (criteria.tco) {
-    boolQuery.push({ match_phrase_prefix: { "events.key": "tco" } });
+    prismaFilter.where.AND.push({
+      events: {
+        some: { key: { contains: 'tco' }}
+      }
+    })
   }
 
   if (criteria.events) {
-    boolQuery.push({
-      bool: {
-        [criteria.includeAllEvents ? "must" : "should"]: _.map(criteria.events, (e) => ({
-          match_phrase: { "events.key": e },
-        })),
-      },
-    });
+    const eventQuery = _.map(criteria.events, e => ({
+      events: {
+        some: { key: { contains: e } }
+      }
+    }))
+    if (criteria.includeAllEvents) {
+      prismaFilter.where.AND = _.concat(prismaFilter.where.AND, eventQuery)
+    } else {
+      prismaFilter.where.AND.push({
+        OR: eventQuery
+      })
+    }
   }
-
-  const mustNotQuery = [];
 
   let groupsToFilter = [];
   let accessibleGroups = [];
@@ -541,27 +488,33 @@ async function searchChallenges(currentUser, criteria) {
     // Return public challenges + challenges from groups that the user has access to
     if (_.isUndefined(currentUser)) {
       // If the user is not authenticated, only query challenges that don't have a group
-      mustNotQuery.push({ exists: { field: "groups" } });
+      prismaFilter.where.AND.push({
+        groups: { isEmpty: true }
+      })
     } else if (!currentUser.isMachine && !_hasAdminRole) {
-      // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
-      groupsQuery.push({ terms: { "groups.keyword": accessibleGroups } });
-      // include public challenges
-      groupsQuery.push({ bool: { must_not: { exists: { field: "groups" } } } });
+      prismaFilter.where.AND.push({
+        OR: [{
+          // include public challenges
+          groups: { isEmpty: true }
+        }, {
+          // If the user is not M2M and is not an admin, return public + challenges from groups the user can access
+          groups: { hasSome: accessibleGroups }
+        }]
+      })
     }
   } else {
-    groupsQuery.push({ terms: { "groups.keyword": groupsToFilter } });
+    prismaFilter.where.AND.push({
+      groups: { hasSome: groupsToFilter }
+    })
   }
 
   if (criteria.ids) {
-    boolQuery.push({
-      bool: {
-        should: _.map(criteria.ids, (id) => ({ match_phrase: { _id: id } })),
-      },
-    });
+    prismaFilter.where.AND.push({
+      id: { in: criteria.ids }
+    })
   }
 
-  const accessQuery = [];
-  let memberChallengeIds;
+  let memberChallengeIds
 
   // FIXME: This is wrong!
   // if (!_.isUndefined(currentUser) && currentUser.handle) {
@@ -570,26 +523,20 @@ async function searchChallenges(currentUser, criteria) {
 
   if (criteria.memberId) {
     // logger.error(`memberId ${criteria.memberId}`)
-    memberChallengeIds = await helper.listChallengesByMember(criteria.memberId);
+    memberChallengeIds = await helper.listChallengesByMember(criteria.memberId)
     // logger.error(`response ${JSON.stringify(ids)}`)
-    accessQuery.push({ terms: { _id: memberChallengeIds } });
-  } else if (currentUser && !_hasAdminRole && !_.get(currentUser, "isMachine", false)) {
-    memberChallengeIds = await helper.listChallengesByMember(currentUser.userId);
-  }
-
-  if (accessQuery.length > 0) {
-    mustQuery.push({
-      bool: {
-        should: accessQuery,
-      },
-    });
+    prismaFilter.where.AND.push({
+      id: { in: memberChallengeIds }
+    })
+  } else if (currentUser && !_hasAdminRole && !_.get(currentUser, 'isMachine', false)) {
+    memberChallengeIds = await helper.listChallengesByMember(currentUser.userId)
   }
 
   // FIXME: Tech Debt
-  let excludeTasks = true;
+  let excludeTasks = true
   // if you're an admin or m2m, security rules wont be applied
-  if (currentUser && (_hasAdminRole || _.get(currentUser, "isMachine", false))) {
-    excludeTasks = false;
+  if (currentUser && (_hasAdminRole || _.get(currentUser, 'isMachine', false))) {
+    excludeTasks = false
   }
 
   /**
@@ -600,135 +547,73 @@ async function searchChallenges(currentUser, criteria) {
    * For admins/m2m:
    * - All tasks will be returned
    */
-  if (currentUser && (_hasAdminRole || _.get(currentUser, "isMachine", false))) {
+  if (currentUser && (_hasAdminRole || _.get(currentUser, 'isMachine', false))) {
     // For admins/m2m, allow filtering based on task properties
-    if (criteria.isTask) {
-      boolQuery.push({ match_phrase: { "task.isTask": criteria.isTask } });
+    if (!_.isNil(criteria.isTask)) {
+      prismaFilter.where.AND.push({
+        taskIsTask: criteria.isTask
+      })
     }
-    if (criteria.taskIsAssigned) {
-      boolQuery.push({
-        match_phrase: { "task.isAssigned": criteria.taskIsAssigned },
-      });
+    if (!_.isNil(criteria.taskIsAssigned)) {
+      prismaFilter.where.AND.push({
+        taskIsAssigned: criteria.taskIsAssigned
+      })
     }
-    if (criteria.taskMemberId) {
-      boolQuery.push({
-        match_phrase: {
-          "task.memberId": criteria.taskMemberId,
-        },
-      });
+    if (!_.isNil(criteria.taskMemberId)) {
+      prismaFilter.where.AND.push({
+        taskMemberId: criteria.taskMemberId
+      })
     }
   } else if (excludeTasks) {
-    mustQuery.push({
-      bool: {
-        should: [
-          ...(_.get(memberChallengeIds, "length", 0) > 0
-            ? [{ bool: { should: [{ terms: { _id: memberChallengeIds } }] } }]
-            : []),
-          { bool: { must_not: { exists: { field: "task.isTask" } } } },
-          { match_phrase: { "task.isTask": false } },
-          {
-            bool: {
-              must: [
-                { match_phrase: { "task.isTask": true } },
-                { match_phrase: { "task.isAssigned": false } },
-              ],
-            },
-          },
-          ...(currentUser && !_hasAdminRole && !_.get(currentUser, "isMachine", false)
-            ? [{ match_phrase: { "task.memberId": currentUser.userId } }]
-            : []),
-        ],
-      },
-    });
-  }
-
-  if (groupsQuery.length > 0) {
-    mustQuery.push({
-      bool: {
-        should: groupsQuery,
-      },
-    });
-  }
-
-  if (multiMatchQuery) {
-    mustQuery.push({
-      bool: {
-        should: multiMatchQuery,
-      },
-    });
-  }
-
-  if (boolQuery.length > 0) {
-    mustQuery.push({
-      bool: {
-        filter: boolQuery,
-      },
-    });
-  }
-
-  let finalQuery = {
-    bool: {},
-  };
-
-  if (mustQuery.length > 0) {
-    finalQuery.bool.must = mustQuery;
-  }
-  if (mustNotQuery.length > 0) {
-    finalQuery.bool.must_not = mustNotQuery;
-    if (!finalQuery.bool.must) {
-      finalQuery.bool.must = mustQuery;
+    const taskFilter = []
+    if (_.get(memberChallengeIds, "length", 0) > 0) {
+      taskFilter.push({
+        id: { in: memberChallengeIds }
+      })
     }
-  }
-  // if none of the above were set, match all
-  if (!finalQuery.bool.must) {
-    finalQuery = {
-      match_all: {},
-    };
+    taskFilter.push({
+      taskIsTask: false
+    })
+    taskFilter.push({
+      taskIsTask: true,
+      taskIsAssigned: false
+    })
+    if (currentUser && !_hasAdminRole && !_.get(currentUser, 'isMachine', false)) {
+      taskFilter.push({
+        taskMemberId: currentUser.userId
+      })
+    }
+    prismaFilter.where.AND.push({
+      OR: taskFilter
+    })
   }
 
-  const esQuery = {
-    index: config.get("ES.ES_INDEX"),
-    size: perPage,
-    from: (page - 1) * perPage, // Es Index starts from 0
-    body: {
-      query: finalQuery,
-      sort: [
-        sortByScore
-          ? { _score: { order: "desc" } }
-          : {
-              [sortByProp]: {
-                order: sortOrderProp,
-                missing: "_last",
-                unmapped_type: "keyword",
-              },
-            },
-      ],
-    },
-  };
+  const sortFilter = {}
+  sortFilter[sortByProp] = sortOrderProp
 
-  logger.info(`ES Query: ${JSON.stringify(esQuery)}`)
-  // Search with constructed query
-  let docs;
+  const prismaQuery = {
+    ...prismaFilter,
+    take: criteria.perPage,
+    skip: (criteria.page - 1) * criteria.perPage,
+    orderBy: [sortFilter],
+    include: includeReturnFields
+  }
+
+  let challenges = []
+  let total = 0
   try {
-    docs =
-      config.get("ES.OPENSEARCH") == "false"
-        ? await esClient.search(esQuery)
-        : (await esClient.search(esQuery)).body;
+    total = await prisma.challenge.count({ ...prismaFilter })
+    challenges = await prisma.challenge.findMany(prismaQuery)
+    _.forEach(challenges, c => {
+      prismaHelper.convertModelToResponse(c);
+      enrichChallengeForResponse(c, c.track, c.type);
+    });
   } catch (e) {
-    logger.error(JSON.stringify(e));
-    // Catch error when the ES is fresh and has no data
-    docs = {
-      hits: {
-        total: 0,
-        hits: [],
-      },
-    };
+    // logger.error(JSON.stringify(e));
+    console.log(e)
   }
 
-  // Extract data from hits
-  const total = docs.hits.total.value;
-
-  let result = _.map(docs.hits.hits, (item) => item._source);
+  let result = challenges
 
   // Hide privateDescription for non-register challenges
   if (currentUser) {
@@ -758,17 +643,7 @@ async function searchChallenges(currentUser, criteria) {
     });
   }
 
-  const challengeTypeList = await ChallengeTypeService.searchChallengeTypes({});
-  const typeMap = new Map();
-  _.each(challengeTypeList.result, (e) => {
-    typeMap.set(e.id, e.name);
-  });
-
-  _.each(result, (element) => {
-    element.type = typeMap.get(element.typeId) || "Code";
-  });
   _.each(result, async (element) => {
-    await getPhasesAndPopulate(element);
     if (element.status !== constants.challengeStatuses.Completed) {
       _.unset(element, "winners");
     }
@@ -859,7 +734,7 @@ searchChallenges.schema = {
  */
 async function createChallenge(currentUser, challenge, userToken) {
   await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
-  let prizeTypeTmp = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+  const prizeTypeTmp = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets)
 
   console.log("TYPE", prizeTypeTmp);
   if (challenge.legacy.selfService) {
@@ -994,37 +869,25 @@ async function createChallenge(currentUser, challenge, userToken) {
     value: typeof m.value === "string" ? m.value : JSON.stringify(m.value),
   }));
 
-  const grpcMetadata = new GrpcMetadata();
-
-  grpcMetadata.set("handle", currentUser.handle);
-  grpcMetadata.set("userId", currentUser.userId);
-  grpcMetadata.set("token", await getM2MToken());
-
   const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
 
   if (prizeType === constants.prizeTypes.USD) {
     convertPrizeSetValuesToCents(challenge.prizeSets);
   }
 
-  const ret = await challengeDomain.create(challenge, grpcMetadata);
+  const prismaModel = prismaHelper.convertChallengeSchemaToPrisma(currentUser, challenge)
+  const ret = await prisma.challenge.create({
+    data: prismaModel,
+    include: includeReturnFields
+  })
 
+  ret.overview = { totalPrizesInCents: ret.overviewTotalPrizes }
   if (prizeType === constants.prizeTypes.USD) {
-    convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
+    convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview)
   }
 
-  ret.numOfSubmissions = 0;
-  ret.numOfRegistrants = 0;
-
-  enrichChallengeForResponse(ret, track, type);
-
-  // Create in ES
-  await esClient.create({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: ret.id,
-    body: ret,
-  });
+  prismaHelper.convertModelToResponse(ret)
+  enrichChallengeForResponse(ret, track, type)
 
   // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
   // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
@@ -1177,19 +1040,6 @@ createChallenge.schema = {
     .required(),
   userToken: Joi.string().required(),
 };
-/**
- * Populate phase data from phase API.
- * @param {Object} the challenge entity
- */
-async function getPhasesAndPopulate(data) {
-  _.each(data.phases, async (p) => {
-    const phase = await phaseHelper.getPhase(p.phaseId);
-    p.name = phase.name;
-    if (phase.description) {
-      p.description = phase.description;
-    }
-  });
-}
 
 /**
  * Get challenge.
@@ -1198,29 +1048,13 @@ async function getPhasesAndPopulate(data) {
  * @param {Boolean} checkIfExists flag to check if challenge exists
  * @returns {Object} the challenge with given id
  */
-async function getChallenge(currentUser, id, checkIfExists) {
-  let challenge;
-  try {
-    if (config.get("ES.OPENSEARCH") == "true") {
-      challenge = (
-        await esClient.getSource({
-          index: config.get("ES.ES_INDEX"),
-          id,
-        })
-      ).body;
-    } else {
-      challenge = await esClient.getSource({
-        index: config.get("ES.ES_INDEX"),
-        type: config.get("ES.ES_TYPE"),
-        id,
-      });
-    }
-  } catch (e) {
-    if (e.statusCode === HttpStatus.NOT_FOUND) {
-      throw new errors.NotFoundError(`Challenge of id ${id} is not found.`);
-    } else {
-      throw e;
-    }
+async function getChallenge (currentUser, id, checkIfExists) {
+  const challenge = await prisma.challenge.findUnique({
+    where: { id },
+    include: includeReturnFields
+  })
+  if (_.isNil(challenge) || _.isNil(challenge.id)) {
+    throw new errors.NotFoundError(`Challenge of id ${id} is not found.`);
   }
   if (checkIfExists) {
     return _.pick(challenge, ["id", "legacyId"]);
@@ -1251,10 +1085,6 @@ async function getChallenge(currentUser, id, checkIfExists) {
     _.unset(challenge, "privateDescription");
   }
 
-  if (challenge.phases && challenge.phases.length > 0) {
-    await getPhasesAndPopulate(challenge);
-  }
-
   if (challenge.status !== constants.challengeStatuses.Completed) {
     _.unset(challenge, "winners");
   }
@@ -1264,7 +1094,10 @@ async function getChallenge(currentUser, id, checkIfExists) {
     _.unset(challenge, "payments");
   }
 
-  return challenge;
+  prismaHelper.convertModelToResponse(challenge);
+  enrichChallengeForResponse(challenge, challenge.track, challenge.type);
+
+  return challenge
 }
 getChallenge.schema = {
   currentUser: Joi.any(),
@@ -1426,11 +1259,18 @@ function validateTask(currentUser, challenge, data, challengeResources) {
  * @param {Object} currentUser the user who perform operation
  * @param {String} challengeId the challenge id
  * @param {Object} data the challenge data to be updated
- * @param {Boolean} isFull the flag indicate it is a fully update operation.
  * @returns {Object} the updated challenge
  */
 async function updateChallenge(currentUser, challengeId, data) {
-  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
+  const challenge = await prisma.challenge.findUnique({
+    where: { id: challengeId },
+    include: includeReturnFields
+  })
+  if (!challenge || !challenge.id) {
+    throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist`)
+  }
+  enrichChallengeForResponse(challenge)
+  prismaHelper.convertModelToResponse(challenge)
   const existingPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
 
   if (existingPrizeType === constants.prizeTypes.USD) {
@@ -1830,40 +1670,69 @@ async function updateChallenge(currentUser, challengeId, data) {
   }
 
   if (data.phases && data.phases.length > 0) {
-    await getPhasesAndPopulate(data);
-
     if (deepEqual(data.phases, challenge.phases)) {
       delete data.phases;
     }
   }
 
-  const updateInput = sanitizeRepeatedFieldsInUpdateRequest(_.omit(data, ["cancelReason"]));
-  if (!_.isEmpty(updateInput)) {
-    const grpcMetadata = new GrpcMetadata();
+  // convert data to prisma models
+  const updateData = prismaHelper.convertChallengeSchemaToPrisma(currentUser, _.omit(data, ['cancelReason']))
+  updateData.updatedBy = _.toString(currentUser.userId)
+  // reset createdBy
+  delete updateData.createdBy
 
-    grpcMetadata.set("handle", currentUser.handle);
-    grpcMetadata.set("userId", currentUser.userId);
-    grpcMetadata.set("token", await getM2MToken());
-
-    const newPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(updateInput.prizeSets);
-    if (newPrizeType != null && existingPrizeType != null && newPrizeType !== existingPrizeType) {
-      throw new errors.BadRequestError(
-        `Cannot change prize type from ${existingPrizeType} to ${newPrizeType}`
-      );
-    }
-
-    await challengeDomain.update(
-      {
-        filterCriteria: getScanCriteria({ id: challengeId }),
-        updateInput,
-      },
-      grpcMetadata
+  const newPrizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(updateData.prizeSets);
+  if (newPrizeType != null && existingPrizeType != null && newPrizeType !== existingPrizeType) {
+    throw new errors.BadRequestError(
+      `Cannot change prize type from ${existingPrizeType} to ${newPrizeType}`
     );
   }
+  const updatedChallenge = await prisma.$transaction(async (tx) => {
+    // drop nested data if updated
+    if (!_.isNil(updateData.legacyRecord)) {
+      await tx.challengeLegacy.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.billingRecord)) {
+      await tx.challengeBilling.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.constraintRecord)) {
+      await tx.challengeConstraint.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.events)) {
+      await tx.challengeEvent.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.discussions)) {
+      await tx.challengeDiscussion.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.metadata)) {
+      await tx.challengeMetadata.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.phases)) {
+      await tx.challengePhase.deleteMany({ where: { challengeId } })
+    }
+    if (!_.isNil(updateData.prizeSets)) {
+      await tx.challengePrizeSet.deleteMany({ where: { challengeId } })
+    }
+    if (_.isNil(updateData.winners)) {
+      await tx.challengeWinner.deleteMany({ where: { challengeId } })
+    }
+    if (_.isNil(updateData.attachment)) {
+      await tx.attachment.deleteMany({ where: { challengeId } })
+    }
+    if (_.isNil(updateData.terms)) {
+      await tx.challengeTerm.deleteMany({ where: { challengeId } })
+    }
+    if (_.isNil(updateData.skills)) {
+      await tx.challengeSkill.deleteMany({ where: { challengeId } })
+    }
 
-  const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-
-  await indexChallengeAndPostToKafka(updatedChallenge, track, type);
+    return await tx.challenge.update({
+      data: updateData,
+      where: { id: challengeId },
+      include: includeReturnFields
+    })
+  })
+  await indexChallengeAndPostToKafka(updatedChallenge, track, type)
 
   if (updatedChallenge.legacy.selfService) {
     const creator = await helper.getMemberByHandle(updatedChallenge.createdBy);
@@ -2248,12 +2117,11 @@ function sanitizeData(data, challenge) {
  * @param {String} challengeId the challenge id
  * @returns {Object} the deleted challenge
  */
-async function deleteChallenge(currentUser, challengeId) {
-  const { items } = await challengeDomain.scan({
-    criteria: getScanCriteria({ id: challengeId, status: constants.challengeStatuses.New }),
-  });
-  const challenge = _.first(items);
-  if (!challenge) {
+async function deleteChallenge (currentUser, challengeId) {
+  const challenge = await prisma.challenge.findUnique({
+    where: { id: challengeId, status: constants.challengeStatuses.New.toUpperCase() }
+  })
+  if (_.isNil(challenge) || _.isNil(challenge.id)) {
     throw new errors.NotFoundError(
       `Challenge with id: ${challengeId} doesn't exist or is not in New status`
     );
@@ -2261,22 +2129,12 @@ async function deleteChallenge(currentUser, challengeId) {
   // ensure user can modify challenge
   await helper.ensureUserCanModifyChallenge(currentUser, challenge);
   // delete DB record
-  const { items: deletedItems } = await challengeDomain.delete(
-    getLookupCriteria("id", challengeId)
-  );
-  if (!_.find(deletedItems, { id: challengeId })) {
-    throw new errors.Internal(`There was an error deleting the challenge with id: ${challengeId}`);
-  }
-  // delete ES document
-  await esClient.delete({
-    index: config.get("ES.ES_INDEX"),
-    refresh: config.get("ES.ES_REFRESH"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    id: challengeId,
-  });
+  await prisma.challenge.delete({ where: { id: challengeId } })
+
   await helper.postBusEvent(constants.Topics.ChallengeDeleted, {
     id: challengeId,
   });
+  prismaHelper.convertModelToResponse(challenge);
   return challenge;
 }
 
@@ -2287,75 +2145,80 @@ deleteChallenge.schema = {
 
 async function advancePhase(currentUser, challengeId, data) {
   logger.info(`Advance Phase Request - ${challengeId} - ${JSON.stringify(data)}`);
-  if (currentUser && (currentUser.isMachine || hasAdminRole(currentUser))) {
-    const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-
-    if (!challenge) {
-      throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist.`);
-    }
-    if (challenge.status !== constants.challengeStatuses.Active) {
-      throw new errors.BadRequestError(
-        `Challenge with id: ${challengeId} is not in Active status.`
-      );
-    }
-
-    const phaseAdvancerResult = await phaseAdvancer.advancePhase(
-      challenge.id,
-      challenge.legacyId,
-      challenge.phases,
-      data.operation,
-      data.phase
+  const machineOrAdmin = currentUser && (currentUser.isMachine || hasAdminRole(currentUser))
+  if (!machineOrAdmin) {
+    throw new errors.ForbiddenError(
+      `Admin role or an M2M token is required to advance the challenge phase.`
     );
+  }
+  const challenge = await prisma.challenge.findUnique({ where: { id: challengeId }, include: includeReturnFields })
 
-    if (phaseAdvancerResult.success) {
-      const grpcMetadata = new GrpcMetadata();
-
-      grpcMetadata.set("handle", currentUser.handle);
-      grpcMetadata.set("userId", currentUser.userId);
-
-      await challengeDomain.update(
-        {
-          filterCriteria: getScanCriteria({ id: challengeId }),
-          updateInput: {
-            phaseUpdate: {
-              phases: phaseAdvancerResult.updatedPhases,
-            },
-          },
-        },
-        grpcMetadata
-      );
-
-      const updatedChallenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-      await indexChallengeAndPostToKafka(updatedChallenge);
-
-      // TODO: This is a temporary solution to update the challenge status to Completed; We currently do not have a way to get winner list using v5 data
-      // TODO: With the implementation of v5 review API we'll develop a mechanism to maintain the winner list in v5 data that challenge-api can use to create the winners list
-      if (phaseAdvancerResult.hasWinningSubmission === true) {
-        await challengeDomain.update(
-          {
-            filterCriteria: getScanCriteria({ id: challengeId }),
-            updateInput: {
-              status: constants.challengeStatuses.Completed,
-            },
-          },
-          grpcMetadata
-        );
-        // Indexing in Kafka is not necessary here since domain-challenge will do it
-      }
-
-      return {
-        success: true,
-        message: phaseAdvancerResult.message,
-        next: phaseAdvancerResult.next,
-      };
-    }
-
-    return phaseAdvancerResult;
+  if (!_.isNil(challenge) || _.isNil(challenge.id)) {
+    throw new errors.NotFoundError(`Challenge with id: ${challengeId} doesn't exist.`);
+  }
+  if (challenge.status !== constants.challengeStatuses.Active) {
+    throw new errors.BadRequestError(
+      `Challenge with id: ${challengeId} is not in Active status.`
+    );
   }
 
-  throw new errors.ForbiddenError(
-    `Admin role or an M2M token is required to advance the challenge phase.`
+  const phaseAdvancerResult = await phaseAdvancer.advancePhase(
+    challenge.id,
+    challenge.legacyId,
+    challenge.phases,
+    data.operation,
+    data.phase
   );
+
+  const auditFields = {
+    createdBy: _.toString(currentUser.userId),
+    updatedBy: _.toString(currentUser.userId)
+  }
+  if (!phaseAdvancerResult.success) {
+    return phaseAdvancerResult
+  }
+  // update phase if result is successful
+  const challengeData = {}
+  const updatedPhaseData = {
+    phases: phaseAdvancerResult.updatedPhases
+  }
+  prismaHelper.convertChallengePhaseSchema(updatedPhaseData, challengeData, auditFields)
+  // Perform partially update for now
+  const newPhases = challengeData.phases
+  const newChallengeData = _.pick(challengeData, ['currentPhaseNames',
+    'registrationStartDate', 'registrationEndDate', 'submissionStartDate', 'submissionEndDate'])
+
+  // TODO: This is a temporary solution to update the challenge status to Completed; We currently do not have a way to get winner list using v5 data
+  // TODO: With the implementation of v5 review API we'll develop a mechanism to maintain the winner list in v5 data that challenge-api can use to create the winners list
+  if (phaseAdvancerResult.hasWinningSubmission === true) {
+    newChallengeData.status = constants.challengeStatuses.Completed.toUpperCase()
+  }
+  await prisma.$transaction(async (tx) => {
+    // upsert phases one by one
+    for (let newPhase of newPhases) {
+      await tx.challengePhase.upsert({
+        where: {
+          challengeId,
+          phaseId: newPhase.phaseId
+        },
+        create: { ...newPhase, challengeId },
+        update: newPhase
+      })
+    }
+    await tx.challenge.update({
+      where: { id: challengeId },
+      data: newChallengeData
+    })
+  })
+  const updatedChallenge = await tx.challenge.findUnique({ where: { id: challengeId } })
+  await indexChallengeAndPostToKafka(updatedChallenge)
+
+  return {
+    success: true,
+    message: phaseAdvancerResult.message,
+    next: phaseAdvancerResult.next
+  }
+  // Indexing in Kafka is not necessary here since domain-challenge will do it
 }
 
 advancePhase.schema = {
@@ -2394,6 +2257,7 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
     `Post Bus Event: ${constants.Topics.ChallengeUpdated} ${JSON.stringify(updatedChallenge)}`
   );
 
+  prismaHelper.convertModelToResponse(updatedChallenge);
   enrichChallengeForResponse(updatedChallenge, track, type);
 
   await helper.postBusEvent(constants.Topics.ChallengeUpdated, updatedChallenge, {
@@ -2402,198 +2266,7 @@ async function indexChallengeAndPostToKafka(updatedChallenge, track, type) {
         ? `${updatedChallenge.id}:${updatedChallenge.status}`
         : undefined,
   });
-
-  // Update ES
-  await esClient.update({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: updatedChallenge.id,
-    body: {
-      doc: updatedChallenge,
-    },
-  });
 }
-
-async function updateLegacyPayout(currentUser, challengeId, data) {
-  console.log(`Update legacy payment data for challenge: ${challengeId} with data: `, data);
-  const challenge = await challengeDomain.lookup(getLookupCriteria("id", challengeId));
-
-  // SQL qurey to fetch the payment and payment_detail record
-  let sql = `SELECT * FROM informixoltp:payment p
-    INNER JOIN informixoltp:payment_detail pd ON p.most_recent_detail_id = pd.payment_detail_id
-    WHERE p.user_id = ${data.userId} AND`;
-
-  if (challenge.legacyId != null) {
-    sql += ` pd.component_project_id = ${challenge.legacyId}`;
-  } else {
-    sql += ` pd.jira_issue_id = \'${challengeId}\'`;
-  }
-
-  sql += " ORDER BY pd.payment_detail_id ASC";
-
-  console.log("Fetch legacy payment detail: ", sql);
-
-  const result = await aclQueryDomain.rawQuery({ sql });
-  let updateClauses = [`date_modified = current`];
-
-  const statusMap = {
-    Paid: 53,
-    OnHold: 55,
-    OnHoldAdmin: 55,
-    Owed: 56,
-    Cancelled: 65,
-    EnteredIntoPaymentSystem: 70,
-  };
-
-  if (data.status != null) {
-    updateClauses.push(`payment_status_id = ${statusMap[data.status]}`);
-    if (data.status === "Paid") {
-      updateClauses.push(`date_paid = '${data.datePaid}'`);
-    } else {
-      updateClauses.push("date_paid = null");
-    }
-  }
-
-  if (data.releaseDate != null) {
-    updateClauses.push(`date_due = '${data.releaseDate}'`);
-  }
-
-  const paymentDetailIds = result.rows.map(
-    (row) => row.fields.find((field) => field.key === "payment_detail_id").value
-  );
-
-  if (data.amount != null) {
-    updateClauses.push(`total_amount = ${data.amount}`);
-    if (paymentDetailIds.length === 1) {
-      updateClauses.push(`net_amount = ${data.amount}`);
-      updateClauses.push(`gross_amount = ${data.amount}`);
-    }
-  }
-
-  if (paymentDetailIds.length === 0) {
-    return {
-      success: false,
-      message: "No payment detail record found",
-    };
-  }
-
-  const whereClause = [`payment_detail_id IN (${paymentDetailIds.join(",")})`];
-
-  const updateQuery = `UPDATE informixoltp:payment_detail SET ${updateClauses.join(
-    ", "
-  )} WHERE ${whereClause.join(" AND ")}`;
-
-  console.log("Update Clauses", updateClauses);
-  console.log("Update Query", updateQuery);
-
-  await aclQueryDomain.rawQuery({ sql: updateQuery });
-
-  if (data.amount != null) {
-    if (paymentDetailIds.length > 1) {
-      const amountInCents = data.amount * 100;
-
-      const split1Cents = Math.round(amountInCents * 0.75);
-      const split2Cents = amountInCents - split1Cents;
-
-      const split1Dollars = Number((split1Cents / 100).toFixed(2));
-      const split2Dollars = Number((split2Cents / 100).toFixed(2));
-
-      const paymentUpdateQueries = paymentDetailIds.map((paymentDetailId, index) => {
-        let amt = 0;
-        if (index === 0) {
-          amt = split1Dollars;
-        }
-        if (index === 1) {
-          amt = split2Dollars;
-        }
-
-        return `UPDATE informixoltp:payment_detail SET date_modified = CURRENT, net_amount = ${amt}, gross_amount = ${amt} WHERE payment_detail_id = ${paymentDetailId}`;
-      });
-
-      console.log("Payment Update Queries", paymentUpdateQueries);
-
-      await Promise.all(
-        paymentUpdateQueries.map((query) => aclQueryDomain.rawQuery({ sql: query }))
-      );
-    }
-  }
-
-  return {
-    success: true,
-    message: "Successfully updated legacy payout",
-  };
-}
-updateLegacyPayout.schema = {
-  currentUser: Joi.any(),
-  challengeId: Joi.id(),
-  data: Joi.object()
-    .keys({
-      userId: Joi.number().integer().positive().required(),
-      amount: Joi.number().allow(null),
-      status: Joi.string().allow(null),
-      datePaid: Joi.string().allow(null),
-      releaseDate: Joi.string().allow(null),
-    })
-};
-
-/**
- * Get SRM Schedule
- * @param {Object} criteria the criteria
- */
-async function getSRMSchedule(criteria = {}) {
-  const sql = getSRMScheduleQuery(criteria);
-  const result = await aclQueryDomain.rawQuery({ sql });
-  return convertSRMScheduleQueryOutput(result);
-}
-
-getSRMSchedule.schema = {
-  criteria: Joi.object().keys({
-    registrationStartTimeAfter: Joi.date().default(new Date()),
-    registrationStartTimeBefore: Joi.date(),
-    statuses: Joi.array()
-      .items(Joi.string().valid(["A", "F", "P"]))
-      .default(["A", "F", "P"]),
-    sortBy: Joi.string()
-      .valid(["registrationStartTime", "codingStartTime", "challengeStartTime"])
-      .default("registrationStartTime"),
-    sortOrder: Joi.string().valid(["asc", "desc"]).default("asc"),
-    page: Joi.page(),
-    perPage: Joi.perPage(),
-  }),
-};
-
-/**
- * Get SRM Schedule
- * @param {Object} currentUser the user who perform operation
- * @param {Object} criteria the criteria
- */
-async function getPracticeProblems(currentUser, criteria = {}) {
-  criteria.userId = currentUser.userId;
-  const { query, countQuery } = getPracticeProblemsQuery(criteria);
-  const resultOutput = await aclQueryDomain.rawQuery({ sql: query });
-  const countOutput = await aclQueryDomain.rawQuery({ sql: countQuery });
-  const result = convertPracticeProblemsQueryOutput(resultOutput);
-  const total = countOutput.rows[0].fields[0].value;
-  return { total, page: criteria.page, perPage: criteria.perPage, result };
-}
-
-getPracticeProblems.schema = {
-  currentUser: Joi.any(),
-  criteria: Joi.object().keys({
-    sortBy: Joi.string()
-      .valid(["problemName", "problemType", "points", "difficulty", "status", "myPoints"])
-      .default("problemId"),
-    sortOrder: Joi.string().valid(["asc", "desc"]).default("desc"),
-    page: Joi.page(),
-    perPage: Joi.perPage(),
-    difficulty: Joi.string().valid(["easy", "medium", "hard"]),
-    status: Joi.string().valid(["new", "viewed", "solved"]),
-    pointsLowerBound: Joi.number().integer(),
-    pointsUpperBound: Joi.number().integer(),
-    problemName: Joi.string(),
-  }),
-};
 
 module.exports = {
   searchChallenges,
@@ -2601,12 +2274,9 @@ module.exports = {
   getChallenge,
   updateChallenge,
   deleteChallenge,
-  updateLegacyPayout,
   getChallengeStatistics,
   sendNotifications,
   advancePhase,
-  getSRMSchedule,
-  getPracticeProblems,
 };
 
 logger.buildService(module.exports);

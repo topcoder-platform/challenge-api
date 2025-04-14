@@ -17,10 +17,13 @@ describe('phase service unit tests', () => {
   const name = `test1${new Date().getTime()}`
   const name2 = `test2${new Date().getTime()}`
   const notFoundId = uuid()
+  const authUser = {
+    userId: 'testuser'
+  }
 
   describe('create phase tests', () => {
     it('create phase successfully 1', async () => {
-      const result = await service.createPhase({
+      const result = await service.createPhase(authUser, {
         name,
         description: 'desc',
         isOpen: true,
@@ -35,7 +38,7 @@ describe('phase service unit tests', () => {
     })
 
     it('create phase successfully 2', async () => {
-      const result = await service.createPhase({
+      const result = await service.createPhase(authUser, {
         name: name2,
         description: 'desc2',
         isOpen: false,
@@ -51,7 +54,7 @@ describe('phase service unit tests', () => {
 
     it('create phase - name already used', async () => {
       try {
-        await service.createPhase({
+        await service.createPhase(authUser, {
           name,
           description: 'desc',
           isOpen: false,
@@ -66,7 +69,7 @@ describe('phase service unit tests', () => {
 
     it('create phase - missing name', async () => {
       try {
-        await service.createPhase({
+        await service.createPhase(authUser, {
           description: 'desc',
           isOpen: false,
           duration: 456
@@ -80,7 +83,7 @@ describe('phase service unit tests', () => {
 
     it('create phase - invalid name', async () => {
       try {
-        await service.createPhase({
+        await service.createPhase(authUser, {
           name: ['xx'],
           description: 'desc',
           isOpen: false,
@@ -95,7 +98,7 @@ describe('phase service unit tests', () => {
 
     it('create phase - invalid duration', async () => {
       try {
-        await service.createPhase({
+        await service.createPhase(authUser, {
           name: 'some name',
           description: 'desc',
           isOpen: false,
@@ -110,7 +113,7 @@ describe('phase service unit tests', () => {
 
     it('create phase - unexpected field', async () => {
       try {
-        await service.createPhase({
+        await service.createPhase(authUser, {
           name: 'some name',
           description: 'desc',
           isOpen: false,
@@ -158,7 +161,7 @@ describe('phase service unit tests', () => {
 
   describe('search phases tests', () => {
     it('search phases successfully 1', async () => {
-      const result = await service.searchPhases({ page: 1, perPage: 10, name: name2.substring(1).toUpperCase() })
+      const result = await service.searchPhases({ page: 1, perPage: 10, name: name2 })
       should.equal(result.total, 1)
       should.equal(result.page, 1)
       should.equal(result.perPage, 10)
@@ -221,7 +224,7 @@ describe('phase service unit tests', () => {
 
   describe('fully update phase tests', () => {
     it('fully update phase successfully', async () => {
-      const result = await service.fullyUpdatePhase(id2, {
+      const result = await service.fullyUpdatePhase(authUser, id2, {
         name: `${name2}-updated`,
         description: 'desc222',
         isOpen: true,
@@ -236,7 +239,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - name already used', async () => {
       try {
-        await service.fullyUpdatePhase(id2, {
+        await service.fullyUpdatePhase(authUser, id2, {
           name,
           description: 'desc',
           isOpen: false,
@@ -251,7 +254,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - not found', async () => {
       try {
-        await service.fullyUpdatePhase(notFoundId, {
+        await service.fullyUpdatePhase(authUser, notFoundId, {
           name: 'slkdjflskjdf',
           description: 'desc',
           isOpen: false,
@@ -266,7 +269,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - invalid id', async () => {
       try {
-        await service.fullyUpdatePhase('invalid', {
+        await service.fullyUpdatePhase(authUser, 'invalid', {
           name: 'slkdjflskjdf',
           description: 'desc',
           isOpen: false,
@@ -281,7 +284,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - null name', async () => {
       try {
-        await service.fullyUpdatePhase(id, {
+        await service.fullyUpdatePhase(authUser, id, {
           name: null,
           description: 'desc',
           isOpen: false,
@@ -296,7 +299,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - invalid name', async () => {
       try {
-        await service.fullyUpdatePhase(id, {
+        await service.fullyUpdatePhase(authUser, id, {
           name: { invalid: 'x' },
           description: 'desc',
           isOpen: false,
@@ -311,7 +314,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - empty name', async () => {
       try {
-        await service.fullyUpdatePhase(id, {
+        await service.fullyUpdatePhase(authUser, id, {
           name: '',
           description: 'desc',
           isOpen: false,
@@ -326,7 +329,7 @@ describe('phase service unit tests', () => {
 
     it('fully update phase - invalid isOpen', async () => {
       try {
-        await service.fullyUpdatePhase(id, {
+        await service.fullyUpdatePhase(authUser, id, {
           name: 'asdfsadfsdf',
           description: 'desc',
           isOpen: 'invalid',
@@ -342,7 +345,7 @@ describe('phase service unit tests', () => {
 
   describe('partially update phase tests', () => {
     it('partially update phase successfully 1', async () => {
-      const result = await service.partiallyUpdatePhase(id2, {
+      const result = await service.partiallyUpdatePhase(authUser, id2, {
         name: `${name2}-33`,
         description: 'desc33',
         duration: 111
@@ -356,7 +359,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - name already used', async () => {
       try {
-        await service.partiallyUpdatePhase(id2, {
+        await service.partiallyUpdatePhase(authUser, id2, {
           name
         })
       } catch (e) {
@@ -368,7 +371,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - not found', async () => {
       try {
-        await service.partiallyUpdatePhase(notFoundId, {
+        await service.partiallyUpdatePhase(authUser, notFoundId, {
           name: 'slkdjflskjdf'
         })
       } catch (e) {
@@ -380,7 +383,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - invalid id', async () => {
       try {
-        await service.partiallyUpdatePhase('invalid', { name: 'hufdufhdfx' })
+        await service.partiallyUpdatePhase(authUser, 'invalid', { name: 'hufdufhdfx' })
       } catch (e) {
         should.equal(e.message.indexOf('"phaseId" must be a valid GUID') >= 0, true)
         return
@@ -390,7 +393,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - null name', async () => {
       try {
-        await service.partiallyUpdatePhase(id, { name: null })
+        await service.partiallyUpdatePhase(authUser, id, { name: null })
       } catch (e) {
         should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
         return
@@ -400,7 +403,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - invalid description', async () => {
       try {
-        await service.partiallyUpdatePhase(id, { description: { invalid: 'x' } })
+        await service.partiallyUpdatePhase(authUser, id, { description: { invalid: 'x' } })
       } catch (e) {
         should.equal(e.message.indexOf('"description" must be a string') >= 0, true)
         return
@@ -410,7 +413,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - empty name', async () => {
       try {
-        await service.partiallyUpdatePhase(id, { name: '' })
+        await service.partiallyUpdatePhase(authUser, id, { name: '' })
       } catch (e) {
         should.equal(e.message.indexOf('"name" is not allowed to be empty') >= 0, true)
         return
@@ -420,7 +423,7 @@ describe('phase service unit tests', () => {
 
     it('partially update phase - unexpected field', async () => {
       try {
-        await service.partiallyUpdatePhase(id, { name: 'xx', other: 'xx' })
+        await service.partiallyUpdatePhase(authUser, id, { name: 'xx', other: 'xx' })
       } catch (e) {
         should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
         return

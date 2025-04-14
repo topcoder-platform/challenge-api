@@ -7,16 +7,12 @@ const _ = require('lodash')
 const config = require('config')
 const uuid = require('uuid/v4')
 const chai = require('chai')
-const fs = require('fs')
-const path = require('path')
 const constants = require('../../app-constants')
 const service = require('../../src/services/ChallengeService')
-const AttachmentService = require('../../src/services/AttachmentService')
 const testHelper = require('../testHelper')
+const prisma = require('../../src/common/prisma').getClient()
 
 const should = chai.should()
-
-const attachmentContent = fs.readFileSync(path.join(__dirname, '../attachment.txt'))
 
 describe('challenge service unit tests', () => {
   // created entity id
@@ -38,58 +34,116 @@ describe('challenge service unit tests', () => {
   // generated data
   let data
   let testChallengeData
-  let testCompletedChallengeData
+  let createdChallengeData
   const notFoundId = uuid()
+  const authUser = {
+    userId: 'testuser'
+  }
 
   before(async () => {
+    await testHelper.clearData()
     await testHelper.createData()
     data = testHelper.getData()
-    // create an attachment for test
-    attachment = await AttachmentService.uploadAttachment({
-      isMachine: true
-    }, data.challenge.id, {
-      attachment: {
-        data: attachmentContent,
-        mimetype: 'plain/text',
-        name: 'attachment.txt',
-        size: attachmentContent.length
-      }
-    })
 
-    testChallengeData = _.omit(data.challenge, ['id', 'created', 'createdBy'])
-    testChallengeData.phases = [{
-      phaseId: data.phase.id,
-      duration: 100
-    }, {
-      phaseId: data.phase2.id,
-      duration: 200
-    }]
-
-    testCompletedChallengeData = _.omit(data.completedChallenge, ['id', 'created', 'createdBy'])
-    testCompletedChallengeData.phases = [{
-      phaseId: data.phase.id,
-      duration: 100
-    }, {
-      phaseId: data.phase2.id,
-      duration: 200
-    }]
+    testChallengeData = {
+      typeId: data.challenge.typeId,
+      trackId: data.challenge.trackId,
+      legacy: {
+        reviewType: 'COMMUNITY',
+        confidentialityType: 'public',
+        useSchedulingAPI: true,
+        pureV5Task: false,
+        selfService: false,
+        selfServiceCopilot: 'aaa'
+      },
+      billing: {
+        billingAccountId: 'billing-account',
+        markup: 100
+      },
+      task: {
+        isTask: false,
+        isAssigned: false,
+        memberId: null
+      },
+      name: 'Prisma Test Challenge',
+      description: 'Prisma Test Challenge',
+      privateDescription: 'Prisma Test Challenge',
+      descriptionFormat: 'html',
+      metadata: [
+        {
+          name: 'meta-name',
+          value: 'meta-value'
+        }
+      ],
+      timelineTemplateId: data.timelineTemplate.id,
+      events: [
+        {
+          id: 1,
+          name: 'event-name',
+          key: 'event-key'
+        }
+      ],
+      phases: [{
+        phaseId: data.phase.id,
+        duration: 120
+      }, {
+        phaseId: data.phase2.id,
+        duration: 200
+      }],
+      discussions: [{
+        id: 'ad985cff-ad3e-44de-b54e-3992505ba0ae',
+        name: 'discussion name',
+        type: 'challenge',
+        provider: 'vanilla',
+        options: [
+          { 'discussion-opt': 'discussion-value' }
+        ]
+      }],
+      prizeSets: [
+        {
+          type: 'placement',
+          description: 'placement prizes',
+          prizes: [
+            {
+              description: 'placement 1',
+              type: 'USD',
+              value: 1000
+            }
+          ]
+        }
+      ],
+      tags: [
+        'tag-1', 'tag-2'
+      ],
+      legacyId: 1,
+      projectId: 123,
+      startDate: '2025-03-13T06:56:50.701Z',
+      status: 'New',
+      groups: [],
+      terms: [],
+      skills: []
+    }
   })
 
   after(async () => {
+    await prisma.challenge.deleteMany({
+      where: {id}
+    })
     await testHelper.clearData()
   })
 
   describe('create challenge tests', () => {
     it('create challenge successfully', async () => {
       const challengeData = _.cloneDeep(testChallengeData)
-      const result = await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+      const result = await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
+      createdChallengeData = result
       should.exist(result.id)
       id = result.id
       should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.track, data.challenge.track)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, data.challenge.description)
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      should.equal(result.trackId, data.challenge.trackId)
+      should.equal(result.name, testChallengeData.name)
+      should.equal(result.description, testChallengeData.description)
+      should.equal(result.timelineTemplateId, testChallengeData.timelineTemplateId)
       should.equal(result.phases.length, 2)
       should.exist(result.phases[0].id)
       should.equal(result.phases[0].phaseId, data.phase.id)
@@ -97,138 +151,42 @@ describe('challenge service unit tests', () => {
       should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
       should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
         challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
       should.exist(result.phases[1].id)
       should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].predecessor, result.phases[0].phaseId)
       should.equal(result.phases[1].duration, challengeData.phases[1].duration)
       should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
         challengeData.phases[0].duration * 1000)
       should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
         challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
       should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].type, testChallengeData.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, testChallengeData.prizeSets[0].description)
       should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
-      should.equal(result.createdBy, 'sub')
+      should.equal(result.prizeSets[0].prizes[0].description, testChallengeData.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, testChallengeData.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, testChallengeData.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, testChallengeData.reviewType)
+      should.equal(result.tags.length, 2)
+      should.equal(result.tags[0], testChallengeData.tags[0])
+      should.equal(_.isNil(result.projectId), _.isNil(testChallengeData.projectId))
+      should.equal(result.legacyId, testChallengeData.legacyId)
+      should.equal(result.forumId, testChallengeData.forumId)
+      should.equal(result.status, testChallengeData.status)
+      should.equal(result.createdBy, 'testuser')
       should.exist(result.startDate)
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
-
-    it('create challenge successfully with completed status', async () => {
-      const challengeData = testCompletedChallengeData
-      const result = await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
-      should.exist(result.id)
-      id2 = result.id
-      should.equal(result.typeId, data.completedChallenge.typeId)
-      should.equal(result.track, data.completedChallenge.track)
-      should.equal(result.name, data.completedChallenge.name)
-      should.equal(result.description, data.completedChallenge.description)
-      should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.completedChallenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.completedChallenge.tags[0])
-      should.equal(result.projectId, data.completedChallenge.projectId)
-      should.equal(result.legacyId, data.completedChallenge.legacyId)
-      should.equal(result.forumId, data.completedChallenge.forumId)
-      should.equal(result.status, data.completedChallenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.completedChallenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.completedChallenge.gitRepoURLs[0])
-      should.equal(result.createdBy, 'sub')
-      should.exist(result.startDate)
-      should.exist(result.created)
-      should.equal(result.numOfSubmissions, 0)
-      should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('create challenge - type not found', async () => {
       const challengeData = _.clone(testChallengeData)
       challengeData.typeId = notFoundId
       try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+        await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
       } catch (e) {
-        should.equal(e.message, `No challenge type found with id: ${notFoundId}.`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it(`create challenge - user doesn't have permission to create challenge under specific project`, async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.projectId = 200
-      try {
-        await service.createChallenge({ userId: '16096823' }, challengeData, config.COPILOT_TOKEN)
-      } catch (e) {
-        should.equal(e.response.data.result.content.message, 'You do not have permissions to perform this action')
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('create challenge - project not found', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.projectId = 100000
-      try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
-      } catch (e) {
-        should.equal(e.message, `Project with id: ${challengeData.projectId} doesn't exist`)
+        should.equal(e.message, `ChallengeType with id: ${notFoundId} doesn't exist`)
         return
       }
       throw new Error('should not reach here')
@@ -238,7 +196,7 @@ describe('challenge service unit tests', () => {
       const challengeData = _.clone(testChallengeData)
       challengeData.projectId = -1
       try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+        await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
       } catch (e) {
         should.equal(e.message.indexOf('"projectId" must be a positive number') >= 0, true)
         return
@@ -250,7 +208,7 @@ describe('challenge service unit tests', () => {
       const challengeData = _.clone(testChallengeData)
       delete challengeData.name
       try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+        await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
       } catch (e) {
         should.equal(e.message.indexOf('"name" is required') >= 0, true)
         return
@@ -262,9 +220,9 @@ describe('challenge service unit tests', () => {
       const challengeData = _.clone(testChallengeData)
       challengeData.startDate = 'abc'
       try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+        await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
       } catch (e) {
-        should.equal(e.message.indexOf('"startDate" must be a number of milliseconds or valid date string') >= 0, true)
+        should.equal(e.message.indexOf('"startDate" must be a valid ISO 8601 date') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -274,7 +232,7 @@ describe('challenge service unit tests', () => {
       const challengeData = _.clone(testChallengeData)
       challengeData.status = ['Active']
       try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+        await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
       } catch (e) {
         should.equal(e.message.indexOf('"status" must be a string') >= 0, true)
         return
@@ -286,7 +244,7 @@ describe('challenge service unit tests', () => {
       const challengeData = _.clone(testChallengeData)
       challengeData.other = 123
       try {
-        await service.createChallenge({ isMachine: true, sub: 'sub' }, challengeData)
+        await service.createChallenge({ isMachine: true, sub: 'sub', userId: 'testuser' }, challengeData, config.M2M_FULL_ACCESS_TOKEN)
       } catch (e) {
         should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
         return
@@ -297,99 +255,45 @@ describe('challenge service unit tests', () => {
 
   describe('get challenge tests', () => {
     it('get challenge successfully', async () => {
-      const result = await service.getChallenge({ isMachine: true }, data.challenge.id)
-      should.equal(result.id, data.challenge.id)
-      should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.track, data.challenge.track)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, data.challenge.description)
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
-      should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, data.challenge.phases[0].id)
-      should.equal(result.phases[0].name, data.challenge.phases[0].name)
-      should.equal(result.phases[0].description, data.challenge.phases[0].description)
-      should.equal(result.phases[0].isOpen, data.challenge.phases[0].isOpen)
-      should.equal(result.phases[0].duration, data.challenge.phases[0].duration)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
-      should.equal(result.createdBy, 'admin')
-      should.exist(result.startDate)
-      should.exist(result.created)
-      should.equal(result.numOfSubmissions, 0)
-      should.equal(result.numOfRegistrants, 0)
-    })
-
-    it('get challenge successfully with terms', async () => {
-      const result = await service.getChallenge({ isMachine: true }, id)
-      const challengeData = _.cloneDeep(testChallengeData)
-      should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.track, data.challenge.track)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, data.challenge.description)
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      const result = await service.getChallenge({ isMachine: true }, createdChallengeData.id)
+      should.equal(result.id, createdChallengeData.id)
+      should.equal(result.typeId, testChallengeData.typeId)
+      should.equal(result.trackId, testChallengeData.trackId)
+      should.equal(result.name, testChallengeData.name)
+      should.equal(result.description, testChallengeData.description)
+      should.equal(result.timelineTemplateId, testChallengeData.timelineTemplateId)
       should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
       should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
+      should.equal(result.phases[0].name, data.phase.name)
+      should.equal(result.phases[0].description, data.phase.description)
+      should.equal(result.phases[0].isOpen, false)
+      should.equal(result.phases[0].duration, testChallengeData.phases[0].duration)
       should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
+      should.equal(result.phases[1].name, data.phase2.name)
+      should.equal(result.phases[1].predecessor, data.phase.id)
+      should.equal(result.phases[1].description, data.phase2.description)
+      should.equal(result.phases[1].isOpen, false)
+      should.equal(result.phases[1].duration, testChallengeData.phases[1].duration)
       should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].type, testChallengeData.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, testChallengeData.prizeSets[0].description)
       should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
-      should.equal(result.createdBy, 'sub')
+      should.equal(result.prizeSets[0].prizes[0].description, testChallengeData.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, testChallengeData.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, testChallengeData.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, testChallengeData.reviewType)
+      should.equal(result.tags.length, 2)
+      should.equal(result.tags[0], testChallengeData.tags[0])
+      should.equal(result.tags[1], testChallengeData.tags[1])
+      should.equal(result.projectId, testChallengeData.projectId)
+      should.equal(result.legacyId, testChallengeData.legacyId)
+      should.equal(result.forumId, testChallengeData.forumId)
+      should.equal(result.status, testChallengeData.status)
+      should.equal(result.createdBy, 'testuser')
       should.exist(result.startDate)
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('get challenge - not found', async () => {
@@ -414,61 +318,112 @@ describe('challenge service unit tests', () => {
   })
 
   describe('search challenges tests', () => {
-    it('search challenges successfully 1', async () => {
+    it('search challenges successfully by legacyId', async() => {
       const res = await service.searchChallenges({ isMachine: true }, {
         page: 1,
         perPage: 10,
-        id: data.challenge.id,
-        typeId: data.challenge.typeId,
-        name: data.challenge.name.substring(2).trim().toUpperCase(),
-        description: data.challenge.description,
-        timelineTemplateId: data.challenge.timelineTemplateId,
-        tag: data.challenge.tags[0],
-        projectId: data.challenge.projectId,
-        legacyId: data.challenge.legacyId,
-        status: data.challenge.status,
-        group: data.challenge.groups[0],
-        gitRepoURL: data.challenge.gitRepoURLs[0],
-        createdDateStart: '1992-01-02',
-        createdDateEnd: '2022-01-02',
-        createdBy: data.challenge.createdBy
+        legacyId: testChallengeData.legacyId
       })
       should.equal(res.total, 1)
       should.equal(res.page, 1)
       should.equal(res.perPage, 10)
       should.equal(res.result.length, 1)
       const result = res.result[0]
-      should.equal(result.id, data.challenge.id)
+      should.equal(result.id, id)
       should.equal(result.type, data.challengeType.name)
-      should.equal(result.track, data.challenge.track)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, data.challenge.description)
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
-      should.equal(result.phases.length, 1)
-      should.equal(result.phases[0].id, data.challenge.phases[0].id)
-      should.equal(result.phases[0].name, data.challenge.phases[0].name)
-      should.equal(result.phases[0].description, data.challenge.phases[0].description)
-      should.equal(result.phases[0].isOpen, data.challenge.phases[0].isOpen)
-      should.equal(result.phases[0].duration, data.challenge.phases[0].duration)
+      should.equal(result.track, data.challengeTrack.name)
+      should.equal(result.name, testChallengeData.name)
+      should.equal(result.description, testChallengeData.description)
+      should.equal(result.timelineTemplateId, testChallengeData.timelineTemplateId)
+      should.equal(result.phases.length, 2)
+      should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].name, data.phase.name)
+      should.equal(result.phases[0].description, data.phase.description)
+      should.equal(result.phases[0].isOpen, false)
+      should.equal(result.phases[0].duration, testChallengeData.phases[0].duration)
+      should.equal(result.phases[1].phaseId, data.phase2.id)
+      should.equal(result.phases[1].name, data.phase2.name)
+      should.equal(result.phases[1].predecessor, data.phase.id)
+      should.equal(result.phases[1].description, data.phase2.description)
+      should.equal(result.phases[1].isOpen, false)
+      should.equal(result.phases[1].duration, testChallengeData.phases[1].duration)
       should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].type, testChallengeData.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, testChallengeData.prizeSets[0].description)
       should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
-      should.equal(result.createdBy, 'admin')
+      should.equal(result.prizeSets[0].prizes[0].description, testChallengeData.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, testChallengeData.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, testChallengeData.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, testChallengeData.reviewType)
+      should.equal(result.tags.length, 2)
+      should.equal(result.tags[0], testChallengeData.tags[0])
+      should.equal(result.tags[1], testChallengeData.tags[1])
+      should.equal(result.projectId, testChallengeData.projectId)
+      should.equal(result.legacyId, testChallengeData.legacyId)
+      should.equal(result.forumId, testChallengeData.forumId)
+      should.equal(result.status, testChallengeData.status)
+      should.equal(result.createdBy, 'testuser')
+      should.exist(result.startDate)
+      should.exist(result.created)
+      should.equal(result.numOfSubmissions, 0)
+      should.equal(result.numOfRegistrants, 0)
+    })
+    it('search challenges successfully 1', async () => {
+      const res = await service.searchChallenges({ isMachine: true }, {
+        page: 1,
+        perPage: 10,
+        id: id,
+
+        typeId: testChallengeData.typeId,
+        name: testChallengeData.name.substring(2).trim(),
+        description: testChallengeData.description,
+        timelineTemplateId: testChallengeData.timelineTemplateId,
+        tag: testChallengeData.tags[0],
+        projectId: testChallengeData.projectId,
+        status: testChallengeData.status,
+        createdDateStart: '1992-01-02',
+        createdDateEnd: '2032-01-02',
+        createdBy: testChallengeData.createdBy
+      })
+      should.equal(res.total, 1)
+      should.equal(res.page, 1)
+      should.equal(res.perPage, 10)
+      should.equal(res.result.length, 1)
+      const result = res.result[0]
+      should.equal(result.id, id)
+      should.equal(result.type, data.challengeType.name)
+      should.equal(result.track, data.challengeTrack.name)
+      should.equal(result.name, testChallengeData.name)
+      should.equal(result.description, testChallengeData.description)
+      should.equal(result.timelineTemplateId, testChallengeData.timelineTemplateId)
+      should.equal(result.phases.length, 2)
+      should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].name, data.phase.name)
+      should.equal(result.phases[0].description, data.phase.description)
+      should.equal(result.phases[0].isOpen, false)
+      should.equal(result.phases[0].duration, testChallengeData.phases[0].duration)
+      should.equal(result.phases[1].phaseId, data.phase2.id)
+      should.equal(result.phases[1].name, data.phase2.name)
+      should.equal(result.phases[1].predecessor, data.phase.id)
+      should.equal(result.phases[1].description, data.phase2.description)
+      should.equal(result.phases[1].isOpen, false)
+      should.equal(result.phases[1].duration, testChallengeData.phases[1].duration)
+      should.equal(result.prizeSets.length, 1)
+      should.equal(result.prizeSets[0].type, testChallengeData.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, testChallengeData.prizeSets[0].description)
+      should.equal(result.prizeSets[0].prizes.length, 1)
+      should.equal(result.prizeSets[0].prizes[0].description, testChallengeData.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, testChallengeData.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, testChallengeData.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, testChallengeData.reviewType)
+      should.equal(result.tags.length, 2)
+      should.equal(result.tags[0], testChallengeData.tags[0])
+      should.equal(result.tags[1], testChallengeData.tags[1])
+      should.equal(result.projectId, testChallengeData.projectId)
+      should.equal(result.legacyId, testChallengeData.legacyId)
+      should.equal(result.forumId, testChallengeData.forumId)
+      should.equal(result.status, testChallengeData.status)
+      should.equal(result.createdBy, 'testuser')
       should.exist(result.startDate)
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
@@ -497,14 +452,11 @@ describe('challenge service unit tests', () => {
         tag: data.challenge.tags[0],
         projectId: data.challenge.projectId,
         forumId: data.challenge.forumId,
-        legacyId: data.challenge.legacyId,
-        status: data.challenge.status,
-        group: data.challenge.groups[0],
-        gitRepoURL: data.challenge.gitRepoURLs[0],
+        status: _.capitalize(data.challenge.status.toLowerCase()),
         createdDateStart: '1992-01-02',
         createdDateEnd: '2022-01-02',
         createdBy: data.challenge.createdBy,
-        memberId: 23124329
+        memberId: '23124329'
       })
       should.equal(res.total, 0)
       should.equal(res.page, 1)
@@ -516,7 +468,7 @@ describe('challenge service unit tests', () => {
       const res = await service.searchChallenges({ isMachine: true }, {
         page: 1,
         perPage: 10,
-        id: id
+        id
       })
       const challengeData = _.cloneDeep(testChallengeData)
       should.equal(res.total, 1)
@@ -526,57 +478,41 @@ describe('challenge service unit tests', () => {
       const result = res.result[0]
 
       should.equal(result.type, data.challengeType.name)
-      should.equal(result.track, challengeData.track)
+      should.equal(result.track, data.challengeTrack.name)
       should.equal(result.name, challengeData.name)
       should.equal(result.description, challengeData.description)
       should.equal(result.timelineTemplateId, challengeData.timelineTemplateId)
       should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
       should.equal(result.phases[0].phaseId, data.phase.id)
+      should.equal(result.phases[0].name, data.phase.name)
+      should.equal(result.phases[0].description, data.phase.description)
+      should.equal(result.phases[0].isOpen, false)
       should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
       should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].name, data.phase2.name)
+      should.equal(result.phases[1].predecessor, data.phase.id)
+      should.equal(result.phases[1].description, data.phase2.description)
+      should.equal(result.phases[1].isOpen, false)
       should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
       should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].type, challengeData.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, challengeData.prizeSets[0].description)
       should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, data.challenge.projectId)
-      should.equal(result.legacyId, data.challenge.legacyId)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
-      should.equal(result.createdBy, 'sub')
+      should.equal(result.prizeSets[0].prizes[0].description, challengeData.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, challengeData.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, challengeData.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, challengeData.reviewType)
+      should.equal(result.tags.length, 2)
+      should.equal(result.tags[0], challengeData.tags[0])
+      should.equal(result.projectId, challengeData.projectId)
+      should.equal(result.legacyId, challengeData.legacyId)
+      should.equal(result.forumId, challengeData.forumId)
+      should.equal(result.status, challengeData.status)
+      should.equal(result.createdBy, 'testuser')
       should.exist(result.startDate)
       should.exist(result.created)
       should.equal(result.numOfSubmissions, 0)
       should.equal(result.numOfRegistrants, 0)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
     it('search challenges successfully 5 - with tco eligible events', async () => {
@@ -597,21 +533,11 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('search challenges - invalid memberId', async () => {
-      try {
-        await service.searchChallenges({ isMachine: true }, { memberId: 'abcde' })
-      } catch (e) {
-        should.equal(e.message.indexOf('"memberId" must be a number') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
     it('search challenges - invalid forumId', async () => {
       try {
-        await service.searchChallenges({ isMachine: true }, { forumId: -1 })
+        await service.searchChallenges({ isMachine: true }, { forumId: 'invalid' })
       } catch (e) {
-        should.equal(e.message.indexOf('"forumId" must be a positive number') >= 0, true)
+        should.equal(e.message.indexOf('"forumId" must be a number') >= 0, true)
         return
       }
       throw new Error('should not reach here')
@@ -716,349 +642,22 @@ describe('challenge service unit tests', () => {
       }
       throw new Error('should not reach here')
     })
-
-    it('search challenges - unexpected field', async () => {
-      try {
-        await service.searchChallenges({ isMachine: true }, { other: 123 })
-      } catch (e) {
-        should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
   })
 
-  describe('fully update challenge tests', () => {
-    it('fully update challenge successfully', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.projectId = 112233
-      challengeData.legacyId = 445566
-      challengeData.attachmentIds = [attachment.id]
-      const result = await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
-      should.equal(result.id, id)
-      should.equal(result.typeId, data.challenge.typeId)
-      should.equal(result.name, data.challenge.name)
-      should.equal(result.description, data.challenge.description)
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, 112233)
-      should.equal(result.legacyId, 445566)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
-      should.equal(result.attachments.length, 1)
-      should.equal(result.attachments[0].id, attachment.id)
-      should.equal(result.attachments[0].fileSize, attachment.fileSize)
-      should.equal(result.attachments[0].fileName, attachment.fileName)
-      should.equal(result.attachments[0].challengeId, attachment.challengeId)
-      should.equal(result.createdBy, 'sub')
-      should.equal(result.updatedBy, 'sub2')
-      should.exist(result.startDate)
-      should.exist(result.created)
-      should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
-
-    it('fully update challenge with winners successfully', async () => {
-      const challengeData = _.clone(testCompletedChallengeData)
-      challengeData.projectId = 112233
-      challengeData.legacyId = 445566
-      challengeData.attachmentIds = [attachment.id]
-      challengeData.winners = winners
-      const result = await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
-      should.equal(result.id, id2)
-      should.equal(result.typeId, data.completedChallenge.typeId)
-      should.equal(result.track, data.completedChallenge.track)
-      should.equal(result.name, data.completedChallenge.name)
-      should.equal(result.description, data.completedChallenge.description)
-      should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.completedChallenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.completedChallenge.tags[0])
-      should.equal(result.projectId, 112233)
-      should.equal(result.legacyId, 445566)
-      should.equal(result.forumId, data.completedChallenge.forumId)
-      should.equal(result.status, data.completedChallenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.completedChallenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.completedChallenge.gitRepoURLs[0])
-      should.equal(result.attachments.length, 1)
-      should.equal(result.attachments[0].id, attachment.id)
-      should.equal(result.attachments[0].fileSize, attachment.fileSize)
-      should.equal(result.attachments[0].fileName, attachment.fileName)
-      should.equal(result.attachments[0].challengeId, attachment.challengeId)
-      should.equal(result.winners.length, 2)
-      should.equal(result.winners[0].userId, winners[0].userId)
-      should.equal(result.winners[0].handle, winners[0].handle)
-      should.equal(result.winners[0].placement, winners[0].placement)
-      should.equal(result.winners[1].userId, winners[1].userId)
-      should.equal(result.winners[1].handle, winners[1].handle)
-      should.equal(result.winners[1].placement, winners[1].placement)
-      should.equal(result.createdBy, 'sub')
-      should.equal(result.updatedBy, 'sub2')
-      should.exist(result.startDate)
-      should.exist(result.created)
-      should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
-
-    it('fully update challenge - not found', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.privateDescription = 'updated-pd'
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, notFoundId, challengeData)
-      } catch (e) {
-        should.equal(e.message, `Challenge with id: ${notFoundId} doesn't exist`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - invalid id', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.track = 'updated-track'
-      challengeData.attachmentIds = [attachment.id]
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, 'invalid', challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('"challengeId" must be a valid GUID') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it(`fully update challenge - project not found`, async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.projectId = 100000
-      try {
-        await service.fullyUpdateChallenge({ userId: '16096823' }, id, challengeData, config.COPILOT_TOKEN)
-      } catch (e) {
-        should.equal(e.message, `Project with id: 100000 doesn't exist`)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it(`fully update challenge - user doesn't have permission to update challenge under specific project`, async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.projectId = 200
-      try {
-        await service.fullyUpdateChallenge({ userId: '16096823' }, id, challengeData, config.COPILOT_TOKEN)
-      } catch (e) {
-        should.equal(e.response.data.result.content.message, 'You do not have permissions to perform this action')
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - null name', async () => {
-      const challengeData = _.clone(testChallengeData)
-      try {
-        challengeData.name = null
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - invalid name', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.name = ['abc']
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('"name" must be a string') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - invalid status', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.status = 'invalid'
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('"status" must be') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - Completed to Active status', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.status = constants.challengeStatuses.Active
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('Cannot change Completed challenge status to Active status') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - set winners with non-completed Active status', async () => {
-      const challengeData = _.clone(testChallengeData)
-      challengeData.winners = winners
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('Cannot set winners for challenge with non-completed Active status') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - Duplicate member with placement 1', async () => {
-      const challengeData = _.clone(testCompletedChallengeData)
-      challengeData.winners = [{
-        userId: 12345678,
-        handle: 'thomaskranitsas',
-        placement: 1
-      },
-      {
-        userId: 12345678,
-        handle: 'thomaskranitsas',
-        placement: 1
-      }]
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('Duplicate member with placement') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - Only one member can have placement 1', async () => {
-      const challengeData = _.clone(testCompletedChallengeData)
-      challengeData.winners = [
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 1
-        },
-        {
-          userId: 3456789,
-          handle: 'tonyj',
-          placement: 1
-        }
-      ]
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('Only one member can have a placement') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('fully update challenge - The same member 12345678 cannot have multiple placements', async () => {
-      const challengeData = _.clone(testCompletedChallengeData)
-      challengeData.winners = [
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 1
-        },
-        {
-          userId: 12345678,
-          handle: 'thomaskranitsas',
-          placement: 2
-        }
-      ]
-      try {
-        await service.fullyUpdateChallenge({ isMachine: true, sub: 'sub2' }, id2, challengeData)
-      } catch (e) {
-        should.equal(e.message.indexOf('The same member 12345678 cannot have multiple placements') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-  })
-
-  describe('partially update challenge tests', () => {
-    it('partially update challenge successfully 1', async () => {
+  describe('update challenge tests', () => {
+    it('update challenge successfully 1', async () => {
       const challengeData = testChallengeData
-      const result = await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+      const result = await service.updateChallenge({ isMachine: true, sub: 'sub3', userId: 22838965 }, id, {
         privateDescription: 'track 333',
         description: 'updated desc',
-        attachmentIds: [] // this will delete attachments
+        attachments: [] // this will delete attachments
       })
       should.equal(result.id, id)
       should.equal(result.typeId, data.challenge.typeId)
       should.equal(result.privateDescription, 'track 333')
-      should.equal(result.name, data.challenge.name)
+      should.equal(result.name, challengeData.name)
       should.equal(result.description, 'updated desc')
-      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      should.equal(result.timelineTemplateId, challengeData.timelineTemplateId)
       should.equal(result.phases.length, 2)
       should.exist(result.phases[0].id)
       should.equal(result.phases[0].phaseId, data.phase.id)
@@ -1066,140 +665,99 @@ describe('challenge service unit tests', () => {
       should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
       should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
         challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
       should.exist(result.phases[1].id)
       should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
+      should.equal(result.phases[1].predecessor, result.phases[0].phaseId)
       should.equal(result.phases[1].duration, challengeData.phases[1].duration)
       should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
         challengeData.phases[0].duration * 1000)
       should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
         challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
       should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.challenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.challenge.prizeSets[0].description)
+      should.equal(result.prizeSets[0].type, challengeData.prizeSets[0].type)
+      should.equal(result.prizeSets[0].description, challengeData.prizeSets[0].description)
       should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.challenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.challenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.challenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.challenge.reviewType)
-      should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.challenge.tags[0])
-      should.equal(result.projectId, 112233)
-      should.equal(result.legacyId, 445566)
-      should.equal(result.forumId, data.challenge.forumId)
-      should.equal(result.status, data.challenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.challenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.challenge.gitRepoURLs[0])
+      should.equal(result.prizeSets[0].prizes[0].description, challengeData.prizeSets[0].prizes[0].description)
+      should.equal(result.prizeSets[0].prizes[0].type, challengeData.prizeSets[0].prizes[0].type)
+      should.equal(result.prizeSets[0].prizes[0].value, challengeData.prizeSets[0].prizes[0].value)
+      should.equal(result.reviewType, challengeData.reviewType)
+      should.equal(result.tags.length, 2)
+      should.equal(result.tags[0], challengeData.tags[0])
+      should.equal(result.tags[1], challengeData.tags[1])
+      should.equal(result.projectId, challengeData.projectId)
+      should.equal(result.legacyId, challengeData.legacyId)
+      should.equal(result.forumId, challengeData.forumId)
+      should.equal(result.status, challengeData.status)
       should.equal(!result.attachments || result.attachments.length === 0, true)
-      should.equal(result.createdBy, 'sub')
-      should.equal(result.updatedBy, 'sub3')
+      should.equal(result.createdBy, 'testuser')
+      should.equal(result.updatedBy, '22838965')
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
-    })
+    }).timeout(3000)
 
-    it('partially update challenge successfully with winners', async () => {
-      const challengeData = testChallengeData
-      const result = await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+    it('update challenge successfully with winners', async () => {
+      const result = await service.updateChallenge({ isMachine: true, sub: 'sub3', userId: 22838965 }, data.challenge.id, {
         winners: [{
           userId: 12345678,
           handle: 'thomaskranitsas',
-          placement: 1
+          placement: 1,
+          type: constants.prizeSetTypes.ChallengePrizes
         }]
       })
-      should.equal(result.id, id2)
-      should.equal(result.typeId, data.completedChallenge.typeId)
-      should.equal(result.track, data.completedChallenge.track)
-      should.equal(result.name, data.completedChallenge.name)
-      should.equal(result.description, data.completedChallenge.description)
-      should.equal(result.timelineTemplateId, data.completedChallenge.timelineTemplateId)
-      should.equal(result.phases.length, 2)
-      should.exist(result.phases[0].id)
-      should.equal(result.phases[0].phaseId, data.phase.id)
-      should.equal(result.phases[0].duration, challengeData.phases[0].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualStartDate, challengeData.startDate), 0)
-      should.equal(testHelper.getDatesDiff(result.phases[0].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.exist(result.phases[1].id)
-      should.equal(result.phases[1].phaseId, data.phase2.id)
-      should.equal(result.phases[1].predecessor, result.phases[0].id)
-      should.equal(result.phases[1].duration, challengeData.phases[1].duration)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].scheduledEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualStartDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000)
-      should.equal(testHelper.getDatesDiff(result.phases[1].actualEndDate, challengeData.startDate),
-        challengeData.phases[0].duration * 1000 + challengeData.phases[1].duration * 1000)
-      should.equal(result.prizeSets.length, 1)
-      should.equal(result.prizeSets[0].type, data.completedChallenge.prizeSets[0].type)
-      should.equal(result.prizeSets[0].description, data.completedChallenge.prizeSets[0].description)
-      should.equal(result.prizeSets[0].prizes.length, 1)
-      should.equal(result.prizeSets[0].prizes[0].description, data.completedChallenge.prizeSets[0].prizes[0].description)
-      should.equal(result.prizeSets[0].prizes[0].type, data.completedChallenge.prizeSets[0].prizes[0].type)
-      should.equal(result.prizeSets[0].prizes[0].value, data.completedChallenge.prizeSets[0].prizes[0].value)
-      should.equal(result.reviewType, data.completedChallenge.reviewType)
+      should.equal(result.id, data.challenge.id)
+      should.equal(result.typeId, data.challenge.typeId)
+      should.equal(result.trackId, data.challenge.trackId)
+      should.equal(result.name, data.challenge.name)
+      should.equal(result.description, data.challenge.description)
+      should.equal(result.timelineTemplateId, data.challenge.timelineTemplateId)
+      should.equal(result.phases.length, 0)
+      should.equal(result.prizeSets.length, 0)
+      should.equal(result.reviewType, data.challenge.reviewType)
       should.equal(result.tags.length, 1)
-      should.equal(result.tags[0], data.completedChallenge.tags[0])
-      should.equal(result.projectId, 112233)
-      should.equal(result.legacyId, 445566)
-      should.equal(result.forumId, data.completedChallenge.forumId)
-      should.equal(result.status, data.completedChallenge.status)
-      should.equal(result.groups.length, 1)
-      should.equal(result.groups[0], data.completedChallenge.groups[0])
-      should.equal(result.gitRepoURLs.length, 1)
-      should.equal(result.gitRepoURLs[0], data.completedChallenge.gitRepoURLs[0])
+      should.equal(result.tags[0], data.challenge.tags[0])
+      should.equal(result.projectId, data.challenge.projectId)
+      should.equal(result.legacyId, data.challenge.legacyId)
+      should.equal(result.forumId, data.challenge.forumId)
+      should.equal(result.status.toUpperCase(), data.challenge.status.toUpperCase())
       should.equal(result.winners.length, 1)
       should.equal(result.winners[0].userId, winners[0].userId)
       should.equal(result.winners[0].handle, winners[0].handle)
       should.equal(result.winners[0].placement, winners[0].placement)
-      should.equal(result.createdBy, 'sub')
-      should.equal(result.updatedBy, 'sub3')
+      should.equal(result.winners[0].type, constants.prizeSetTypes.ChallengePrizes)
+      should.equal(result.createdBy, 'admin')
+      should.equal(result.updatedBy, '22838965')
       should.exist(result.startDate)
       should.exist(result.created)
       should.exist(result.updated)
-      should.equal(result.terms.length, 2)
-      should.equal(testHelper.deepCompareArrays(result.terms, _.map(data.defaultProjectTerms, t => t.id)), true)
     })
 
-    it(`partially update challenge - project not found`, async () => {
+    it('update challenge - project not found', async () => {
       try {
-        await service.partiallyUpdateChallenge({ userId: '16096823' }, id, { projectId: 100000 }, config.COPILOT_TOKEN)
+        await service.updateChallenge(
+          { userId: '16096823', handle: '', roles: [constants.UserRoles.Admin] },
+          id,
+          { projectId: 100000 })
       } catch (e) {
-        should.equal(e.message, `Project with id: 100000 doesn't exist`)
+        should.equal(e.message, 'Project with id: 100000 doesn\'t exist')
         return
       }
       throw new Error('should not reach here')
     })
 
-    it(`partially update challenge - user doesn't have permission to update challenge under specific project`, async () => {
+    it('update challenge - user doesn\'t have permission to update challenge under specific project', async () => {
       try {
-        await service.partiallyUpdateChallenge({ userId: '16096823' }, id, { projectId: 200 }, config.COPILOT_TOKEN)
+        await service.updateChallenge({ userId: '16096823', handle: '' }, id, { projectId: 200 })
       } catch (e) {
-        should.equal(e.response.data.result.content.message, 'You do not have permissions to perform this action')
+        should.equal(e.message, 'Only M2M, admin, challenge\'s copilot or users with full access can perform modification.')
         return
       }
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - timeline template not found', async () => {
+    it('update challenge - timeline template not found', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, id, {
           timelineTemplateId: notFoundId
         })
       } catch (e) {
@@ -1209,9 +767,9 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - challenge not found', async () => {
+    it('update challenge - challenge not found', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, notFoundId, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, notFoundId, {
           privateDescription: 'track 333'
         })
       } catch (e) {
@@ -1221,9 +779,9 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - invalid type id', async () => {
+    it('update challenge - invalid type id', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, id, {
           typeId: 'invalid'
         })
       } catch (e) {
@@ -1233,33 +791,21 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - empty tags', async () => {
+    it('update challenge - invalid start date', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
-          tags: []
-        })
-      } catch (e) {
-        should.equal(e.message.indexOf('"tags" does not contain 1 required value(s)') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('partially update challenge - invalid start date', async () => {
-      try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, id, {
           startDate: 'abc'
         })
       } catch (e) {
-        should.equal(e.message.indexOf('"startDate" must be a number of milliseconds or valid date string') >= 0, true)
+        should.equal(e.message.indexOf('"startDate" must be a valid ISO 8601 date') >= 0, true)
         return
       }
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - empty name', async () => {
+    it('update challenge - empty name', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, id, {
           name: ''
         })
       } catch (e) {
@@ -1269,21 +815,9 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - unexpected field', async () => {
+    it('update challenge - Completed to Active status', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
-          other: '123'
-        })
-      } catch (e) {
-        should.equal(e.message.indexOf('"other" is not allowed') >= 0, true)
-        return
-      }
-      throw new Error('should not reach here')
-    })
-
-    it('partially update challenge - Completed to Active status', async () => {
-      try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, data.challenge.id, {
           status: constants.challengeStatuses.Active
         })
       } catch (e) {
@@ -1293,30 +827,32 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - set winners with non-completed Active status', async () => {
+    it('update challenge - set winners with non-completed Active status', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, id, {
           winners
         })
       } catch (e) {
-        should.equal(e.message.indexOf('Cannot set winners for challenge with non-completed Active status') >= 0, true)
+        should.equal(e.message.indexOf('Cannot set winners for challenge with non-completed') >= 0, true)
         return
       }
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - Duplicate member with placement 1', async () => {
+    it('update challenge - Duplicate member with placement 1', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, data.challenge.id, {
           winners: [{
             userId: 12345678,
             handle: 'thomaskranitsas',
-            placement: 1
+            placement: 1,
+            type: constants.prizeSetTypes.ChallengePrizes
           },
           {
             userId: 12345678,
             handle: 'thomaskranitsas',
-            placement: 1
+            placement: 1,
+            type: constants.prizeSetTypes.ChallengePrizes
           }]
         })
       } catch (e) {
@@ -1326,19 +862,21 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - Only one member can have placement 1', async () => {
+    it('update challenge - Only one member can have placement 1', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, data.challenge.id, {
           winners: [
             {
               userId: 12345678,
               handle: 'thomaskranitsas',
-              placement: 1
+              placement: 1,
+              type: constants.prizeSetTypes.ChallengePrizes
             },
             {
               userId: 3456789,
               handle: 'tonyj',
-              placement: 1
+              placement: 1,
+              type: constants.prizeSetTypes.ChallengePrizes
             }
           ]
         })
@@ -1349,19 +887,21 @@ describe('challenge service unit tests', () => {
       throw new Error('should not reach here')
     })
 
-    it('partially update challenge - The same member 12345678 cannot have multiple placements', async () => {
+    it('update challenge - The same member 12345678 cannot have multiple placements', async () => {
       try {
-        await service.partiallyUpdateChallenge({ isMachine: true, sub: 'sub3' }, id2, {
+        await service.updateChallenge({ isMachine: true, sub: 'sub3' }, data.challenge.id, {
           winners: [
             {
               userId: 12345678,
               handle: 'thomaskranitsas',
-              placement: 1
+              placement: 1,
+              type: constants.prizeSetTypes.ChallengePrizes
             },
             {
               userId: 12345678,
               handle: 'thomaskranitsas',
-              placement: 2
+              placement: 2,
+              type: constants.prizeSetTypes.ChallengePrizes
             }
           ]
         })

@@ -7,7 +7,7 @@ const cors = require('cors')
 const config = require('config')
 const winston = require('winston')
 const _ = require('lodash')
-const helper = require('../src/common/helper')
+const prisma = require('../src/common/prisma').getClient()
 
 const app = express()
 app.set('port', config.PORT)
@@ -33,6 +33,24 @@ const groups = {
   }
 }
 
+// create resources
+app.post('/v5/resources', (req, res) => {
+  // let's directly return 200 now.
+  winston.debug(`creating challenge resources`)
+  res.json({})
+})
+
+// get resource roles. Return roles with full write access
+app.get('/v5/resource-roles', (req, res) => {
+  res.json([{
+    id: '10ba038e-48da-487b-96e8-8d3b99b6d18a',
+    fullWriteAccess: true
+  }, {
+    id: '10ba038e-48da-487b-96e8-8d3b99b6d18a',
+    fullWriteAccess: true
+  }])
+})
+
 // get challenge resources
 app.get('/v5/resources', (req, res) => {
   winston.debug(`query: ${JSON.stringify(req.query, null, 2)}`)
@@ -55,6 +73,13 @@ app.get('/v5/resources', (req, res) => {
     memberId: '151743',
     memberHandle: 'Ghostar', // copilot
     roleId: '10ba038e-48da-487b-96e8-8d3b99b6d18b'
+  }, {
+    // submitter & winner
+    id: '22ba038e-48da-487b-96e8-8d3b99b6d183',
+    challengeId,
+    memberId: '12345678',
+    memberHandle: 'thomaskranitsas',
+    roleId: '732339e7-8e30-49d7-9198-cccf9451e221'
   }]
 
   winston.info(`Challenge resources: ${JSON.stringify(resources, null, 4)}`)
@@ -65,7 +90,7 @@ app.get('/v5/resources', (req, res) => {
 app.get('/v5/resources/:memberId/challenges', (req, res) => {
   const memberId = req.params.memberId
   if (memberId === '40309246' || memberId === '151743') {
-    helper.scan('Challenge')
+    prisma.challenge.findMany()
       .then(result => {
         const ret = []
         for (const element of result) {
@@ -88,12 +113,21 @@ app.get('/v5/resources/:memberId/challenges', (req, res) => {
   }
 })
 
+let projectIdSeed = 3456;
+// create project
+app.post('/v5/projects', (req, res) => {
+  // directly return result with id
+  projectIdSeed += 1
+  res.json({ id: projectIdSeed })
+})
+
 // get project by id
 app.get('/v5/projects/:projectId', (req, res) => {
   const projectId = req.params.projectId
-  if (projectId === '111' || projectId === '123' || projectId === '112233') {
+  if (projectId === '111' || projectId === '123' || projectId === '112233' || projectId === '16531') {
     res.json({
       projectId,
+      directProjectId: parseInt(projectId) + 1,
       terms: ['0fcb41d1-ec7c-44bb-8f3b-f017a61cd708', 'be0652ae-8b28-4e91-9b42-8ad00b31e9cb']
     })
   } else if (projectId === '200') {
@@ -108,6 +142,15 @@ app.get('/v5/projects/:projectId', (req, res) => {
   } else {
     res.status(404).end()
   }
+})
+
+// get project billing info
+app.get('/v5/projects/:projectId/billingAccount', (req, res) => {
+  // let's return same billing info for now
+  res.json({
+    markup: 1,
+    tcBillingAccountId: 'test-billing-account'
+  })
 })
 
 // search groups
@@ -217,6 +260,18 @@ app.get('/v5/terms/:termId', (req, res) => {
   } else {
     res.status(404).end()
   }
+})
+
+// Event Bus API
+app.post('/v5/bus/events', (req, res) => {
+  winston.info('Received bus events')
+  res.status(200).json({})
+})
+
+app.post('/v5/auth0', (req, res) => {
+  winston.info('Received Auth0 request')
+  // return config/test.js#M2M_FULL_ACCESS_TOKEN
+  res.status(200).json({ access_token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3RvcGNvZGVyLWRldi5hdXRoMC5jb20vIiwic3ViIjoiZW5qdzE4MTBlRHozWFR3U08yUm4yWTljUVRyc3BuM0JAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vbTJtLnRvcGNvZGVyLWRldi5jb20vIiwiaWF0IjoxNTUwOTA2Mzg4LCJleHAiOjE4ODA5OTI3ODgsImF6cCI6ImVuancxODEwZUR6M1hUd1NPMlJuMlk5Y1FUcnNwbjNCIiwiaXNNYWNoaW5lIjp0cnVlLCJzY29wZSI6ImFsbDpjaGFsbGVuZ2VzIGFsbDpjaGFsbGVuZ2VfdHlwZXMgYWxsOmNoYWxsZW5nZV9zZXR0aW5ncyByZWFkOmNoYWxsZW5nZV9hdWRpdF9sb2dzIGFsbDpjaGFsbGVuZ2VfcGhhc2VzIGFsbDp0aW1lbGluZV90ZW1wbGF0ZXMgYWxsOmNoYWxsZW5nZV9hdHRhY2htZW50cyBhbGw6Y2hhbGxlbmdlX3R5cGVfdGltZWxpbmVfdGVtcGxhdGVzIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIn0.On-x52qiJJyaLfljBUOYCU1bHWTy9I4CLIIJVyFS-l4' })
 })
 
 app.use((req, res) => {

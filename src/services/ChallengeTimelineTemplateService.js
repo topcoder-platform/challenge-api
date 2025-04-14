@@ -1,16 +1,7 @@
 /**
  * This service provides operations of challenge type timeline template.
  */
-
-const { GRPC_CHALLENGE_SERVER_HOST, GRPC_CHALLENGE_SERVER_PORT } = process.env;
-
 const _ = require("lodash");
-const {
-  DomainHelper: { getScanCriteria, getLookupCriteria },
-} = require("@topcoder-framework/lib-common");
-
-const { ChallengeTimelineTemplateDomain } = require("@topcoder-framework/domain-challenge");
-
 const Joi = require("joi");
 
 const helper = require("../common/helper");
@@ -23,10 +14,7 @@ const challengeTrackService = require("./ChallengeTrackService");
 const challengeTypeService = require("./ChallengeTypeService");
 const timelineTemplateService = require("./TimelineTemplateService");
 
-const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
-  GRPC_CHALLENGE_SERVER_HOST,
-  GRPC_CHALLENGE_SERVER_PORT
-);
+const prisma = require('../common/prisma').getClient()
 
 /**
  * Search challenge type timeline templates.
@@ -34,11 +22,12 @@ const challengeTimelineTemplateDomain = new ChallengeTimelineTemplateDomain(
  * @returns {Promise<array>} the search result
  */
 async function searchChallengeTimelineTemplates(criteria) {
-  const scanCriteria = getScanCriteria(_.omit(criteria, ["page", "perPage"]));
+  const filter = getSearchFilter(_.omit(criteria, ['page', 'perPage']))
 
-  const { items } = await challengeTimelineTemplateDomain.scan({
-    criteria: scanCriteria,
-  });
+  let items = await prisma.challengeTimelineTemplate.findMany({
+    where: filter
+  })
+  items = _.map(items, t => _.omit(t, constants.auditFields));
 
   const nRecords = items.length;
 
@@ -48,6 +37,31 @@ async function searchChallengeTimelineTemplates(criteria) {
     perPage: Math.max(nRecords, 10),
     result: items,
   };
+}
+
+/**
+ * Get prisma filter
+ *
+ * @param {Object} criteria search criteria
+ * @returns filter used in prisma
+ */
+function getSearchFilter (criteria) {
+  const ret = {}
+  if (criteria.typeId) {
+    ret.typeId = { equals: criteria.typeId }
+  }
+  if (criteria.trackId) {
+    ret.trackId = { equals: criteria.trackId }
+  }
+  if (criteria.timelineTemplateId) {
+    ret.timelineTemplateId = { equals: criteria.timelineTemplateId }
+  }
+  if (criteria.isDefault === 'true' || criteria.isDefault === 'false') {
+    ret.isDefault = { equals: criteria.isDefault === 'true' }
+  } else if (criteria.isDefault) {
+    ret.isDefault = { equals: true }
+  }
+  return ret
 }
 
 searchChallengeTimelineTemplates.schema = {
@@ -63,10 +77,11 @@ searchChallengeTimelineTemplates.schema = {
 
 /**
  * Unset existing default timeline template in order to create a new one
+ * @param {Object} authUser auth user
  * @param {String} typeId the type ID
  * @param {String} trackId the track ID
  */
-async function unsetDefaultTimelineTemplate(typeId, trackId) {
+async function unsetDefaultTimelineTemplate (authUser, typeId, trackId) {
   const records = await searchChallengeTimelineTemplates({
     typeId,
     trackId,
@@ -76,19 +91,21 @@ async function unsetDefaultTimelineTemplate(typeId, trackId) {
     return;
   }
   for (const record of records.result) {
-    await fullyUpdateChallengeTimelineTemplate(record.id, {
+    await fullyUpdateChallengeTimelineTemplate(authUser, record.id, {
       ...record,
       isDefault: false,
+      updatedBy: authUser.userId,
     });
   }
 }
 
 /**
  * Create challenge type timeline template.
+ * @param {Object} authUser auth user
  * @param {Object} data the data to create challenge type timeline template
  * @returns {Object} the created challenge type timeline template
  */
-async function createChallengeTimelineTemplate(data) {
+async function createChallengeTimelineTemplate (authUser, data) {
   // check duplicate
   const records = await searchChallengeTimelineTemplates(data);
   if (records.total > 0) {
@@ -100,10 +117,13 @@ async function createChallengeTimelineTemplate(data) {
   await timelineTemplateService.getTimelineTemplate(data.timelineTemplateId);
 
   if (data.isDefault) {
-    await unsetDefaultTimelineTemplate(data.typeId, data.trackId);
+    await unsetDefaultTimelineTemplate(authUser, data.typeId, data.trackId);
   }
+  data.createdBy = authUser.userId
+  data.updatedBy = authUser.userId
 
-  const template = await challengeTimelineTemplateDomain.create(data);
+  let template = await prisma.challengeTimelineTemplate.create({ data });
+  template = _.omit(template, constants.auditFields);
 
   // post bus event
   await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateCreated, template);
@@ -111,6 +131,7 @@ async function createChallengeTimelineTemplate(data) {
 }
 
 createChallengeTimelineTemplate.schema = {
+  authUser: Joi.any(),
   data: Joi.object()
     .keys({
       typeId: Joi.id(),
@@ -127,9 +148,11 @@ createChallengeTimelineTemplate.schema = {
  * @returns {Promise<Object>} the challenge type timeline template with given id
  */
 async function getChallengeTimelineTemplate(challengeTimelineTemplateId) {
-  return challengeTimelineTemplateDomain.lookup(
-    getLookupCriteria("id", challengeTimelineTemplateId)
-  );
+  const ret = await prisma.challengeTimelineTemplate.findUnique({ where: { id: challengeTimelineTemplateId } })
+  if (!ret || _.isUndefined(ret.id)) {
+    throw new errors.NotFoundError(`ChallengeTimelineTemplate with id: ${challengeTimelineTemplateId} doesn't exist`)
+  }
+  return _.omit(ret, constants.auditFields)
 }
 
 getChallengeTimelineTemplate.schema = {
@@ -138,12 +161,13 @@ getChallengeTimelineTemplate.schema = {
 
 /**
  * Fully update challenge type timeline template.
+ * @param {Object} authUser auth user
  * @param {String} challengeTimelineTemplateId the challenge type timeline template id
  * @param {Object} data the challenge type timeline template data to be updated
  * @returns {Object} the updated challenge type timeline template
  */
-async function fullyUpdateChallengeTimelineTemplate(challengeTimelineTemplateId, data) {
-  const record = await getChallengeTimelineTemplate(challengeTimelineTemplateId);
+async function fullyUpdateChallengeTimelineTemplate (authUser, challengeTimelineTemplateId, data) {
+  const record = await getChallengeTimelineTemplate(challengeTimelineTemplateId)
   if (
     record.typeId === data.typeId &&
     record.trackId === data.trackId &&
@@ -166,21 +190,20 @@ async function fullyUpdateChallengeTimelineTemplate(challengeTimelineTemplateId,
   await timelineTemplateService.getTimelineTemplate(data.timelineTemplateId);
 
   if (data.isDefault) {
-    await unsetDefaultTimelineTemplate(data.typeId, data.trackId);
+    await unsetDefaultTimelineTemplate(authUser, data.typeId, data.trackId);
   }
+  data.updatedBy = authUser.userId;
 
-  const updateInput = {
-    filterCriteria: getScanCriteria({
-      id: challengeTimelineTemplateId,
-    }),
-    updateInput: data,
-  };
+  let ret = await prisma.challengeTimelineTemplate.update({
+    data,
+    where: { id: challengeTimelineTemplateId }
+  })
+  ret = _.omit(ret, constants.auditFields)
 
-  const { items } = await challengeTimelineTemplateDomain.update(updateInput);
-  if (items.length > 0) {
+  if (ret && ret.id) {
     // post bus event
-    await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateUpdated, items[0]);
-    return items[0];
+    await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateUpdated, ret);
+    return ret;
   } else {
     throw new errors.NotFoundError(
       `A challenge type timeline template with id: ${challengeTimelineTemplateId} not found.`
@@ -189,6 +212,7 @@ async function fullyUpdateChallengeTimelineTemplate(challengeTimelineTemplateId,
 }
 
 fullyUpdateChallengeTimelineTemplate.schema = {
+  authUser: Joi.any(),
   challengeTimelineTemplateId: Joi.id(),
   data: createChallengeTimelineTemplate.schema.data,
 };
@@ -199,19 +223,11 @@ fullyUpdateChallengeTimelineTemplate.schema = {
  * @returns {Object} the deleted challenge type timeline template
  */
 async function deleteChallengeTimelineTemplate(challengeTimelineTemplateId) {
-  const { items: templates } = await challengeTimelineTemplateDomain.delete(
-    getLookupCriteria("id", challengeTimelineTemplateId)
-  );
-
-  if (templates.length === 0) {
-    throw new errors.NotFoundError(
-      `A challenge type timeline template with id: ${challengeTimelineTemplateId} not found.`
-    );
-  }
-
+  let ret = await getChallengeTimelineTemplate(challengeTimelineTemplateId)
+  await prisma.challengeTimelineTemplate.delete({ where: { id: challengeTimelineTemplateId } })
   // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateDeleted, templates[0]);
-  return templates[0];
+  await helper.postBusEvent(constants.Topics.ChallengeTimelineTemplateDeleted, ret)
+  return ret
 }
 
 deleteChallengeTimelineTemplate.schema = {
