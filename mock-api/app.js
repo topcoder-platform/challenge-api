@@ -61,6 +61,8 @@ app.get('/v5/resources', (req, res) => {
   const challengeId = req.query.challengeId
   winston.info(`Get resources of challenge id ${challengeId}`)
 
+  const memberId = req.query.memberId
+
   const resources = [{
     id: '22ba038e-48da-487b-96e8-8d3b99b6d181',
     challengeId,
@@ -82,8 +84,16 @@ app.get('/v5/resources', (req, res) => {
     roleId: '732339e7-8e30-49d7-9198-cccf9451e221'
   }]
 
+  let ret
+  if (memberId) {
+    // filter with memberId
+    ret = _.filter(resources, r => r.memberId === memberId)
+  } else {
+    ret = resources
+  }
+
   winston.info(`Challenge resources: ${JSON.stringify(resources, null, 4)}`)
-  res.json(resources)
+  res.json(ret)
 })
 
 // get challenges member can access to

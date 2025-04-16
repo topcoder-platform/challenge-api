@@ -9,6 +9,10 @@ const helper = require("../common/helper");
 const s3ParseUrl = require("../common/s3ParseUrl");
 const logger = require("../common/logger");
 const constants = require("../../app-constants");
+const {
+  enrichChallengeForResponse
+} = require("../common/challenge-helper");
+const prismaHelper = require('../common/prisma-helper');
 
 const bucketWhitelist = config.AMAZON.BUCKET_WHITELIST.split(",").map((bucketName) =>
   bucketName.trim()
@@ -43,8 +47,11 @@ async function _getChallengeAttachment(challengeId, attachmentId) {
   const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } })
   const attachment = await prisma.attachment.findUnique({ where: { id: attachmentId } })
   if (!challenge || !challenge.id || !attachment || attachment.challengeId !== challengeId) {
-    throw errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
+    throw new errors.NotFoundError(`Attachment ${attachmentId} not found in challenge ${challengeId}`)
   }
+  // convert challenge data
+  enrichChallengeForResponse(challenge)
+  prismaHelper.convertModelToResponse(challenge)
   return { challenge, attachment };
 }
 

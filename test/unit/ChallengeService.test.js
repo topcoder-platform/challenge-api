@@ -373,7 +373,11 @@ describe('challenge service unit tests', () => {
         page: 1,
         perPage: 10,
         id: id,
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> bf8ac4b (fix Attachment tests)
         typeId: testChallengeData.typeId,
         name: testChallengeData.name.substring(2).trim(),
         description: testChallengeData.description,

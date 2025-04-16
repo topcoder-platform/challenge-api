@@ -12,6 +12,7 @@ let phase
 let phase2
 let timelineTemplate
 let challenge
+let taskChallenge
 
 /**
  * function to deeply compare arrays  regardeless of the order
@@ -30,6 +31,7 @@ const phase1Id = uuid()
 const phase2Id = uuid()
 const timelineTemplateId = uuid()
 const challengeId = uuid()
+const taskChallengeId = uuid()
 
 /**
  * Create test data
@@ -129,6 +131,27 @@ async function createData () {
     updatedBy: 'admin'
   }
   challenge = await prisma.challenge.create({ data: challengeData })
+
+  taskChallenge = await prisma.challenge.create({ data: {
+    id: taskChallengeId,
+    taskIsTask: true,
+    taskIsAssigned: true,
+    name: 'Task',
+    description: 'desc',
+    privateDescription: 'private description',
+    descriptionFormat: 'html',
+    timelineTemplate: { connect: { id: timelineTemplate.id } },
+    type: { connect: { id: challengeTypeId } },
+    track: { connect: { id: challengeTrackId } },
+    tags: ['tag1'],
+    projectId: 111,
+    legacyId: 222,
+    startDate: new Date(),
+    status: constants.challengeStatuses.Completed.toUpperCase(),
+    createdAt: new Date(),
+    createdBy: 'admin',
+    updatedBy: 'admin'
+  }})
 }
 
 const defaultProjectTerms = [
@@ -163,7 +186,7 @@ const additionalTerm = {
  */
 async function clearData () {
   await prisma.challenge.deleteMany({
-    where: { id: { in: [challengeId] } }
+    where: { id: { in: [challengeId, taskChallengeId] } }
   })
   await prisma.timelineTemplate.deleteMany({ where: { id: timelineTemplateId } })
   await prisma.phase.deleteMany({ where: { id: { in: [phase1Id, phase2Id] } } })
@@ -182,6 +205,7 @@ function getData () {
     phase2,
     timelineTemplate,
     challenge,
+    taskChallenge,
     defaultProjectTerms,
     additionalTerm,
     mockTerms
