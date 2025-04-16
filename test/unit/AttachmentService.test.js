@@ -8,14 +8,13 @@ const path = require('path')
 const uuid = require('uuid/v4')
 const chai = require('chai')
 const awsMock = require('aws-sdk-mock')
+const service = require('../../src/services/AttachmentService')
 const testHelper = require('../testHelper')
 const prisma = require('../../src/common/prisma').getClient()
 
 const should = chai.should()
 
 const attachmentContent = fs.readFileSync(path.join(__dirname, '../attachment.txt'))
-
-let service
 
 describe('attachment service unit tests', () => {
   // created attachment id
@@ -31,8 +30,6 @@ describe('attachment service unit tests', () => {
     awsMock.mock('S3', 'getObject', (params, callback) => {
       callback(null, { Body: Buffer.from(attachmentContent) });
     });
-    // import service after setting up S3 mock
-    service = require('../../src/services/AttachmentService')
     await testHelper.createData()
     data = testHelper.getData()
     // create attachment
