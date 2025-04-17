@@ -392,15 +392,16 @@ class ChallengeHelper {
     if (type) {
       challenge.type = type.name;
     }
-
-    challenge.metadata = challenge.metadata.map((m) => {
-      try {
-        m.value = JSON.stringify(JSON.parse(m.value)); // when we update how we index data, make this a JSON field
-      } catch (err) {
-        // do nothing
-      }
-      return m;
-    });
+    if (challenge.metadata) {
+      challenge.metadata = challenge.metadata.map((m) => {
+        try {
+          m.value = JSON.stringify(JSON.parse(m.value)); // when we update how we index data, make this a JSON field
+        } catch (err) {
+          // do nothing
+        }
+        return m;
+      });
+    }
   }
 
   static convertDateToISOString(startDate) {

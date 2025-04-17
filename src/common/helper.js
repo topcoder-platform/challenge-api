@@ -29,7 +29,16 @@ AWS.config.update({
   // secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
   region: config.AMAZON.AWS_REGION,
 });
-const s3 = new AWS.S3();
+
+let s3
+
+// lazy initialization of S3 instance
+function getS3() {
+  if (!s3) {
+    s3 = new AWS.S3();
+  }
+  return s3
+}
 
 /**
  * Wrap async function to standard express function
@@ -194,7 +203,7 @@ async function downloadFromFileStack(url) {
  * @return {Promise} promise resolved to downloaded data
  */
 async function downloadFromS3(bucket, key) {
-  const file = await s3.getObject({ Bucket: bucket, Key: key }).promise();
+  const file = await getS3().getObject({ Bucket: bucket, Key: key }).promise();
   return {
     data: file.Body,
     mimetype: file.ContentType,
@@ -208,7 +217,7 @@ async function downloadFromS3(bucket, key) {
  * @return {Promise} promise resolved to deleted data
  */
 async function deleteFromS3(bucket, key) {
-  return s3.deleteObject({ Bucket: bucket, Key: key }).promise();
+  return getS3().deleteObject({ Bucket: bucket, Key: key }).promise();
 }
 
 /**

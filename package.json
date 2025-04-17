@@ -28,6 +28,7 @@
   "license": "MIT",
   "repository": "https://github.com/topcoder-platform/challenge-api",
   "devDependencies": {
+    "aws-sdk-mock": "^6.2.1",
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
     "mocha": "^11.1.0",
