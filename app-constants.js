@@ -9,6 +9,7 @@ const UserRoles = {
   Manager: "Connect Manager",
   User: "Topcoder User",
   SelfServiceCustomer: "Self-Service Customer",
+  ProjectManager: "Project Manager",
 };
 
 const prizeSetTypes = {

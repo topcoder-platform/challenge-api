@@ -22,7 +22,7 @@ const elasticsearch = require("elasticsearch");
 
 const projectHelper = require("./project-helper");
 const m2mHelper = require("./m2m-helper");
-const { hasAdminRole } = require("./role-helper");
+const { hasAdminRole, hasProjectManagerRole } = require("./role-helper");
 
 // Bus API Client
 let busApiClient;
@@ -960,7 +960,7 @@ async function _ensureAccessibleForTaskChallenge(currentUser, challenge) {
     }
     const canAccesChallenge = _.isUndefined(currentUser)
       ? false
-      : currentUser.isMachine || hasAdminRole(currentUser) || !_.isEmpty(memberResources);
+      : currentUser.isMachine || hasAdminRole(currentUser) || hasProjectManagerRole(currentUser) || !_.isEmpty(memberResources);
     if (!canAccesChallenge) {
       throw new errors.ForbiddenError(`You don't have access to view this challenge`);
     }
