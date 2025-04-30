@@ -16,7 +16,7 @@ function hasAdminRole(authUser) {
 }
 
 /**
- * Check if the user has admin role
+ * Check if the user has project manager role
  * @param {Object} authUser the user
  */
 function hasProjectManagerRole(authUser) {
