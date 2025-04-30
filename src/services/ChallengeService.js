@@ -601,7 +601,7 @@ async function searchChallenges(currentUser, criteria) {
    * For admins/m2m:
    * - All tasks will be returned
    */
-  if (currentUser && (_hasAdminRole || _.get(currentUser, "isMachine", false))) {
+  if (currentUser && (_hasAdminRole || _hasProjectManagerRole || _.get(currentUser, "isMachine", false))) {
     // For admins/m2m, allow filtering based on task properties
     if (criteria.isTask) {
       boolQuery.push({ match_phrase: { "task.isTask": criteria.isTask } });
