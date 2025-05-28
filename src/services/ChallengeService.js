@@ -35,7 +35,7 @@ const PhaseAdvancer = require("../phase-management/PhaseAdvancer");
 const { ChallengeDomain } = require("@topcoder-framework/domain-challenge");
 const { QueryDomain } = require("@topcoder-framework/domain-acl");
 
-const { hasAdminRole } = require("../common/role-helper");
+const { hasAdminRole, hasProjectManagerRole } = require("../common/role-helper");
 const {
   enrichChallengeForResponse,
   sanitizeRepeatedFieldsInUpdateRequest,
@@ -152,6 +152,7 @@ async function searchChallenges(currentUser, criteria) {
   ];
 
   const _hasAdminRole = hasAdminRole(currentUser);
+  const _hasProjectManagerRole = hasProjectManagerRole(currentUser);
 
   const includedTrackIds = _.isArray(criteria.trackIds) ? criteria.trackIds : [];
   const includedTypeIds = _.isArray(criteria.typeIds) ? criteria.typeIds : [];
@@ -588,7 +589,7 @@ async function searchChallenges(currentUser, criteria) {
   // FIXME: Tech Debt
   let excludeTasks = true;
   // if you're an admin or m2m, security rules wont be applied
-  if (currentUser && (_hasAdminRole || _.get(currentUser, "isMachine", false))) {
+  if (currentUser && (_hasAdminRole || _hasProjectManagerRole || _.get(currentUser, "isMachine", false))) {
     excludeTasks = false;
   }
 
