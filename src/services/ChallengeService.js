@@ -858,190 +858,194 @@ searchChallenges.schema = {
  * @returns {Object} the created challenge
  */
 async function createChallenge(currentUser, challenge, userToken) {
-  await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
-  let prizeTypeTmp = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+  var ret
+  try { 
+    await challengeHelper.validateCreateChallengeRequest(currentUser, challenge);
+    let prizeTypeTmp = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
 
-  console.log("TYPE", prizeTypeTmp);
-  if (challenge.legacy.selfService) {
-    // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
-    if (!challenge.projectId && challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
-      const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`;
-      challenge.projectId = await helper.createSelfServiceProject(
-        selfServiceProjectName,
-        "N/A",
-        config.NEW_SELF_SERVICE_PROJECT_TYPE,
-        userToken
-      );
-    }
+    console.log("TYPE", prizeTypeTmp);
+    if (challenge.legacy.selfService) {
+      // if self-service, create a new project (what about if projectId is provided in the payload? confirm with business!)
+      if (!challenge.projectId && challengeHelper.isProjectIdRequired(challenge.timelineTemplateId)) {
+        const selfServiceProjectName = `Self service - ${currentUser.handle} - ${challenge.name}`;
+        challenge.projectId = await helper.createSelfServiceProject(
+          selfServiceProjectName,
+          "N/A",
+          config.NEW_SELF_SERVICE_PROJECT_TYPE,
+          userToken
+        );
+      }
 
-    if (challenge.metadata && challenge.metadata.length > 0) {
-      for (const entry of challenge.metadata) {
-        if (challenge.description.includes(`{{${entry.name}}}`)) {
-          challenge.description = challenge.description
-            .split(`{{${entry.name}}}`)
-            .join(entry.value);
+      if (challenge.metadata && challenge.metadata.length > 0) {
+        for (const entry of challenge.metadata) {
+          if (challenge.description.includes(`{{${entry.name}}}`)) {
+            challenge.description = challenge.description
+              .split(`{{${entry.name}}}`)
+              .join(entry.value);
+          }
         }
       }
     }
-  }
 
-  /** Ensure project exists, and set direct project id, billing account id & markup */
-  if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId) || challenge.projectId) {
-    const { projectId } = challenge;
+    /** Ensure project exists, and set direct project id, billing account id & markup */
+    if (challengeHelper.isProjectIdRequired(challenge.timelineTemplateId) || challenge.projectId) {
+      const { projectId } = challenge;
 
-    const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
-    const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
-      projectId
+      const { directProjectId } = await projectHelper.getProject(projectId, currentUser);
+      const { billingAccountId, markup } = await projectHelper.getProjectBillingInformation(
+        projectId
+      );
+
+      _.set(challenge, "legacy.directProjectId", directProjectId);
+      _.set(challenge, "billing.billingAccountId", billingAccountId);
+      _.set(challenge, "billing.markup", markup || 0);
+    }
+
+    if (!_.isUndefined(_.get(challenge, "legacy.reviewType"))) {
+      _.set(challenge, "legacy.reviewType", _.toUpper(_.get(challenge, "legacy.reviewType")));
+    }
+
+    if (!challenge.status) {
+      challenge.status = constants.challengeStatuses.New;
+    }
+
+    if (!challenge.startDate) {
+      challenge.startDate = new Date().toISOString();
+    } else {
+      challenge.startDate = convertToISOString(challenge.startDate);
+    }
+
+    const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
+
+    if (_.get(type, "isTask")) {
+      _.set(challenge, "task.isTask", true);
+      // this is only applicable for WorkType: Gig, i.e., Tasks created from Salesforce
+      if (challenge.billing != null && challenge.billing.clientBillingRate != null) {
+        _.set(challenge, "billing.clientBillingRate", challenge.billing.clientBillingRate);
+      }
+
+      if (_.isUndefined(_.get(challenge, "task.isAssigned"))) {
+        _.set(challenge, "task.isAssigned", false);
+      }
+      if (_.isUndefined(_.get(challenge, "task.memberId"))) {
+        _.set(challenge, "task.memberId", null);
+      } else {
+        throw new errors.BadRequestError(`Cannot assign a member before the challenge gets created.`);
+      }
+    }
+
+    if (challenge.phases && challenge.phases.length > 0) {
+      await phaseHelper.validatePhases(challenge.phases);
+    }
+
+    // populate phases
+    if (!challenge.timelineTemplateId) {
+      if (challenge.typeId && challenge.trackId) {
+        const supportedTemplates =
+          await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
+            typeId: challenge.typeId,
+            trackId: challenge.trackId,
+            isDefault: true,
+          });
+        const challengeTimelineTemplate = supportedTemplates.result[0];
+        if (!challengeTimelineTemplate) {
+          throw new errors.BadRequestError(
+            `The selected trackId ${challenge.trackId} and typeId: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`
+          );
+        }
+        challenge.timelineTemplateId = challengeTimelineTemplate.timelineTemplateId;
+      } else {
+        throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`);
+      }
+    }
+    challenge.phases = await phaseHelper.populatePhasesForChallengeCreation(
+      challenge.phases,
+      challenge.startDate,
+      challenge.timelineTemplateId
     );
 
-    _.set(challenge, "legacy.directProjectId", directProjectId);
-    _.set(challenge, "billing.billingAccountId", billingAccountId);
-    _.set(challenge, "billing.markup", markup || 0);
-  }
+    // populate challenge terms
+    // const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
+    // challenge.terms = await helper.validateChallengeTerms(_.union(projectTerms, challenge.terms))
+    // TODO - challenge terms returned from projects api don't have a role associated
+    // this will need to be updated to associate project terms with a roleId
+    challenge.terms = await helper.validateChallengeTerms(challenge.terms || []);
 
-  if (!_.isUndefined(_.get(challenge, "legacy.reviewType"))) {
-    _.set(challenge, "legacy.reviewType", _.toUpper(_.get(challenge, "legacy.reviewType")));
-  }
-
-  if (!challenge.status) {
-    challenge.status = constants.challengeStatuses.New;
-  }
-
-  if (!challenge.startDate) {
-    challenge.startDate = new Date().toISOString();
-  } else {
-    challenge.startDate = convertToISOString(challenge.startDate);
-  }
-
-  const { track, type } = await challengeHelper.validateAndGetChallengeTypeAndTrack(challenge);
-
-  if (_.get(type, "isTask")) {
-    _.set(challenge, "task.isTask", true);
-    // this is only applicable for WorkType: Gig, i.e., Tasks created from Salesforce
-    if (challenge.billing != null && challenge.billing.clientBillingRate != null) {
-      _.set(challenge, "billing.clientBillingRate", challenge.billing.clientBillingRate);
+    // default the descriptionFormat
+    if (!challenge.descriptionFormat) {
+      challenge.descriptionFormat = "markdown";
     }
 
-    if (_.isUndefined(_.get(challenge, "task.isAssigned"))) {
-      _.set(challenge, "task.isAssigned", false);
+    if (challenge.phases && challenge.phases.length > 0) {
+      challenge.endDate = helper.calculateChallengeEndDate(challenge);
     }
-    if (_.isUndefined(_.get(challenge, "task.memberId"))) {
-      _.set(challenge, "task.memberId", null);
-    } else {
-      throw new errors.BadRequestError(`Cannot assign a member before the challenge gets created.`);
+
+    if (challenge.events == null) challenge.events = [];
+    if (challenge.attachments == null) challenge.attachments = [];
+    if (challenge.prizeSets == null) challenge.prizeSets = [];
+    if (challenge.metadata == null) challenge.metadata = [];
+    if (challenge.groups == null) challenge.groups = [];
+    if (challenge.tags == null) challenge.tags = [];
+    if (challenge.startDate != null) challenge.startDate = challenge.startDate;
+    if (challenge.endDate != null) challenge.endDate = challenge.endDate;
+    if (challenge.discussions == null) challenge.discussions = [];
+    if (challenge.skills == null) challenge.skills = [];
+
+    challenge.metadata = challenge.metadata.map((m) => ({
+      name: m.name,
+      value: typeof m.value === "string" ? m.value : JSON.stringify(m.value),
+    }));
+
+    const grpcMetadata = new GrpcMetadata();
+
+    grpcMetadata.set("handle", currentUser.handle);
+    grpcMetadata.set("userId", currentUser.userId);
+    grpcMetadata.set("token", await getM2MToken());
+
+    const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
+
+    if (prizeType === constants.prizeTypes.USD) {
+      convertPrizeSetValuesToCents(challenge.prizeSets);
     }
-  }
 
-  if (challenge.phases && challenge.phases.length > 0) {
-    await phaseHelper.validatePhases(challenge.phases);
-  }
+    ret = await challengeDomain.create(challenge, grpcMetadata);
 
-  // populate phases
-  if (!challenge.timelineTemplateId) {
-    if (challenge.typeId && challenge.trackId) {
-      const supportedTemplates =
-        await ChallengeTimelineTemplateService.searchChallengeTimelineTemplates({
-          typeId: challenge.typeId,
-          trackId: challenge.trackId,
-          isDefault: true,
-        });
-      const challengeTimelineTemplate = supportedTemplates.result[0];
-      if (!challengeTimelineTemplate) {
-        throw new errors.BadRequestError(
-          `The selected trackId ${challenge.trackId} and typeId: ${challenge.typeId} does not have a default timeline template. Please provide a timelineTemplateId`
-        );
+    if (prizeType === constants.prizeTypes.USD) {
+      convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
+    }
+
+    ret.numOfSubmissions = 0;
+    ret.numOfRegistrants = 0;
+
+    enrichChallengeForResponse(ret, track, type);
+
+    // Create in ES
+    await esClient.create({
+      index: config.get("ES.ES_INDEX"),
+      type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
+      refresh: config.get("ES.ES_REFRESH"),
+      id: ret.id,
+      body: ret,
+    });
+
+    // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
+    // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
+
+    if (challenge.legacy.selfService) {
+      if (currentUser.handle) {
+        await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
       }
-      challenge.timelineTemplateId = challengeTimelineTemplate.timelineTemplateId;
     } else {
-      throw new errors.BadRequestError(`trackId and typeId are required to create a challenge`);
+      if (currentUser.handle) {
+        await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
+      }
     }
+
+    // post bus event
+    await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
+  } catch (ex){
+      logger.logFullError(err);
   }
-  challenge.phases = await phaseHelper.populatePhasesForChallengeCreation(
-    challenge.phases,
-    challenge.startDate,
-    challenge.timelineTemplateId
-  );
-
-  // populate challenge terms
-  // const projectTerms = await helper.getProjectDefaultTerms(challenge.projectId)
-  // challenge.terms = await helper.validateChallengeTerms(_.union(projectTerms, challenge.terms))
-  // TODO - challenge terms returned from projects api don't have a role associated
-  // this will need to be updated to associate project terms with a roleId
-  challenge.terms = await helper.validateChallengeTerms(challenge.terms || []);
-
-  // default the descriptionFormat
-  if (!challenge.descriptionFormat) {
-    challenge.descriptionFormat = "markdown";
-  }
-
-  if (challenge.phases && challenge.phases.length > 0) {
-    challenge.endDate = helper.calculateChallengeEndDate(challenge);
-  }
-
-  if (challenge.events == null) challenge.events = [];
-  if (challenge.attachments == null) challenge.attachments = [];
-  if (challenge.prizeSets == null) challenge.prizeSets = [];
-  if (challenge.metadata == null) challenge.metadata = [];
-  if (challenge.groups == null) challenge.groups = [];
-  if (challenge.tags == null) challenge.tags = [];
-  if (challenge.startDate != null) challenge.startDate = challenge.startDate;
-  if (challenge.endDate != null) challenge.endDate = challenge.endDate;
-  if (challenge.discussions == null) challenge.discussions = [];
-  if (challenge.skills == null) challenge.skills = [];
-
-  challenge.metadata = challenge.metadata.map((m) => ({
-    name: m.name,
-    value: typeof m.value === "string" ? m.value : JSON.stringify(m.value),
-  }));
-
-  const grpcMetadata = new GrpcMetadata();
-
-  grpcMetadata.set("handle", currentUser.handle);
-  grpcMetadata.set("userId", currentUser.userId);
-  grpcMetadata.set("token", await getM2MToken());
-
-  const prizeType = challengeHelper.validatePrizeSetsAndGetPrizeType(challenge.prizeSets);
-
-  if (prizeType === constants.prizeTypes.USD) {
-    convertPrizeSetValuesToCents(challenge.prizeSets);
-  }
-
-  const ret = await challengeDomain.create(challenge, grpcMetadata);
-
-  if (prizeType === constants.prizeTypes.USD) {
-    convertPrizeSetValuesToDollars(ret.prizeSets, ret.overview);
-  }
-
-  ret.numOfSubmissions = 0;
-  ret.numOfRegistrants = 0;
-
-  enrichChallengeForResponse(ret, track, type);
-
-  // Create in ES
-  await esClient.create({
-    index: config.get("ES.ES_INDEX"),
-    type: config.get("ES.OPENSEARCH") == "false" ? config.get("ES.ES_TYPE") : undefined,
-    refresh: config.get("ES.ES_REFRESH"),
-    id: ret.id,
-    body: ret,
-  });
-
-  // If the challenge is self-service, add the creating user as the "client manager", *not* the manager
-  // This is necessary for proper handling of the vanilla embed on the self-service work item dashboard
-
-  if (challenge.legacy.selfService) {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.CLIENT_MANAGER_ROLE_ID);
-    }
-  } else {
-    if (currentUser.handle) {
-      await helper.createResource(ret.id, ret.createdBy, config.MANAGER_ROLE_ID);
-    }
-  }
-
-  // post bus event
-  await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
-
   return ret;
 }
 createChallenge.schema = {
