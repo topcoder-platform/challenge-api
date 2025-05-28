@@ -1045,6 +1045,7 @@ async function createChallenge(currentUser, challenge, userToken) {
     // post bus event
     await helper.postBusEvent(constants.Topics.ChallengeCreated, ret);
   } catch (err){
+      console.error(err);
       logger.logFullError(err);
   }
   return ret;
